@@ -1,0 +1,66 @@
+Renderer.1 {
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texture = "themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturedisabled = None;
+    texturedown = "themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturefocused = "themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturehover = "themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+}
+
+Slider.Slider {
+    ChangeValueOnScroll = true;
+    InvertedDirection = false;
+    Maximum = 30;
+    Minimum = 0;
+    Position = (20, 20);
+    Size = (200, 16);
+    Step = 1;
+    Value = 0;
+
+    Renderer {
+        texturethumb = "themes/Black.png" Part(243, 150, 30, 30);
+        texturethumbhover = None;
+        texturetrack = "themes/Black.png" Part(203, 150, 20, 45) Middle(0, 15, 20, 15);
+        texturetrackhover = "themes/Black.png" Part(223, 150, 20, 45) Middle(0, 15, 20, 15);
+    }
+}
+
+Label.Nb {
+    AutoSize = true;
+    Position = (230, 20);
+    ScrollbarPolicy = Never;
+    Size = (11.2, 18);
+    Text = 1;
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        texturebackground = None;
+
+        scrollbar {
+            texturearrowdown = "themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowdownhover = "themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowup = "themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturearrowuphover = "themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturethumb = "themes/Black.png" Part(143, 154, 20, 20);
+            texturethumbhover = "themes/Black.png" Part(143, 174, 20, 20);
+            texturetrack = "themes/Black.png" Part(123, 154, 20, 20);
+            texturetrackhover = "themes/Black.png" Part(123, 174, 20, 20);
+        }
+    }
+}
+
+Button.Ok {
+    Position = (210, 50);
+    Text = Ok;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Button.Cancel {
+    Position = (140, 50);
+    Text = Cancel;
+    TextSize = 13;
+    renderer = &1;
+}

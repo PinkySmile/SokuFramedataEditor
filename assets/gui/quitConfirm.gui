@@ -1,0 +1,58 @@
+Renderer.1 {
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturedisabled = None;
+    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+}
+
+Button.Yes {
+    Position = (20, 50);
+    Size = (60, 22);
+    Text = Yes;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Button.No {
+    Position = (100, 50);
+    Size = (60, 22);
+    Text = No;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Button.Cancel {
+    Position = (180, 50);
+    Size = (60, 22);
+    Text = Cancel;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Label.Label1 {
+    AutoSize = true;
+    Position = (30, 20);
+    ScrollbarPolicy = Never;
+    Size = (206.2, 18);
+    Text = "Do you want to save changes ?";
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        texturebackground = None;
+
+        scrollbar {
+            texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+            texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+            texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+            texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+        }
+    }
+}
