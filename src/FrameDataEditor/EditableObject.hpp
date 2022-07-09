@@ -22,7 +22,7 @@ public:
 	unsigned _animationCtr = 0;
 
 	EditableObject() = default;
-	EditableObject(const std::string &frameData);
+	EditableObject(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
 	~EditableObject() override = default;
 	void render() const override;
 	void update() override;

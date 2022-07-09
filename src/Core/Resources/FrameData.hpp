@@ -14,6 +14,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include "../Data/Vector.hpp"
 #include "../Data/Color.hpp"
+#include <resource.hpp>
 
 namespace SpiralOfFate
 {
@@ -87,75 +88,29 @@ namespace SpiralOfFate
 		};
 	};
 
-	class FrameData {
+	class FrameData : public ShadyCore::Schema::Sequence::MoveFrame {
 	private:
-		std::pair<std::vector<Color>, std::vector<Color>> _palette;
 		bool _slave = false;
+		std::string _pal;
+		std::string _character;
+		const ShadyCore::Palette &_palette;
 
 	public:
-		std::string spritePath;
-		std::string soundPath;
-		std::string hitSoundPath;
+		const ShadyCore::Schema &_schema;
 		unsigned textureHandle = 0;
-		unsigned soundHandle = 0;
 		unsigned hitSoundHandle = 0;
-		Vector2i offset = {0, 0};
-		Vector2u size = {0, 0};
-		Box textureBounds = {{0, 0}, {0, 0}};
-		float rotation = 0;
-		std::vector<Box> hurtBoxes;
-		std::vector<Box> hitBoxes;
-		unsigned duration = 1;
-		unsigned specialMarker = 0;
-		DefensiveFlags dFlag = {0};
-		OffensiveFlags oFlag = {0};
-		Box *collisionBox = nullptr;
-		unsigned blockStun = 0;
-		unsigned hitStun = 0;
-		float prorate = 0;
-		unsigned neutralLimit = 0;
-		unsigned voidLimit = 0;
-		unsigned spiritLimit = 0;
-		unsigned matterLimit = 0;
-		int pushBack = 0;
-		int pushBlock = 0;
-		int subObjectSpawn = 0;
-		unsigned manaGain = 0;
-		unsigned manaCost = 0;
-		unsigned hitStop = 0;
-		unsigned damage = 0;
-		unsigned chipDamage = 0;
-		std::optional<unsigned> priority;
-		Vector2i speed = {0, 0};
-		Vector2i hitSpeed = {0, 0};
-		Vector2i counterHitSpeed = {0, 0};
-		std::optional<Vector2f> gravity;
 
-		FrameData() = default;
-		~FrameData();
+		FrameData(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
 		FrameData(const FrameData &other);
-		FrameData(const nlohmann::json &json, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
+		~FrameData();
+		FrameData(const std::string &chr, const ShadyCore::Schema &schema, ShadyCore::Schema::Sequence::MoveFrame &frame, const ShadyCore::Palette &palette, const std::string &palName);
 		FrameData &operator=(const FrameData &other);
+		void setSlave(bool slave = true);
 		void reloadTexture();
 		void reloadSound();
-		void setSlave(bool slave = true);
-		nlohmann::json toJson() const;
-		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadFile(const std::string &path, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
-		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadFileJson(const nlohmann::json &path, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
+
+		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadSchema(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
 	};
-
-	inline void to_json(nlohmann::json &j, const FrameData &data) {
-		j = data.toJson();
-	}
-
-	inline void to_json(nlohmann::json &j, const Box &box) {
-		j = {
-			{"left", box.pos.x},
-			{"top", box.pos.y},
-			{"width", box.size.x},
-			{"height", box.size.y},
-		};
-	}
 }
 
 

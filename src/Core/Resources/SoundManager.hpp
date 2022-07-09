@@ -12,6 +12,7 @@
 #include "Sprite.hpp"
 #include "../Data/Vector.hpp"
 #include "../Data/Color.hpp"
+#include <package.hpp>
 
 namespace SpiralOfFate
 {
@@ -22,11 +23,12 @@ namespace SpiralOfFate
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
 		std::map<unsigned, sf::SoundBuffer> _sounds;
+		std::map<std::string, ShadyCore::Sfx> _loadedSounds;
 		std::map<std::string, std::pair<unsigned, unsigned>> _allocatedSounds;
 
 	public:
 		~SoundManager();
-		unsigned load(std::string file);
+		unsigned load(ShadyCore::PackageEx &package, const std::string &file);
 		void addRef(unsigned id);
 		void remove(unsigned id);
 		void play(unsigned id) const;

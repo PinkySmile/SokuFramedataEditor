@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(SoFGV CXX)
+project(SokuFDEditor CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -7,7 +7,7 @@ add_compile_definitions(_USE_MATH_DEFINES=1)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/pkgs)
 find_package(SFML REQUIRED)
 find_package(TGUI REQUIRED)
-include_directories(include ${SFML_INCLUDE_DIRS} ${TGUI_INCLUDE_DIRS} ${clip_INCLUDE_DIRS} src/Core)
+include_directories(include ${SFML_INCLUDE_DIRS} ${TGUI_INCLUDE_DIRS} ${clip_INCLUDE_DIRS} src/Core shady-packer/src/Core SokuLib/src)
 
 add_subdirectory(shady-packer)
 
@@ -92,6 +92,7 @@ if (WIN32)
 		${SFML_WINDOW_LIB}
 		${SFML_NETWORK_LIB}
 		${TGUI_LIB}
+		shady-core
 		ws2_32
 	)
 else ()
@@ -103,6 +104,7 @@ else ()
 		${SFML_WINDOW_LIB}
 		${SFML_NETWORK_LIB}
 		${TGUI_LIB}
+		shady-core
 		pthread
 		png
 		xcb
@@ -116,4 +118,4 @@ add_executable(
 	src/FrameDataEditor/EditableObject.cpp
 	src/FrameDataEditor/EditableObject.hpp
 	src/Core/SoFGV.hpp)
-target_link_libraries(FrameDataEditor SoFGVCore shady-core)
+target_link_libraries(FrameDataEditor SoFGVCore)

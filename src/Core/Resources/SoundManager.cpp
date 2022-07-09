@@ -8,10 +8,8 @@
 
 namespace SpiralOfFate
 {
-	unsigned SoundManager::load(std::string file)
+	unsigned SoundManager::load(ShadyCore::PackageEx &package, const std::string &file)
 	{
-		for (auto pos = file.find('\\'); pos != std::string::npos; pos = file.find('\\'))
-			file[pos] = '/';
 		if (this->_allocatedSounds[file].second != 0) {
 			this->_allocatedSounds[file].second++;
 			game->logger.debug("Returning already loaded file " + file);
@@ -19,7 +17,20 @@ namespace SpiralOfFate
 		}
 
 		unsigned index;
+		auto entry = package.find(file, ShadyCore::FileType::TYPE_SFX);
 
+		if (entry == package.end()) {
+			game->logger.error("Could not find sfx " + file);
+			return 0;
+		}
+
+		auto sfxEntry = this->_loadedSounds.find(file);
+		ShadyCore::Sfx &resourceSfx = this->_loadedSounds[file];
+
+		if (sfxEntry == this->_loadedSounds.end()) {
+			ShadyCore::getResourceReader(entry.fileType())(&resourceSfx, entry.open());
+			entry.close();
+		}
 		if (this->_freedIndexes.empty()) {
 			this->_lastIndex += this->_lastIndex == 0;
 			index = this->_lastIndex;
@@ -29,11 +40,12 @@ namespace SpiralOfFate
 			this->_freedIndexes.pop_back();
 		}
 
+		//TODO: Load sound from loaded file
 		game->logger.debug("Loading file " + file);
-		if (!this->_sounds[index].loadFromFile(file)) {
+		//if (!this->_sounds[index].loadFromSamples()) {
 			this->_freedIndexes.push_back(index);
 			return 0;
-		}
+		//}
 
 		this->_allocatedSounds[file].first = index;
 		this->_allocatedSounds[file].second = 1;

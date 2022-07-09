@@ -3,26 +3,254 @@
 #include <TGUI/TGUI.hpp>
 #include <SoFGV.hpp>
 #include "EditableObject.hpp"
+#include <package.hpp>
+#include <Action.hpp>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <dbghelp.h>
 #include <crtdbg.h>
 #endif
 
-namespace SokuLib {
-	enum Action {
-		ACTION_PLACEHOLDER
-	};
-}
+using namespace SpiralOfFate;
 
 std::map<SokuLib::Action, std::string> actionNames{
-
+	{ SokuLib::ACTION_IDLE,                              "Idle" },
+	{ SokuLib::ACTION_CROUCHING,                         "Crouching" },
+	{ SokuLib::ACTION_CROUCHED,                          "Crouched" },
+	{ SokuLib::ACTION_STANDING_UP,                       "Standing Up" },
+	{ SokuLib::ACTION_WALK_FORWARD,                      "Walk Forward" },
+	{ SokuLib::ACTION_WALK_BACKWARD,                     "Walk Backward" },
+	{ SokuLib::ACTION_NEUTRAL_JUMP,                      "Neutral Jump" },
+	{ SokuLib::ACTION_FORWARD_JUMP,                      "Forward Jump" },
+	{ SokuLib::ACTION_BACKWARD_JUMP,                     "Backward Jump" },
+	{ SokuLib::ACTION_FALLING,                           "Falling" },
+	{ SokuLib::ACTION_LANDING,                           "Landing" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_SMALL_HITSTUN,    "Stand Ground Hit Small Hitstun" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_MEDIUM_HITSTUN,   "Stand Ground Hit Medium Hitstun" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_BIG_HITSTUN,      "Stand Ground Hit Big Hitstun" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_HUGE_HITSTUN,     "Stand Ground Hit Huge Hitstun" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_SMALL_HITSTUN_2,  "Stand Ground Hit Small Hitstun 2" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_MEDIUM_HITSTUN_2, "Stand Ground Hit Medium Hitstun 2" },
+	{ SokuLib::ACTION_STAND_GROUND_HIT_BIG_HITSTUN_2,    "Stand Ground Hit Big Hitstun 2" },
+	{ SokuLib::ACTION_CROUCH_GROUND_HIT_SMALL_HITSTUN,   "Crouch Ground Hit Small Hitstun" },
+	{ SokuLib::ACTION_CROUCH_GROUND_HIT_MEDIUM_HITSTUN,  "Crouch Ground Hit Medium Hitstun" },
+	{ SokuLib::ACTION_CROUCH_GROUND_HIT_BIG_HITSTUN,     "Crouch Ground Hit Big Hitstun" },
+	{ SokuLib::ACTION_AIR_HIT_SMALL_HITSTUN,             "Air Hit Small Hitstun" },
+	{ SokuLib::ACTION_AIR_HIT_MEDIUM_HITSTUN,            "Air Hit Medium Hitstun" },
+	{ SokuLib::ACTION_AIR_HIT_BIG_HITSTUN,               "Air Hit Big Hitstun" },
+	{ SokuLib::ACTION_AIR_HIT_DIRECT_KNOCKDOWN,          "Air Hit Direct Knockdown" },
+	{ SokuLib::ACTION_AIR_HIT_CAN_WALL_SLAM,             "Air Hit Can Wall Slam" },
+	{ SokuLib::ACTION_AIR_HIT_BIG_HITSTUN4,              "Air Hit Big Hitstun4" },
+	{ SokuLib::ACTION_AIR_HIT_WALL_SLAMMED,              "Air Hit Wall Slammed" },
+	{ SokuLib::ACTION_AIR_HIT_HUGE_HITSTUN,              "Air Hit Huge Hitstun" },
+	{ SokuLib::ACTION_AIR_HIT_WALL_SLAMMED2,             "Air Hit Wall Slammed2" },
+	{ SokuLib::ACTION_AIR_HIT_WILL_GROUND_SLAM,          "Air Hit Will Ground_slam" },
+	{ SokuLib::ACTION_AIR_HIT_GROUND_SLAMMED,            "Air Hit Ground Slammed" },
+	{ SokuLib::ACTION_KNOCKED_DOWN,                      "Knocked Down" },
+	{ SokuLib::ACTION_KNOCKED_DOWN_STATIC,               "Knocked Down_static" },
+	{ SokuLib::ACTION_GRABBED,                           "Grabbed" },
+	{ SokuLib::ACTION_GROUND_CRUSHED,                    "Ground Crushed" },
+	{ SokuLib::ACTION_AIR_CRUSHED,                       "Air Crushed" },
+	{ SokuLib::ACTION_RIGHTBLOCK_HIGH_SMALL_BLOCKSTUN,   "Rightblock High Small Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_HIGH_MEDIUM_BLOCKSTUN,  "Rightblock High Medium Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_HIGH_BIG_BLOCKSTUN,     "Rightblock High Big Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_HIGH_HUGE_BLOCKSTUN,    "Rightblock High Huge Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_LOW_SMALL_BLOCKSTUN,    "Rightblock Low Small Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_LOW_MEDIUM_BLOCKSTUN,   "Rightblock Low Medium Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_LOW_BIG_BLOCKSTUN,      "Rightblock Low Big Blockstun" },
+	{ SokuLib::ACTION_RIGHTBLOCK_LOW_HUGE_BLOCKSTUN,     "Rightblock Low Huge Blockstun" },
+	{ SokuLib::ACTION_AIR_GUARD,                         "Air Guard" },
+	{ SokuLib::ACTION_WRONGBLOCK_HIGH_SMALL_BLOCKSTUN,   "Wrongblock High Small Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_HIGH_MEDIUM_BLOCKSTUN,  "Wrongblock High Medium Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_HIGH_BIG_BLOCKSTUN,     "Wrongblock High Big Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_HIGH_HUGE_BLOCKSTUN,    "Wrongblock High Huge Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_LOW_SMALL_BLOCKSTUN,    "Wrongblock Low Small Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_LOW_MEDIUM_BLOCKSTUN,   "Wrongblock Low Medium Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_LOW_BIG_BLOCKSTUN,      "Wrongblock Low Big Blockstun" },
+	{ SokuLib::ACTION_WRONGBLOCK_LOW_HUGE_BLOCKSTUN,     "Wrongblock Low Huge Blockstun" },
+	{ SokuLib::ACTION_FORWARD_AIRTECH,                   "Forward Airtech" },
+	{ SokuLib::ACTION_BACKWARD_AIRTECH,                  "Backward Airtech" },
+	{ SokuLib::ACTION_FORWARD_TECH,                      "Forward Tech" },
+	{ SokuLib::ACTION_BACKWARD_TECH,                     "Backward Tech" },
+	{ SokuLib::ACTION_NEUTRAL_TECH,                      "Neutral Tech" },
+	{ SokuLib::ACTION_FORWARD_DASH,                      "Forward Dash" },
+	{ SokuLib::ACTION_BACKDASH,                          "Backdash" },
+	{ SokuLib::ACTION_FORWARD_AIRDASH,                   "Forward Airdash" },
+	{ SokuLib::ACTION_BACKWARD_AIRDASH,                  "Backward Airdash" },
+	{ SokuLib::ACTION_GROUNDDASH_RECOVERY,               "Grounddash Recovery" },
+	{ SokuLib::ACTION_LILYPAD_FORWARD_DASH,              "Lilypad Forward Dash" },
+	{ SokuLib::ACTION_LILYPAD_BACKDASH,                  "Lilypad Backdash" },
+	{ SokuLib::ACTION_NEUTRAL_HIGH_JUMP,                 "Neutral High Jump" },
+	{ SokuLib::ACTION_FORWARD_HIGH_JUMP,                 "Forward High Jump" },
+	{ SokuLib::ACTION_BACKWARD_HIGH_JUMP,                "Backward High Jump" },
+	{ SokuLib::ACTION_NEUTRAL_HIGH_JUMP_FROM_GROUND_DASH, "Neutral High Jump From Ground Dash" },
+	{ SokuLib::ACTION_FORWARD_HIGH_JUMP_FROM_GROUND_DASH, "Forward High Jump From Ground Dash" },
+	{ SokuLib::ACTION_FLY,                                "Fly" },
+	{ SokuLib::ACTION_HARDLAND,                           "Hardland" },
+	{ SokuLib::ACTION_SUWAKO_j2D,                         "Suwako j2d" },
+	{ SokuLib::ACTION_SUWAKO_j1D_j3D,                     "Suwako j1d/j3d" },
+	{ SokuLib::ACTION_BE2,                                "Be2" },
+	{ SokuLib::ACTION_BE1,                                "Be1" },
+	{ SokuLib::ACTION_BE6,                                "Be6" },
+	{ SokuLib::ACTION_BE4,                                "Be4" },
+	{ SokuLib::ACTION_jBE4,                               "Jbe4" },
+	{ SokuLib::ACTION_jBE6,                               "Jbe6" },
+	{ SokuLib::ACTION_5A,                                 "5a" },
+	{ SokuLib::ACTION_f5A,                                "F5a" },
+	{ SokuLib::ACTION_6A,                                 "6a" },
+	{ SokuLib::ACTION_2A,                                 "2a" },
+	{ SokuLib::ACTION_3A,                                 "3a" },
+	{ SokuLib::ACTION_66A,                                "66a" },
+	{ SokuLib::ACTION_j5A,                                "J5a" },
+	{ SokuLib::ACTION_j6A,                                "J6a" },
+	{ SokuLib::ACTION_j2A,                                "J2a" },
+	{ SokuLib::ACTION_j8A,                                "J8a" },
+	{ SokuLib::ACTION_f2A,                                "F2a" },
+	{ SokuLib::ACTION_5AA,                                "5aa" },
+	{ SokuLib::ACTION_5AAA,                               "5aaa" },
+	{ SokuLib::ACTION_5AAAA,                              "5aaaa" },
+	{ SokuLib::ACTION_5AAAAA,                             "5aaaaa" },
+	{ SokuLib::ACTION_5AAA3A,                             "5aaa3a" },
+	{ SokuLib::ACTION_j5AA,                               "J5aa" },
+	{ SokuLib::ACTION_4A,                                 "4a" },
+	{ SokuLib::ACTION_SUWAKO_3A,                          "Suwako 3a" },
+	{ SokuLib::ACTION_SUWAKO_LILYPAD_6A,                  "Suwako Lilypad 6a" },
+	{ SokuLib::ACTION_5B,                                 "5b" },
+	{ SokuLib::ACTION_6B,                                 "6b" },
+	{ SokuLib::ACTION_2B,                                 "2b" },
+	{ SokuLib::ACTION_3B,                                 "3b" },
+	{ SokuLib::ACTION_j5B,                                "J5b" },
+	{ SokuLib::ACTION_j6B,                                "J6b" },
+	{ SokuLib::ACTION_j2B,                                "J2b" },
+	{ SokuLib::ACTION_4B,                                 "4b" },
+	{ SokuLib::ACTION_66B,                                "66b" },
+	{ SokuLib::ACTION_j4B,                                "J4b" },
+	{ SokuLib::ACTION_5C,                                 "5c" },
+	{ SokuLib::ACTION_6C,                                 "6c" },
+	{ SokuLib::ACTION_2C,                                 "2c" },
+	{ SokuLib::ACTION_4C,                                 "4c" },
+	{ SokuLib::ACTION_j5C,                                "J5c" },
+	{ SokuLib::ACTION_j6C,                                "J6c" },
+	{ SokuLib::ACTION_j2C,                                "J2c" },
+	{ SokuLib::ACTION_j1C,                                "J1c" },
+	{ SokuLib::ACTION_66C,                                "66c" },
+	{ SokuLib::ACTION_ALICE_4C,                           "Alice 4c" },
+	{ SokuLib::ACTION_ORRERIES_B,                         "Orreries B" },
+	{ SokuLib::ACTION_AIR_ORRERIES_B,                     "Air Orreries B" },
+	{ SokuLib::ACTION_ORRERIES_C,                         "Orreries C" },
+	{ SokuLib::ACTION_AIR_ORRERIES_C,                     "Air Orreries C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL1_B,                   "Default Skill1 B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL1_C,                   "Default Skill1 C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL1_AIR_B,               "Default Skill1 Air B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL1_AIR_C,               "Default Skill1 Air C" },
+	{ SokuLib::ACTION_ALT1_SKILL1_B,                      "Alt1 Skill1 B" },
+	{ SokuLib::ACTION_ALT1_SKILL1_C,                      "Alt1 Skill1 C" },
+	{ SokuLib::ACTION_ALT1_SKILL1_AIR_B,                  "Alt1 Skill1 Air B" },
+	{ SokuLib::ACTION_ALT1_SKILL1_AIR_C,                  "Alt1 Skill1 Air C" },
+	{ SokuLib::ACTION_ALT2_SKILL1_B,                      "Alt2 Skill1 B" },
+	{ SokuLib::ACTION_ALT2_SKILL1_C,                      "Alt2 Skill1 C" },
+	{ SokuLib::ACTION_ALT2_SKILL1_AIR_B,                  "Alt2 Skill1 Air B" },
+	{ SokuLib::ACTION_ALT2_SKILL1_AIR_C,                  "Alt2 Skill1 Air C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL2_B,                   "Default Skill2 B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL2_C,                   "Default Skill2 C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL2_AIR_B,               "Default Skill2 Air B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL2_AIR_C,               "Default Skill2 Air C" },
+	{ SokuLib::ACTION_ALT1_SKILL2_B,                      "Alt1 Skill2 B" },
+	{ SokuLib::ACTION_ALT1_SKILL2_C,                      "Alt1 Skill2 C" },
+	{ SokuLib::ACTION_ALT1_SKILL2_AIR_B,                  "Alt1 Skill2 Air B" },
+	{ SokuLib::ACTION_ALT1_SKILL2_AIR_C,                  "Alt1 Skill2 Air C" },
+	{ SokuLib::ACTION_ALT2_SKILL2_B,                      "Alt2 Skill2 B" },
+	{ SokuLib::ACTION_ALT2_SKILL2_C,                      "Alt2 Skill2 C" },
+	{ SokuLib::ACTION_ALT2_SKILL2_AIR_B,                  "Alt2 Skill2 Air B" },
+	{ SokuLib::ACTION_ALT2_SKILL2_AIR_C,                  "Alt2 Skill2 Air C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL3_B,                   "Default Skill3 B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL3_C,                   "Default Skill3 C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL3_AIR_B,               "Default Skill3 Air B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL3_AIR_C,               "Default Skill3 Air C" },
+	{ SokuLib::ACTION_ALT1_SKILL3_B,                      "Alt1 Skill3 B" },
+	{ SokuLib::ACTION_ALT1_SKILL3_C,                      "Alt1 Skill3 C" },
+	{ SokuLib::ACTION_ALT1_SKILL3_AIR_B,                  "Alt1 Skill3 Air B" },
+	{ SokuLib::ACTION_ALT1_SKILL3_AIR_C,                  "Alt1 Skill3 Air C" },
+	{ SokuLib::ACTION_ALT2_SKILL3_B,                      "Alt2 Skill3 B" },
+	{ SokuLib::ACTION_ALT2_SKILL3_C,                      "Alt2 Skill3 C" },
+	{ SokuLib::ACTION_ALT2_SKILL3_AIR_B,                  "Alt2 Skill3 Air B" },
+	{ SokuLib::ACTION_ALT2_SKILL3_AIR_C,                  "Alt2 Skill3 Air C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL4_B,                   "Default Skill4 B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL4_C,                   "Default Skill4 C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL4_AIR_B,               "Default Skill4 Air B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL4_AIR_C,               "Default Skill4 Air C" },
+	{ SokuLib::ACTION_ALT1_SKILL4_B,                      "Alt1 Skill4 B" },
+	{ SokuLib::ACTION_ALT1_SKILL4_C,                      "Alt1 Skill4 C" },
+	{ SokuLib::ACTION_ALT1_SKILL4_AIR_B,                  "Alt1 Skill4 Air B" },
+	{ SokuLib::ACTION_ALT1_SKILL4_AIR_C,                  "Alt1 Skill4 Air C" },
+	{ SokuLib::ACTION_ALT2_SKILL4_B,                      "Alt2 Skill4 B" },
+	{ SokuLib::ACTION_ALT2_SKILL4_C,                      "Alt2 Skill4 C" },
+	{ SokuLib::ACTION_ALT2_SKILL4_AIR_B,                  "Alt2 Skill4 Air B" },
+	{ SokuLib::ACTION_ALT2_SKILL4_AIR_C,                  "Alt2 Skill4 Air C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL5_B,                   "Default Skill5 B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL5_C,                   "Default Skill5 C" },
+	{ SokuLib::ACTION_DEFAULT_SKILL5_AIR_B,               "Default Skill5 Air B" },
+	{ SokuLib::ACTION_DEFAULT_SKILL5_AIR_C,               "Default Skill5 Air C" },
+	{ SokuLib::ACTION_ALT1_SKILL5_B,                      "Alt1 Skill5 B" },
+	{ SokuLib::ACTION_ALT1_SKILL5_C,                      "Alt1 Skill5 C" },
+	{ SokuLib::ACTION_ALT1_SKILL5_AIR_B,                  "Alt1 Skill5 Air B" },
+	{ SokuLib::ACTION_ALT1_SKILL5_AIR_C,                  "Alt1 Skill5 Air C" },
+	{ SokuLib::ACTION_ALT2_SKILL5_B,                      "Alt2 Skill5 B" },
+	{ SokuLib::ACTION_ALT2_SKILL5_C,                      "Alt2 Skill5 C" },
+	{ SokuLib::ACTION_ALT2_SKILL5_AIR_B,                  "Alt2 Skill5 Air B" },
+	{ SokuLib::ACTION_ALT2_SKILL5_AIR_C,                  "Alt2 Skill5 Air C" },
+	{ SokuLib::ACTION_USING_SC_ID_200,                    "Using SC Id 200" },
+	{ SokuLib::ACTION_USING_SC_ID_201,                    "Using SC Id 201" },
+	{ SokuLib::ACTION_USING_SC_ID_202,                    "Using SC Id 202" },
+	{ SokuLib::ACTION_USING_SC_ID_203,                    "Using SC Id 203" },
+	{ SokuLib::ACTION_USING_SC_ID_204,                    "Using SC Id 204" },
+	{ SokuLib::ACTION_USING_SC_ID_205,                    "Using SC Id 205" },
+	{ SokuLib::ACTION_USING_SC_ID_206,                    "Using SC Id 206" },
+	{ SokuLib::ACTION_USING_SC_ID_207,                    "Using SC Id 207" },
+	{ SokuLib::ACTION_USING_SC_ID_208,                    "Using SC Id 208" },
+	{ SokuLib::ACTION_USING_SC_ID_209,                    "Using SC Id 209" },
+	{ SokuLib::ACTION_USING_SC_ID_210,                    "Using SC Id 210" },
+	{ SokuLib::ACTION_USING_SC_ID_211,                    "Using SC Id 211" },
+	{ SokuLib::ACTION_USING_SC_ID_212,                    "Using SC Id 212" },
+	{ SokuLib::ACTION_USING_SC_ID_213,                    "Using SC Id 213" },
+	{ SokuLib::ACTION_USING_SC_ID_214,                    "Using SC Id 214" },
+	{ SokuLib::ACTION_USING_SC_ID_215,                    "Using SC Id 215" },
+	{ SokuLib::ACTION_USING_SC_ID_216,                    "Using SC Id 216" },
+	{ SokuLib::ACTION_USING_SC_ID_217,                    "Using SC Id 217" },
+	{ SokuLib::ACTION_USING_SC_ID_218,                    "Using SC Id 218" },
+	{ SokuLib::ACTION_USING_SC_ID_219,                    "Using SC Id 219" },
+	{ SokuLib::ACTION_SC_ID_200_ALT_EFFECT,               "SC Id 200 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_201_ALT_EFFECT,               "SC Id 201 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_202_ALT_EFFECT,               "SC Id 202 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_203_ALT_EFFECT,               "SC Id 203 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_204_ALT_EFFECT,               "SC Id 204 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_205_ALT_EFFECT,               "SC Id 205 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_206_ALT_EFFECT,               "SC Id 206 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_207_ALT_EFFECT,               "SC Id 207 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_208_ALT_EFFECT,               "SC Id 208 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_209_ALT_EFFECT,               "SC Id 209 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_210_ALT_EFFECT,               "SC Id 210 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_211_ALT_EFFECT,               "SC Id 211 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_212_ALT_EFFECT,               "SC Id 212 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_213_ALT_EFFECT,               "SC Id 213 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_214_ALT_EFFECT,               "SC Id 214 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_215_ALT_EFFECT,               "SC Id 215 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_216_ALT_EFFECT,               "SC Id 216 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_217_ALT_EFFECT,               "SC Id 217 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_218_ALT_EFFECT,               "SC Id 218 Alt Effect" },
+	{ SokuLib::ACTION_SC_ID_219_ALT_EFFECT,               "SC Id 219 Alt Effect" },
+	{ SokuLib::ACTION_SKILL_CARD,                         "Skill Card" },
+	{ SokuLib::ACTION_SYSTEM_CARD,                        "System Card" },
+	{ SokuLib::ACTION_IBUKI_GOURD,                        "Ibuki Gourd" },
+	{ SokuLib::ACTION_RECOVERY_CHARM,                     "Recovery Charm" },
+	{ SokuLib::ACTION_MAGIC_POTION,                       "Magic Potion" },
+	{ SokuLib::ACTION_TALISMAN,                           "Talisman" },
+	{ SokuLib::ACTION_BOMB,                               "Bomb" },
+	{ SokuLib::ACTION_HANGEKI,                            "Hangeki" },
+	{ SokuLib::ACTION_LEFT_HANDED_FOLDING_FAN,            "Left Handed Folding Fan" },
+	{ SokuLib::ACTION_SPELL_BREAKING_DRUG,                "Spell Breaking Drug" },
 };
-
-namespace ShadyCore {
-	void* Allocate(size_t s) { return malloc(s); }
-	void Deallocate(void* p) { free(p); }
-}
 
 auto c = std::make_shared<bool>(false);
 float updateTimer = 0;
@@ -39,18 +267,39 @@ bool spriteSelected = false;
 bool quitRequest = false;
 tgui::Color normalColor;
 tgui::Button::Ptr boxButton;
-SpiralOfFate::Vector2i mouseStart;
-SpiralOfFate::Vector2i lastMouse;
-SpiralOfFate::Box *selectedBox;
+Vector2i mouseStart;
+Vector2i lastMouse;
+ShadyCore::Schema::Sequence::BBox *selectedBox;
 std::array<tgui::Button::Ptr, 8> resizeButtons;
+
+struct {
+	ShadyCore::Schema *schema;
+	ShadyCore::Palette *palette;
+	std::string palName;
+	std::string chr;
+} editSession;
 
 void	arrangeButtons(EditableObject *object)
 {
 	auto *data = object ? &object->_moves.at(object->_action)[object->_actionBlock][object->_animation] : nullptr;
-	SpiralOfFate::Box box = spriteSelected ? SpiralOfFate::Box{{static_cast<int>(data->offset.x - data->size.x / 2), static_cast<int>(-data->offset.y - data->size.y)}, data->size} : *selectedBox;
+	Box box = spriteSelected ? Box{
+		{
+			static_cast<int>(data->offsetX - data->texWidth * (data->blendOptions.scaleX ? data->blendOptions.scaleX : 200) / 100.f / 2),
+			static_cast<int>(-data->offsetY - data->texHeight * (data->blendOptions.scaleY ? data->blendOptions.scaleY : 200) / 100.f)
+		}, {
+			static_cast<unsigned int>(data->texWidth * (data->blendOptions.scaleX ? data->blendOptions.scaleX : 200) / 100.f),
+			static_cast<unsigned int>(data->texHeight * (data->blendOptions.scaleY ? data->blendOptions.scaleY : 200) / 100.f)
+		}
+	} : Box{
+		{selectedBox->left, -selectedBox->up},
+		{
+			static_cast<unsigned int>(selectedBox->left - selectedBox->right),
+			static_cast<unsigned int>(selectedBox->up - selectedBox->down)
+		}
+	};
 
 	for (int i = 0; i < 8; i++) {
-		SpiralOfFate::Vector2i pos;
+		Vector2i pos;
 		auto resizeButton = resizeButtons[i];
 
 		if (i == 0 || i == 3 || i == 5)
@@ -70,7 +319,7 @@ void	arrangeButtons(EditableObject *object)
 	}
 }
 
-void	selectBox(tgui::Button::Ptr button, SpiralOfFate::Box *box)
+void	selectBox(tgui::Button::Ptr button, ShadyCore::Schema::Sequence::BBox *box)
 {
 	spriteSelected = false;
 	selectedBox = box;
@@ -98,7 +347,7 @@ void	selectSprite(tgui::Button::Ptr button, std::unique_ptr<EditableObject> &obj
 	arrangeButtons(&*object);
 }
 
-void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::unique_ptr<EditableObject> &object)
+void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<EditableObject> &object)
 {
 	int i = 0;
 	auto button = tgui::Button::create();
@@ -116,10 +365,10 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 	renderer->setBorderColorDisabled({0xFF, 0xFF, 0xFF});
 	renderer->setBorderColorFocused({0xFF, 0xFF, 0xFF});
 	renderer->setBorders(1);
-	button->setSize(data.size.x, data.size.y);
+	button->setSize(data.texWidth * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f, data.texHeight * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f);
 	button->setPosition(
-		"&.w / 2 + " + std::to_string(static_cast<int>(data.offset.x - data.size.x / 2)),
-		"&.h / 2 + " + std::to_string(-data.size.y - data.offset.y + 300)
+		"&.w / 2 + " + std::to_string(-data.offsetX),
+		"&.h / 2 + " + std::to_string(-data.offsetY + 300)
 	);
 	button->connect("MousePressed", [&object](std::weak_ptr<tgui::Button> self){
 		selectSprite(self.lock(), object);
@@ -127,7 +376,7 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 	}, std::weak_ptr<tgui::Button>(button));
 	panel->add(button, "SpriteBox");
 
-	for (auto &box : data.hurtBoxes) {
+	for (auto &box : data.hBoxes) {
 		button = tgui::Button::create();
 		renderer = button->getRenderer();
 		renderer->setBackgroundColor({0x00, 0xFF, 0x00, 0x4C});
@@ -141,8 +390,8 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 		renderer->setBorderColorDisabled({0x00, 0xFF, 0x00});
 		renderer->setBorderColorFocused({0x00, 0xFF, 0x00});
 		renderer->setBorders(1);
-		button->setSize(box.size.x, box.size.y);
-		button->setPosition("&.w / 2 + " + std::to_string(box.pos.x), "&.h / 2 + " + std::to_string(box.pos.y + 300));
+		button->setSize(box.right - box.left, box.down - box.up);
+		button->setPosition("&.w / 2 + " + std::to_string(box.left), "&.h / 2 + " + std::to_string(box.up + 300));
 		button->connect("MousePressed", [&box](std::weak_ptr<tgui::Button> self){
 			selectBox(self.lock(), &box);
 			canDrag = true;
@@ -151,7 +400,7 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 		i++;
 	}
 	i = 0;
-	for (auto &box : data.hitBoxes) {
+	for (auto &box : data.aBoxes) {
 		button = tgui::Button::create();
 		renderer = button->getRenderer();
 		renderer->setBackgroundColor({0xFF, 0x00, 0x00, 0x4C});
@@ -165,8 +414,8 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 		renderer->setBorderColorDisabled({0xFF, 0x00, 0x00});
 		renderer->setBorderColorFocused({0xFF, 0x00, 0x00});
 		renderer->setBorders(1);
-		button->setSize(box.size.x, box.size.y);
-		button->setPosition("&.w / 2 + " + std::to_string(box.pos.x), "&.h / 2 + " + std::to_string(box.pos.y + 300));
+		button->setSize(box.right - box.left, box.down - box.up);
+		button->setPosition("&.w / 2 + " + std::to_string(box.left), "&.h / 2 + " + std::to_string(box.up + 300));
 		button->connect("MousePressed", [&box](std::weak_ptr<tgui::Button> self){
 			selectBox(self.lock(), &box);
 			canDrag = true;
@@ -174,7 +423,9 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 		panel->add(button, "HitBox" + std::to_string(i));
 		i++;
 	}
-	if (data.collisionBox) {
+	if (!data.cBoxes.empty()) {
+		auto &box = data.cBoxes.front();
+
 		button = tgui::Button::create();
 		renderer = button->getRenderer();
 		renderer->setBackgroundColor({0xFF, 0xFF, 0x00, 0x4C});
@@ -188,10 +439,10 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 		renderer->setBorderColorDisabled({0xFF, 0xFF, 0x00});
 		renderer->setBorderColorFocused({0xFF, 0xFF, 0x00});
 		renderer->setBorders(1);
-		button->setSize(data.collisionBox->size.x, data.collisionBox->size.y);
-		button->setPosition("&.w / 2 + " + std::to_string(data.collisionBox->pos.x), "&.h / 2 + " + std::to_string(data.collisionBox->pos.y + 300));
-		button->connect("MousePressed", [&data](std::weak_ptr<tgui::Button> self){
-			selectBox(self.lock(), data.collisionBox);
+		button->setSize(box.right - box.left, box.down - box.up);
+		button->setPosition("&.w / 2 + " + std::to_string(box.left), "&.h / 2 + " + std::to_string(box.up + 300));
+		button->connect("MousePressed", [&data, &box](std::weak_ptr<tgui::Button> self){
+			selectBox(self.lock(), &box);
 			canDrag = true;
 		}, std::weak_ptr<tgui::Button>(button));
 		panel->add(button, "CollisionBox");
@@ -201,92 +452,75 @@ void	refreshBoxes(tgui::Panel::Ptr panel, SpiralOfFate::FrameData &data, std::un
 void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &object)
 {
 	auto progress = panel->get<tgui::Slider>("Progress");
-	auto manaGain = panel->get<tgui::EditBox>("ManaGain");
-	auto manaCost = panel->get<tgui::EditBox>("ManaCost");
-	auto neutralLimit = panel->get<tgui::EditBox>("NLimit");
-	auto gravity = panel->get<tgui::EditBox>("Gravity");
+	auto limit = panel->get<tgui::EditBox>("Limit");
 	auto sprite = panel->get<tgui::EditBox>("Sprite");
-	auto sound = panel->get<tgui::EditBox>("SFX");
 	auto hitSound = panel->get<tgui::EditBox>("HitSFX");
 	auto offset = panel->get<tgui::EditBox>("Offset");
 	auto bounds = panel->get<tgui::EditBox>("Bounds");
-	auto size = panel->get<tgui::EditBox>("Size");
-	auto rotation = panel->get<tgui::Slider>("Rotation");
+	auto scale = panel->get<tgui::EditBox>("Scale");
 	auto collisionBox = panel->get<tgui::CheckBox>("Collision");
 	auto duration = panel->get<tgui::EditBox>("Duration");
-	auto marker = panel->get<tgui::EditBox>("Marker");
-	auto subObj = panel->get<tgui::EditBox>("SubObj");
 	auto pushBack = panel->get<tgui::EditBox>("PushBack");
 	auto pushBlock = panel->get<tgui::EditBox>("PushBlock");
-	auto blockStun = panel->get<tgui::EditBox>("BlockStun");
+	auto pBlockStun = panel->get<tgui::EditBox>("PBlockStun");
+	auto eBlockStun = panel->get<tgui::EditBox>("EBlockStun");
+	auto pHitStun = panel->get<tgui::EditBox>("PHitStun");
+	auto eHitStun = panel->get<tgui::EditBox>("EHitStun");
 	auto hitStun = panel->get<tgui::EditBox>("HitStun");
-	auto hitStop = panel->get<tgui::EditBox>("HitStop");
 	auto hitSpeed = panel->get<tgui::EditBox>("HitSpeed");
 	auto counterHitSpeed = panel->get<tgui::EditBox>("CHSpeed");
-	auto spiritLimit = panel->get<tgui::EditBox>("SpiritLimit");
-	auto voidLimit = panel->get<tgui::EditBox>("VoidLimit");
-	auto matterLimit = panel->get<tgui::EditBox>("MatterLimit");
 	auto prorate = panel->get<tgui::EditBox>("Rate");
 	auto damage = panel->get<tgui::EditBox>("Damage");
 	auto speed = panel->get<tgui::EditBox>("MoveSpeed");
-	auto oFlags = panel->get<tgui::EditBox>("oFlags");
-	auto dFlags = panel->get<tgui::EditBox>("dFlags");
-	auto prio = panel->get<tgui::EditBox>("Priority");
+	auto fFlags = panel->get<tgui::EditBox>("fFlags");
+	auto aFlags = panel->get<tgui::EditBox>("aFlags");
 	auto chip = panel->get<tgui::EditBox>("ChipDmg");
 	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 	auto actionName = panel->get<tgui::Button>("ActionName");
 	auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
 
-	SpiralOfFate::game->logger.debug("Soft refresh");
+	game->logger.debug("Soft refresh");
 	*c = true;
 	actionName->setText(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second);
-	dFlags->setText(std::to_string(data.dFlag.flags));
-	oFlags->setText(std::to_string(data.oFlag.flags));
-	if (data.priority)
-		prio->setText(std::to_string(*data.priority));
-	else
-		prio->setText("");
-	chip->setText(std::to_string(data.chipDamage));
+	fFlags->setText(std::to_string(data.traits.frameFlags));
+	aFlags->setText(std::to_string(data.traits.attackFlags));
+	chip->setText(std::to_string(data.traits.chipDamage));
 	progress->setMinimum(0);
 	progress->setMaximum(object->_moves.at(object->_action)[object->_actionBlock].size() - 1);
 	progress->setValue(object->_animation);
-	sprite->setText(data.spritePath);
-	sound->setText(data.soundPath);
-	hitSound->setText(data.hitSoundPath);
-	damage->setText(std::to_string(data.damage));
+	sprite->setText(data._schema.images[data.imageIndex].name);
+	hitSound->setText(std::to_string(data.traits.onHitSfx));
+	damage->setText(std::to_string(data.traits.damage));
 	duration->setText(std::to_string(data.duration));
-	marker->setText(std::to_string(data.specialMarker));
-	subObj->setText(std::to_string(data.subObjectSpawn));
-	pushBack->setText(std::to_string(data.pushBack));
-	pushBlock->setText(std::to_string(data.pushBlock));
-	blockStun->setText(std::to_string(data.blockStun));
-	hitStun->setText(std::to_string(data.hitStun));
-	hitStop->setText(std::to_string(data.hitStop));
-	spiritLimit->setText(std::to_string(data.spiritLimit));
-	voidLimit->setText(std::to_string(data.voidLimit));
-	matterLimit->setText(std::to_string(data.matterLimit));
-	prorate->setText(std::to_string(data.prorate));
-	manaGain->setText(std::to_string(data.manaGain));
-	manaCost->setText(std::to_string(data.manaCost));
-	neutralLimit->setText(std::to_string(data.neutralLimit));
+	pBlockStun->setText(std::to_string(data.traits.onBlockPlayerStun));
+	eBlockStun->setText(std::to_string(data.traits.onBlockEnemyStun));
+	pHitStun->setText(std::to_string(data.traits.onHitPlayerStun));
+	eHitStun->setText(std::to_string(data.traits.onHitEnemyStun));
+	hitStun->setText(std::to_string(data.traits.onHitEnemyStun));
+	prorate->setText(std::to_string(data.traits.proration / 10) + "." + std::to_string(data.traits.proration % 10) + "%");
+	limit->setText(std::to_string(data.traits.limit));
 
-	auto newBounds = "(" + std::to_string(data.textureBounds.pos.x) + "," + std::to_string(data.textureBounds.pos.y) + "," + std::to_string(data.textureBounds.size.x) + "," + std::to_string(data.textureBounds.size.y) + ")";
-	auto newSize = "(" + std::to_string(data.size.x) + "," + std::to_string(data.size.y) + ")";
-	auto newOffset = "(" + std::to_string(data.offset.x) + "," + std::to_string(data.offset.y) + ")";
-	auto newSpeed = "(" + std::to_string(data.speed.x) + "," + std::to_string(data.speed.y) + ")";
-	auto newCHitSpeed = "(" + std::to_string(data.counterHitSpeed.x) + "," + std::to_string(data.counterHitSpeed.y) + ")";
-	auto newHitSpeed = "(" + std::to_string(data.hitSpeed.x) + "," + std::to_string(data.hitSpeed.y) + ")";
-	auto newGravity = data.gravity ? "(" + std::to_string(data.gravity->x) + "," + std::to_string(data.gravity->y) + ")" : "";
+	auto newBounds = "(" + std::to_string(data.texOffsetX) + "," + std::to_string(data.texOffsetY) + "," + std::to_string(data.texWidth) + "," + std::to_string(data.texHeight) + ")";
+	auto newScale = "(" +
+		std::to_string(data.blendOptions.scaleX / 100) + "." + (data.blendOptions.scaleX % 100 < 10 ? "0" : "") + std::to_string(data.blendOptions.scaleX % 100) + "," +
+		std::to_string(data.blendOptions.scaleY / 100) + "." + (data.blendOptions.scaleY % 100 < 10 ? "0" : "") + std::to_string(data.blendOptions.scaleY % 100) +
+	")";
+	auto newOffset = "(" + std::to_string(data.offsetX) + "," + std::to_string(data.offsetY) + ")";
+	auto newSpeed = "(" +
+		std::to_string(data.effect.speedX / 100) + "." + (data.effect.speedX % 100 < 10 ? "0" : "") + std::to_string(data.effect.speedX % 100) + "," +
+		std::to_string(data.effect.speedY / 100) + "." + (data.effect.speedY % 100 < 10 ? "0" : "") + std::to_string(data.effect.speedY % 100) +
+	")";
+	auto newHitSpeed = "(" +
+		std::to_string(data.traits.speedX / 100) + "." + (data.traits.speedX % 100 < 10 ? "0" : "") + std::to_string(data.traits.speedX % 100) + "," +
+		std::to_string(data.traits.speedY / 100) + "." + (data.traits.speedY % 100 < 10 ? "0" : "") + std::to_string(data.traits.speedY % 100) +
+	")";
 
-	counterHitSpeed->setText(newCHitSpeed);
 	hitSpeed->setText(newHitSpeed);
 	speed->setText(newSpeed);
 	offset->setText(newOffset);
 	bounds->setText(newBounds);
-	size->setText(newSize);
-	gravity->setText(newGravity);
-	rotation->setValue(data.rotation * 180 / M_PI);
-	collisionBox->setChecked(data.collisionBox != nullptr);
+	scale->setText(newScale);
+	collisionBox->setChecked(!data.cBoxes.empty());
 	selectBox(nullptr, nullptr);
 	refreshBoxes(boxes, data, object);
 	*c = false;
@@ -304,7 +538,7 @@ void	refreshRightPanel(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, 
 	auto speedLabel = panel->get<tgui::Label>("SpeedLabel");
 	auto frame = panel->get<tgui::SpinButton>("Frame");
 
-	SpiralOfFate::game->logger.debug("Hard refresh");
+	game->logger.debug("Hard refresh");
 	panel->setEnabled(static_cast<bool>(object));
 	if (!object)
 		return gui.get<tgui::Panel>("Boxes")->removeAllWidgets();
@@ -319,13 +553,14 @@ void	refreshRightPanel(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, 
 		speedCtrl->setValue(0);
 	if (object->_moves[0].empty()) {
 		object->_moves[0].emplace_back();
-		object->_moves[0][0].emplace_back();
+		object->_moves[0][0].emplace_back(editSession.chr, *editSession.schema, *editSession.palette, editSession.palName);
 	}
 	refreshFrameDataPanel(panel, gui.get<tgui::Panel>("Boxes"), object);
 }
 
 void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &object)
 {
+	// Ctrl UI
 	auto panWeak = std::weak_ptr<tgui::Panel>(panel);
 	auto animPanel = panel->get<tgui::Panel>("AnimPanel");
 	auto action = panel->get<tgui::EditBox>("Action");
@@ -338,121 +573,74 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	auto step = panel->get<tgui::Button>("Step");
 	auto speedCtrl = panel->get<tgui::SpinButton>("Speed");
 	auto speedLabel = panel->get<tgui::Label>("SpeedLabel");
+
 	auto sprite = panel->get<tgui::EditBox>("Sprite");
-	auto sfx = panel->get<tgui::EditBox>("SFX");
 	auto hitSound = panel->get<tgui::EditBox>("HitSFX");
 	auto offset = panel->get<tgui::EditBox>("Offset");
 	auto bounds = panel->get<tgui::EditBox>("Bounds");
-	auto size = panel->get<tgui::EditBox>("Size");
-	auto rotation = panel->get<tgui::Slider>("Rotation");
+	auto scale = panel->get<tgui::EditBox>("Scale");
 	auto collisionBox = panel->get<tgui::CheckBox>("Collision");
 	auto duration = panel->get<tgui::EditBox>("Duration");
-	auto marker = panel->get<tgui::EditBox>("Marker");
-	auto subObj = panel->get<tgui::EditBox>("SubObj");
-	auto pushBack = panel->get<tgui::EditBox>("PushBack");
-	auto pushBlock = panel->get<tgui::EditBox>("PushBlock");
-	auto blockStun = panel->get<tgui::EditBox>("BlockStun");
-	auto hitStun = panel->get<tgui::EditBox>("HitStun");
-	auto spiritLimit = panel->get<tgui::EditBox>("SpiritLimit");
-	auto voidLimit = panel->get<tgui::EditBox>("VoidLimit");
-	auto matterLimit = panel->get<tgui::EditBox>("MatterLimit");
+	auto pBlockStun = panel->get<tgui::EditBox>("PBlockStun");
+	auto eBlockStun = panel->get<tgui::EditBox>("EBlockStun");
+	auto pHitStun = panel->get<tgui::EditBox>("PHitStun");
+	auto eHitStun = panel->get<tgui::EditBox>("EHitStun");
 	auto prorate = panel->get<tgui::EditBox>("Rate");
 	auto damage = panel->get<tgui::EditBox>("Damage");
-	auto manaGain = panel->get<tgui::EditBox>("ManaGain");
-	auto manaCost = panel->get<tgui::EditBox>("ManaCost");
-	auto hitStop = panel->get<tgui::EditBox>("HitStop");
 	auto hitSpeed = panel->get<tgui::EditBox>("HitSpeed");
-	auto neutralLimit = panel->get<tgui::EditBox>("NLimit");
+	auto limit = panel->get<tgui::EditBox>("Limit");
 	auto gravity = panel->get<tgui::EditBox>("Gravity");
 	auto speed = panel->get<tgui::EditBox>("MoveSpeed");
-	auto counterHitSpeed = panel->get<tgui::EditBox>("CHSpeed");
-	auto oFlags = panel->get<tgui::EditBox>("oFlags");
-	auto dFlags = panel->get<tgui::EditBox>("dFlags");
-	auto prio = panel->get<tgui::EditBox>("Priority");
+	auto aFlags = panel->get<tgui::EditBox>("aFlags");
+	auto fFlags = panel->get<tgui::EditBox>("fFlags");
 	auto chip = panel->get<tgui::EditBox>("ChipDmg");
-
-	auto grab = panel->get<tgui::CheckBox>("Grab");
-	auto aub = panel->get<tgui::CheckBox>("AUB");
-	auto ub = panel->get<tgui::CheckBox>("UB");
-	auto voidElem = panel->get<tgui::CheckBox>("VoidElem");
-	auto spiritElem = panel->get<tgui::CheckBox>("SpiritElement");
-	auto matterElem = panel->get<tgui::CheckBox>("MatterElement");
-	auto lowHit = panel->get<tgui::CheckBox>("LowHit");
-	auto highHit = panel->get<tgui::CheckBox>("HighHit");
-	auto autoHitPos = panel->get<tgui::CheckBox>("AutoHitPos");
-	auto canCH = panel->get<tgui::CheckBox>("CanCH");
-	auto hitSwitch = panel->get<tgui::CheckBox>("HitSwitch");
-	auto cancelable = panel->get<tgui::CheckBox>("Cancelable");
-	auto jab = panel->get<tgui::CheckBox>("Jab");
-	auto resetHit = panel->get<tgui::CheckBox>("ResetHit");
-	auto resetSpeed = panel->get<tgui::CheckBox>("ResetSpeed");
-	auto restand = panel->get<tgui::CheckBox>("Restand");
-	auto super = panel->get<tgui::CheckBox>("Super");
-	auto ultimate = panel->get<tgui::CheckBox>("Ultimate");
-	auto jumpCancelable = panel->get<tgui::CheckBox>("JumpCancel");
-	auto transformCancelable = panel->get<tgui::CheckBox>("TransCancel");
-	auto unTransformCancelable = panel->get<tgui::CheckBox>("UnTransCancel");
-	auto dashCancelable = panel->get<tgui::CheckBox>("DashCancel");
-	auto backDashCancelable = panel->get<tgui::CheckBox>("BDCancel");
-	auto voidMana = panel->get<tgui::CheckBox>("VoidMana");
-	auto matterMana = panel->get<tgui::CheckBox>("MatterMana");
-	auto spiritMana = panel->get<tgui::CheckBox>("SpiritMana");
-
-	auto invulnerable = panel->get<tgui::CheckBox>("Invulnerable");
-	auto invulnerableArmor = panel->get<tgui::CheckBox>("InvulnerableArmor");
-	auto superArmor = panel->get<tgui::CheckBox>("SuperArmor");
-	auto grabInvul = panel->get<tgui::CheckBox>("GrabInvul");
-	auto voidBlock = panel->get<tgui::CheckBox>("VoidBlock");
-	auto spiritBlock = panel->get<tgui::CheckBox>("SpiritBlock");
-	auto matterBlock = panel->get<tgui::CheckBox>("MatterBlock");
-	auto neutralBlock = panel->get<tgui::CheckBox>("NeutralBlock");
-	auto airborne = panel->get<tgui::CheckBox>("Air");
-	auto canBlock = panel->get<tgui::CheckBox>("CanBlock");
-	auto highBlock = panel->get<tgui::CheckBox>("HighBlock");
-	auto lowBlock = panel->get<tgui::CheckBox>("LowBlock");
-	auto dashSpeed = panel->get<tgui::CheckBox>("DashSpeed");
-	auto resetRotation = panel->get<tgui::CheckBox>("ResetRotation");
-	auto counterHit = panel->get<tgui::CheckBox>("CounterHit");
-	auto flash = panel->get<tgui::CheckBox>("Flash");
-	auto crouch = panel->get<tgui::CheckBox>("Crouch");
-	auto projInvul = panel->get<tgui::CheckBox>("ProjInvul");
-	auto proj = panel->get<tgui::CheckBox>("Proj");
-	auto lc = panel->get<tgui::CheckBox>("LC");
-	auto dc = panel->get<tgui::CheckBox>("DC");
-	auto resOPS = panel->get<tgui::CheckBox>("ResetOPSpeed");
-	auto neutralInvul = panel->get<tgui::CheckBox>("NInv");
-	auto matterInvul = panel->get<tgui::CheckBox>("MInv");
-	auto spiritInvul = panel->get<tgui::CheckBox>("SInv");
-	auto voidInvul = panel->get<tgui::CheckBox>("VInv");
+	std::vector<tgui::CheckBox::Ptr> fFlagsCheckboxes;
+	std::vector<tgui::CheckBox::Ptr> aFlagsCheckboxes;
 
 	actionName->connect("Clicked", [&gui, &object, block, action]{
+		//TODO: Also display moves that are in the object but not in the list
 		auto window = Utils::openWindowWithFocus(gui, 500, "&.h - 100");
 		auto pan = tgui::ScrollablePanel::create({"&.w", "&.h"});
 		unsigned i = 0;
+		std::vector<unsigned> toDisplay;
 
+		for (auto &a : actionNames)
+			toDisplay.push_back(a.first);
+		for (auto &a : object->_moves) {
+			if (std::find(toDisplay.begin(), toDisplay.end(), a.first) == toDisplay.end())
+				toDisplay.push_back(a.first);
+		}
+		std::sort(toDisplay.begin(), toDisplay.end());
 		Utils::setRenderer(pan);
 		window->setTitle("Default character moves");
 		window->add(pan);
-		for (auto &move : actionNames) {
-			auto label = tgui::Label::create(std::to_string(move.first));
-			auto button = tgui::Button::create(move.second);
+		for (auto &moveId : toDisplay) {
+			auto it = actionNames.find(static_cast<SokuLib::Action>(moveId));
+			auto label = tgui::Label::create(std::to_string(moveId));
+			auto button = tgui::Button::create(it == actionNames.end() ? "Unnamed move #" + std::to_string(moveId) : it->second);
 
 			label->setPosition(10, i * 25 + 12);
 			button->setPosition(50, i * 25 + 10);
 			button->setSize(430, 20);
 			Utils::setRenderer(button);
 			Utils::setRenderer(label);
-			if (object->_moves.find(move.first) == object->_moves.end()) {
+			if (object->_moves.find(moveId) == object->_moves.end()) {
 				button->getRenderer()->setTextColor(tgui::Color::Red);
 				button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0x40, 0x40});
 				button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0, 0});
 				button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x00, 0x00});
 				button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x20, 0x20});
+			} else if (it == actionNames.end()) {
+				button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00});
+				button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0xA0, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x50, 0});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x40, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x60, 0x20});
 			}
 
-			button->connect("Clicked", [move, action](std::weak_ptr<tgui::ChildWindow> win){
+			button->connect("Clicked", [moveId, action](std::weak_ptr<tgui::ChildWindow> win){
 				win.lock()->close();
-				action->setText(std::to_string(move.first));
+				action->setText(std::to_string(moveId));
 				action->onReturnKeyPress.emit(&*action, action->getText());
 			}, std::weak_ptr<tgui::ChildWindow>(window));
 
@@ -491,7 +679,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		blockLabel->setText("Block " + std::to_string(i));
 		object->_actionBlock = i;
 		if (object->_moves[object->_action][i].empty())
-			object->_moves[object->_action][i].emplace_back();
+			object->_moves[object->_action][i].emplace_back(editSession.chr, *editSession.schema, *editSession.palette, editSession.palName);
 		progress->setMaximum(object->_moves[object->_action][i].size() - 1);
 		progress->setMinimum(0);
 		if (progress->getValue() == 0)
@@ -520,17 +708,6 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		timer = 0;
 		animPanel->setEnabled(f == 0);
 	});
-	prio->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		if (t.empty())
-			data.priority.reset();
-		else
-			data.priority = std::stoul(t);
-	});
 	chip->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
@@ -539,7 +716,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.chipDamage = std::stoul(t);
+		data.traits.chipDamage = std::stoul(t);
 	});
 	sprite->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -547,8 +724,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.spritePath = t;
-		data.reloadTexture();
+		//TODO: Actually change the sprite
+		//data.spritePath = t;
+		//data.reloadTexture();
 	});
 	hitSound->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -556,16 +734,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.hitSoundPath = t;
-		data.reloadSound();
-	});
-	sfx->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.soundPath = t;
+		data.traits.onHitSfx = std::stoul(t);
 		data.reloadSound();
 	});
 	speed->connect("TextChanged", [boxes, &object](std::string t){
@@ -581,8 +750,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.speed.x = std::stol(x);
-			data.speed.y = std::stol(y);
+			data.effect.speedX = std::stof(x) * 100;
+			data.effect.speedY = std::stof(y) * 100;
 			refreshBoxes(boxes, data, object);
 			if (spriteSelected)
 				arrangeButtons(&*object);
@@ -601,8 +770,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.offset.x = std::stol(x);
-			data.offset.y = std::stol(y);
+			data.offsetX = std::stol(x);
+			data.offsetY = std::stol(y);
 			refreshBoxes(boxes, data, object);
 			if (spriteSelected)
 				arrangeButtons(&*object);
@@ -620,33 +789,14 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 		try {
-			data.hitSpeed.x = std::stol(x);
-			data.hitSpeed.y = std::stol(y);
+			data.traits.speedX = std::stof(x) * 100;
+			data.traits.speedY = std::stof(y) * 100;
 		} catch (...) {}
 		refreshBoxes(boxes, data, object);
 		if (spriteSelected)
 			arrangeButtons(&*object);
 	});
-	counterHitSpeed->connect("TextChanged", [boxes, &object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto pos = t.find(',');
-		auto x = t.substr(1, pos - 1);
-		auto y = t.substr(pos + 1, t.size() - pos - 1);
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		try {
-			data.counterHitSpeed.x = std::stol(x);
-			data.counterHitSpeed.y = std::stol(y);
-		} catch (...) {}
-		refreshBoxes(boxes, data, object);
-		if (spriteSelected)
-			arrangeButtons(&*object);
-	});
-	size->connect("TextChanged", [&object, boxes](std::string t){
+	scale->connect("TextChanged", [&object, boxes](std::string t){
 		if (*c)
 			return;
 		if (t.empty())
@@ -659,47 +809,12 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stoul(y);
-			data.size.x = std::stoul(x);
-			data.size.y = std::stoul(y);
+			data.blendOptions.scaleX = std::stof(x) * 100;
+			data.blendOptions.scaleY = std::stof(y) * 100;
 		} catch (...) {}
 		refreshBoxes(boxes, data, object);
 		if (spriteSelected)
 			arrangeButtons(&*object);
-	});
-	gravity->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		if (t.size() <= 2) {
-			data.gravity.reset();
-			return;
-		}
-		if (t.front() != '(' || t.back() != ')') {
-			data.gravity.reset();
-			return;
-		}
-
-		auto pos = t.find(',');
-
-		if (pos == std::string::npos) {
-			data.gravity.reset();
-			return;
-		}
-
-		auto x = t.substr(1, pos - 1);
-		auto y = t.substr(pos + 1, t.size() - pos - 2);
-
-		try {
-			data.gravity = SpiralOfFate::Vector2f(
-				std::stof(x),
-				std::stof(y)
-			);
-		} catch (...) {
-			data.gravity.reset();
-			return;
-		}
 	});
 	bounds->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -725,19 +840,11 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			std::stoul(x);
 			std::stoul(y);
 			std::stoul(w);
-			data.textureBounds.pos.x = std::stoul(x);
-			data.textureBounds.pos.y = std::stoul(y);
-			data.textureBounds.size.x = std::stoul(w);
-			data.textureBounds.size.y = std::stoul(h);
+			data.texOffsetX = std::stoul(x);
+			data.texOffsetY = std::stoul(y);
+			data.texWidth   = std::stoul(w);
+			data.texHeight  = std::stoul(h);
 		} catch (...) {}
-	});
-	rotation->connect("ValueChanged", [&object](float f){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.rotation = f * M_PI / 180;
 	});
 	duration->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -757,9 +864,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.damage = std::stoul(t);
+		data.traits.damage = std::stoul(t);
 	});
-	marker->connect("TextChanged", [&object](std::string t){
+	pBlockStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
 		if (t.empty())
@@ -767,9 +874,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.specialMarker = std::stoul(t);
+		data.traits.onBlockPlayerStun = std::stoul(t);
 	});
-	manaGain->connect("TextChanged", [&object](std::string t){
+	eBlockStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
 		if (t.empty())
@@ -777,9 +884,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.manaGain = std::stoul(t);
+		data.traits.onBlockEnemyStun = std::stoul(t);
 	});
-	manaCost->connect("TextChanged", [&object](std::string t){
+	pHitStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
 		if (t.empty())
@@ -787,9 +894,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.manaCost = std::stoul(t);
+		data.traits.onHitPlayerStun = std::stoul(t);
 	});
-	hitStop->connect("TextChanged", [&object](std::string t){
+	eHitStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
 		if (t.empty())
@@ -797,9 +904,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.hitStop = std::stoul(t);
+		data.traits.onHitEnemyStun = std::stoul(t);
 	});
-	subObj->connect("TextChanged", [&object](std::string t){
+	limit->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
 		if (t.empty())
@@ -807,89 +914,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		try {
-			data.subObjectSpawn = std::stoi(t);
-		} catch (...) {}
-	});
-	pushBack->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.pushBack = std::stoi(t);
-	});
-	pushBlock->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.pushBlock = std::stoi(t);
-	});
-	blockStun->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.blockStun = std::stoul(t);
-	});
-	hitStun->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.hitStun = std::stoul(t);
-	});
-	neutralLimit->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.neutralLimit = std::stoul(t);
-	});
-	spiritLimit->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.spiritLimit = std::stoul(t);
-	});
-	voidLimit->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.voidLimit = std::stoul(t);
-	});
-	matterLimit->connect("TextChanged", [&object](std::string t){
-		if (*c)
-			return;
-		if (t.empty())
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		data.matterLimit = std::stoul(t);
+		data.traits.limit = std::stoul(t);
 	});
 	prorate->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -899,7 +924,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.prorate = std::stof(t);
+		data.traits.proration = std::stof(t) * 10;
 	});
 	collisionBox->connect("Checked", [&object, boxes]{
 		if (*c)
@@ -907,8 +932,13 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		if (!data.collisionBox)
-			data.collisionBox = new SpiralOfFate::Box{{-static_cast<int>(data.size.x) / 2, 0}, data.size};
+		if (!data.cBoxes.empty())
+			data.cBoxes.push_back({
+				static_cast<int>(-(data.texWidth * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f) / 2),
+				static_cast<int>(-data.texHeight * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f),
+				static_cast<int>(data.texWidth * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f / 2),
+				0
+			});
 		refreshBoxes(boxes, data, object);
 	});
 	collisionBox->connect("Unchecked", [&object, boxes]{
@@ -917,300 +947,31 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		if (selectedBox && selectedBox == data.collisionBox)
+		if (selectedBox && selectedBox == &data.cBoxes.front())
 			selectBox(nullptr, nullptr);
-		delete data.collisionBox;
-		data.collisionBox = nullptr;
+		data.cBoxes.clear();
 		refreshBoxes(boxes, data, object);
 	});
 
-	grab->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
+	for (int i = 0; i < 32; i++) {
+		auto checkbox = panel->get<tgui::CheckBox>("fFlag" + std::to_string(i));
 
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+		fFlagsCheckboxes.push_back(checkbox);
+		if (!checkbox)
+			continue;
+		checkbox->connect("Changed", [i, fFlags, &object](bool b){
+			if (*c)
+				return;
 
-		*c = true;
-		data.oFlag.grab = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	aub->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
+			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.airUnblockable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	ub->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.unblockable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	voidElem->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.voidElement = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	spiritElem->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.spiritElement = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	matterElem->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.matterElement = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	lowHit->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.lowHit = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	highHit->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.highHit = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	autoHitPos->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.autoHitPos = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	canCH->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.canCounterHit = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	hitSwitch->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.hitSwitch = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	cancelable->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.cancelable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	jab->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.jab = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	resetHit->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.resetHits = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	resetSpeed->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.resetSpeed = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	restand->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.restand = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	super->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.super = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	ultimate->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.ultimate = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	jumpCancelable->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.jumpCancelable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	transformCancelable->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.transformCancelable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	unTransformCancelable->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.unTransformCancelable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	dashCancelable->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.dashCancelable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	backDashCancelable->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.backDashCancelable = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	voidMana->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.voidMana = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	matterMana->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.matterMana = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	spiritMana->connect("Changed", [oFlags, &object](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.oFlag.spiritMana = b;
-		oFlags->setText(std::to_string(data.oFlag.flags));
-		*c = false;
-	});
-	oFlags->connect("TextChanged", [&object, voidMana, matterMana, spiritMana, super, ultimate, jumpCancelable, transformCancelable, unTransformCancelable, dashCancelable, backDashCancelable, grab, aub, ub, voidElem, spiritElem, matterElem, lowHit, highHit, autoHitPos, canCH, hitSwitch, cancelable, jab, resetHit, resetSpeed, restand](std::string t){
+			*c = true;
+			data.traits.frameFlags = (data.traits.frameFlags & ~(1 << i)) | b << i;
+			fFlags->setText(std::to_string(data.traits.frameFlags));
+			*c = false;
+		});
+	}
+	fFlags->connect("TextChanged", [&object, fFlagsCheckboxes](std::string t){
 		if (t.empty())
 			return;
 
@@ -1219,325 +980,34 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		if (!*c) {
 			*c = true;
-			data.oFlag.flags = std::stoul(t);
+			data.traits.frameFlags = std::stoul(t);
 		}
-		grab->setChecked(data.oFlag.grab);
-		aub->setChecked(data.oFlag.airUnblockable);
-		ub->setChecked(data.oFlag.unblockable);
-		voidElem->setChecked(data.oFlag.voidElement);
-		spiritElem->setChecked(data.oFlag.spiritElement);
-		matterElem->setChecked(data.oFlag.matterElement);
-		lowHit->setChecked(data.oFlag.lowHit);
-		highHit->setChecked(data.oFlag.highHit);
-		autoHitPos->setChecked(data.oFlag.autoHitPos);
-		canCH->setChecked(data.oFlag.canCounterHit);
-		hitSwitch->setChecked(data.oFlag.hitSwitch);
-		cancelable->setChecked(data.oFlag.cancelable);
-		jab->setChecked(data.oFlag.jab);
-		resetHit->setChecked(data.oFlag.resetHits);
-		resetSpeed->setChecked(data.oFlag.resetSpeed);
-		restand->setChecked(data.oFlag.restand);
-		super->setChecked(data.oFlag.super);
-		ultimate->setChecked(data.oFlag.ultimate);
-		jumpCancelable->setChecked(data.oFlag.jumpCancelable);
-		transformCancelable->setChecked(data.oFlag.transformCancelable);
-		unTransformCancelable->setChecked(data.oFlag.unTransformCancelable);
-		dashCancelable->setChecked(data.oFlag.dashCancelable);
-		backDashCancelable->setChecked(data.oFlag.backDashCancelable);
-		voidMana->setChecked(data.oFlag.voidMana);
-		matterMana->setChecked(data.oFlag.matterMana);
-		spiritMana->setChecked(data.oFlag.spiritMana);
+		for (int i = 0; i < 32; i++)
+			if (fFlagsCheckboxes[i])
+				fFlagsCheckboxes[i]->setChecked((data.traits.frameFlags & (1 << i)) != 0);
 		if (!g)
 			*c = false;
 	});
 
-	invulnerable->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
+	for (int i = 0; i < 32; i++) {
+		auto checkbox = panel->get<tgui::CheckBox>("aFlag" + std::to_string(i));
 
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+		aFlagsCheckboxes.push_back(checkbox);
+		if (!checkbox)
+			continue;
+		checkbox->connect("Changed", [i, aFlags, &object](bool b){
+			if (*c)
+				return;
 
-		*c = true;
-		data.dFlag.invulnerable = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	invulnerableArmor->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
+			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.invulnerableArmor = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	superArmor->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.superarmor = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	grabInvul->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.grabInvulnerable = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	voidBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.voidBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	spiritBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.spiritBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	matterBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.matterBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	neutralBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.neutralBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	airborne->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.airborne = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	canBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.canBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	highBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.highBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	lowBlock->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.lowBlock = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	dashSpeed->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.karaCancel = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	resetRotation->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.resetRotation = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	counterHit->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.counterHit = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	flash->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.flash = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	crouch->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.crouch = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	projInvul->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.projectileInvul = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	proj->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.projectile = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	lc->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.landCancel = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	dc->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.dashCancel = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	resOPS->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.resetSpeed = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	neutralInvul->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.neutralInvul = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	matterInvul->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.matterInvul = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	spiritInvul->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.spiritInvul = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	voidInvul->connect("Changed", [&object, dFlags](bool b){
-		if (*c)
-			return;
-
-		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-
-		*c = true;
-		data.dFlag.voidInvul = b;
-		dFlags->setText(std::to_string(data.dFlag.flags));
-		*c = false;
-	});
-	dFlags->connect("TextChanged", [neutralInvul, matterInvul, spiritInvul, voidInvul, projInvul, proj, resOPS, lc, dc, crouch, flash, invulnerable, invulnerableArmor, superArmor, grabInvul, voidBlock, spiritBlock, matterBlock, neutralBlock, airborne, canBlock, highBlock, lowBlock, dashSpeed, resetRotation, counterHit, &object](std::string t){
+			*c = true;
+			data.traits.attackFlags = (data.traits.attackFlags & ~(1 << i)) | b << i;
+			aFlags->setText(std::to_string(data.traits.attackFlags));
+			*c = false;
+		});
+	}
+	aFlags->connect("TextChanged", [&object, aFlagsCheckboxes](std::string t){
 		if (t.empty())
 			return;
 
@@ -1546,93 +1016,27 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		if (!*c) {
 			*c = true;
-			data.dFlag.flags = std::stoul(t);
+			data.traits.attackFlags = std::stoul(t);
 		}
-		invulnerable->setChecked(data.dFlag.invulnerable);
-		invulnerableArmor->setChecked(data.dFlag.invulnerableArmor);
-		superArmor->setChecked(data.dFlag.superarmor);
-		grabInvul->setChecked(data.dFlag.grabInvulnerable);
-		voidBlock->setChecked(data.dFlag.voidBlock);
-		crouch->setChecked(data.dFlag.crouch);
-		spiritBlock->setChecked(data.dFlag.spiritBlock);
-		matterBlock->setChecked(data.dFlag.matterBlock);
-		neutralBlock->setChecked(data.dFlag.neutralBlock);
-		airborne->setChecked(data.dFlag.airborne);
-		canBlock->setChecked(data.dFlag.canBlock);
-		highBlock->setChecked(data.dFlag.highBlock);
-		lowBlock->setChecked(data.dFlag.lowBlock);
-		dashSpeed->setChecked(data.dFlag.karaCancel);
-		resetRotation->setChecked(data.dFlag.resetRotation);
-		counterHit->setChecked(data.dFlag.counterHit);
-		flash->setChecked(data.dFlag.flash);
-		projInvul->setChecked(data.dFlag.projectileInvul);
-		proj->setChecked(data.dFlag.projectile);
-		lc->setChecked(data.dFlag.landCancel);
-		dc->setChecked(data.dFlag.dashCancel);
-		resOPS->setChecked(data.dFlag.resetSpeed);
-		neutralInvul->setChecked(data.dFlag.neutralInvul);
-		matterInvul->setChecked(data.dFlag.matterInvul);
-		spiritInvul->setChecked(data.dFlag.spiritInvul);
-		voidInvul->setChecked(data.dFlag.voidInvul);
+		for (int i = 0; i < 32; i++)
+			if (aFlagsCheckboxes[i])
+				aFlagsCheckboxes[i]->setChecked((data.traits.attackFlags & (1 << i)) != 0);
 		if (!g)
 			*c = false;
 	});
 }
 
-void	saveCallback(std::unique_ptr<EditableObject> &object)
+bool	saveCallback(std::unique_ptr<EditableObject> &object)
 {
-	if (!object)
-		return;
-	if (loadedPath.empty())
-		loadedPath = Utils::saveFileDialog("Save framedata", "assets", {{".*\\.json", "Frame data file"}});
-	if (loadedPath.empty())
-		return;
-
-	nlohmann::json j = nlohmann::json::array();
-
-	for (auto &[key, value] : object->_moves) {
-		j.push_back({
-			{"action", key},
-			{"framedata", value}
-		});
-	}
-
-	std::ofstream stream{loadedPath};
-
-	if (stream.fail()) {
-		Utils::dispMsg("Saving failed", loadedPath + ": " + strerror(errno), MB_ICONERROR);
-		return;
-	}
-	stream << j.dump(4) << std::endl;
+	//TODO: Save
+	Utils::dispMsg("Error", "Not implemented yet", MB_ICONWARNING);
+	return false;
 }
 
 void	saveAsCallback(std::unique_ptr<EditableObject> &object)
 {
-	if (!object)
-		return;
-
-	auto path = Utils::saveFileDialog("Save framedata", loadedPath.empty() ? "assets" : loadedPath, {{".*\\.json", "Frame data file"}});
-
-	if (path.empty())
-		return;
-	loadedPath = path;
-
-	nlohmann::json j = nlohmann::json::array();
-
-	for (auto &[key, value] : object->_moves) {
-		j.push_back({
-			{"action", key},
-			{"framedata", value}
-		});
-	}
-
-	std::ofstream stream{path};
-
-	if (stream.fail()) {
-		Utils::dispMsg("Saving failed", path + ": " + strerror(errno), MB_ICONERROR);
-		return;
-	}
-	stream << j.dump(4) << std::endl;
+	//TODO: Save
+	Utils::dispMsg("Error", "Not implemented yet", MB_ICONWARNING);
 }
 
 void	removeBoxCallback(tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr panel)
@@ -1642,24 +1046,24 @@ void	removeBoxCallback(tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &
 
 	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-	if (selectedBox == data.collisionBox) {
+	if (selectedBox == &data.cBoxes.front()) {
 		auto block = panel->get<tgui::CheckBox>("Collision");
 
 		block->setChecked(false);
 		selectBox(nullptr, nullptr);
 		return;
 	}
-	for (auto it = data.hitBoxes.begin(); it < data.hitBoxes.end(); it++) {
+	for (auto it = data.aBoxes.begin(); it < data.aBoxes.end(); it++) {
 		if (&*it == selectedBox) {
-			data.hitBoxes.erase(it);
+			data.aBoxes.erase(it);
 			refreshBoxes(boxes, data, object);
 			selectBox(nullptr, nullptr);
 			return;
 		}
 	}
-	for (auto it = data.hurtBoxes.begin(); it < data.hurtBoxes.end(); it++) {
+	for (auto it = data.hBoxes.begin(); it < data.hBoxes.end(); it++) {
 		if (&*it == selectedBox) {
-			data.hurtBoxes.erase(it);
+			data.hBoxes.erase(it);
 			refreshBoxes(boxes, data, object);
 			selectBox(nullptr, nullptr);
 			return;
@@ -1686,13 +1090,38 @@ void	newFileCallback(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr
 
 void	openFileCallback(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr bar, tgui::Gui &gui)
 {
-	auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
+	//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
+	std::ifstream stream{"assets/chr.txt"};
+	std::string character = "remilia";
+
+	editSession.palName = "palette000.pal";
+	if (!stream.fail()) {
+		std::getline(stream, character);
+		std::getline(stream, editSession.palName);
+	}
+
+	std::string path = "data/character/" + character + "/" + character + ".pat";
 
 	if (path.empty())
 		return;
+
+	auto pal = game->characterPaths[character].palettes.find(editSession.palName);
+	auto entry = game->package.find(path, ShadyCore::FileType::TYPE_SCHEMA);
+
+	if (entry == game->package.end())
+		throw std::runtime_error("Could not find file " + path);
+	if (pal == game->characterPaths[character].palettes.end())
+		throw std::runtime_error("Could not find palette " + editSession.palName);
+
+	editSession.chr = character;
+	editSession.palName = pal->first;
+	editSession.palette = &pal->second;
+	editSession.schema = &game->characterPaths[character].framedata;
+	ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ShadyCore::FileType::SCHEMA_GAME_PATTERN})(editSession.schema, entry.open());
+	entry.close();
 	try {
 		object.reset();
-		object = std::make_unique<EditableObject>(path);
+		object = std::make_unique<EditableObject>(editSession.chr, *editSession.schema, *editSession.palette, editSession.palName);
 		loadedPath = path;
 		refreshRightPanel(gui, object);
 		bar->setMenuEnabled({"New"}, true);
@@ -1743,7 +1172,7 @@ void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 {
 	object->_actionBlock = object->_moves.at(object->_action).size();
 	object->_moves.at(object->_action).emplace_back();
-	object->_moves.at(object->_action).back().emplace_back();
+	object->_moves.at(object->_action).back().emplace_back(editSession.chr, *editSession.schema, *editSession.palette, editSession.palName);
 	refreshRightPanel(gui, object, false);
 
 	auto block = panel->get<tgui::SpinButton>("Block");
@@ -1753,22 +1182,22 @@ void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 
 void	newHurtBoxCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
-	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hurtBoxes.push_back({{-10, -10}, {20, 20}});
+	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.push_back({-10, 10, 10, -10});
 
-	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hurtBoxes.back();
+	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.back();
 
 	refreshBoxes(boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
-	selectBox(boxes->get<tgui::Button>("HurtBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hurtBoxes.size() - 1)), &box);
+	selectBox(boxes->get<tgui::Button>("HurtBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.size() - 1)), &box);
 }
 
 void	newHitBoxCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
-	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hitBoxes.push_back({{-10, -10}, {20, 20}});
+	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.push_back({-10, 10, 10, -10});
 
-	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hurtBoxes.back();
+	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.back();
 
 	refreshBoxes(boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
-	selectBox(boxes->get<tgui::Button>("HitBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hurtBoxes.size() - 1)), &box);
+	selectBox(boxes->get<tgui::Button>("HitBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.size() - 1)), &box);
 }
 
 void	removeFrameCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
@@ -1776,7 +1205,7 @@ void	removeFrameCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::P
 	auto &arr = object->_moves.at(object->_action)[object->_actionBlock];
 
 	if (arr.size() == 1) {
-		arr.back() = SpiralOfFate::FrameData();
+		arr.back() = FrameData(editSession.chr, *editSession.schema, *editSession.palette, editSession.palName);
 		refreshBoxes(boxes, arr.back(), object);
 		selectBox(nullptr, nullptr);
 		return;
@@ -1794,7 +1223,7 @@ void	removeAnimationBlockCallback(std::unique_ptr<EditableObject> &object)
 
 	if (arr.size() == 1) {
 		arr.back().clear();
-		arr.back().emplace_back();
+		arr.back().emplace_back(editSession.chr, *editSession.schema, *editSession.palette, editSession.palName);
 		return;
 	}
 	arr.erase(arr.begin() + object->_actionBlock);
@@ -1813,12 +1242,12 @@ void	removeActionCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 	refreshRightPanel(gui, object);
 }
 
-void	copyBoxesFromFrame(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes, SpiralOfFate::FrameData &other)
+void	copyBoxesFromFrame(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes, FrameData &other)
 {
 	auto &frame = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-	frame.hurtBoxes = other.hurtBoxes;
-	frame.hitBoxes = other.hitBoxes;
+	frame.hBoxes = other.hBoxes;
+	frame.aBoxes = other.aBoxes;
 	refreshBoxes(boxes, frame, object);
 }
 
@@ -1836,33 +1265,33 @@ void	copyBoxesFromNextFrame(std::unique_ptr<EditableObject> &object, tgui::Panel
 	copyBoxesFromFrame(object, boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation + 1]);
 }
 
-void	flattenCollisionBoxes(std::unique_ptr<EditableObject> &object, std::vector<std::vector<SpiralOfFate::FrameData>> &action, SpiralOfFate::FrameData *base)
+void	flattenCollisionBoxes(std::unique_ptr<EditableObject> &object, std::vector<std::vector<FrameData>> &action, FrameData *base)
 {
 	if (!base)
 		for (auto &block : action)
 			for (auto &frame : block)
-				if (frame.collisionBox) {
+				if (!frame.cBoxes.empty()) {
 					base = &frame;
 					goto allGood;
 				}
-	if (!base || !base->collisionBox)
+	if (!base || base->cBoxes.empty())
 		return;
 
 allGood:
 	for (auto &block : action)
 		for (auto &frame : block)
-			if (frame.collisionBox && &frame != base) {
-				delete frame.collisionBox;
-				frame.collisionBox = new SpiralOfFate::Box(*base->collisionBox);
+			if (!frame.cBoxes.empty() && &frame != base) {
+				frame.cBoxes.clear();
+				frame.cBoxes.push_back(base->cBoxes.front());
 			}
 }
 
 void	flattenAllCollisionBoxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
 	for (auto &[id, action] : object->_moves) {
-		if (id < 100 && action.front().front().collisionBox && id) {
-			delete action.front().front().collisionBox;
-			action.front().front().collisionBox = new SpiralOfFate::Box(*object->_moves.at(0)[0][0].collisionBox);
+		if (id < 100 && !action.front().front().cBoxes.empty() && id) {
+			action.front().front().cBoxes.clear();
+			action.front().front().cBoxes.push_back(object->_moves.at(0)[0][0].cBoxes.front());
 		}
 		flattenCollisionBoxes(object, action, nullptr);
 	}
@@ -1881,7 +1310,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	auto panel = gui.get<tgui::Panel>("Panel1");
 	auto boxes = gui.get<tgui::Panel>("Boxes");
 
-	SpiralOfFate::game->logger.debug("Placing hooks");
+	game->logger.debug("Placing hooks");
 	placeAnimPanelHooks(gui, panel, boxes, object);
 
 	bar->setMenuEnabled({"New"}, false);
@@ -1909,7 +1338,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"Misc", "Copy boxes from next frame"}, copyBoxesFromNextFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten all collision boxes"}, flattenAllCollisionBoxes, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten this move collision boxes"}, flattenThisMoveCollisionBoxes, std::ref(object), boxes);
-	bar->connectMenuItem({"Misc", "Reload textures"}, []{ SpiralOfFate::game->textureMgr.reloadEverything(); });
+	bar->connectMenuItem({"Misc", "Reload textures"}, []{ /*game->textureMgr.reloadEverything();*/ });
 
 	for (unsigned i = 0; i < resizeButtons.size(); i++) {
 		auto &resizeButton = resizeButtons[i];
@@ -1938,25 +1367,30 @@ void	handleDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mou
 		return;
 	if (!selectedBox && !spriteSelected)
 		return;
-	if (mouseStart.distance(SpiralOfFate::Vector2i{mouseX, mouseY}) > 10)
+	if (mouseStart.distance(Vector2i{mouseX, mouseY}) > 10)
 		dragStart = true;
 	if (!dragStart)
 		return;
 	if (!dragLeft && !dragRight && !dragUp && !dragDown) {
-		if (spriteSelected) {
+		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-			SpiralOfFate::Vector2i diff = SpiralOfFate::Vector2i{mouseX, mouseY} - lastMouse;
+			Vector2i diff = Vector2i{mouseX, mouseY} - lastMouse;
 
 			diff.y *= -1;
-			data.offset += diff;
-			boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.offset.x - data.size.x / 2)), "&.h / 2 + " + std::to_string(data.offset.y + 300));
-			gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.offset.x) + "," + std::to_string(data.offset.y) + ")");
-			arrangeButtons(&*object);
+			data.offsetX += diff.x;
+			data.offsetY += diff.y;
+			boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.offsetX - (data.texWidth * data.blendOptions.scaleX) / 2)), "&.h / 2 + " + std::to_string(data.offsetY + 300));
+			gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.offsetX) + "," + std::to_string(data.offsetY) + ")");
+			arrangeButtons(&*object);*/
 		} else {
-			SpiralOfFate::Vector2i diff{mouseX, mouseY};
+			Vector2i diff{mouseX, mouseY};
 
-			selectedBox->pos += diff - lastMouse;
-			boxButton->setPosition("&.w / 2 + " + std::to_string(selectedBox->pos.x), "&.h / 2 + " + std::to_string(selectedBox->pos.y + 300));
+			diff -= lastMouse;
+			selectedBox->left += diff.x;
+			selectedBox->right += diff.x;
+			selectedBox->down += diff.y;
+			selectedBox->up += diff.y;
+			boxButton->setPosition("&.w / 2 + " + std::to_string(selectedBox->left), "&.h / 2 + " + std::to_string(selectedBox->up + 300));
 			arrangeButtons(&*object);
 		}
 		lastMouse = {mouseX, mouseY};
@@ -1965,35 +1399,35 @@ void	handleDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mou
 	if (dragLeft) {
 		auto diff = mouseX - lastMouse.x;
 
-		if (spriteSelected) {
+		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-			if (static_cast<int>(data.size.x) - diff < 10) {
-				data.offset.x += data.size.x - 10;
-				lastMouse.x += data.size.x - 10;
-				data.size.x = 10;
+			if (static_cast<int>(data.texWidth * data.blendOptions.scaleX) - diff < 10) {
+				data.offsetX += data.texWidth * data.blendOptions.scaleX - 10;
+				lastMouse.x += data.texWidth * data.blendOptions.scaleX - 10;
+				data.blendOptions.scaleX = data.texWidth / 10;
 			} else {
-				data.offset.x += diff;
+				data.offsetX += diff;
 				bbb = !bbb;
 				bbb &= diff % 2;
 				data.size.x -= diff + copysign(bbb, diff);
 				lastMouse.x = mouseX;
-			}
+			}*/
 		} else {
-			if (static_cast<int>(selectedBox->size.x) - diff < 10) {
+			/*if (static_cast<int>(selectedBox->size.x) - diff < 10) {
 				selectedBox->pos.x += selectedBox->size.x - 10;
 				lastMouse.x += selectedBox->size.x - 10;
 				selectedBox->size.x = 10;
-			} else {
-				selectedBox->pos.x += diff;
-				selectedBox->size.x -= diff;
-				lastMouse.x = mouseX;
-			}
+			} else {*/
+			selectedBox->left += diff;
+			//selectedBox->size.x -= diff;
+			lastMouse.x = mouseX;
+			//}
 		}
 	} else if (dragRight) {
 		auto diff = mouseX - lastMouse.x;
 
-		if (spriteSelected) {
+		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 			if (static_cast<int>(data.size.x) + diff < 10) {
@@ -2006,21 +1440,22 @@ void	handleDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mou
 				bbb &= diff % 2;
 				data.offset.x += diff / 2 + copysign(bbb, diff);
 				lastMouse.x = mouseX;
-			}
+			}*/
 		} else {
-			if (static_cast<int>(selectedBox->size.x) + diff < 10) {
+			/*if (static_cast<int>(selectedBox->size.x) + diff < 10) {
 				lastMouse.x -= selectedBox->size.x - 10;
 				selectedBox->size.x = 10;
-			} else {
-				selectedBox->size.x += diff;
+			} else {*/
+				//selectedBox->size.x += diff;
+				selectedBox->right += diff;
 				lastMouse.x = mouseX;
-			}
+			//}
 		}
 	}
 	if (dragUp) {
 		auto diff = mouseY - lastMouse.y;
 
-		if (spriteSelected) {
+		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 			if (static_cast<int>(data.size.y) - diff < 10) {
@@ -2029,22 +1464,23 @@ void	handleDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mou
 			} else {
 				data.size.y -= diff;
 				lastMouse.y = mouseY;
-			}
+			}*/
 		} else {
-			if (static_cast<int>(selectedBox->size.y) - diff < 10) {
+			/*if (static_cast<int>(selectedBox->size.y) - diff < 10) {
 				selectedBox->pos.y += selectedBox->size.y - 10;
 				lastMouse.y += selectedBox->size.y - 10;
 				selectedBox->size.y = 10;
-			} else {
-				selectedBox->pos.y += diff;
-				selectedBox->size.y -= diff;
+			} else {*/
+				//selectedBox->pos.y += diff;
+				//selectedBox->size.y -= diff;
+				selectedBox->up += diff;
 				lastMouse.y = mouseY;
-			}
+			//}
 		}
 	} else if (dragDown) {
 		auto diff = mouseY - lastMouse.y;
 
-		if (spriteSelected) {
+		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 			if (static_cast<int>(data.size.y) + diff < 10) {
@@ -2055,28 +1491,29 @@ void	handleDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mou
 				data.offset.y -= diff;
 				data.size.y += diff;
 				lastMouse.y = mouseY;
-			}
+			}*/
 		} else {
-			if (static_cast<int>(selectedBox->size.y) + diff < 10) {
+			/*if (static_cast<int>(selectedBox->size.y) + diff < 10) {
 				lastMouse.y -= selectedBox->size.y - 10;
 				selectedBox->size.y = 10;
-			} else {
-				selectedBox->size.y += diff;
+			} else {*/
+				//selectedBox->size.y += diff;
+				selectedBox->down += diff;
 				lastMouse.y = mouseY;
-			}
+			//}
 		}
 	}
-	if (spriteSelected) {
+	if (spriteSelected) {/*
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 		boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.offset.x - data.size.x / 2)), "&.h / 2 + " + std::to_string(data.offset.y + 300));
 		boxButton->setSize(data.size.x, data.size.y);
 		gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.offset.x) + "," + std::to_string(data.offset.y) + ")");
 		gui.get<tgui::EditBox>("Size")->setText("(" + std::to_string(data.size.x) + "," + std::to_string(data.size.y) + ")");
-		arrangeButtons(&*object);
+		arrangeButtons(&*object);*/
 	} else {
-		boxButton->setPosition("&.w / 2 + " + std::to_string(selectedBox->pos.x), "&.h / 2 + " + std::to_string(selectedBox->pos.y + 300));
-		boxButton->setSize(selectedBox->size.x, selectedBox->size.y);
+		boxButton->setPosition("&.w / 2 + " + std::to_string(selectedBox->left), "&.h / 2 + " + std::to_string(selectedBox->up + 300));
+		boxButton->setSize(selectedBox->left - selectedBox->right, selectedBox->up - selectedBox->down);
 		arrangeButtons(&*object);
 	}
 }
@@ -2129,12 +1566,62 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 	}
 }
 
+void	loadSettings()
+{
+	game->logger.debug("Loading settings");
+
+	std::ifstream file("assets/dats.json");
+
+	if (file.fail())
+		throw std::invalid_argument("Could not open dats.json");
+	if (file.is_open()) {
+		nlohmann::json json;
+		file >> json;
+		file.close();
+
+		std::string swr = json["swr"];
+		std::string soku = json["soku"];
+		std::string soku2 = json["soku2"];
+		std::vector<std::filesystem::path> paths = {
+			std::filesystem::path(soku) / "th123a.dat",
+			std::filesystem::path(soku) / "th123b.dat",
+			std::filesystem::path(soku) / "th123c.dat",
+			std::filesystem::path(swr)  / "th105a.dat",
+			std::filesystem::path(swr)  / "th105b.dat",
+			std::filesystem::path(swr)  / "th105c.dat",
+		};
+
+		for (auto &path : std::filesystem::directory_iterator(soku2))
+			paths.push_back(soku2 / path.path().filename() / (path.path().filename().string() + ".dat"));
+
+		for (auto &path : paths)
+			game->package.merge(new ShadyCore::Package(path));
+		for (auto &entry : game->package) {
+			if (entry.first.name.substr(0, strlen("data_character_")) != "data_character_")
+				continue;
+
+			std::string name = std::string(entry.first.name.substr(strlen("data_character_")));
+			std::string filename = name.substr(name.find_last_of('_') + 1);
+
+			name = name.substr(0, name.find('_'));
+			if (entry.first.fileType == ShadyCore::FileType::TYPE_SCHEMA) {
+				game->logger.debug("Found schema " + std::string(entry.first.name));
+				//ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ShadyCore::FileType::SCHEMA_GAME_ANIM})(&game->characterPaths[name].framedata, entry.second->open());
+			} else if (entry.first.fileType == ShadyCore::FileType::TYPE_PALETTE) {
+				game->logger.debug("Found palette " + std::string(entry.first.name));
+				ShadyCore::getResourceReader(entry.first.fileType)(&game->characterPaths[name].palettes[filename + ".pal"], entry.second->open());
+			}
+		}
+	}
+}
+
 void	run()
 {
-	SpiralOfFate::game->screen = std::make_unique<SpiralOfFate::Screen>("Frame data editor");
+	loadSettings();
+	game->screen = std::make_unique<Screen>("Frame data editor");
 
 	std::unique_ptr<EditableObject> object;
-	tgui::Gui gui{*SpiralOfFate::game->screen};
+	tgui::Gui gui{*game->screen};
 	sf::Image icon;
 	sf::Event event;
 	sf::Texture stage;
@@ -2145,7 +1632,7 @@ void	run()
 	sprite.setPosition({stage.getSize().x * 1.f / -2.f, stage.getSize().y * 1.f / -1.4f});
 	sprite.setScale(1, 1);
 	if (icon.loadFromFile("assets/editorIcon.png"))
-		SpiralOfFate::game->screen->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+		game->screen->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	gui.loadWidgetsFromFile("assets/gui/editor.gui");
 
@@ -2156,25 +1643,25 @@ void	run()
 	sf::View guiView{
 		{
 			0, 0,
-			static_cast<float>(SpiralOfFate::game->screen->getSize().x),
-			static_cast<float>(SpiralOfFate::game->screen->getSize().y)
+			static_cast<float>(game->screen->getSize().x),
+			static_cast<float>(game->screen->getSize().y)
 		}
 	};
 
 	placeGuiHooks(gui, object);
 	view.setCenter(panel->getSize().x / 2, -300);
-	view.setSize(SpiralOfFate::game->screen->getSize().x, SpiralOfFate::game->screen->getSize().y);
-	SpiralOfFate::game->screen->setView(view);
+	view.setSize(game->screen->getSize().x, game->screen->getSize().y);
+	game->screen->setView(view);
 	gui.setView(guiView);
-	while (SpiralOfFate::game->screen->isOpen()) {
+	while (game->screen->isOpen()) {
 		timer++;
-		SpiralOfFate::game->screen->clear(sf::Color::Black);
-		SpiralOfFate::game->screen->draw(sprite);
+		game->screen->clear(sf::Color::Black);
+		game->screen->draw(sprite);
 		if (object) {
 			if (timer >= updateTimer || updateAnyway) {
 				object->update();
 				if (object->_animationCtr == 0)
-					SpiralOfFate::game->soundMgr.play(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].soundHandle);
+					game->soundMgr.play(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hitSoundHandle);
 				updateAnyway = false;
 				progress->setValue(object->_animation);
 				timer -= updateTimer;
@@ -2182,7 +1669,7 @@ void	run()
 			object->render();
 		}
 
-		while (SpiralOfFate::game->screen->pollEvent(event)) {
+		while (game->screen->pollEvent(event)) {
 			gui.handleEvent(event);
 			if (event.type == sf::Event::Closed) {
 				quitRequest = true;
@@ -2197,7 +1684,7 @@ void	run()
 
 				view.setCenter(panel->getSize().x / 2, -300);
 				view.setSize(event.size.width, event.size.height);
-				SpiralOfFate::game->screen->setView(view);
+				game->screen->setView(view);
 				continue;
 			}
 			dragging &= sf::Mouse::isButtonPressed(sf::Mouse::Left);
@@ -2216,10 +1703,10 @@ void	run()
 				handleDrag(gui, object, event.mouseMove.x, event.mouseMove.y);
 		}
 		gui.draw();
-		SpiralOfFate::game->screen->display();
+		game->screen->display();
 		if (quitRequest) {
 			if (!object) {
-				SpiralOfFate::game->screen->close();
+				game->screen->close();
 				continue;
 			}
 			quitRequest = false;
@@ -2230,33 +1717,11 @@ void	run()
 
 			window->loadWidgetsFromFile("assets/gui/quitConfirm.gui");
 			window->get<tgui::Button>("Yes")->connect("Clicked", [&object](std::weak_ptr<tgui::ChildWindow> self){
-				if (loadedPath.empty())
-					loadedPath = Utils::saveFileDialog("Save framedata", "assets", {{".*\\.json", "Frame data file"}});
-				if (loadedPath.empty()) {
-					self.lock()->close();
-					return;
-				}
-
-				nlohmann::json j = nlohmann::json::array();
-
-				for (auto &[key, value] : object->_moves) {
-					j.push_back({
-						{"action", key},
-						{"framedata", value}
-					});
-				}
-
-				std::ofstream stream{loadedPath};
-
-				if (stream.fail()) {
-					Utils::dispMsg("Saving failed", loadedPath + ": " + strerror(errno), MB_ICONERROR);
-					return;
-				}
-				stream << j.dump(4) << std::endl;
-				SpiralOfFate::game->screen->close();
+				if (saveCallback(object))
+					game->screen->close();
 			}, std::weak_ptr<tgui::ChildWindow>(window));
 			window->get<tgui::Button>("No")->connect("Clicked", []{
-				SpiralOfFate::game->screen->close();
+				game->screen->close();
 			});
 			window->get<tgui::Button>("Cancel")->connect("Clicked", [](std::weak_ptr<tgui::ChildWindow> self){
 				self.lock()->close();
@@ -2310,8 +1775,8 @@ LONG WINAPI UnhandledExFilter(PEXCEPTION_POINTERS ExPtr)
 		CloseHandle(hFile);
 	} else
 		sprintf(buf, "Fatal exception caught.\nCould not create file %s\n%s", buf2, getLastError().c_str());
-	SpiralOfFate::game->logger.fatal(buf);
-	Utils::dispMsg("Fatal error", buf, MB_ICONERROR, &*SpiralOfFate::game->screen);
+	game->logger.fatal(buf);
+	Utils::dispMsg("Fatal error", buf, MB_ICONERROR, &*game->screen);
 	exit(EXIT_FAILURE);
 }
 #endif
@@ -2323,16 +1788,16 @@ int	main()
 #endif
 
 	try {
-		new SpiralOfFate::Game("./editor.log");
-		SpiralOfFate::game->logger.info("Starting editor.");
+		new Game("./editor.log");
+		game->logger.info("Starting editor.");
 		run();
-		SpiralOfFate::game->logger.info("Goodbye !");
+		game->logger.info("Goodbye !");
 	} catch (std::exception &e) {
-		SpiralOfFate::game->logger.fatal(e.what());
-		Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, &*SpiralOfFate::game->screen);
-		delete SpiralOfFate::game;
+		game->logger.fatal(e.what());
+		Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, &*game->screen);
+		delete game;
 		return EXIT_FAILURE;
 	}
-	delete SpiralOfFate::game;
+	delete game;
 	return EXIT_SUCCESS;
 }

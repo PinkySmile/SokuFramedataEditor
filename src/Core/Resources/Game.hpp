@@ -97,6 +97,11 @@ namespace SpiralOfFate
 		/*  4 */ BASICSOUND_GROUND_SLAM = BASICSOUND_KNOCKDOWN,
 	};
 
+	struct CharacterData {
+		ShadyCore::Schema framedata;
+		std::map<std::string, ShadyCore::Palette> palettes;
+	};
+
 	struct Game {
 		bool hosting = false;
 		std::mt19937 random;
@@ -107,6 +112,8 @@ namespace SpiralOfFate
 		std::unique_ptr<Screen> screen;
 		TextureManager textureMgr;
 		SoundManager soundMgr;
+		ShadyCore::PackageEx package;
+		std::map<std::string, CharacterData> characterPaths;
 
 		Game(const std::string &loggerPath = "./latest.log");
 		~Game();

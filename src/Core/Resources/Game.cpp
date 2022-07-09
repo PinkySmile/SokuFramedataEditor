@@ -26,3 +26,8 @@ namespace SpiralOfFate
 		this->logger.debug("~Game()<");
 	}
 }
+
+namespace ShadyCore {
+	void* Allocate(size_t s) { return malloc(s); }
+	void Deallocate(void* p) { free(p); }
+}
