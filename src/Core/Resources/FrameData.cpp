@@ -5,7 +5,6 @@
 #include <fstream>
 #include "FrameData.hpp"
 #include "Game.hpp"
-#include "../Logger.hpp"
 
 namespace SpiralOfFate
 {
@@ -33,29 +32,38 @@ namespace SpiralOfFate
 				throw std::invalid_argument("Found unknown object id " + std::to_string(sequ->getType()) + " in schema");
 		}
 		for (auto &object : objects)
-			result[object->getId()] = result.at(object->targetId);
+			result.emplace(object->getId(), object->targetId);
+		if (result.find(0) == result.end())
+			throw std::invalid_argument("Schema does not contain action with id 0");
 		return result;
 	}
 
-	FrameData::FrameData(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName) :
-		ShadyCore::Schema::Sequence::MoveFrame(),
-		_pal(palName),
-		_character(chr),
-		_palette(palette),
-		_schema(schema)
-	{
-	}
-
 	FrameData::FrameData(const std::string &chr, const ShadyCore::Schema &schema, ShadyCore::Schema::Sequence::MoveFrame &frame, const ShadyCore::Palette &palette, const std::string &palName) :
-		ShadyCore::Schema::Sequence::MoveFrame(frame),
 		_pal(palName),
 		_character(chr),
-		_palette(palette),
-		_schema(schema)
+		_palette(&palette),
+		_schema(schema),
+		imageIndex(frame.imageIndex),
+		unknown(frame.unknown),
+		texOffsetX(frame.texOffsetX),
+		texOffsetY(frame.texOffsetY),
+		texWidth(frame.texWidth),
+		texHeight(frame.texHeight),
+		offsetX(frame.offsetX),
+		offsetY(frame.offsetY),
+		duration(frame.duration),
+		renderGroup(frame.renderGroup),
+		blendOptions(frame.blendOptions),
+		traits(frame.traits),
+		cBoxes(frame.cBoxes),
+		hBoxes(frame.hBoxes),
+		aBoxes(frame.aBoxes),
+		effect(frame.effect),
+		frame(frame)
 	{
 		Vector2u textureSize;
 
-		this->textureHandle = game->textureMgr.load(game->package, this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name, &textureSize);
+		this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name, &textureSize);
 		if (this->traits.onHitSfx) {
 			char buffer[4];
 
@@ -82,11 +90,27 @@ namespace SpiralOfFate
 	}
 
 	FrameData::FrameData(const FrameData &other) :
-		ShadyCore::Schema::Sequence::MoveFrame(other),
 		_pal(other._pal),
 		_character(other._character),
 		_palette(other._palette),
-		_schema(other._schema)
+		_schema(other._schema),
+		imageIndex(other.imageIndex),
+		unknown(other.unknown),
+		texOffsetX(other.texOffsetX),
+		texOffsetY(other.texOffsetY),
+		texWidth(other.texWidth),
+		texHeight(other.texHeight),
+		offsetX(other.offsetX),
+		offsetY(other.offsetY),
+		duration(other.duration),
+		renderGroup(other.renderGroup),
+		blendOptions(other.blendOptions),
+		traits(other.traits),
+		cBoxes(other.cBoxes),
+		hBoxes(other.hBoxes),
+		aBoxes(other.aBoxes),
+		effect(other.effect),
+		frame(other.frame)
 	{
 		this->textureHandle = other.textureHandle;
 		this->hitSoundHandle = other.hitSoundHandle;
@@ -94,30 +118,15 @@ namespace SpiralOfFate
 			game->textureMgr.addRef(this->textureHandle);
 			game->soundMgr.addRef(this->hitSoundHandle);
 		}
-	}
-
-	FrameData &FrameData::operator=(const FrameData &other)
-	{
-		if (!this->_slave) {
-			game->textureMgr.remove(this->textureHandle);
-			game->soundMgr.remove(this->hitSoundHandle);
-		}
-		this->textureHandle = other.textureHandle;
-		this->hitSoundHandle = other.hitSoundHandle;
-		ShadyCore::Schema::Sequence::MoveFrame::operator=(other);
-		if (!this->_slave) {
-			game->textureMgr.addRef(this->textureHandle);
-			game->soundMgr.addRef(this->hitSoundHandle);
-		}
-		return *this;
 	}
 
 	void FrameData::reloadTexture()
 	{
 		my_assert(!this->_slave);
+		this->needReload = false;
 		game->textureMgr.remove(this->textureHandle);
 		// TODO: Use the actual value
-		this->textureHandle = game->textureMgr.load(game->package, this->_palette, this->_pal, "data/character/" + this->_character + "/attackAb001.cv3");
+		this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name);
 	}
 
 	void FrameData::reloadSound()
@@ -135,9 +144,89 @@ namespace SpiralOfFate
 
 	void FrameData::setSlave(bool slave)
 	{
-		if (!slave && this->_slave)
+		if (!slave && this->_slave) {
+			game->textureMgr.addRef(this->textureHandle);
+			game->soundMgr.addRef(this->hitSoundHandle);
+		} else if (slave && !this->_slave) {
 			game->textureMgr.remove(this->textureHandle);
+			game->soundMgr.remove(this->hitSoundHandle);
+		}
 		this->_slave = slave;
+	}
+
+	void FrameData::setPalette(const ShadyCore::Palette &palette, const std::string &name)
+	{
+		this->needReload = !this->_slave;
+		this->_pal = name;
+		this->_palette = &palette;
+	}
+
+	FrameData &FrameData::operator=(FrameData &other)
+	{
+		this->_pal = other._pal;
+		this->_character = other._character;
+		this->_palette = other._palette;
+		if (!this->_slave) {
+			game->textureMgr.remove(this->textureHandle);
+			game->soundMgr.remove(this->hitSoundHandle);
+			game->textureMgr.addRef(other.textureHandle);
+			game->soundMgr.addRef(other.hitSoundHandle);
+		}
+		this->textureHandle = other.textureHandle;
+		this->hitSoundHandle = other.hitSoundHandle;
+		this->needReload = other.needReload;
+		(*(const ShadyCore::Schema **)&this->_schema) = &other._schema;
+		(*(uint16_t **)&this->imageIndex) = &other.imageIndex;
+		(*(uint16_t **)&this->unknown) = &other.unknown;
+		(*(uint16_t **)&this->texOffsetX) = &other.texOffsetX;
+		(*(uint16_t **)&this->texOffsetY) = &other.texOffsetY;
+		(*(uint16_t **)&this->texWidth) = &other.texWidth;
+		(*(uint16_t **)&this->texHeight) = &other.texHeight;
+		(*(int16_t **)&this->offsetX) = &other.offsetX;
+		(*(int16_t **)&this->offsetY) = &other.offsetY;
+		(*(uint16_t **)&this->duration) = &other.duration;
+		(*(uint8_t **)&this->renderGroup) = &other.renderGroup;
+		(*(ShadyCore::Schema::Sequence::MoveTraits **)&this->traits) = &other.traits;
+		(*(std::vector<ShadyCore::Schema::Sequence::BBox> **)&this->cBoxes) = &other.cBoxes;
+		(*(std::vector<ShadyCore::Schema::Sequence::BBox> **)&this->hBoxes) = &other.hBoxes;
+		(*(std::vector<ShadyCore::Schema::Sequence::BBox> **)&this->aBoxes) = &other.aBoxes;
+		(*(ShadyCore::Schema::Sequence::MoveEffect **)&this->effect) = &other.effect;
+		(*(ShadyCore::Schema::Sequence::MoveFrame **)&this->frame) = &other.frame;
+		return *this;
+	}
+
+	FrameData &FrameData::operator=(FrameData &&other)
+	{
+		this->_pal = other._pal;
+		this->_character = other._character;
+		this->_palette = other._palette;
+		if (!this->_slave) {
+			game->textureMgr.remove(this->textureHandle);
+			game->soundMgr.remove(this->hitSoundHandle);
+			game->textureMgr.addRef(other.textureHandle);
+			game->soundMgr.addRef(other.hitSoundHandle);
+		}
+		this->textureHandle = other.textureHandle;
+		this->hitSoundHandle = other.hitSoundHandle;
+		this->needReload = other.needReload;
+		(*(const ShadyCore::Schema **)&this->_schema) = &other._schema;
+		(*(uint16_t **)&this->imageIndex) = &other.imageIndex;
+		(*(uint16_t **)&this->unknown) = &other.unknown;
+		(*(uint16_t **)&this->texOffsetX) = &other.texOffsetX;
+		(*(uint16_t **)&this->texOffsetY) = &other.texOffsetY;
+		(*(uint16_t **)&this->texWidth) = &other.texWidth;
+		(*(uint16_t **)&this->texHeight) = &other.texHeight;
+		(*(int16_t **)&this->offsetX) = &other.offsetX;
+		(*(int16_t **)&this->offsetY) = &other.offsetY;
+		(*(uint16_t **)&this->duration) = &other.duration;
+		(*(uint8_t **)&this->renderGroup) = &other.renderGroup;
+		(*(ShadyCore::Schema::Sequence::MoveTraits **)&this->traits) = &other.traits;
+		(*(std::vector<ShadyCore::Schema::Sequence::BBox> **)&this->cBoxes) = &other.cBoxes;
+		(*(std::vector<ShadyCore::Schema::Sequence::BBox> **)&this->hBoxes) = &other.hBoxes;
+		(*(std::vector<ShadyCore::Schema::Sequence::BBox> **)&this->aBoxes) = &other.aBoxes;
+		(*(ShadyCore::Schema::Sequence::MoveEffect **)&this->effect) = &other.effect;
+		(*(ShadyCore::Schema::Sequence::MoveFrame **)&this->frame) = &other.frame;
+		return *this;
 	}
 
 	Box::operator sf::IntRect() const noexcept

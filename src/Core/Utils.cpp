@@ -380,6 +380,7 @@ namespace Utils
 				auto win = tgui::ChildWindow::create();
 				win->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
 				gui.add(win);
+				setRenderer(win);
 
 				win->setFocused(true);
 
@@ -488,74 +489,63 @@ namespace Utils
 
 	sf::Color HSLtoRGB(const HSLColor &color)
 	{
-		struct {
-			double h;
-			double s;
-			double l;
-		} temp{
-			color.h % 240 == 0 ? 1 : color.h * 360 / 240.,
-			color.s / 240.,
-			color.l / 240.,
-		};
-		double C = (1 - std::abs(2 * temp.l - 1)) * temp.s;
-		double Tp = temp.h / 60;
-		double m = temp.l - C / 2;
-		double X = C * (1 - std::abs(std::fmod(Tp, 2) - 1));
-		struct {
-			double r;
-			double g;
-			double b;
-		} colorp;
+		float h = color.h * 360 / 240.f;
+		float s = color.s / 240.f;
+		float l = color.l / 240.f;
+		float c = (1.0f - std::abs(2.0f * l - 1.0f)) * s;
+		float x = c * (1.0f - std::abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
+		float m = l - c / 2.0f;
+		float r = 0;
+		float g = 0;
+		float b = 0;
 
-		if (temp.h == 0)
-			colorp = {0, 0, 0};
-		else if (Tp < 1)
-			colorp = {C, X, 0};
-		else if (Tp < 2)
-			colorp = {X, C, 0};
-		else if (Tp < 3)
-			colorp = {0, C, X};
-		else if (Tp < 4)
-			colorp = {0, X, C};
-		else if (Tp < 5)
-			colorp = {X, 0, C};
-		else if (Tp < 6)
-			colorp = {C, 0, X};
-
-		return {
-			static_cast<unsigned char>((colorp.r + m) * 255),
-			static_cast<unsigned char>((colorp.g + m) * 255),
-			static_cast<unsigned char>((colorp.b + m) * 255),
-			255
-		};
+		if ((0.0f <= h && h < 60.0f) || h >= 360.0f) {
+			r = c;    g = x;   b = 0.0f;
+		} else if (60.0f <= h && h < 120.0f) {
+			r = x;    g = c;   b = 0.0f;
+		} else if (120.0f <= h && h < 180.0f) {
+			r = 0.0f; g = c;   b = x;
+		} else if (180.0f <= h && h < 240.0f) {
+			r = 0.0f; g = x;   b = c;
+		} else if (240.0f <= h && h < 300.0f) {
+			r = x;   g = 0.0f; b = c;
+		} else if (300.0f <= h && h < 360.0f) {
+			r = c;   g = 0.0f; b = x;
+		}
+		return sf::Color(
+			static_cast<sf::Uint8>(std::round((r + m) * 255.0f)),
+			static_cast<sf::Uint8>(std::round((g + m) * 255.0f)),
+			static_cast<sf::Uint8>(std::round((b + m) * 255.0f))
+		);
 	}
 
 	HSLColor RGBtoHSL(const sf::Color &color)
 	{
-		struct {
-			double r;
-			double g;
-			double b;
-		} colorp{color.r / 255., color.g / 255., color.b / 255.};
-		double M = std::max(colorp.r, std::max(colorp.g, colorp.b));
-		double m = std::min(colorp.r, std::min(colorp.g, colorp.b));
-		double C = M - m;
-		double Tp = 0;
+		float r = color.r / 255.f;
+		float g = color.g / 255.f;
+		float b = color.b / 255.f;
+		float max = std::max(r, std::max(g, b));
+		float min = std::min(r, std::min(g, b));
+		float h = 0;
+		float s = 0;
+		float l = (max + min) / 2;
 
-		if (C == 0)
-			Tp = 0;
-		else if (M == colorp.r)
-			Tp = std::fmod((colorp.g - colorp.b) / C, 6);
-		else if (M == colorp.g)
-			Tp = std::fmod((colorp.b - colorp.r) / C + 2, 6);
-		else if (M == colorp.b)
-			Tp = std::fmod((colorp.r - colorp.g) / C + 4, 6);
-
-		double l = (M + m) / 2;
-
-		return HSLColor{
-			static_cast<unsigned char>(60. * Tp * 240 / 360),
-			static_cast<unsigned char>(l == 1 ? 0 : C / (1 - std::abs(2 * l - 1)) * 240),
+		if (max == min)
+			h = s = 0;
+		else {
+			float d = max - min;
+			s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+			if (max == r)
+				h = (g - b) / d + (g < b ? 6 : 0);
+			else if (max == g)
+				h = (b - r) / d + 2;
+			else if (max == b)
+				h = (r - g) / d + 4;
+			h /= 6;
+		}
+		return {
+			static_cast<unsigned char>(h * 240),
+			static_cast<unsigned char>(s * 240),
 			static_cast<unsigned char>(l * 240)
 		};
 	}

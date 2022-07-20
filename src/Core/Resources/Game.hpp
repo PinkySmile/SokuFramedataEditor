@@ -98,7 +98,6 @@ namespace SpiralOfFate
 	};
 
 	struct CharacterData {
-		ShadyCore::Schema framedata;
 		std::map<std::string, ShadyCore::Palette> palettes;
 	};
 

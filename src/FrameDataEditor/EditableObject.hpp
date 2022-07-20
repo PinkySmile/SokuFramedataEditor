@@ -11,8 +11,8 @@
 class EditableObject : public SpiralOfFate::IObject {
 public:
 	mutable SpiralOfFate::Sprite _sprite;
+	mutable std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
 
-	std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
 	SpiralOfFate::Vector2f _position = {0, 0};
 	SpiralOfFate::Vector2f _speed = {0, 0};
 	float _gravity = 0;

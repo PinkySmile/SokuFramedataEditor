@@ -108,8 +108,20 @@ namespace SpiralOfFate
 
 				image.setPixel(x, y, color);
 			}
-		} else
-			image.create(resourceImage.width, resourceImage.height, resourceImage.raw);
+		} else {
+			auto raw = new sf::Color[resourceImage.width * resourceImage.height];
+
+			for (unsigned x = 0; x < resourceImage.width; x++)
+				for (unsigned y = 0; y < resourceImage.height; y++)
+					raw[y * resourceImage.width + x] = sf::Color{
+						resourceImage.raw[(y * resourceImage.width + x) * 4 + 2],
+						resourceImage.raw[(y * resourceImage.width + x) * 4 + 1],
+						resourceImage.raw[(y * resourceImage.width + x) * 4 + 0],
+						resourceImage.raw[(y * resourceImage.width + x) * 4 + 3]
+					};
+			image.create(resourceImage.width, resourceImage.height, reinterpret_cast<const sf::Uint8 *>(raw));
+			delete[] raw;
+		}
 
 		if (this->_freedIndexes.empty()) {
 			this->_lastIndex += this->_lastIndex == 0;
@@ -197,5 +209,26 @@ namespace SpiralOfFate
 	TextureManager::~TextureManager()
 	{
 		game->logger.debug("~TextureManager()");
+	}
+
+	const ShadyCore::Image &TextureManager::getUnderlyingImage(const std::string &file)
+	{
+		return this->_loadedImages.at(file);
+	}
+
+	void TextureManager::invalidatePalette(const std::string &palName)
+	{
+		std::string name = palName + "|";
+		std::vector<std::string> keys;
+
+		for (auto &[loadedPath, attr] : this->_allocatedTextures)
+			if (loadedPath.substr(0, name.size()) == name)
+				keys.push_back(loadedPath);
+		for (auto &key : keys) {
+			auto node = this->_allocatedTextures.extract(key);
+
+			node.key() = "INVALID" + node.key();
+			this->_allocatedTextures.insert(std::move(node));
+		}
 	}
 }

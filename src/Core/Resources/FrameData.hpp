@@ -88,26 +88,50 @@ namespace SpiralOfFate
 		};
 	};
 
-	class FrameData : public ShadyCore::Schema::Sequence::MoveFrame {
+	class FrameData {
 	private:
 		bool _slave = false;
 		std::string _pal;
 		std::string _character;
-		const ShadyCore::Palette &_palette;
+		const ShadyCore::Palette *_palette;
 
 	public:
 		const ShadyCore::Schema &_schema;
 		unsigned textureHandle = 0;
 		unsigned hitSoundHandle = 0;
+		bool needReload = false;
 
-		FrameData(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
+		//From ShadyCore::Schema::Sequence::Frame
+		uint16_t &imageIndex;
+		uint16_t &unknown;
+		uint16_t &texOffsetX;
+		uint16_t &texOffsetY;
+		uint16_t &texWidth;
+		uint16_t &texHeight;
+		int16_t &offsetX;
+		int16_t &offsetY;
+		uint16_t &duration;
+		uint8_t &renderGroup;
+		ShadyCore::Schema::Sequence::BlendOptions &blendOptions;
+
+		//From ShadyCore::Schema::Sequence::MoveFrame
+		ShadyCore::Schema::Sequence::MoveTraits &traits;
+		std::vector<ShadyCore::Schema::Sequence::BBox> &cBoxes;
+		std::vector<ShadyCore::Schema::Sequence::BBox> &hBoxes;
+		std::vector<ShadyCore::Schema::Sequence::BBox> &aBoxes;
+		ShadyCore::Schema::Sequence::MoveEffect &effect;
+
+		ShadyCore::Schema::Sequence::MoveFrame &frame;
+
 		FrameData(const FrameData &other);
 		~FrameData();
 		FrameData(const std::string &chr, const ShadyCore::Schema &schema, ShadyCore::Schema::Sequence::MoveFrame &frame, const ShadyCore::Palette &palette, const std::string &palName);
-		FrameData &operator=(const FrameData &other);
+		FrameData &operator=(FrameData &other);
+		FrameData &operator=(FrameData &&other);
 		void setSlave(bool slave = true);
 		void reloadTexture();
 		void reloadSound();
+		void setPalette(const ShadyCore::Palette &palette, const std::string &name);
 
 		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadSchema(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
 	};

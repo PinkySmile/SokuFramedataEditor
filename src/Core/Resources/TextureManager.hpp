@@ -26,11 +26,13 @@ namespace SpiralOfFate
 
 	public:
 		~TextureManager();
+		const ShadyCore::Image &getUnderlyingImage(const std::string &file);
 		unsigned load(ShadyCore::PackageEx &package, const std::string &file, Vector2u *size = nullptr);
 		unsigned load(ShadyCore::PackageEx &package, const ShadyCore::Palette &palette, const std::string &palName, const std::string &file, Vector2u *size = nullptr);
 		Vector2u getTextureSize(unsigned id) const;
 		void addRef(unsigned id);
 		void remove(unsigned id);
+		void invalidatePalette(const std::string &palName);
 		void render(Sprite &sprite) const;
 	};
 }

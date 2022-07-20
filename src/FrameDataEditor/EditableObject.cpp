@@ -13,6 +13,10 @@ void EditableObject::render() const
 {
 	sf::RectangleShape rect;
 	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+
+	if (data.needReload)
+		data.reloadTexture();
+
 	auto scale = SpiralOfFate::Vector2f{
 		(data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
 		(data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
@@ -80,6 +84,8 @@ void EditableObject::update()
 		this->_animation %= this->_moves.at(this->_action)[this->_actionBlock].size();
 		data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
 		SpiralOfFate::game->soundMgr.play(data->hitSoundHandle);
+		if (!data->duration)
+			break;
 	}
 	this->_position += this->_speed;
 	this->_speed.y += this->_gravity;

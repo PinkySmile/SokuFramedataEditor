@@ -1,0 +1,179 @@
+Renderer.1 {
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturedisabled = None;
+    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+}
+
+Renderer.2 {
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
+}
+
+Renderer.3 {
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+}
+
+EditBox.SokuPath {
+    Position = (90, 9);
+    Size = (330, 22);
+    TextSize = 13;
+    renderer = &3;
+}
+
+Button.SokuBrowse {
+    Position = (430, 10);
+    Text = Browse;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Label.Label1 {
+    AutoSize = true;
+    Position = (10, 11);
+    ScrollbarPolicy = Never;
+    Size = (67.2, 18);
+    Text = "Soku path";
+    TextSize = 13;
+    renderer = &2;
+}
+
+Label.Label2 {
+    AutoSize = true;
+    Position = (10, 41);
+    ScrollbarPolicy = Never;
+    Size = (66.2, 18);
+    Text = "SWR path";
+    TextSize = 13;
+    renderer = &2;
+}
+
+EditBox.SWRPath {
+    Position = (90, 39);
+    Size = (330, 22);
+    TextSize = 13;
+    renderer = &3;
+}
+
+Button.SWRBrowse {
+    Position = (430, 40);
+    Text = Browse;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Button.Soku2Browse {
+    Position = (430, 70);
+    Text = Browse;
+    TextSize = 13;
+    renderer = &1;
+}
+
+EditBox.Soku2Path {
+    Position = (90, 69);
+    Size = (330, 22);
+    TextSize = 13;
+    renderer = &3;
+}
+
+Label.Label3 {
+    AutoSize = true;
+    Position = (10, 71);
+    ScrollbarPolicy = Never;
+    Size = (75.2, 18);
+    Text = "Soku2 path";
+    TextSize = 13;
+    renderer = &2;
+}
+
+Label.Label4 {
+    AutoSize = true;
+    Position = (10, 101);
+    ScrollbarPolicy = Never;
+    Size = (115.2, 18);
+    Text = "Background Color";
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        texturebackground = None;
+
+        scrollbar {
+            texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+            texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+            texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+            texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+        }
+    }
+}
+
+Button.BG {
+    Position = (130, 100);
+    Size = (40, 20);
+    TextSize = 13;
+
+    Renderer {
+        backgroundcolor = #F5F5F5;
+        backgroundcolordisabled = #E6E6E6;
+        backgroundcolordown = #EBEBEB;
+        backgroundcolorhover = white;
+        bordercolor = #3C3C3C;
+        bordercolordisabled = #7D7D7D;
+        bordercolordown = black;
+        bordercolorfocused = #1E1EB4;
+        bordercolorhover = black;
+        borders = (1, 1, 1, 1);
+        textcolor = #3C3C3C;
+        textcolordisabled = #7D7D7D;
+        textcolordown = black;
+        textcolorhover = black;
+        texture = None;
+        texturedisabled = None;
+        texturedown = None;
+        texturefocused = None;
+        texturehover = None;
+    }
+}
+
+Button.Cancel {
+    Position = (430, 110);
+    Size = (60, 22);
+    Text = Cancel;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Button.Save {
+    Position = (360, 110);
+    Size = (60, 22);
+    Text = Save;
+    TextSize = 13;
+    renderer = &1;
+}
