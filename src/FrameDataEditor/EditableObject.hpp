@@ -10,6 +10,10 @@
 
 class EditableObject : public SpiralOfFate::IObject {
 public:
+	float scale = 1;
+	SpiralOfFate::Vector2f translate = {0, 0};
+	bool displayScaled = false;
+
 	mutable SpiralOfFate::Sprite _sprite;
 	mutable std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
 

@@ -2717,13 +2717,25 @@ void	run()
 				game->logger.warn("Current directory changed " + std::filesystem::current_path().string());
 				std::filesystem::current_path(cwd);
 			}
-			gui.handleEvent(event);
+
+			auto handled = gui.handleEvent(event);
+
 			if (event.type == sf::Event::Closed) {
 				quitRequest = true;
 				continue;
 			}
-			if (event.type == sf::Event::KeyPressed)
+			if (event.type == sf::Event::KeyPressed) {
 				handleKeyPress(event.key, object, gui);
+				continue;
+			}
+			if (!handled && event.type == sf::Event::MouseWheelScrolled && object && !displayHitboxes) {
+				object->scale *= 1 + std::copysign(0.1f, event.mouseWheelScroll.delta);
+				if (object->scale < 1)
+					object->scale = 1;
+				if (object->scale > 4)
+					object->scale = 4;
+				continue;
+			}
 			if (event.type == sf::Event::Resized) {
 				guiView.setSize(event.size.width, event.size.height);
 				guiView.setCenter(event.size.width / 2, event.size.height / 2);
@@ -2749,6 +2761,8 @@ void	run()
 			if (event.type == sf::Event::MouseMoved && dragging && canDrag)
 				handleDrag(gui, object, event.mouseMove.x, event.mouseMove.y);
 		}
+		if (object)
+			object->displayScaled = !displayHitboxes;
 		gui.draw();
 		game->screen->display();
 		if (quitRequest) {

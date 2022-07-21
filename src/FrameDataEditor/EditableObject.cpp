@@ -13,13 +13,15 @@ void EditableObject::render() const
 {
 	sf::RectangleShape rect;
 	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+	auto translate = this->displayScaled ? this->translate : SpiralOfFate::Vector2f{0, 0};
+	auto s = this->displayScaled ? this->scale : 1.f;
 
 	if (data.needReload)
 		data.reloadTexture();
 
 	auto scale = SpiralOfFate::Vector2f{
-		(data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
-		(data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
+		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
+		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
 	};
 	auto bounds = SpiralOfFate::Vector2f{
 		static_cast<float>(data.texWidth),
@@ -31,13 +33,9 @@ void EditableObject::render() const
 		data.texWidth,
 		data.texHeight
 	};
-	auto size = SpiralOfFate::Vector2f{
-		scale.x * bounds.x,
-		scale.y * bounds.y
-	};
 	auto result = SpiralOfFate::Vector2f{
-		static_cast<float>(-data.offsetX),
-		static_cast<float>(-data.offsetY)
+		static_cast<float>(-data.offsetX) * s,
+		static_cast<float>(-data.offsetY) * s
 	};
 
 	if (data.blendOptions.flipHorz) {
@@ -57,6 +55,7 @@ void EditableObject::render() const
 		data.texWidth * scale.x / 2,
 		data.texHeight * scale.y / 2
 	};
+	result += translate;
 	this->_sprite.setOrigin(bounds / 2.f);
 	this->_sprite.setRotation(data.blendOptions.angle);
 	this->_sprite.setPosition(result);
