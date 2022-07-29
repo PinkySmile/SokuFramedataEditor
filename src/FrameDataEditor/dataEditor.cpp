@@ -261,6 +261,9 @@ auto c = std::make_shared<bool>(false);
 float updateTimer = 0;
 float timer = 0;
 std::string loadedPath;
+bool colorPickDrag = false;
+bool hovering = false;
+bool normalDrag = false;
 bool canDrag = false;
 bool dragStart = false;
 bool dragUp = false;
@@ -282,6 +285,9 @@ std::string swr;
 std::string soku;
 std::string soku2;
 sf::Color bgColor = sf::Color::Black;
+sf::Image selectedColorMaskImage;
+sf::Sprite selectedColorMaskSprite;
+sf::Texture selectedColorMaskTexture;
 ShadyCore::Schema tempSchema;
 
 struct {
@@ -427,17 +433,17 @@ void	verifySettings()
 
 void loadPackages()
 {
-	std::vector<std::filesystem::path> paths = {
-		std::filesystem::path(soku) / "th123a.dat",
-		std::filesystem::path(soku) / "th123b.dat",
+	std::list<std::filesystem::path> paths = {
 		std::filesystem::path(soku) / "th123c.dat",
-		std::filesystem::path(swr)  / "th105a.dat",
+		std::filesystem::path(soku) / "th123b.dat",
+		std::filesystem::path(soku) / "th123a.dat",
 		std::filesystem::path(swr)  / "th105b.dat",
+		std::filesystem::path(swr)  / "th105a.dat",
 	};
 
 	try {
 		for (auto &path: std::filesystem::directory_iterator(soku2))
-			paths.push_back(soku2 / path.path().filename() / (path.path().filename().string() + ".dat"));
+			paths.push_front(soku2 / path.path().filename() / (path.path().filename().string() + ".dat"));
 	} catch (const std::exception &e) {
 		game->logger.error("Error loading soku2: " + std::string(e.what()));
 	}
@@ -1732,9 +1738,13 @@ void	flattenThisMoveCollisionBoxes(std::unique_ptr<EditableObject> &object, tgui
 	refreshBoxes(std::move(boxes), object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
 }
 
-void	switchHitboxes(tgui::Panel::Ptr boxes)
+void	switchHitboxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
 	displayHitboxes = !displayHitboxes;
+	if (object) {
+		object->scale = 1;
+		object->translate = {0, 0};
+	}
 	boxes->setVisible(displayHitboxes);
 }
 
@@ -1838,7 +1848,6 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 		auto size = cross->getSize();
 
 		sprintf(buffer, "#%02X%02X%02X", temp.r, temp.g, temp.b);
-		light->setValue(color.l);
 		hue->setText(std::to_string(color.h));
 		saturation->setText(std::to_string(color.s));
 		lightness->setText(std::to_string(color.l));
@@ -1847,6 +1856,7 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 			((240 - color.s) * 200 / 240) + pos.y - size.y / 2
 		});
 		edit->setText(buffer);
+		light->setValue(color.l);
 		preview->getRenderer()->setBackgroundColor(c);
 	};
 	auto sliderCallback = [updatePalButton, cross, light, lightness, satHuePic, hue, saturation, preview, edit]{
@@ -2031,7 +2041,7 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 
 	cross->ignoreMouseEvents();
 
-	auto colorPickHandler = [cross, satHuePic, light, hue, saturation, edit, preview, updateTexture](tgui::Vector2f pos){
+	auto colorPickHandler = [cross, satHuePic, light, hue, saturation, edit, preview, updateTexture](tgui::Vector2f pos, bool b){
 		char buffer[8];
 		unsigned char h = pos.x * 240 / 200;
 		unsigned char s = 240 - pos.y * 240 / 200;
@@ -2053,10 +2063,11 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 		edit->setText(buffer);
 		preview->getRenderer()->setBackgroundColor({buffer});
 		updateTexture(color, temp, true);
+		colorPickDrag = b;
 	};
 
-	satHuePic->onMousePress.connect(colorPickHandler);
-	satHuePic->onMouseRelease.connect(colorPickHandler);
+	satHuePic->connect("MousePressed",  [colorPickHandler](tgui::Vector2f pos){colorPickHandler(pos, true); });
+	satHuePic->connect("MouseReleased", [colorPickHandler](tgui::Vector2f pos){colorPickHandler(pos, false);});
 
 	col->removeAllWidgets();
 	if (!editSession.palette) {
@@ -2164,6 +2175,37 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 			ptr.lock()->setFocused(false);
 			col->get<tgui::Button>("Color" + std::to_string(selectedColor))->setFocused(true);
 		}, std::weak_ptr(button));
+		button->connect("Unfocused", [i](std::weak_ptr<tgui::Button> self){
+			if (i == selectedColor)
+				self.lock()->setFocused(true);
+		}, std::weak_ptr(button));
+		button->connect("MouseLeft", [i]{
+			hovering = false;
+		});
+		button->connect("MouseEntered", [i, &object]{
+			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+			auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema.images.at(data.imageIndex).name);
+			auto val = ((uint16_t*)editSession.palette->data)[i];
+			sf::Color color{
+				static_cast<sf::Uint8>(~((val & 0b0111110000000000) >> 7 | (val & 0b0111000000000000) >> 12)),
+				static_cast<sf::Uint8>(~((val & 0b0000001111100000) >> 2 | (val & 0b0000001110000000) >> 7)),
+				static_cast<sf::Uint8>(~((val & 0b0000000000011111) << 3 | (val & 0b0000000000011100) >> 2)),
+				static_cast<sf::Uint8>((val & 0x8000) ? 255 : 0)
+			};
+
+			hovering = true;
+			if (img.bitsPerPixel != 8 )
+				return;
+			selectedColorMaskImage.create(img.width, img.height);
+			for (unsigned y = 0; y < img.height; y++)
+				for (unsigned x = 0; x < img.width; x++)
+					if (i && img.raw[y * img.paddedWidth + x] == i)
+						selectedColorMaskImage.setPixel(x, y, color);
+					else
+						selectedColorMaskImage.setPixel(x, y, sf::Color::Transparent);
+			selectedColorMaskTexture.loadFromImage(selectedColorMaskImage);
+			selectedColorMaskSprite.setTexture(selectedColorMaskTexture, true);
+		});
 		renderer->setBackgroundColor(color);
 		renderer->setBackgroundColorDown(color);
 		renderer->setBackgroundColorDisabled(color);
@@ -2391,6 +2433,25 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"Misc", "Copy boxes from next frame"}, copyBoxesFromNextFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten all collision boxes"}, flattenAllCollisionBoxes, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten this move collision boxes"}, flattenThisMoveCollisionBoxes, std::ref(object), boxes);
+	bar->connectMenuItem({"Misc", "Evil mode"}, [&gui, &object]{
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		for (int i = 0; i < 256; i++) {
+			auto &val = ((uint16_t*)editSession.palette->data)[i];
+
+			val = ~val;
+			if (i)
+				val |= 0x8000;
+			else
+				val &= ~0x8000;
+		}
+		game->textureMgr.invalidatePalette(editSession.palName);
+		for (auto &action : object->_moves)
+			for (auto &block : action.second)
+				for (auto &anim : block)
+					anim.setPalette(*editSession.palette, editSession.palName);
+		displayPalEditor(object, gui, false);
+	});
 	bar->connectMenuItem({"Misc", "Reload textures"}, [&object]{
 		game->logger.debug("Reloading textures");
 		for (auto &action : object->_moves)
@@ -2405,7 +2466,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 
 	bar->connectMenuItem({"View", "Palette editor"}, displayPalEditorForce, std::ref(object), std::ref(gui));
 	bar->connectMenuItem({"View", "Blending options"}, displayBlendingOptions, std::ref(gui));
-	bar->connectMenuItem({"View", "Hitboxes (H)"}, switchHitboxes, boxes);
+	bar->connectMenuItem({"View", "Hitboxes (H)"}, switchHitboxes, std::ref(object), boxes);
 
 	bar->connectMenuItem({"Help", "About"}, displayAbout, std::ref(gui));
 
@@ -2428,7 +2489,94 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	}
 }
 
-void	handleDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mouseX, int mouseY)
+void	handleColorPickDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, int mouseX, int mouseY)
+{
+	tgui::ChildWindow::Ptr window = gui.get<tgui::ChildWindow>("PaletteEditor");
+
+	if (!window)
+		return;
+
+	auto satHuePic = window->get<tgui::Picture>("SatHue");
+	auto winPos = window->getPosition();
+	auto picPos = satHuePic->getPosition();
+	auto pos = Vector2f{mouseX - picPos.x - winPos.x, mouseY - picPos.y - winPos.y - 20};
+	auto pal = window->get<tgui::ComboBox>("Palettes");
+	auto col = window->get<tgui::ScrollablePanel>("Colors");
+	auto light = window->get<tgui::Slider>("Lightness");
+	auto cross = window->get<tgui::Picture>("Cross");
+	auto preview = window->get<tgui::TextBox>("Preview");
+	auto hue = window->get<tgui::EditBox>("Hue");
+	auto saturation = window->get<tgui::EditBox>("Sat");
+	auto lightness = window->get<tgui::EditBox>("Light");
+	auto edit = window->get<tgui::EditBox>("Edit");
+	char buffer[8];
+	unsigned char h = std::max(0.f, std::min(240.f, pos.x * 240 / 200));
+	unsigned char s = std::max(0.f, std::min(240.f, 240 - pos.y * 240 / 200));
+	Utils::HSLColor color = {
+		h,
+		s,
+		static_cast<unsigned char>(light->getValue())
+	};
+	sf::Color temp = HSLtoRGB(color);
+	auto csize = cross->getSize();
+	sf::Image image;
+	sf::Texture texture;
+
+	sprintf(buffer, "#%02X%02X%02X", temp.r, temp.g, temp.b);
+	hue->setText(std::to_string(color.h));
+	saturation->setText(std::to_string(color.s));
+	cross->setPosition({
+		(color.h * 200 / 240) + satHuePic->getPosition().x - csize.x / 2,
+		((240 - color.s) * 200 / 240) + satHuePic->getPosition().y - csize.y / 2
+	});
+	edit->setText(buffer);
+	preview->getRenderer()->setBackgroundColor({buffer});
+
+	image.create(light->getSize().x, light->getSize().y);
+
+	auto size = image.getSize();
+
+	for (unsigned y = 0; y < size.y; y++) {
+		color.l = 240 - (240 * y / size.y);
+
+		auto rgb = HSLtoRGB(color);
+		sf::Color sf{rgb.r, rgb.g, rgb.b, 255};
+
+		for (unsigned x = 0; x < size.x; x++)
+			image.setPixel(x, y, sf);
+	}
+	texture.loadFromImage(image);
+	light->getRenderer()->setTextureTrack({texture});
+
+	auto button = col->get<tgui::Button>("Color" + std::to_string(selectedColor));
+
+	if (!button)
+		return;
+	if (!editSession.palette)
+		return;
+
+	auto renderer = button->getRenderer();
+	auto &newpal = ((uint16_t*)editSession.palette->data)[selectedColor];
+
+	newpal = 0;
+	newpal |= (temp.r >> 3 & 0x1F) << 10;
+	newpal |= (temp.g >> 3 & 0x1F) << 5;
+	newpal |= (temp.b >> 3  & 0x1F) << 0;
+	if (selectedColor)
+		newpal |= 0x8000;
+	renderer->setBackgroundColor(temp);
+	renderer->setBackgroundColorDown(temp);
+	renderer->setBackgroundColorDisabled(temp);
+	renderer->setBackgroundColorFocused(temp);
+	renderer->setBackgroundColorHover(temp);
+	game->textureMgr.invalidatePalette(editSession.palName);
+	for (auto &action : object->_moves)
+		for (auto &block : action.second)
+			for (auto &anim : block)
+				anim.setPalette(*editSession.palette, editSession.palName);
+}
+
+void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX, int mouseY)
 {
 	static bool bbb = false;
 
@@ -2619,7 +2767,7 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 			else if (event.control)
 				newHurtBoxCallback(object, boxes);
 			else
-				switchHitboxes(boxes);
+				switchHitboxes(object, boxes);
 		}
 
 		if (event.code == sf::Keyboard::Delete) {
@@ -2657,6 +2805,249 @@ void	loadSettings()
 }
 
 std::filesystem::path cwd;
+
+void	renderTopLayer(EditableObject &object)
+{
+	sf::RectangleShape rect;
+	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
+	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
+	auto s = object.displayScaled ? object.scale : 1.f;
+	auto scale = SpiralOfFate::Vector2f{
+		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
+		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
+	};
+	auto bounds = SpiralOfFate::Vector2f{
+		static_cast<float>(data.texWidth),
+		static_cast<float>(data.texHeight)
+	};
+	auto texBounds = sf::IntRect{
+		data.texOffsetX,
+		data.texOffsetY,
+		data.texWidth,
+		data.texHeight
+	};
+	auto result = SpiralOfFate::Vector2f{
+		static_cast<float>(-data.offsetX) * s,
+		static_cast<float>(-data.offsetY) * s
+	};
+
+	if (data.blendOptions.flipHorz) {
+		texBounds.left += texBounds.width;
+		texBounds.width *= -1;
+	}
+	if (data.blendOptions.flipVert) {
+		texBounds.top += texBounds.height;
+		texBounds.height *= -1;
+	}
+	//result.y *= -1;
+	//result += SpiralOfFate::Vector2f{
+	//	size.x / -2.f,
+	//	-static_cast<float>(size.y)
+	//};
+	result += SpiralOfFate::Vector2f{
+		data.texWidth * scale.x / 2,
+		data.texHeight * scale.y / 2
+	};
+	result += translate;
+	selectedColorMaskSprite.setOrigin(bounds / 2.f);
+	selectedColorMaskSprite.setRotation(data.blendOptions.angle);
+	selectedColorMaskSprite.setPosition(result);
+	selectedColorMaskSprite.setScale(scale);
+	selectedColorMaskSprite.setTextureRect(texBounds);
+	SpiralOfFate::game->screen->draw(selectedColorMaskSprite);
+}
+
+Vector2f mousePosToImgPos(EditableObject &object, Vector2i mouse, const FrameData &data, tgui::Panel::Ptr panel)
+{
+	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
+	auto s = object.displayScaled ? object.scale : 1.f;
+	auto scale = SpiralOfFate::Vector2f{
+		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
+		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
+	};
+	auto bounds = SpiralOfFate::Vector2f{
+		static_cast<float>(data.texWidth),
+		static_cast<float>(data.texHeight)
+	};
+	auto texBounds = sf::IntRect{
+		data.texOffsetX,
+		data.texOffsetY,
+		data.texWidth,
+		data.texHeight
+	};
+	auto result = SpiralOfFate::Vector2f{
+		static_cast<float>(-data.offsetX) * s,
+		static_cast<float>(-data.offsetY) * s
+	};
+	auto view = game->screen->getView();
+	auto imgPos = result + translate + object._position + SpiralOfFate::Vector2f{
+		(game->screen->getSize().x / 2 - panel->getSize().x / 2),
+		static_cast<float>(game->screen->getSize().y / 2 + 300)
+	};
+
+	return (mouse - imgPos) / scale;
+}
+
+bool	selectColor(tgui::Gui &gui, std::unique_ptr<EditableObject> &obj, int mouseX, int mouseY, tgui::Panel::Ptr panel)
+{
+	if (!obj)
+		return false;
+
+	auto &object = *obj;
+	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
+	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema.images.at(data.imageIndex).name);
+
+	if (img.bitsPerPixel != 8)
+		return false;
+
+	sf::RectangleShape rect;
+	auto pos = mousePosToImgPos(object, {mouseX, mouseY}, data, panel);
+	auto bounds = SpiralOfFate::Vector2f{
+		static_cast<float>(data.texWidth),
+		static_cast<float>(data.texHeight)
+	};
+
+	if (pos.y < 0 || pos.y > bounds.y || pos.x < 0 || pos.x > bounds.x)
+		return false;
+
+	int i = img.raw[static_cast<int>(pos.y) * img.paddedWidth + static_cast<int>(pos.x)];
+	int old = selectedColor;
+	tgui::ChildWindow::Ptr window = gui.get<tgui::ChildWindow>("PaletteEditor");
+
+	if (!i)
+		return false;
+	selectedColor = i;
+	if (!window)
+		return true;
+
+	auto pal = window->get<tgui::ComboBox>("Palettes");
+	auto col = window->get<tgui::ScrollablePanel>("Colors");
+	auto light = window->get<tgui::Slider>("Lightness");
+	auto satHuePic = window->get<tgui::Picture>("SatHue");
+	auto cross = window->get<tgui::Picture>("Cross");
+	auto preview = window->get<tgui::TextBox>("Preview");
+	auto hue = window->get<tgui::EditBox>("Hue");
+	auto saturation = window->get<tgui::EditBox>("Sat");
+	auto lightness = window->get<tgui::EditBox>("Light");
+	auto edit = window->get<tgui::EditBox>("Edit");
+	auto button = col->get<tgui::Button>("Color" + std::to_string(i));
+	char buffer[8];
+	auto val = ((uint16_t*)editSession.palette->data)[i];
+	sf::Color color{
+		static_cast<sf::Uint8>((val & 0b0111110000000000) >> 7 | (val & 0b0111000000000000) >> 12),
+		static_cast<sf::Uint8>((val & 0b0000001111100000) >> 2 | (val & 0b0000001110000000) >> 7),
+		static_cast<sf::Uint8>((val & 0b0000000000011111) << 3 | (val & 0b0000000000011100) >> 2),
+		static_cast<sf::Uint8>((val & 0x8000) ? 255 : 0)
+	};
+	Utils::HSLColor c = Utils::RGBtoHSL(color);
+	auto pos2 = satHuePic->getPosition();
+	auto size = cross->getSize();
+
+	col->get<tgui::Button>("Color" + std::to_string(old))->setFocused(false);
+	sprintf(buffer, "#%02X%02X%02X", color.r, color.g, color.b);
+	light->onValueChange.setEnabled(false);
+	light->setValue(c.l);
+	light->onValueChange.setEnabled(true);
+	hue->setText(std::to_string(c.h));
+	saturation->setText(std::to_string(c.s));
+	lightness->setText(std::to_string(c.l));
+	cross->setPosition({
+		(c.h * 200 / 240) + pos2.x - size.x / 2,
+		((240 - c.s) * 200 / 240) + pos2.y - size.y / 2
+	});
+	edit->setText(buffer);
+	preview->getRenderer()->setBackgroundColor({buffer});
+
+	sf::Image image;
+	sf::Texture texture;
+
+	image.create(light->getSize().x, light->getSize().y);
+
+	auto s = image.getSize();
+
+	for (unsigned y = 0; y < size.y; y++) {
+		c.l = 240 - (240 * y / size.y);
+
+		auto rgb = HSLtoRGB(c);
+		sf::Color sf{rgb.r, rgb.g, rgb.b, 255};
+
+		for (unsigned x = 0; x < s.x; x++)
+			image.setPixel(x, y, sf);
+	}
+	texture.loadFromImage(image);
+	light->getRenderer()->setTextureTrack({texture});
+
+	button->setFocused(true);
+	return true;
+}
+
+void 	hoverImagePixel(std::unique_ptr<EditableObject> &obj, int mouseX, int mouseY, tgui::Panel::Ptr panel)
+{
+	if (!obj)
+		return;
+
+	auto &object = *obj;
+	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
+	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema.images.at(data.imageIndex).name);
+
+	if (img.bitsPerPixel != 8) {
+		game->logger.debug("Image is not 8 bits per pixel: " + std::to_string(img.bitsPerPixel));
+		hovering = false;
+		return;
+	}
+
+	sf::RectangleShape rect;
+	auto pos = mousePosToImgPos(object, {mouseX, mouseY}, data, panel);
+	auto bounds = SpiralOfFate::Vector2f{
+		static_cast<float>(data.texWidth),
+		static_cast<float>(data.texHeight)
+	};
+
+	if (pos.y < 0 || pos.y > bounds.y || pos.x < 0 || pos.x > bounds.x) {
+		hovering = false;
+		return;
+	}
+
+	int i = img.raw[static_cast<int>(pos.y) * img.paddedWidth + static_cast<int>(pos.x)];
+
+	if (!i) {
+		hovering = false;
+		return;
+	}
+
+	auto val = ((uint16_t*)editSession.palette->data)[i];
+	sf::Color color{
+		static_cast<sf::Uint8>(~((val & 0b0111110000000000) >> 7 | (val & 0b0111000000000000) >> 12)),
+		static_cast<sf::Uint8>(~((val & 0b0000001111100000) >> 2 | (val & 0b0000001110000000) >> 7)),
+		static_cast<sf::Uint8>(~((val & 0b0000000000011111) << 3 | (val & 0b0000000000011100) >> 2)),
+		static_cast<sf::Uint8>((val & 0x8000) ? 255 : 0)
+	};
+
+	if (img.bitsPerPixel != 8)
+		return;
+	hovering = true;
+	selectedColorMaskImage.create(img.width, img.height);
+	for (unsigned y = 0; y < img.height; y++)
+		for (unsigned x = 0; x < img.width; x++)
+			if (i && img.raw[y * img.paddedWidth + x] == i)
+				selectedColorMaskImage.setPixel(x, y, color);
+			else
+				selectedColorMaskImage.setPixel(x, y, sf::Color::Transparent);
+	selectedColorMaskTexture.loadFromImage(selectedColorMaskImage);
+	selectedColorMaskSprite.setTexture(selectedColorMaskTexture, true);
+}
+
+bool	onWidget(tgui::Gui &gui, int x, int y)
+{
+	for (auto &widget : gui.getWidgets())
+		if (
+			widget->isVisible() && widget->isEnabled() &&
+			widget->getPosition().x <= x && widget->getPosition().x + widget->getSize().x >= x &&
+			widget->getPosition().y <= y && widget->getPosition().y + widget->getSize().y >= y
+		)
+			return true;
+	return false;
+}
 
 void	run()
 {
@@ -2697,7 +3088,8 @@ void	run()
 	game->screen->setView(view);
 	gui.setView(guiView);
 	while (game->screen->isOpen()) {
-		timer++;
+		if (!hovering)
+			timer++;
 		game->screen->clear(bgColor);
 		game->screen->draw(sprite);
 		if (object) {
@@ -2710,7 +3102,11 @@ void	run()
 				timer -= updateTimer;
 			}
 			object->render();
+			if (hovering)
+				renderTopLayer(*object);
 		}
+
+		std::optional<sf::Vector2i> drag;
 
 		while (game->screen->pollEvent(event)) {
 			if (cwd != std::filesystem::current_path()) {
@@ -2747,20 +3143,37 @@ void	run()
 				continue;
 			}
 			dragging &= sf::Mouse::isButtonPressed(sf::Mouse::Left);
-			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && (handled || onWidget(gui, event.mouseButton.x, event.mouseButton.y) || !selectColor(gui, object, event.mouseButton.x, event.mouseButton.y, panel))) {
 				dragging = true;
 				dragStart = false;
 				mouseStart = {event.mouseButton.x, event.mouseButton.y};
 				lastMouse = mouseStart;
+				normalDrag = !handled;
 			}
 			dragUp &= dragging;
 			dragDown &= dragging;
 			dragLeft &= dragging;
 			dragRight &= dragging;
 			canDrag &= dragging;
-			if (event.type == sf::Event::MouseMoved && dragging && canDrag)
-				handleDrag(gui, object, event.mouseMove.x, event.mouseMove.y);
+			colorPickDrag &= dragging;
+			if (event.type == sf::Event::MouseMoved && dragging) {
+				if (canDrag)
+					handleDrag(gui, object, event.mouseMove.x, event.mouseMove.y);
+				else if (colorPickDrag)
+					drag = {event.mouseMove.x, event.mouseMove.y};
+				else if (!displayHitboxes && object && normalDrag && !handled) {
+					object->translate += Vector2f{
+						static_cast<float>(event.mouseMove.x - lastMouse.x),
+						static_cast<float>(event.mouseMove.y - lastMouse.y)
+					};
+					lastMouse = Vector2i{event.mouseMove.x, event.mouseMove.y};
+				} else if (!handled)
+					hoverImagePixel(object, event.mouseMove.x, event.mouseMove.y, panel);
+			} else if (event.type == sf::Event::MouseMoved && !handled)
+				hoverImagePixel(object, event.mouseMove.x, event.mouseMove.y, panel);
 		}
+		if (drag)
+			handleColorPickDrag(gui, object, drag->x, drag->y);
 		if (object)
 			object->displayScaled = !displayHitboxes;
 		gui.draw();

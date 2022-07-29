@@ -63,7 +63,11 @@ namespace SpiralOfFate
 	{
 		Vector2u textureSize;
 
-		this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name, &textureSize);
+		try {
+			this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name, &textureSize);
+		} catch (std::exception &e) {
+			game->logger.error("Error loading texture: " + std::string(e.what()) + "\n");
+		}
 		if (this->traits.onHitSfx) {
 			char buffer[4];
 
@@ -125,8 +129,11 @@ namespace SpiralOfFate
 		my_assert(!this->_slave);
 		this->needReload = false;
 		game->textureMgr.remove(this->textureHandle);
-		// TODO: Use the actual value
-		this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name);
+		try {
+			this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name);
+		} catch (std::exception &e) {
+			game->logger.error("Error loading texture: " + std::string(e.what()) + "\n");
+		}
 	}
 
 	void FrameData::reloadSound()

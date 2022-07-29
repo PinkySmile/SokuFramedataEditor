@@ -114,10 +114,10 @@ namespace SpiralOfFate
 			for (unsigned x = 0; x < resourceImage.width; x++)
 				for (unsigned y = 0; y < resourceImage.height; y++)
 					raw[y * resourceImage.width + x] = sf::Color{
-						resourceImage.raw[(y * resourceImage.width + x) * 4 + 2],
-						resourceImage.raw[(y * resourceImage.width + x) * 4 + 1],
-						resourceImage.raw[(y * resourceImage.width + x) * 4 + 0],
-						resourceImage.raw[(y * resourceImage.width + x) * 4 + 3]
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 2],
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 1],
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 0],
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 3]
 					};
 			image.create(resourceImage.width, resourceImage.height, reinterpret_cast<const sf::Uint8 *>(raw));
 			delete[] raw;

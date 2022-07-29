@@ -19,21 +19,21 @@ void EditableObject::render() const
 	if (data.needReload)
 		data.reloadTexture();
 
-	auto scale = SpiralOfFate::Vector2f{
+	SpiralOfFate::Vector2f scale{
 		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
 		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
 	};
-	auto bounds = SpiralOfFate::Vector2f{
+	SpiralOfFate::Vector2f bounds{
 		static_cast<float>(data.texWidth),
 		static_cast<float>(data.texHeight)
 	};
-	auto texBounds = sf::IntRect{
+	sf::IntRect texBounds{
 		data.texOffsetX,
 		data.texOffsetY,
 		data.texWidth,
 		data.texHeight
 	};
-	auto result = SpiralOfFate::Vector2f{
+	SpiralOfFate::Vector2f result{
 		static_cast<float>(-data.offsetX) * s,
 		static_cast<float>(-data.offsetY) * s
 	};
