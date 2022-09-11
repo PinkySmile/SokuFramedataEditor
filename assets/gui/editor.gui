@@ -1,30 +1,32 @@
 Renderer.1 {
-    borderbetweenarrows = 0;
-    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+    backgroundcolor = rgb(80, 80, 80);
+    texturebackground = None;
 }
 
 Renderer.2 {
-    backgroundcolor = transparent;
-    bordercolor = #BEBEBE;
-    borders = (0, 1, 0, 0);
-    textcolor = #3C3C3C;
-    texturebackground = None;
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturedisabled = None;
+    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
 }
 
 Renderer.3 {
     textcolor = rgb(190, 190, 190);
-    textcolorhover = rgb(250, 250, 250);
-    texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
-    texturecheckeddisabled = None;
-    texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
-    texturecheckedhover = "assets/gui/themes/Black.png" Part(188, 0, 32, 32);
-    textureunchecked = "assets/gui/themes/Black.png" Part(92, 0, 32, 32);
-    textureuncheckeddisabled = None;
-    textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
-    textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
 }
 
 Renderer.4 {
@@ -43,14 +45,30 @@ Renderer.4 {
 Renderer.5 {
     textcolor = rgb(190, 190, 190);
     textcolorhover = rgb(250, 250, 250);
-    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturedisabled = None;
-    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
+    texturecheckeddisabled = None;
+    texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
+    texturecheckedhover = "assets/gui/themes/Black.png" Part(188, 0, 32, 32);
+    textureunchecked = "assets/gui/themes/Black.png" Part(92, 0, 32, 32);
+    textureuncheckeddisabled = None;
+    textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
+    textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
 }
 
 Renderer.6 {
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+}
+
+Renderer.7 {
     textcolor = rgb(190, 190, 190);
     texturebackground = None;
 
@@ -66,7 +84,7 @@ Renderer.6 {
     }
 }
 
-Renderer.7 {
+Renderer.8 {
     textcolor = rgb(190, 190, 190);
     textcolorhover = rgb(250, 250, 250);
     texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
@@ -77,19 +95,6 @@ Renderer.7 {
     textureuncheckeddisabled = None;
     textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
     textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
-}
-
-Renderer.8 {
-    caretcolor = rgb(110, 110, 255);
-    defaulttextcolor = rgb(120, 120, 120);
-    padding = (6, 4, 6, 4);
-    selectedtextbackgroundcolor = rgb( 10, 110, 255);
-    selectedtextcolor = White;
-    textcolor = rgb(190, 190, 190);
-    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
-    texturedisabled = None;
-    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
-    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
 }
 
 Renderer.9 {
@@ -122,6 +127,139 @@ Renderer.10 {
 }
 
 Renderer.11 {
+    backgroundcolor = transparent;
+    bordercolor = #BEBEBE;
+    borders = (0, 1, 0, 0);
+    textcolor = #3C3C3C;
+    texturebackground = None;
+}
+
+Renderer.12 {
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+}
+
+Renderer.13 {
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
+}
+
+Renderer.14 {
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
+}
+
+Renderer.15 {
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
+}
+
+Renderer.16 {
+    backgroundcolor = black;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolordown = #EBEBEB;
+    backgroundcolorhover = black;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolordown = black;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (0, 0, 0, 0);
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolordown = black;
+    textcolorhover = black;
+    texture = None;
+    texturedisabled = None;
+    texturedown = None;
+    texturefocused = None;
+    texturehover = None;
+}
+
+Renderer.17 {
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+}
+
+Renderer.18 {
+    borderbetweenarrows = 0;
+    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+}
+
+Renderer.19 {
+    backgroundcolor = transparent;
+    bordercolor = #BEBEBE;
+    borders = (0, 1, 0, 0);
+    textcolor = #3C3C3C;
+    texturebackground = None;
+}
+
+Renderer.20 {
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+}
+
+Renderer.21 {
     textcolor = rgb(190, 190, 190);
     textcolorhover = rgb(250, 250, 250);
     texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
@@ -134,16 +272,16 @@ Renderer.11 {
     textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
 }
 
-Renderer.12 {
-    backgroundcolor = rgb(80, 80, 80);
-    texturebackground = None;
-}
-
-Panel.Panel1 {
+ScrollablePanel.Panel1 {
+    ContentSize = (0, 0);
     Enabled = false;
     Position = (&.w - w, 20);
     Size = (610, &.h - 20);
-    renderer = &12;
+
+    Renderer {
+        backgroundcolor = rgb(80, 80, 80);
+        texturebackground = None;
+    }
 
     Label.Label {
         AutoSize = true;
@@ -152,7 +290,7 @@ Panel.Panel1 {
         Size = (43.2, 18);
         Text = Action;
         TextSize = 13;
-        renderer = &6;
+        renderer = &3;
     }
 
     SpinButton.Block {
@@ -162,7 +300,7 @@ Panel.Panel1 {
         Size = (20, 42);
         Step = 1;
         Value = 0;
-        renderer = &1;
+        renderer = &18;
     }
 
     Label.Label1 {
@@ -172,7 +310,7 @@ Panel.Panel1 {
         Size = (48.2, 18);
         Text = "Block 0";
         TextSize = 13;
-        renderer = &6;
+        renderer = &3;
     }
 
     Label.Label2 {
@@ -182,7 +320,7 @@ Panel.Panel1 {
         Size = (56.2, 18);
         Text = "Frame 0";
         TextSize = 13;
-        renderer = &6;
+        renderer = &3;
     }
 
     EditBox.Action {
@@ -190,7 +328,7 @@ Panel.Panel1 {
         Position = (70, 20);
         Size = (40, 22);
         TextSize = 13;
-        renderer = &8;
+        renderer = &9;
     }
 
     Slider.Progress {
@@ -218,32 +356,32 @@ Panel.Panel1 {
         Size = (19.2, 18);
         Text = x0;
         TextSize = 13;
-        renderer = &6;
+        renderer = &3;
     }
 
     Button.Play {
         Position = (240, 50);
         Text = Play;
         TextSize = 13;
-        renderer = &5;
+        renderer = &2;
     }
 
     Button.Step {
         Position = (300, 50);
         Text = Step;
         TextSize = 13;
-        renderer = &5;
+        renderer = &2;
     }
 
     Panel.AnimPanel {
         Position = (0, 90);
         Size = (610, &.h - y);
-        renderer = &12;
+        renderer = &1;
 
         Panel.Panel2 {
             Position = (0, 40);
-            Size = (&.w, &.h - y);
-            renderer = &12;
+            Size = (&.w, 900);
+            renderer = &1;
 
             Label.Label17 {
                 AutoSize = true;
@@ -280,7 +418,7 @@ Panel.Panel1 {
                 Size = (38.2, 18);
                 Text = Value;
                 TextSize = 13;
-                renderer = &6;
+                renderer = &3;
             }
 
             EditBox.fFlags {
@@ -289,13 +427,13 @@ Panel.Panel1 {
                 Size = (130, 22);
                 Text = 0;
                 TextSize = 13;
-                renderer = &8;
+                renderer = &9;
             }
 
             Label.Label19 {
-                Position = (310, 300);
+                Position = (310.56, 300);
                 ScrollbarPolicy = Never;
-                Size = (4.2, &.h - y);
+                Size = (23.64, 510);
                 TextSize = 13;
 
                 Renderer {
@@ -312,7 +450,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Standing;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag2 {
@@ -320,7 +458,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Airborne;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag4 {
@@ -328,7 +466,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Guard Available";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag6 {
@@ -336,7 +474,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Counter Hit State";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag1 {
@@ -344,7 +482,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Crouching;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag3 {
@@ -352,7 +490,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Down;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag5 {
@@ -360,7 +498,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Cancelable;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag7 {
@@ -368,7 +506,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Super Armor";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag8 {
@@ -376,7 +514,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Normal Armor";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag19 {
@@ -384,7 +522,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Guard Point";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag10 {
@@ -392,7 +530,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Grazing;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag11 {
@@ -400,7 +538,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Guarding;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag12 {
@@ -408,7 +546,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Grab Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag13 {
@@ -416,7 +554,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Melee Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag14 {
@@ -424,7 +562,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Bullet Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag15 {
@@ -432,7 +570,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Air Attack Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             Label.Label20 {
@@ -459,7 +597,7 @@ Panel.Panel1 {
                 Size = (130, 22);
                 Text = 0;
                 TextSize = 13;
-                renderer = &8;
+                renderer = &9;
             }
 
             Label.Label21 {
@@ -469,7 +607,7 @@ Panel.Panel1 {
                 Size = (38.2, 18);
                 Text = Value;
                 TextSize = 13;
-                renderer = &6;
+                renderer = &3;
             }
 
             CheckBox.aFlag0 {
@@ -477,7 +615,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Flag1 Stagger";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag1 {
@@ -485,7 +623,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "High RB";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag3 {
@@ -493,7 +631,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Air Blockable";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag5 {
@@ -501,7 +639,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Ignore Armor";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag7 {
@@ -509,7 +647,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Grab;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag11 {
@@ -517,7 +655,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Skill ATK Type";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag2 {
@@ -525,7 +663,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Low RB";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag4 {
@@ -533,7 +671,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Unblockable;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag6 {
@@ -541,7 +679,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Hit On WB";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag10 {
@@ -549,7 +687,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Induce CH";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag12 {
@@ -557,7 +695,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Spell ATK Type";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag13 {
@@ -565,7 +703,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Air ATK Type";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag16 {
@@ -573,7 +711,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Obj ATK Type";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag17 {
@@ -581,7 +719,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Unreflectable;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag19 {
@@ -589,7 +727,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Guard Crush";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag20 {
@@ -597,7 +735,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Friendly Fire";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag16 {
@@ -605,7 +743,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "High ATK Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag17 {
@@ -613,7 +751,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Low ATK Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag18 {
@@ -621,7 +759,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Obj ATK Invul";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.ReflectBullet {
@@ -629,7 +767,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Reflect Bullet";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag20 {
@@ -637,7 +775,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Flip Velocity";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag21 {
@@ -645,7 +783,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Movement Cancel";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag22 {
@@ -653,7 +791,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "After Image";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag23 {
@@ -661,7 +799,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Loop Animation";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.fFlag24 {
@@ -669,16 +807,16 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Attack Object";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             EditBox.MoveSpeed {
                 InputValidator = "\\([+-]?[0-9]*\\.?[0-9]{0,2},[+-]?[0-9]*\\.?[0-9]{0,2}\\)";
-                Position = (290, 210);
-                Size = (140, 22);
+                Position = (330, 210);
+                Size = (80, 22);
                 Text = "(0,0)";
                 TextSize = 13;
-                renderer = &8;
+                renderer = &9;
             }
 
             CheckBox.aFlag21 {
@@ -686,7 +824,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Flag22 Stagger";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag22 {
@@ -694,7 +832,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Is Bullet";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag23 {
@@ -702,7 +840,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Ungrazable;
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             CheckBox.aFlag24 {
@@ -710,7 +848,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Drain On Graze";
                 TextSize = 13;
-                renderer = &3;
+                renderer = &8;
             }
 
             Label.Label34 {
@@ -718,7 +856,7 @@ Panel.Panel1 {
                 ScrollbarPolicy = Never;
                 Size = (300, 9.8);
                 TextSize = 13;
-                renderer = &2;
+                renderer = &19;
             }
 
             Label.Label35 {
@@ -790,7 +928,7 @@ Panel.Panel1 {
                 ScrollbarPolicy = Never;
                 Size = (300, 9.8);
                 TextSize = 13;
-                renderer = &2;
+                renderer = &19;
             }
 
             CheckBox.Mod0 {
@@ -798,7 +936,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Lift Attack";
                 TextSize = 13;
-                renderer = &7;
+                renderer = &4;
             }
 
             CheckBox.Mod2 {
@@ -806,7 +944,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Border;
                 TextSize = 13;
-                renderer = &7;
+                renderer = &4;
             }
 
             CheckBox.Mod1 {
@@ -814,7 +952,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Smash ATK";
                 TextSize = 13;
-                renderer = &7;
+                renderer = &4;
             }
 
             CheckBox.Mod3 {
@@ -822,7 +960,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Chain Art";
                 TextSize = 13;
-                renderer = &7;
+                renderer = &4;
             }
 
             CheckBox.aFlag14 {
@@ -830,7 +968,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "High ATK Type";
                 TextSize = 13;
-                renderer = &11;
+                renderer = &21;
             }
 
             CheckBox.aFlag15 {
@@ -838,7 +976,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = "Low ATK Type";
                 TextSize = 13;
-                renderer = &11;
+                renderer = &21;
             }
 
             CheckBox.Mod4 {
@@ -846,7 +984,7 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Spell;
                 TextSize = 13;
-                renderer = &4;
+                renderer = &5;
             }
 
             CheckBox.Mod5 {
@@ -854,7 +992,184 @@ Panel.Panel1 {
                 Size = (20, 20);
                 Text = Counter;
                 TextSize = 13;
-                renderer = &4;
+                renderer = &5;
+            }
+
+            Label.Label14 {
+                Position = (0, 110);
+                ScrollbarPolicy = Never;
+                Size = (610, 9.8);
+                TextSize = 13;
+                renderer = &11;
+            }
+
+            Label.Label15 {
+                Position = (0, 360);
+                ScrollbarPolicy = Never;
+                Size = (310, 9.8);
+                TextSize = 13;
+                renderer = &11;
+            }
+
+            Label.Label16 {
+                AutoSize = true;
+                Position = (20, 40);
+                ScrollbarPolicy = Never;
+                Size = (111.2, 40);
+                Text = "Blend options";
+                TextSize = 13;
+
+                Renderer {
+                    bordercolor = #BEBEBE;
+                    borders = (1, 1, 1, 1);
+                    padding = (10, 10, 10, 10);
+                    textcolor = rgb(190, 190, 190);
+                    texturebackground = None;
+
+                    scrollbar {
+                        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+                        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+                        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+                        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+                        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+                        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+                        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+                        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+                    }
+                }
+            }
+
+            Button.Button2 {
+                Position = (420, 60);
+                Size = (11, 11);
+                TextSize = 13;
+
+                Renderer {
+                    backgroundcolor = #F5F5F5;
+                    backgroundcolordisabled = #E6E6E6;
+                    backgroundcolordown = #EBEBEB;
+                    backgroundcolorhover = white;
+                    bordercolor = #3C3C3C;
+                    bordercolordisabled = #7D7D7D;
+                    bordercolordown = black;
+                    bordercolorfocused = #1E1EB4;
+                    bordercolorhover = black;
+                    borders = (0, 0, 0, 0);
+                    textcolor = #3C3C3C;
+                    textcolordisabled = #7D7D7D;
+                    textcolordown = black;
+                    textcolorhover = black;
+                    texture = None;
+                    texturedisabled = None;
+                    texturedown = None;
+                    texturefocused = None;
+                    texturehover = None;
+                }
+            }
+
+            Button.Button3 {
+                Position = (410, 50);
+                Size = (11, 11);
+                TextSize = 13;
+
+                Renderer {
+                    backgroundcolor = #F5F5F5;
+                    backgroundcolordisabled = #E6E6E6;
+                    backgroundcolordown = #EBEBEB;
+                    backgroundcolorhover = white;
+                    bordercolor = #3C3C3C;
+                    bordercolordisabled = #7D7D7D;
+                    bordercolordown = black;
+                    bordercolorfocused = #1E1EB4;
+                    bordercolorhover = black;
+                    borders = (0, 0, 0, 0);
+                    textcolor = #3C3C3C;
+                    textcolordisabled = #7D7D7D;
+                    textcolordown = black;
+                    textcolorhover = black;
+                    texture = None;
+                    texturedisabled = None;
+                    texturedown = None;
+                    texturefocused = None;
+                    texturehover = None;
+                }
+            }
+
+            Button.Button4 {
+                Position = (420, 50);
+                Size = (11, 11);
+                TextSize = 13;
+                renderer = &16;
+            }
+
+            Button.Button5 {
+                Position = (410, 60);
+                Size = (11, 11);
+                TextSize = 13;
+                renderer = &16;
+            }
+
+            Button.BlendColorBut {
+                Position = (410, 50);
+                Size = (21, 21);
+                TextSize = 13;
+
+                Renderer {
+                    backgroundcolor = #F5F5F500;
+                    backgroundcolordisabled = #E6E6E6;
+                    backgroundcolordown = #EBEBEB;
+                    backgroundcolorhover = white;
+                    bordercolor = #3C3C3C;
+                    bordercolordisabled = #7D7D7D;
+                    bordercolordown = black;
+                    bordercolorfocused = #1E1EB4;
+                    bordercolorhover = black;
+                    borders = (1, 1, 1, 1);
+                    textcolor = #3C3C3C;
+                    textcolordisabled = #7D7D7D;
+                    textcolordown = black;
+                    textcolorhover = black;
+                    texture = None;
+                    texturedisabled = None;
+                    texturedown = None;
+                    texturefocused = None;
+                    texturehover = None;
+                }
+            }
+
+            EditBox.Pos {
+                InputValidator = "\\([+-]?[0-9]*\\.?[0-9]{0,2},[+-]?[0-9]*\\.?[0-9]{0,2}\\)";
+                Position = (500, 210);
+                Size = (90, 22);
+                Text = "(0,0)";
+                TextSize = 13;
+                renderer = &17;
+            }
+
+            EditBox.PosExtra {
+                InputValidator = "\\([+-]?[0-9]*\\.?[0-9]{0,2},[+-]?[0-9]*\\.?[0-9]{0,2}\\)";
+                Position = (500, 240);
+                Size = (90, 22);
+                Text = "(0,0)";
+                TextSize = 13;
+                renderer = &17;
+            }
+
+            EditBox.Pivot {
+                InputValidator = "\\([+-]?[0-9]*\\.?[0-9]{0,2},[+-]?[0-9]*\\.?[0-9]{0,2}\\)";
+                Position = (500, 270);
+                Size = (90, 22);
+                Text = "(0,0)";
+                TextSize = 13;
+                renderer = &17;
+            }
+
+            Label.Label45 {
+                Position = (0, 30);
+                ScrollbarPolicy = Never;
+                Size = (610, 9.8);
+                TextSize = 13;
+                renderer = &11;
             }
         }
 
@@ -865,7 +1180,7 @@ Panel.Panel1 {
             Size = (40.2, 18);
             Text = Sprite;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.Sprite {
@@ -873,7 +1188,7 @@ Panel.Panel1 {
             Position = (90, 10);
             Size = (170, 22);
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         EditBox.Offset {
@@ -882,7 +1197,7 @@ Panel.Panel1 {
             Size = (90, 22);
             Text = "(0,0)";
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label4 {
@@ -892,35 +1207,35 @@ Panel.Panel1 {
             Size = (43.2, 18);
             Text = Offset;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         Label.Label5 {
             AutoSize = true;
-            Position = (450, 42);
+            Position = (450, 92);
             ScrollbarPolicy = Never;
             Size = (37.2, 18);
             Text = Scale;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.Scale {
             InputValidator = "\\([+-]?[0-9]*\\.?[0-9]{0,2},[+-]?[0-9]*\\.?[0-9]{0,2}\\)";
-            Position = (500, 40);
-            Size = (90, 22);
+            Position = (490, 90);
+            Size = (110, 22);
             Text = "(1,1)";
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         EditBox.Bounds {
             InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4},[0-9]{1,4},[0-9]{1,4}\\)";
             Position = (90, 40);
-            Size = (110, 22);
+            Size = (130, 22);
             Text = "(128,0,64,128)";
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label6 {
@@ -930,33 +1245,33 @@ Panel.Panel1 {
             Size = (50.2, 18);
             Text = Bounds;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.Duration {
             InputValidator = UInt;
-            Position = (360, 70);
-            Size = (100, 22);
+            Position = (350, 10);
+            Size = (50, 22);
             Text = 1;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label8 {
             AutoSize = true;
-            Position = (300, 72);
+            Position = (280, 12);
             ScrollbarPolicy = Never;
             Size = (58.2, 18);
             Text = Duration;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         CheckBox.Collision {
-            Position = (570, 70);
+            Position = (570, 40);
             Size = (20, 20);
             TextSize = 13;
-            renderer = &3;
+            renderer = &8;
         }
 
         Label.Label91 {
@@ -966,169 +1281,169 @@ Panel.Panel1 {
             Size = (117.2, 18);
             Text = "Enemy Block stun";
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.EBlockStun {
             InputValidator = UInt;
-            Position = (130, 190);
+            Position = (140, 190);
             Size = (80, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Level90 {
             AutoSize = true;
-            Position = (448, 192);
+            Position = (442, 192);
             ScrollbarPolicy = Never;
-            Size = (52.2, 18);
-            Text = "Hit stun";
+            Size = (48.2, 18);
+            Text = Untech;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
-        EditBox.HitStun {
+        EditBox.Untech {
             InputValidator = UInt;
             Position = (500, 190);
             Size = (90, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         EditBox.Rate {
             InputValidator = "\\d{1,3}.?\\d?%";
-            Position = (500, 250);
+            Position = (500, 160);
             Size = (90, 22);
             Text = 0%;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label11 {
             AutoSize = true;
-            Position = (450, 252);
+            Position = (430, 162);
             ScrollbarPolicy = Never;
-            Size = (50.2, 18);
-            Text = Prorate;
+            Size = (61.2, 18);
+            Text = Proration;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.HitSpeed {
             InputValidator = "\\([+-]?[0-9]*\\.?[0-9]{0,2},[+-]?[0-9]*\\.?[0-9]{0,2}\\)";
-            Position = (90, 280);
-            Size = (110, 22);
+            Position = (90, 340);
+            Size = (200, 22);
             Text = "(0,0)";
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label10 {
             AutoSize = true;
-            Position = (480, 72);
+            Position = (480, 42);
             ScrollbarPolicy = Never;
             Size = (83.2, 18);
             Text = "Collision box";
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         Label.Label23 {
             AutoSize = true;
-            Position = (10, 282);
+            Position = (10, 342);
             ScrollbarPolicy = Never;
             Size = (64.2, 18);
             Text = "Hit Speed";
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         Label.Label27 {
             AutoSize = true;
-            Position = (240, 252);
+            Position = (280, 252);
             ScrollbarPolicy = Never;
             Size = (43.2, 18);
             Text = Speed;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         Label.Label28 {
             AutoSize = true;
-            Position = (230, 192);
+            Position = (260, 162);
             ScrollbarPolicy = Never;
             Size = (58.2, 18);
             Text = Damage;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.Damage {
             InputValidator = UInt;
-            Position = (290, 190);
-            Size = (140, 22);
+            Position = (330, 160);
+            Size = (80, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         EditBox.Limit {
             InputValidator = UInt;
-            Position = (290, 220);
-            Size = (140, 22);
+            Position = (330, 220);
+            Size = (80, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.qdqzd {
             AutoSize = true;
-            Position = (245, 222);
+            Position = (285, 222);
             ScrollbarPolicy = Never;
             Size = (34.2, 18);
             Text = Limit;
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         Label.Label31 {
             AutoSize = true;
-            Position = (10, 102);
+            Position = (10, 372);
             ScrollbarPolicy = Never;
             Size = (64.2, 18);
             Text = "Hit Sound";
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.HitSFX {
             DefaultText = 0;
             InputValidator = UInt;
-            Position = (90, 100);
-            Size = (80, 22);
+            Position = (90, 370);
+            Size = (60, 22);
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label33 {
             AutoSize = true;
-            Position = (330, 312);
+            Position = (230, 192);
             ScrollbarPolicy = Never;
             Size = (88.2, 18);
             Text = "Chip damage";
             TextSize = 13;
-            renderer = &6;
+            renderer = &3;
         }
 
         EditBox.ChipDmg {
             InputValidator = UInt;
-            Position = (420, 310);
-            Size = (70, 22);
+            Position = (330, 190);
+            Size = (80, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &8;
+            renderer = &9;
         }
 
         Label.Label7 {
@@ -1138,12 +1453,12 @@ Panel.Panel1 {
             Size = (112.2, 18);
             Text = "Player Block stun";
             TextSize = 13;
-            renderer = &10;
+            renderer = &7;
         }
 
         EditBox.PBlockStun {
             InputValidator = UInt;
-            Position = (130, 160);
+            Position = (140, 160);
             Size = (80, 22);
             Text = 0;
             TextSize = 13;
@@ -1164,20 +1479,20 @@ Panel.Panel1 {
 
         EditBox.EHitStun {
             InputValidator = UInt;
-            Position = (130, 250);
+            Position = (140, 250);
             Size = (80, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &9;
+            renderer = &6;
         }
 
         EditBox.PHitStun {
             InputValidator = UInt;
-            Position = (130, 220);
+            Position = (140, 220);
             Size = (80, 22);
             Text = 0;
             TextSize = 13;
-            renderer = &9;
+            renderer = &6;
         }
 
         Label.Label9 {
@@ -1212,7 +1527,289 @@ Panel.Panel1 {
             Size = (96.2, 18);
             Text = "Player Hit stun";
             TextSize = 13;
+            renderer = &7;
+        }
+
+        Label.Label13 {
+            AutoSize = true;
+            Position = (30, 122);
+            ScrollbarPolicy = Never;
+            Size = (92.2, 18);
+            Text = "Render Group";
+            TextSize = 13;
             renderer = &10;
+        }
+
+        EditBox.renderGroup {
+            InputValidator = UInt;
+            Position = (130, 120);
+            Size = (30, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &20;
+        }
+
+        EditBox.BlendMode {
+            InputValidator = UInt;
+            Position = (180, 90);
+            Size = (70, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &20;
+        }
+
+        Label.Label22 {
+            AutoSize = true;
+            Position = (140, 92);
+            ScrollbarPolicy = Never;
+            Size = (37.2, 18);
+            Text = Mode;
+            TextSize = 13;
+            renderer = &10;
+        }
+
+        EditBox.BlendColor {
+            InputValidator = "#[0-9a-fA-F]{0,8}";
+            Position = (310, 90);
+            Size = (90, 22);
+            Text = "#00000000";
+            TextSize = 13;
+            renderer = &20;
+        }
+
+        Label.Label24 {
+            AutoSize = true;
+            Position = (260, 92);
+            ScrollbarPolicy = Never;
+            Size = (36.2, 18);
+            Text = Color;
+            TextSize = 13;
+            renderer = &10;
+        }
+
+        Label.Label25 {
+            AutoSize = true;
+            Position = (170, 122);
+            ScrollbarPolicy = Never;
+            Size = (75.2, 18);
+            Text = "Flip Vertical";
+            TextSize = 13;
+            renderer = &10;
+        }
+
+        EditBox.BlendFlipVert {
+            InputValidator = UInt;
+            Position = (250, 120);
+            Size = (70, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &20;
+        }
+
+        Label.Label26 {
+            AutoSize = true;
+            Position = (330, 122);
+            ScrollbarPolicy = Never;
+            Size = (92.2, 18);
+            Text = "Flip Horizontal";
+            TextSize = 13;
+            renderer = &10;
+        }
+
+        EditBox.BlendFlipHorz {
+            InputValidator = UInt;
+            Position = (420, 120);
+            Size = (70, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &20;
+        }
+
+        EditBox.EditBox1 {
+            InputValidator = UInt;
+            Position = (540, 120);
+            Size = (60, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &20;
+        }
+
+        Label.Label29 {
+            AutoSize = true;
+            Position = (500, 122);
+            ScrollbarPolicy = Never;
+            Size = (39.2, 18);
+            Text = Angle;
+            TextSize = 13;
+            renderer = &10;
+        }
+
+        Label.Label30 {
+            AutoSize = true;
+            Position = (160, 372);
+            ScrollbarPolicy = Never;
+            Size = (62.2, 18);
+            Text = "Hit Effect";
+            TextSize = 13;
+            renderer = &15;
+        }
+
+        EditBox.HitEffect {
+            DefaultText = 0;
+            InputValidator = UInt;
+            Position = (230, 370);
+            Size = (60, 22);
+            TextSize = 13;
+
+            Renderer {
+                caretcolor = rgb(110, 110, 255);
+                defaulttextcolor = rgb(120, 120, 120);
+                padding = (6, 4, 6, 4);
+                selectedtextbackgroundcolor = rgb( 10, 110, 255);
+                selectedtextcolor = White;
+                textcolor = rgb(190, 190, 190);
+                texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+                texturedisabled = None;
+                texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+                texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+            }
+        }
+
+        EditBox.AtkLvl {
+            InputValidator = UInt;
+            Position = (500, 220);
+            Size = (90, 22);
+            Text = 0;
+            TextSize = 13;
+
+            Renderer {
+                caretcolor = rgb(110, 110, 255);
+                defaulttextcolor = rgb(120, 120, 120);
+                padding = (6, 4, 6, 4);
+                selectedtextbackgroundcolor = rgb( 10, 110, 255);
+                selectedtextcolor = White;
+                textcolor = rgb(190, 190, 190);
+                texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+                texturedisabled = None;
+                texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+                texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+            }
+        }
+
+        Label.Label32 {
+            AutoSize = true;
+            Position = (412, 222);
+            ScrollbarPolicy = Never;
+            Size = (82.2, 18);
+            Text = "Attack Level";
+            TextSize = 13;
+            renderer = &13;
+        }
+
+        Label.Label38 {
+            AutoSize = true;
+            Position = (10, 282);
+            ScrollbarPolicy = Never;
+            Size = (109.2, 18);
+            Text = "On Hit Card Gain";
+            TextSize = 13;
+            renderer = &15;
+        }
+
+        EditBox.HCardGain {
+            InputValidator = UInt;
+            Position = (140, 280);
+            Size = (80, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &12;
+        }
+
+        Label.Label39 {
+            AutoSize = true;
+            Position = (10, 312);
+            ScrollbarPolicy = Never;
+            Size = (125.2, 18);
+            Text = "On Block Card Gain";
+            TextSize = 13;
+            renderer = &15;
+        }
+
+        EditBox.BCardGain {
+            InputValidator = UInt;
+            Position = (140, 310);
+            Size = (80, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &12;
+        }
+
+        EditBox.AHitSequ {
+            InputValidator = UInt;
+            Position = (330, 280);
+            Size = (80, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &12;
+        }
+
+        Label.Label40 {
+            AutoSize = true;
+            Position = (250, 282);
+            ScrollbarPolicy = Never;
+            Size = (77.2, 18);
+            Text = "Air Hit Sequ";
+            TextSize = 13;
+            renderer = &14;
+        }
+
+        Label.Label41 {
+            AutoSize = true;
+            Position = (220, 312);
+            ScrollbarPolicy = Never;
+            Size = (107.2, 18);
+            Text = "Ground Hit Sequ";
+            TextSize = 13;
+            renderer = &14;
+        }
+
+        EditBox.GHitSequ {
+            InputValidator = UInt;
+            Position = (330, 310);
+            Size = (80, 22);
+            Text = 0;
+            TextSize = 13;
+            renderer = &12;
+        }
+
+        Label.Label42 {
+            AutoSize = true;
+            Position = (442, 252);
+            ScrollbarPolicy = Never;
+            Size = (53.2, 18);
+            Text = Position;
+            TextSize = 13;
+            renderer = &13;
+        }
+
+        Label.Label43 {
+            AutoSize = true;
+            Position = (412, 282);
+            ScrollbarPolicy = Never;
+            Size = (91.2, 18);
+            Text = "Position Extra";
+            TextSize = 13;
+            renderer = &13;
+        }
+
+        Label.Label44 {
+            AutoSize = true;
+            Position = (462, 312);
+            ScrollbarPolicy = Never;
+            Size = (35.2, 18);
+            Text = Pivot;
+            TextSize = 13;
+            renderer = &13;
         }
     }
 
@@ -1223,14 +1820,14 @@ Panel.Panel1 {
         Size = (42, 20);
         Step = 0.05;
         Value = 0;
-        renderer = &1;
+        renderer = &18;
     }
 
     Button.ActionName {
         Position = (20, 60);
         Size = (200, 22);
         TextSize = 10;
-        renderer = &5;
+        renderer = &2;
     }
 }
 

@@ -28,6 +28,6 @@ namespace SpiralOfFate
 }
 
 namespace ShadyCore {
-	void* Allocate(size_t s) { return malloc(s); }
-	void Deallocate(void* p) { free(p); }
+	void* Allocate(size_t s) { return new char[s]; }
+	void Deallocate(void* p) { delete[] (char *)p; }
 }
