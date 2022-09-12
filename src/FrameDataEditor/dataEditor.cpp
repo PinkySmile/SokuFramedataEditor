@@ -637,42 +637,87 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 
 void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &object)
 {
-	auto progress = panel->get<tgui::Slider>("Progress");
-	auto limit = panel->get<tgui::EditBox>("Limit");
-	auto sprite = panel->get<tgui::EditBox>("Sprite");
-	auto hitSound = panel->get<tgui::EditBox>("HitSFX");
-	auto offset = panel->get<tgui::EditBox>("Offset");
-	auto bounds = panel->get<tgui::EditBox>("Bounds");
+	auto blendMode = panel->get<tgui::EditBox>("BlendMode");
+	auto blendColor = panel->get<tgui::EditBox>("BlendColor");
+	auto blendColorBut = panel->get<tgui::Button>("BlendColorBut");
 	auto scale = panel->get<tgui::EditBox>("Scale");
-	auto collisionBox = panel->get<tgui::CheckBox>("Collision");
-	auto duration = panel->get<tgui::EditBox>("Duration");
-	auto pushBack = panel->get<tgui::EditBox>("PushBack");
-	auto pushBlock = panel->get<tgui::EditBox>("PushBlock");
+	auto renderGroup = panel->get<tgui::EditBox>("renderGroup");
+	auto blendFlipVert = panel->get<tgui::EditBox>("BlendFlipVert");
+	auto blendFlipHorz = panel->get<tgui::EditBox>("BlendFlipHorz");
+	auto blendAngle = panel->get<tgui::EditBox>("BlendAngle");
 	auto pBlockStun = panel->get<tgui::EditBox>("PBlockStun");
 	auto eBlockStun = panel->get<tgui::EditBox>("EBlockStun");
 	auto pHitStun = panel->get<tgui::EditBox>("PHitStun");
 	auto eHitStun = panel->get<tgui::EditBox>("EHitStun");
+	auto hCardGain = panel->get<tgui::EditBox>("HCardGain");
+	auto bCardGain = panel->get<tgui::EditBox>("BCardGain");
 	auto hitSpeed = panel->get<tgui::EditBox>("HitSpeed");
-	auto counterHitSpeed = panel->get<tgui::EditBox>("CHSpeed");
-	auto prorate = panel->get<tgui::EditBox>("Rate");
+	auto hitSound = panel->get<tgui::EditBox>("HitSFX");
+	auto hitEffect = panel->get<tgui::EditBox>("HitEffect");
 	auto damage = panel->get<tgui::EditBox>("Damage");
+	auto chip = panel->get<tgui::EditBox>("ChipDmg");
+	auto limit = panel->get<tgui::EditBox>("Limit");
 	auto speed = panel->get<tgui::EditBox>("MoveSpeed");
+	auto aHitSequ = panel->get<tgui::EditBox>("AHitSequ");
+	auto gHitSequ = panel->get<tgui::EditBox>("GHitSequ");
+	auto prorate = panel->get<tgui::EditBox>("Rate");
+	auto untech = panel->get<tgui::EditBox>("Untech");
+	auto atkLvl = panel->get<tgui::ComboBox>("AtkLvl");
+	auto pos = panel->get<tgui::EditBox>("Pos");
+	auto posExtra = panel->get<tgui::EditBox>("PosExtra");
+	auto pivot = panel->get<tgui::EditBox>("Pivot");
+
+	auto mods = panel->get<tgui::EditBox>("Modifiers");
+	auto progress = panel->get<tgui::Slider>("Progress");
+	auto sprite = panel->get<tgui::EditBox>("Sprite");
+	auto offset = panel->get<tgui::EditBox>("Offset");
+	auto bounds = panel->get<tgui::EditBox>("Bounds");
+	auto duration = panel->get<tgui::EditBox>("Duration");
+	auto collisionBox = panel->get<tgui::CheckBox>("Collision");
 	auto fFlags = panel->get<tgui::EditBox>("fFlags");
 	auto aFlags = panel->get<tgui::EditBox>("aFlags");
-	auto chip = panel->get<tgui::EditBox>("ChipDmg");
 	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 	auto actionName = panel->get<tgui::Button>("ActionName");
 	auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
+	auto renderer = blendColorBut->getRenderer();
+	char buffer[10];
+	auto color = sf::Color{
+		static_cast<unsigned char>((data.blendOptions.color >> 16) & 0xFF),
+		static_cast<unsigned char>((data.blendOptions.color >> 8) & 0xFF),
+		static_cast<unsigned char>((data.blendOptions.color >> 0) & 0xFF),
+		static_cast<unsigned char>((data.blendOptions.color >> 24) & 0xFF)
+	};
 
+	sprintf(buffer, "#%08x", data.blendOptions.color);
 	game->logger.debug("Soft refresh");
 	*c = true;
 	actionName->setText(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second);
 	fFlags->setText(std::to_string(data.traits.frameFlags));
 	aFlags->setText(std::to_string(data.traits.attackFlags));
+	mods->setText(std::to_string(data.traits.comboModifier));
 	chip->setText(std::to_string(data.traits.chipDamage));
 	progress->setMinimum(0);
 	progress->setMaximum(object->_moves.at(object->_action)[object->_actionBlock].size() - 1);
 	progress->setValue(object->_animation);
+	blendMode->setText(std::to_string(data.blendOptions.mode));
+	blendColor->setText(buffer);
+	renderer->setBackgroundColor(color);
+	renderer->setBackgroundColorDisabled(color);
+	renderer->setBackgroundColorHover(color);
+	renderer->setBackgroundColorDown(color);
+	renderer->setBackgroundColorFocused(color);
+	blendMode->setText(std::to_string(data.blendOptions.mode));
+	renderGroup->setText(std::to_string(data.renderGroup));
+	blendFlipVert->setText(std::to_string(data.blendOptions.flipVert));
+	blendFlipHorz->setText(std::to_string(data.blendOptions.flipHorz));
+	blendAngle->setText(std::to_string(data.blendOptions.angle));
+	hCardGain->setText(std::to_string(data.traits.onHitCardGain));
+	bCardGain->setText(std::to_string(data.traits.onBlockCardGain));
+	hitEffect->setText(std::to_string(data.traits.onHitEffect));
+	aHitSequ->setText(std::to_string(data.traits.onAirHitSetSequence));
+	gHitSequ->setText(std::to_string(data.traits.onGroundHitSetSequence));
+	untech->setText(std::to_string(data.traits.untech));
+	atkLvl->setSelectedItemByIndex(data.traits.attackLevel);
 	sprite->setText(data._schema.images[data.imageIndex].name);
 	hitSound->setText(std::to_string(data.traits.onHitSfx));
 	damage->setText(std::to_string(data.traits.damage));
@@ -698,7 +743,22 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 		std::to_string(data.traits.speedX / 100) + "." + (data.traits.speedX % 100 < 10 ? "0" : "") + std::to_string(data.traits.speedX % 100) + "," +
 		std::to_string(data.traits.speedY / 100) + "." + (data.traits.speedY % 100 < 10 ? "0" : "") + std::to_string(data.traits.speedY % 100) +
 	")";
+	auto newPos = "(" +
+		std::to_string(data.effect.positionXExtra / 100) + "." + (data.effect.positionXExtra % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionXExtra % 100) + "," +
+		std::to_string(data.effect.positionYExtra / 100) + "." + (data.effect.positionYExtra % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionYExtra % 100) +
+	")";
+	auto newPosExtra = "(" +
+		std::to_string(data.effect.positionX / 100) + "." + (data.effect.positionX % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionX % 100) + "," +
+		std::to_string(data.effect.positionY / 100) + "." + (data.effect.positionY % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionY % 100) +
+	")";
+	auto newPivot = "(" +
+		std::to_string(data.effect.pivotX / 100) + "." + (data.effect.pivotX % 100 < 10 ? "0" : "") + std::to_string(data.effect.pivotX % 100) + "," +
+		std::to_string(data.effect.pivotY / 100) + "." + (data.effect.pivotY % 100 < 10 ? "0" : "") + std::to_string(data.effect.pivotY % 100) +
+	")";
 
+	pos->setText(newPos);
+	posExtra->setText(newPosExtra);
+	pivot->setText(newPivot);
 	hitSpeed->setText(newHitSpeed);
 	speed->setText(newSpeed);
 	offset->setText(newOffset);
@@ -781,9 +841,31 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	auto speed = panel->get<tgui::EditBox>("MoveSpeed");
 	auto aFlags = panel->get<tgui::EditBox>("aFlags");
 	auto fFlags = panel->get<tgui::EditBox>("fFlags");
+	auto mods = panel->get<tgui::EditBox>("Modifiers");
 	auto chip = panel->get<tgui::EditBox>("ChipDmg");
+
+	auto blendMode = panel->get<tgui::EditBox>("BlendMode");
+	auto blendColor = panel->get<tgui::EditBox>("BlendColor");
+	auto blendColorBut = panel->get<tgui::Button>("BlendColorBut");
+	auto renderGroup = panel->get<tgui::EditBox>("renderGroup");
+	auto blendFlipVert = panel->get<tgui::EditBox>("BlendFlipVert");
+	auto blendFlipHorz = panel->get<tgui::EditBox>("BlendFlipHorz");
+	auto blendAngle = panel->get<tgui::EditBox>("BlendAngle");
+	auto hCardGain = panel->get<tgui::EditBox>("HCardGain");
+	auto bCardGain = panel->get<tgui::EditBox>("BCardGain");
+	auto hitEffect = panel->get<tgui::EditBox>("HitEffect");
+	auto aHitSequ = panel->get<tgui::EditBox>("AHitSequ");
+	auto gHitSequ = panel->get<tgui::EditBox>("GHitSequ");
+	auto untech = panel->get<tgui::EditBox>("Untech");
+	auto atkLvl = panel->get<tgui::ComboBox>("AtkLvl");
+	auto pos = panel->get<tgui::EditBox>("Pos");
+	auto posExtra = panel->get<tgui::EditBox>("PosExtra");
+	auto pivot = panel->get<tgui::EditBox>("Pivot");
+	auto renderer = blendColorBut->getRenderer();
+
 	std::vector<tgui::CheckBox::Ptr> fFlagsCheckboxes;
 	std::vector<tgui::CheckBox::Ptr> aFlagsCheckboxes;
+	std::vector<tgui::CheckBox::Ptr> modsCheckboxes;
 
 	actionName->connect("Clicked", [&gui, &object, block, action]{
 		auto window = Utils::openWindowWithFocus(gui, 500, "&.h - 100");
@@ -910,6 +992,184 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 		data.traits.chipDamage = std::stoul(t);
+	});
+	blendMode->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.blendOptions.mode = std::stoul(t);
+	});
+	blendColor->connect("TextChanged", [&object, renderer](std::string t){
+		if (*c || t.size() != 9)
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.blendOptions.color = std::stoul(t.substr(1), nullptr, 16);
+
+		auto color = sf::Color{
+			static_cast<unsigned char>((data.blendOptions.color >> 16) & 0xFF),
+			static_cast<unsigned char>((data.blendOptions.color >> 8) & 0xFF),
+			static_cast<unsigned char>((data.blendOptions.color >> 0) & 0xFF),
+			static_cast<unsigned char>((data.blendOptions.color >> 24) & 0xFF)
+		};
+
+		renderer->setBackgroundColor(color);
+		renderer->setBackgroundColorDisabled(color);
+		renderer->setBackgroundColorHover(color);
+		renderer->setBackgroundColorDown(color);
+		renderer->setBackgroundColorFocused(color);
+	});
+	blendColorBut->connect("Clicked", [&gui, &object, blendColor](){
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+		auto color = sf::Color{
+			static_cast<unsigned char>((data.blendOptions.color >> 16) & 0xFF),
+			static_cast<unsigned char>((data.blendOptions.color >> 8) & 0xFF),
+			static_cast<unsigned char>((data.blendOptions.color >> 0) & 0xFF),
+			static_cast<unsigned char>((data.blendOptions.color >> 24) & 0xFF)
+		};
+
+		Utils::makeColorPickWindow(gui, [&data, blendColor](sf::Color col){
+			char buffer[10];
+
+			sprintf(buffer, "#%02x%02x%02x%02x", col.a, col.r, col.g, col.b);
+			blendColor->setText(buffer);
+		}, color);
+	});
+	renderGroup->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.renderGroup = std::stoul(t);
+	});
+	blendFlipVert->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.blendOptions.flipVert = std::stoul(t);
+	});
+	blendFlipHorz->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.blendOptions.flipHorz = std::stoul(t);
+	});
+	blendAngle->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.blendOptions.angle = std::stoul(t);
+	});
+	hCardGain->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.onHitCardGain = std::stoul(t);
+	});
+	bCardGain->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.onBlockCardGain = std::stoul(t);
+	});
+	hitEffect->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.onHitEffect = std::stoul(t);
+	});
+	aHitSequ->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.onAirHitSetSequence = std::stoul(t);
+	});
+	gHitSequ->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.onGroundHitSetSequence = std::stoul(t);
+	});
+	untech->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.untech = std::stoul(t);
+	});
+	atkLvl->connect("ItemSelected", [&object](int i){
+		if (*c)
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.traits.attackLevel = i;
+	});
+	pos->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto pos = t.find(',');
+		auto x = t.substr(1, pos - 1);
+		auto y = t.substr(pos + 1, t.size() - pos - 1);
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		try {
+			std::stol(y);
+			data.effect.positionX = std::stof(x) * 100;
+			data.effect.positionY = std::stof(y) * 100;
+		} catch (std::exception &) {}
+	});
+	posExtra->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto pos = t.find(',');
+		auto x = t.substr(1, pos - 1);
+		auto y = t.substr(pos + 1, t.size() - pos - 1);
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		try {
+			std::stol(y);
+			data.effect.positionXExtra = std::stof(x) * 100;
+			data.effect.positionYExtra = std::stof(y) * 100;
+		} catch (std::exception &) {}
+	});
+	pivot->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto pos = t.find(',');
+		auto x = t.substr(1, pos - 1);
+		auto y = t.substr(pos + 1, t.size() - pos - 1);
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		try {
+			std::stol(y);
+			data.effect.pivotX = std::stof(x) * 100;
+			data.effect.pivotY = std::stof(y) * 100;
+		} catch (std::exception &) {}
 	});
 	sprite->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1213,6 +1473,42 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		for (int i = 0; i < 32; i++)
 			if (aFlagsCheckboxes[i])
 				aFlagsCheckboxes[i]->setChecked((data.traits.attackFlags & (1 << i)) != 0);
+		if (!g)
+			*c = false;
+	});
+
+	for (int i = 0; i < 8; i++) {
+		auto checkbox = panel->get<tgui::CheckBox>("Mod" + std::to_string(i));
+
+		modsCheckboxes.push_back(checkbox);
+		if (!checkbox)
+			continue;
+		checkbox->connect("Changed", [i, aFlags, &object](bool b){
+			if (*c)
+				return;
+
+			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+			*c = true;
+			data.traits.comboModifier = (data.traits.comboModifier & ~(1 << i)) | b << i;
+			aFlags->setText(std::to_string(data.traits.comboModifier));
+			*c = false;
+		});
+	}
+	mods->connect("TextChanged", [&object, modsCheckboxes](std::string t){
+		if (t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+		auto g = *c;
+
+		if (!*c) {
+			*c = true;
+			data.traits.comboModifier = std::stoul(t);
+		}
+		for (int i = 0; i < 8; i++)
+			if (modsCheckboxes[i])
+				modsCheckboxes[i]->setChecked((data.traits.comboModifier & (1 << i)) != 0);
 		if (!g)
 			*c = false;
 	});
