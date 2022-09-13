@@ -63,6 +63,20 @@ namespace SpiralOfFate
 	{
 		Vector2u textureSize;
 
+		for (auto &box : this->hBoxes)
+			if (box.up > box.down) {
+				auto down = box.up;
+
+				box.up = box.down;
+				box.down = down;
+			}
+		for (auto &box : this->aBoxes)
+			if (box.up > box.down) {
+				auto down = box.up;
+
+				box.up = box.down;
+				box.down = down;
+			}
 		try {
 			this->textureHandle = game->textureMgr.load(game->package, *this->_palette, this->_pal, "data/character/" + this->_character + "/" + this->_schema.images.at(this->imageIndex).name, &textureSize);
 		} catch (std::exception &e) {

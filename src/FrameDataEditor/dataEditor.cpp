@@ -871,6 +871,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		auto window = Utils::openWindowWithFocus(gui, 500, "&.h - 100");
 		auto pan = tgui::ScrollablePanel::create({"&.w", "&.h"});
 		unsigned i = 0;
+		float current = 0;
+		auto scroll = 0;
 		std::vector<unsigned> toDisplay;
 
 		for (auto &a : actionNames)
@@ -893,7 +895,15 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			button->setSize(430, 20);
 			Utils::setRenderer(button);
 			Utils::setRenderer(label);
-			if (object->_moves.find(moveId) == object->_moves.end()) {
+			if (moveId == object->_action) {
+				if (i > 30)
+					scroll = (i - 20) * 25;
+				button->getRenderer()->setTextColor(tgui::Color::Green);
+				button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
+			} else if (object->_moves.find(moveId) == object->_moves.end()) {
 				button->getRenderer()->setTextColor(tgui::Color::Red);
 				button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0x40, 0x40});
 				button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0, 0});
@@ -917,6 +927,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			pan->add(button);
 			i++;
 		}
+		pan->setVerticalScrollbarValue(scroll);
 
 		auto label = tgui::Label::create("");
 
@@ -1958,23 +1969,36 @@ void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 	block->setValue(object->_moves.at(object->_action).size() - 1);
 }
 
+static bool msgDisplayed = false;
+static bool msgDisplayed2 = false;
+
 void	newHurtBoxCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
-	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.push_back({-10, 10, 10, -10});
+	if (object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.size() >= 5 && !msgDisplayed) {
+		Utils::dispMsg("Warning", "This frame already has 5 or more hurtboxes. The game can only process 5 hurtboxes at once and adding more than that may crash the game.", MB_ICONWARNING);
+		msgDisplayed = true;
+	}
+	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.push_back({-10, -10, 10, 10});
 
 	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.back();
 
 	refreshBoxes(boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
+	normalColor = {0x00, 0xFF, 0x00, 0xA0};
 	selectBox(boxes->get<tgui::Button>("HurtBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.size() - 1)), &box);
 }
 
 void	newHitBoxCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
-	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.push_back({-10, 10, 10, -10});
+	if (object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.size() >= 5 && !msgDisplayed2) {
+		Utils::dispMsg("Warning", "This frame already has 5 or more hitboxes. The game can only process 5 hitboxes at once and adding more than that may crash the game.", MB_ICONWARNING);
+		msgDisplayed2 = true;
+	}
+	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.push_back({-10, -10, 10, 10});
 
 	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.back();
 
 	refreshBoxes(boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
+	normalColor = {0xFF, 0x00, 0x00, 0xA0};
 	selectBox(boxes->get<tgui::Button>("HitBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.size() - 1)), &box);
 }
 
