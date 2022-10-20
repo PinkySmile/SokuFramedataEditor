@@ -23,6 +23,10 @@ void EditableObject::render() const
 		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
 		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
 	};
+	SpiralOfFate::Vector2f scaleReal{
+		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 100) / 100.f,
+		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 100) / 100.f
+	};
 	SpiralOfFate::Vector2f bounds{
 		static_cast<float>(data.texWidth),
 		static_cast<float>(data.texHeight)
@@ -34,8 +38,8 @@ void EditableObject::render() const
 		data.texHeight
 	};
 	SpiralOfFate::Vector2f result{
-		static_cast<float>(-data.offsetX) * s,
-		static_cast<float>(-data.offsetY) * s
+		static_cast<float>(-data.offsetX) * s * scaleReal.x,
+		static_cast<float>(-data.offsetY) * s * scaleReal.y
 	};
 
 	if (data.blendOptions.flipHorz) {

@@ -381,15 +381,20 @@ namespace Utils
 		if (mustExist)
 			ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-		bool result = GetOpenFileName(&ofn);
+		bool r = GetOpenFileName(&ofn);
 
 		std::filesystem::current_path(cwd);
 		delete[] pattern;
-		if (result)
+		if (r)
 			return ofn.lpstrFile;
-		else
-			return "";
-#else
+		else {
+			auto err = CommDlgExtendedError();
+
+			if (!err)
+				return "";
+			MessageBoxA(nullptr, ("Error " + std::to_string(err) + " on GetOpenFileName. Please report this.").c_str(), "GetOpenFileName error", MB_ICONERROR);
+		}
+#endif
 		sf::RenderWindow window{{500, 300}, title, sf::Style::Titlebar};
 		tgui::Gui gui{window};
 		std::string result;
@@ -510,7 +515,6 @@ namespace Utils
 			window.display();
 		}
 		return result;
-#endif
 	}
 
 	std::string saveFileDialog(const std::string &title, const std::string &basePath, const std::vector<std::pair<std::string, std::string>> &patterns)

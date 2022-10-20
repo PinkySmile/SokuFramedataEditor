@@ -538,6 +538,10 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 	int i = 0;
 	auto button = tgui::Button::create();
 	auto renderer = button->getRenderer();
+	SpiralOfFate::Vector2f scaleReal{
+		(data.blendOptions.scaleX ? data.blendOptions.scaleX : 100) / 100.f,
+		(data.blendOptions.scaleY ? data.blendOptions.scaleY : 100) / 100.f
+	};
 
 	panel->removeAllWidgets();
 	renderer->setBackgroundColor({0xFF, 0xFF, 0xFF, 0x00});
@@ -553,8 +557,8 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 	renderer->setBorders(1);
 	button->setSize(data.texWidth * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f, data.texHeight * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f);
 	button->setPosition(
-		"&.w / 2 + " + std::to_string(-data.offsetX),
-		"&.h / 2 + " + std::to_string(-data.offsetY + 300)
+		"&.w / 2 + " + std::to_string(-data.offsetX * scaleReal.x),
+		"&.h / 2 + " + std::to_string(-data.offsetY * scaleReal.y + 300)
 	);
 	button->connect("MousePressed", [&object](std::weak_ptr<tgui::Button> self){
 		selectSprite(self.lock(), object);
