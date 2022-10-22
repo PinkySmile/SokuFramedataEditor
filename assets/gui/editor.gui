@@ -1930,7 +1930,7 @@ MenuBar.main_bar {
     }
 
     Menu {
-        Items = ["Copy boxes from last frame", "Copy boxes from next frame", "Flatten all collision boxes", "Flatten this move collision boxes", "Reload textures", "Evil mode"];
+        Items = ["Copy boxes from last frame", "Copy boxes from next frame", "Flatten this move collision boxes", "Reload textures", "Evil mode"];
         Text = Misc;
     }
 

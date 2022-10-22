@@ -87,7 +87,7 @@ Label.Version {
 
 Label.Label4 {
     AutoSize = true;
-    Position = (280, 70);
+    Position = (&.w - 10 - w, 70);
     ScrollbarPolicy = Never;
     Size = (173.2, 18);
     Text = "Made by PinkySmile#3506";
@@ -112,10 +112,10 @@ Label.Label4 {
 
 Label.Label5 {
     AutoSize = true;
-    Position = (170, 90);
+    Position = (&.w - 10 - w, 90);
     ScrollbarPolicy = Never;
     Size = (283.2, 18);
-    Text = "Credits to DPhoenix#1069 for shady-loader";
+    Text = "Powered by shady-loader made by DPhoenix#1069";
     TextSize = 13;
 
     Renderer {

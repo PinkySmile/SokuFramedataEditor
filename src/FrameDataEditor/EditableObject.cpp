@@ -20,33 +20,33 @@ void EditableObject::render() const
 		data.reloadTexture();
 
 	SpiralOfFate::Vector2f scale{
-		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
-		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
+		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f,
+		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
 	};
 	SpiralOfFate::Vector2f scaleReal{
-		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 100) / 100.f,
-		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 100) / 100.f
+		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 100) / 100.f,
+		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 100) / 100.f
 	};
 	SpiralOfFate::Vector2f bounds{
-		static_cast<float>(data.texWidth),
-		static_cast<float>(data.texHeight)
+		static_cast<float>(data.frame->texWidth),
+		static_cast<float>(data.frame->texHeight)
 	};
 	sf::IntRect texBounds{
-		data.texOffsetX,
-		data.texOffsetY,
-		data.texWidth,
-		data.texHeight
+		data.frame->texOffsetX,
+		data.frame->texOffsetY,
+		data.frame->texWidth,
+		data.frame->texHeight
 	};
 	SpiralOfFate::Vector2f result{
-		static_cast<float>(-data.offsetX) * s * scaleReal.x,
-		static_cast<float>(-data.offsetY) * s * scaleReal.y
+		static_cast<float>(-data.frame->offsetX) * s * scaleReal.x,
+		static_cast<float>(-data.frame->offsetY) * s * scaleReal.y
 	};
 
-	if (data.blendOptions.flipHorz) {
+	if (data.frame->blendOptions.flipHorz) {
 		texBounds.left += texBounds.width;
 		texBounds.width *= -1;
 	}
-	if (data.blendOptions.flipVert) {
+	if (data.frame->blendOptions.flipVert) {
 		texBounds.top += texBounds.height;
 		texBounds.height *= -1;
 	}
@@ -56,12 +56,12 @@ void EditableObject::render() const
 	//	-static_cast<float>(size.y)
 	//};
 	result += SpiralOfFate::Vector2f{
-		data.texWidth * scale.x / 2,
-		data.texHeight * scale.y / 2
+		data.frame->texWidth * scale.x / 2,
+		data.frame->texHeight * scale.y / 2
 	};
 	result += translate;
 	this->_sprite.setOrigin(bounds / 2.f);
-	this->_sprite.setRotation(data.blendOptions.angle);
+	this->_sprite.setRotation(data.frame->blendOptions.angle);
 	this->_sprite.setPosition(result);
 	this->_sprite.setScale(scale);
 	this->_sprite.textureHandle = data.textureHandle;
@@ -81,13 +81,13 @@ void EditableObject::update()
 	auto *data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
 
 	this->_animationCtr++;
-	while (this->_animationCtr >= data->duration) {
+	while (this->_animationCtr >= data->frame->duration) {
 		this->_animationCtr = 0;
 		this->_animation++;
 		this->_animation %= this->_moves.at(this->_action)[this->_actionBlock].size();
 		data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
 		SpiralOfFate::game->soundMgr.play(data->hitSoundHandle);
-		if (!data->duration)
+		if (!data->frame->duration)
 			break;
 	}
 	this->_position += this->_speed;

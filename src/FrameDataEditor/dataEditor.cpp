@@ -318,11 +318,11 @@ void	arrangeButtons(EditableObject *object)
 	auto *data = object ? &object->_moves.at(object->_action)[object->_actionBlock][object->_animation] : nullptr;
 	Box box = spriteSelected ? Box{
 		{
-			static_cast<int>(-data->offsetX),
-			static_cast<int>(-data->offsetY)
+			static_cast<int>(-data->frame->offsetX),
+			static_cast<int>(-data->frame->offsetY)
 		}, {
-			static_cast<unsigned int>(data->texWidth * (data->blendOptions.scaleX ? data->blendOptions.scaleX : 200) / 100.f),
-			static_cast<unsigned int>(data->texHeight * (data->blendOptions.scaleY ? data->blendOptions.scaleY : 200) / 100.f)
+			static_cast<unsigned int>(data->frame->texWidth * (data->frame->blendOptions.scaleX ? data->frame->blendOptions.scaleX : 200) / 100.f),
+			static_cast<unsigned int>(data->frame->texHeight * (data->frame->blendOptions.scaleY ? data->frame->blendOptions.scaleY : 200) / 100.f)
 		}
 	} : Box{
 		{selectedBox->left, selectedBox->up},
@@ -539,8 +539,8 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 	auto button = tgui::Button::create();
 	auto renderer = button->getRenderer();
 	SpiralOfFate::Vector2f scaleReal{
-		(data.blendOptions.scaleX ? data.blendOptions.scaleX : 100) / 100.f,
-		(data.blendOptions.scaleY ? data.blendOptions.scaleY : 100) / 100.f
+		(data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 100) / 100.f,
+		(data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 100) / 100.f
 	};
 
 	panel->removeAllWidgets();
@@ -555,10 +555,10 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 	renderer->setBorderColorDisabled({0xFF, 0xFF, 0xFF});
 	renderer->setBorderColorFocused({0xFF, 0xFF, 0xFF});
 	renderer->setBorders(1);
-	button->setSize(data.texWidth * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f, data.texHeight * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f);
+	button->setSize(data.frame->texWidth * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f, data.frame->texHeight * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f);
 	button->setPosition(
-		"&.w / 2 + " + std::to_string(-data.offsetX * scaleReal.x),
-		"&.h / 2 + " + std::to_string(-data.offsetY * scaleReal.y + 300)
+		"&.w / 2 + " + std::to_string(-data.frame->offsetX * scaleReal.x),
+		"&.h / 2 + " + std::to_string(-data.frame->offsetY * scaleReal.y + 300)
 	);
 	button->connect("MousePressed", [&object](std::weak_ptr<tgui::Button> self){
 		selectSprite(self.lock(), object);
@@ -566,7 +566,7 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 	}, std::weak_ptr<tgui::Button>(button));
 	panel->add(button, "SpriteBox");
 
-	for (auto &box : data.hBoxes) {
+	for (auto &box : data.frame->hBoxes) {
 		button = tgui::Button::create();
 		renderer = button->getRenderer();
 		renderer->setBackgroundColor({0x00, 0xFF, 0x00, 0x4C});
@@ -590,7 +590,7 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 		i++;
 	}
 	i = 0;
-	for (auto &box : data.aBoxes) {
+	for (auto &box : data.frame->aBoxes) {
 		button = tgui::Button::create();
 		renderer = button->getRenderer();
 		renderer->setBackgroundColor({0xFF, 0x00, 0x00, 0x4C});
@@ -613,8 +613,8 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 		panel->add(button, "HitBox" + std::to_string(i));
 		i++;
 	}
-	if (!data.cBoxes.empty()) {
-		auto &box = data.cBoxes.front();
+	if (!data.frame->cBoxes.empty()) {
+		auto &box = data.frame->cBoxes.front();
 
 		button = tgui::Button::create();
 		renderer = button->getRenderer();
@@ -686,78 +686,78 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	auto renderer = blendColorBut->getRenderer();
 	char buffer[10];
 	auto color = sf::Color{
-		static_cast<unsigned char>((data.blendOptions.color >> 16) & 0xFF),
-		static_cast<unsigned char>((data.blendOptions.color >> 8) & 0xFF),
-		static_cast<unsigned char>((data.blendOptions.color >> 0) & 0xFF),
-		static_cast<unsigned char>((data.blendOptions.color >> 24) & 0xFF)
+		static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
+		static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
+		static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
+		static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
 	};
 
-	sprintf(buffer, "#%08x", data.blendOptions.color);
+	sprintf(buffer, "#%08x", data.frame->blendOptions.color);
 	game->logger.debug("Soft refresh");
 	*c = true;
 	actionName->setText(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second);
-	fFlags->setText(std::to_string(data.traits.frameFlags));
-	aFlags->setText(std::to_string(data.traits.attackFlags));
-	mods->setText(std::to_string(data.traits.comboModifier));
-	chip->setText(std::to_string(data.traits.chipDamage));
+	fFlags->setText(std::to_string(data.frame->traits.frameFlags));
+	aFlags->setText(std::to_string(data.frame->traits.attackFlags));
+	mods->setText(std::to_string(data.frame->traits.comboModifier));
+	chip->setText(std::to_string(data.frame->traits.chipDamage));
 	progress->setMinimum(0);
 	progress->setMaximum(object->_moves.at(object->_action)[object->_actionBlock].size() - 1);
 	progress->setValue(object->_animation);
-	blendMode->setText(std::to_string(data.blendOptions.mode));
+	blendMode->setText(std::to_string(data.frame->blendOptions.mode));
 	blendColor->setText(buffer);
 	renderer->setBackgroundColor(color);
 	renderer->setBackgroundColorDisabled(color);
 	renderer->setBackgroundColorHover(color);
 	renderer->setBackgroundColorDown(color);
 	renderer->setBackgroundColorFocused(color);
-	blendMode->setText(std::to_string(data.blendOptions.mode));
-	renderGroup->setText(std::to_string(data.renderGroup));
-	blendFlipVert->setText(std::to_string(data.blendOptions.flipVert));
-	blendFlipHorz->setText(std::to_string(data.blendOptions.flipHorz));
-	blendAngle->setText(std::to_string(data.blendOptions.angle));
-	hCardGain->setText(std::to_string(data.traits.onHitCardGain));
-	bCardGain->setText(std::to_string(data.traits.onBlockCardGain));
-	hitEffect->setText(std::to_string(data.traits.onHitEffect));
-	aHitSequ->setText(std::to_string(data.traits.onAirHitSetSequence));
-	gHitSequ->setText(std::to_string(data.traits.onGroundHitSetSequence));
-	untech->setText(std::to_string(data.traits.untech));
-	atkLvl->setSelectedItemByIndex(data.traits.attackLevel);
-	sprite->setText(data._schema.images[data.imageIndex].name);
-	hitSound->setText(std::to_string(data.traits.onHitSfx));
-	damage->setText(std::to_string(data.traits.damage));
-	duration->setText(std::to_string(data.duration));
-	pBlockStun->setText(std::to_string(data.traits.onBlockPlayerStun));
-	eBlockStun->setText(std::to_string(data.traits.onBlockEnemyStun));
-	pHitStun->setText(std::to_string(data.traits.onHitPlayerStun));
-	eHitStun->setText(std::to_string(data.traits.onHitEnemyStun));
-	prorate->setText(std::to_string(data.traits.proration / 10) + "." + std::to_string(data.traits.proration % 10) + "%");
-	limit->setText(std::to_string(data.traits.limit));
+	blendMode->setText(std::to_string(data.frame->blendOptions.mode));
+	renderGroup->setText(std::to_string(data.frame->renderGroup));
+	blendFlipVert->setText(std::to_string(data.frame->blendOptions.flipVert));
+	blendFlipHorz->setText(std::to_string(data.frame->blendOptions.flipHorz));
+	blendAngle->setText(std::to_string(data.frame->blendOptions.angle));
+	hCardGain->setText(std::to_string(data.frame->traits.onHitCardGain));
+	bCardGain->setText(std::to_string(data.frame->traits.onBlockCardGain));
+	hitEffect->setText(std::to_string(data.frame->traits.onHitEffect));
+	aHitSequ->setText(std::to_string(data.frame->traits.onAirHitSetSequence));
+	gHitSequ->setText(std::to_string(data.frame->traits.onGroundHitSetSequence));
+	untech->setText(std::to_string(data.frame->traits.untech));
+	atkLvl->setSelectedItemByIndex(data.frame->traits.attackLevel);
+	sprite->setText(data._schema->images[data.frame->imageIndex].name);
+	hitSound->setText(std::to_string(data.frame->traits.onHitSfx));
+	damage->setText(std::to_string(data.frame->traits.damage));
+	duration->setText(std::to_string(data.frame->duration));
+	pBlockStun->setText(std::to_string(data.frame->traits.onBlockPlayerStun));
+	eBlockStun->setText(std::to_string(data.frame->traits.onBlockEnemyStun));
+	pHitStun->setText(std::to_string(data.frame->traits.onHitPlayerStun));
+	eHitStun->setText(std::to_string(data.frame->traits.onHitEnemyStun));
+	prorate->setText(std::to_string(data.frame->traits.proration / 10) + "." + std::to_string(data.frame->traits.proration % 10) + "%");
+	limit->setText(std::to_string(data.frame->traits.limit));
 
-	auto newBounds = "(" + std::to_string(data.texOffsetX) + "," + std::to_string(data.texOffsetY) + "," + std::to_string(data.texWidth) + "," + std::to_string(data.texHeight) + ")";
+	auto newBounds = "(" + std::to_string(data.frame->texOffsetX) + "," + std::to_string(data.frame->texOffsetY) + "," + std::to_string(data.frame->texWidth) + "," + std::to_string(data.frame->texHeight) + ")";
 	auto newScale = "(" +
-		std::to_string(data.blendOptions.scaleX / 100) + "." + (data.blendOptions.scaleX % 100 < 10 ? "0" : "") + std::to_string(data.blendOptions.scaleX % 100) + "," +
-		std::to_string(data.blendOptions.scaleY / 100) + "." + (data.blendOptions.scaleY % 100 < 10 ? "0" : "") + std::to_string(data.blendOptions.scaleY % 100) +
+		std::to_string(data.frame->blendOptions.scaleX / 100) + "." + (data.frame->blendOptions.scaleX % 100 < 10 ? "0" : "") + std::to_string(data.frame->blendOptions.scaleX % 100) + "," +
+		std::to_string(data.frame->blendOptions.scaleY / 100) + "." + (data.frame->blendOptions.scaleY % 100 < 10 ? "0" : "") + std::to_string(data.frame->blendOptions.scaleY % 100) +
 	")";
-	auto newOffset = "(" + std::to_string(data.offsetX) + "," + std::to_string(data.offsetY) + ")";
+	auto newOffset = "(" + std::to_string(data.frame->offsetX) + "," + std::to_string(data.frame->offsetY) + ")";
 	auto newSpeed = "(" +
-		std::to_string(data.effect.speedX / 100) + "." + (data.effect.speedX % 100 < 10 ? "0" : "") + std::to_string(data.effect.speedX % 100) + "," +
-		std::to_string(data.effect.speedY / 100) + "." + (data.effect.speedY % 100 < 10 ? "0" : "") + std::to_string(data.effect.speedY % 100) +
+		std::to_string(data.frame->effect.speedX / 100) + "." + (data.frame->effect.speedX % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.speedX % 100) + "," +
+		std::to_string(data.frame->effect.speedY / 100) + "." + (data.frame->effect.speedY % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.speedY % 100) +
 	")";
 	auto newHitSpeed = "(" +
-		std::to_string(data.traits.speedX / 100) + "." + (data.traits.speedX % 100 < 10 ? "0" : "") + std::to_string(data.traits.speedX % 100) + "," +
-		std::to_string(data.traits.speedY / 100) + "." + (data.traits.speedY % 100 < 10 ? "0" : "") + std::to_string(data.traits.speedY % 100) +
+		std::to_string(data.frame->traits.speedX / 100) + "." + (data.frame->traits.speedX % 100 < 10 ? "0" : "") + std::to_string(data.frame->traits.speedX % 100) + "," +
+		std::to_string(data.frame->traits.speedY / 100) + "." + (data.frame->traits.speedY % 100 < 10 ? "0" : "") + std::to_string(data.frame->traits.speedY % 100) +
 	")";
 	auto newPos = "(" +
-		std::to_string(data.effect.positionXExtra / 100) + "." + (data.effect.positionXExtra % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionXExtra % 100) + "," +
-		std::to_string(data.effect.positionYExtra / 100) + "." + (data.effect.positionYExtra % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionYExtra % 100) +
+		std::to_string(data.frame->effect.positionXExtra / 100) + "." + (data.frame->effect.positionXExtra % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.positionXExtra % 100) + "," +
+		std::to_string(data.frame->effect.positionYExtra / 100) + "." + (data.frame->effect.positionYExtra % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.positionYExtra % 100) +
 	")";
 	auto newPosExtra = "(" +
-		std::to_string(data.effect.positionX / 100) + "." + (data.effect.positionX % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionX % 100) + "," +
-		std::to_string(data.effect.positionY / 100) + "." + (data.effect.positionY % 100 < 10 ? "0" : "") + std::to_string(data.effect.positionY % 100) +
+		std::to_string(data.frame->effect.positionX / 100) + "." + (data.frame->effect.positionX % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.positionX % 100) + "," +
+		std::to_string(data.frame->effect.positionY / 100) + "." + (data.frame->effect.positionY % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.positionY % 100) +
 	")";
 	auto newPivot = "(" +
-		std::to_string(data.effect.pivotX / 100) + "." + (data.effect.pivotX % 100 < 10 ? "0" : "") + std::to_string(data.effect.pivotX % 100) + "," +
-		std::to_string(data.effect.pivotY / 100) + "." + (data.effect.pivotY % 100 < 10 ? "0" : "") + std::to_string(data.effect.pivotY % 100) +
+		std::to_string(data.frame->effect.pivotX / 100) + "." + (data.frame->effect.pivotX % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.pivotX % 100) + "," +
+		std::to_string(data.frame->effect.pivotY / 100) + "." + (data.frame->effect.pivotY % 100 < 10 ? "0" : "") + std::to_string(data.frame->effect.pivotY % 100) +
 	")";
 
 	pos->setText(newPos);
@@ -768,7 +768,7 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	offset->setText(newOffset);
 	bounds->setText(newBounds);
 	scale->setText(newScale);
-	collisionBox->setChecked(!data.cBoxes.empty());
+	collisionBox->setChecked(!data.frame->cBoxes.empty());
 	selectBox(nullptr, nullptr);
 	refreshBoxes(boxes, data, object);
 	*c = false;
@@ -802,10 +802,13 @@ void	refreshRightPanel(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, 
 	if (object->_moves[0].empty()) {
 		object->_moves[0].emplace_back();
 
+		//TODO: Properly init a default one
+		auto newSequence = new ShadyCore::Schema::Sequence(0, true);
 		auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 
-		tempSchema.objects.push_back(reinterpret_cast<ShadyCore::Schema::Object *const>(newElem));
-		object->_moves[0][0].emplace_back(editSession.chr, tempSchema, *newElem, *editSession.palette, editSession.palName);
+		newSequence->frames.push_back(newElem);
+		tempSchema.objects.push_back(newSequence);
+		object->_moves[0][0].emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
 	}
 	refreshFrameDataPanel(panel, gui.get<tgui::Panel>("Boxes"), object);
 }
@@ -963,12 +966,15 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		blockLabel->setText("Block " + std::to_string(i));
 		object->_actionBlock = i;
 		if (object->_moves[object->_action][i].empty()) {
+			game->logger.warn("This block is empty so we generate a frame");
 			auto old = reinterpret_cast<ShadyCore::Schema::Sequence::MoveFrame *>(tempSchema.objects.back());
+			auto newSequence = new ShadyCore::Schema::Sequence(object->_action, true);
 			auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 
-			//TODO: Properly init a default one
-			tempSchema.objects.push_back(reinterpret_cast<ShadyCore::Schema::Object *const>(newElem));
-			object->_moves[object->_action][i].emplace_back(editSession.chr, tempSchema, *newElem, *editSession.palette, editSession.palName);
+			//TODO: Init a proper value
+			newSequence->frames.push_back(newElem);
+			tempSchema.objects.push_back(newSequence);
+			object->_moves[object->_action][i].emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
 		}
 		progress->setMaximum(object->_moves[object->_action][i].size() - 1);
 		progress->setMinimum(0);
@@ -1006,7 +1012,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.chipDamage = std::stoul(t);
+		data.frame->traits.chipDamage = std::stoul(t);
 	});
 	blendMode->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1014,7 +1020,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.blendOptions.mode = std::stoul(t);
+		data.frame->blendOptions.mode = std::stoul(t);
 	});
 	blendColor->connect("TextChanged", [&object, renderer](std::string t){
 		if (*c || t.size() != 9)
@@ -1022,13 +1028,13 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.blendOptions.color = std::stoul(t.substr(1), nullptr, 16);
+		data.frame->blendOptions.color = std::stoul(t.substr(1), nullptr, 16);
 
 		auto color = sf::Color{
-			static_cast<unsigned char>((data.blendOptions.color >> 16) & 0xFF),
-			static_cast<unsigned char>((data.blendOptions.color >> 8) & 0xFF),
-			static_cast<unsigned char>((data.blendOptions.color >> 0) & 0xFF),
-			static_cast<unsigned char>((data.blendOptions.color >> 24) & 0xFF)
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
 		};
 
 		renderer->setBackgroundColor(color);
@@ -1040,10 +1046,10 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	blendColorBut->connect("Clicked", [&gui, &object, blendColor](){
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 		auto color = sf::Color{
-			static_cast<unsigned char>((data.blendOptions.color >> 16) & 0xFF),
-			static_cast<unsigned char>((data.blendOptions.color >> 8) & 0xFF),
-			static_cast<unsigned char>((data.blendOptions.color >> 0) & 0xFF),
-			static_cast<unsigned char>((data.blendOptions.color >> 24) & 0xFF)
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
+			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
 		};
 
 		Utils::makeColorPickWindow(gui, [&data, blendColor](sf::Color col){
@@ -1059,7 +1065,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.renderGroup = std::stoul(t);
+		data.frame->renderGroup = std::stoul(t);
 	});
 	blendFlipVert->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1067,7 +1073,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.blendOptions.flipVert = std::stoul(t);
+		data.frame->blendOptions.flipVert = std::stoul(t);
 	});
 	blendFlipHorz->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1075,7 +1081,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.blendOptions.flipHorz = std::stoul(t);
+		data.frame->blendOptions.flipHorz = std::stoul(t);
 	});
 	blendAngle->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1083,7 +1089,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.blendOptions.angle = std::stoul(t);
+		data.frame->blendOptions.angle = std::stoul(t);
 	});
 	hCardGain->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1091,7 +1097,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onHitCardGain = std::stoul(t);
+		data.frame->traits.onHitCardGain = std::stoul(t);
 	});
 	bCardGain->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1099,7 +1105,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onBlockCardGain = std::stoul(t);
+		data.frame->traits.onBlockCardGain = std::stoul(t);
 	});
 	hitEffect->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1107,7 +1113,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onHitEffect = std::stoul(t);
+		data.frame->traits.onHitEffect = std::stoul(t);
 	});
 	aHitSequ->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1115,7 +1121,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onAirHitSetSequence = std::stoul(t);
+		data.frame->traits.onAirHitSetSequence = std::stoul(t);
 	});
 	gHitSequ->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1123,7 +1129,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onGroundHitSetSequence = std::stoul(t);
+		data.frame->traits.onGroundHitSetSequence = std::stoul(t);
 	});
 	untech->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1131,7 +1137,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.untech = std::stoul(t);
+		data.frame->traits.untech = std::stoul(t);
 	});
 	atkLvl->connect("ItemSelected", [&object](int i){
 		if (*c)
@@ -1139,7 +1145,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.attackLevel = i;
+		data.frame->traits.attackLevel = i;
 	});
 	pos->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())
@@ -1152,8 +1158,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.effect.positionX = std::stof(x) * 100;
-			data.effect.positionY = std::stof(y) * 100;
+			data.frame->effect.positionX = std::stof(x) * 100;
+			data.frame->effect.positionY = std::stof(y) * 100;
 		} catch (std::exception &) {}
 	});
 	posExtra->connect("TextChanged", [&object](std::string t){
@@ -1167,8 +1173,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.effect.positionXExtra = std::stof(x) * 100;
-			data.effect.positionYExtra = std::stof(y) * 100;
+			data.frame->effect.positionXExtra = std::stof(x) * 100;
+			data.frame->effect.positionYExtra = std::stof(y) * 100;
 		} catch (std::exception &) {}
 	});
 	pivot->connect("TextChanged", [&object](std::string t){
@@ -1182,8 +1188,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.effect.pivotX = std::stof(x) * 100;
-			data.effect.pivotY = std::stof(y) * 100;
+			data.frame->effect.pivotX = std::stof(x) * 100;
+			data.frame->effect.pivotY = std::stof(y) * 100;
 		} catch (std::exception &) {}
 	});
 	sprite->connect("TextChanged", [&object](std::string t){
@@ -1192,16 +1198,16 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.imageIndex = getOrCreateImage(tempSchema, t);
+		data.frame->imageIndex = getOrCreateImage(tempSchema, t);
 		data.reloadTexture();
 	});
 	hitSound->connect("TextChanged", [&object](std::string t){
-		if (*c)
+		if (*c || t.empty())
 			return;
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onHitSfx = std::stoul(t);
+		data.frame->traits.onHitSfx = std::stoul(t);
 		data.reloadSound();
 	});
 	speed->connect("TextChanged", [boxes, &object](std::string t){
@@ -1217,8 +1223,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.effect.speedX = std::stof(x) * 100;
-			data.effect.speedY = std::stof(y) * 100;
+			data.frame->effect.speedX = std::stof(x) * 100;
+			data.frame->effect.speedY = std::stof(y) * 100;
 			refreshBoxes(boxes, data, object);
 			if (spriteSelected)
 				arrangeButtons(&*object);
@@ -1237,8 +1243,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stol(y);
-			data.offsetX = std::stol(x);
-			data.offsetY = std::stol(y);
+			data.frame->offsetX = std::stol(x);
+			data.frame->offsetY = std::stol(y);
 			refreshBoxes(boxes, data, object);
 			if (spriteSelected)
 				arrangeButtons(&*object);
@@ -1256,8 +1262,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 		try {
-			data.traits.speedX = std::stof(x) * 100;
-			data.traits.speedY = std::stof(y) * 100;
+			data.frame->traits.speedX = std::stof(x) * 100;
+			data.frame->traits.speedY = std::stof(y) * 100;
 		} catch (...) {}
 		refreshBoxes(boxes, data, object);
 		if (spriteSelected)
@@ -1276,8 +1282,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		try {
 			std::stoul(y);
-			data.blendOptions.scaleX = std::stof(x) * 100;
-			data.blendOptions.scaleY = std::stof(y) * 100;
+			data.frame->blendOptions.scaleX = std::stof(x) * 100;
+			data.frame->blendOptions.scaleY = std::stof(y) * 100;
 		} catch (...) {}
 		refreshBoxes(boxes, data, object);
 		if (spriteSelected)
@@ -1307,10 +1313,10 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			std::stoul(x);
 			std::stoul(y);
 			std::stoul(w);
-			data.texOffsetX = std::stoul(x);
-			data.texOffsetY = std::stoul(y);
-			data.texWidth   = std::stoul(w);
-			data.texHeight  = std::stoul(h);
+			data.frame->texOffsetX = std::stoul(x);
+			data.frame->texOffsetY = std::stoul(y);
+			data.frame->texWidth   = std::stoul(w);
+			data.frame->texHeight  = std::stoul(h);
 		} catch (...) {}
 	});
 	duration->connect("TextChanged", [&object](std::string t){
@@ -1321,7 +1327,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.duration = std::stoul(t);
+		data.frame->duration = std::stoul(t);
 	});
 	damage->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1331,7 +1337,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.damage = std::stoul(t);
+		data.frame->traits.damage = std::stoul(t);
 	});
 	pBlockStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1341,7 +1347,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onBlockPlayerStun = std::stoul(t);
+		data.frame->traits.onBlockPlayerStun = std::stoul(t);
 	});
 	eBlockStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1351,7 +1357,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onBlockEnemyStun = std::stoul(t);
+		data.frame->traits.onBlockEnemyStun = std::stoul(t);
 	});
 	pHitStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1361,7 +1367,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onHitPlayerStun = std::stoul(t);
+		data.frame->traits.onHitPlayerStun = std::stoul(t);
 	});
 	eHitStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1371,7 +1377,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.onHitEnemyStun = std::stoul(t);
+		data.frame->traits.onHitEnemyStun = std::stoul(t);
 	});
 	limit->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1381,7 +1387,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.limit = std::stoul(t);
+		data.frame->traits.limit = std::stoul(t);
 	});
 	prorate->connect("TextChanged", [&object](std::string t){
 		if (*c)
@@ -1391,7 +1397,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.traits.proration = std::stof(t) * 10;
+		data.frame->traits.proration = std::stof(t) * 10;
 	});
 	collisionBox->connect("Checked", [&object, boxes]{
 		if (*c)
@@ -1399,12 +1405,12 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		if (data.cBoxes.empty())
-			data.cBoxes.push_back({
-				static_cast<int>(-data.offsetX),
-				static_cast<int>(-data.offsetY),
-				static_cast<int>(data.texWidth  * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f - data.offsetX),
-				static_cast<int>(data.texHeight * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f -data.offsetY),
+		if (data.frame->cBoxes.empty())
+			data.frame->cBoxes.push_back({
+				static_cast<int>(-20),
+				static_cast<int>(-200),
+				static_cast<int>(20),
+				static_cast<int>(0),
 			});
 		refreshBoxes(boxes, data, object);
 	});
@@ -1414,9 +1420,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		if (selectedBox && selectedBox == &data.cBoxes.front())
+		if (selectedBox && selectedBox == &data.frame->cBoxes.front())
 			selectBox(nullptr, nullptr);
-		data.cBoxes.clear();
+		data.frame->cBoxes.clear();
 		refreshBoxes(boxes, data, object);
 	});
 
@@ -1433,8 +1439,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 			*c = true;
-			data.traits.frameFlags = (data.traits.frameFlags & ~(1 << i)) | b << i;
-			fFlags->setText(std::to_string(data.traits.frameFlags));
+			data.frame->traits.frameFlags = (data.frame->traits.frameFlags & ~(1 << i)) | b << i;
+			fFlags->setText(std::to_string(data.frame->traits.frameFlags));
 			*c = false;
 		});
 	}
@@ -1447,11 +1453,11 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		if (!*c) {
 			*c = true;
-			data.traits.frameFlags = std::stoul(t);
+			data.frame->traits.frameFlags = std::stoul(t);
 		}
 		for (int i = 0; i < 32; i++)
 			if (fFlagsCheckboxes[i])
-				fFlagsCheckboxes[i]->setChecked((data.traits.frameFlags & (1 << i)) != 0);
+				fFlagsCheckboxes[i]->setChecked((data.frame->traits.frameFlags & (1 << i)) != 0);
 		if (!g)
 			*c = false;
 	});
@@ -1469,8 +1475,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 			*c = true;
-			data.traits.attackFlags = (data.traits.attackFlags & ~(1 << i)) | b << i;
-			aFlags->setText(std::to_string(data.traits.attackFlags));
+			data.frame->traits.attackFlags = (data.frame->traits.attackFlags & ~(1 << i)) | b << i;
+			aFlags->setText(std::to_string(data.frame->traits.attackFlags));
 			*c = false;
 		});
 	}
@@ -1483,11 +1489,11 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		if (!*c) {
 			*c = true;
-			data.traits.attackFlags = std::stoul(t);
+			data.frame->traits.attackFlags = std::stoul(t);
 		}
 		for (int i = 0; i < 32; i++)
 			if (aFlagsCheckboxes[i])
-				aFlagsCheckboxes[i]->setChecked((data.traits.attackFlags & (1 << i)) != 0);
+				aFlagsCheckboxes[i]->setChecked((data.frame->traits.attackFlags & (1 << i)) != 0);
 		if (!g)
 			*c = false;
 	});
@@ -1505,8 +1511,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 			*c = true;
-			data.traits.comboModifier = (data.traits.comboModifier & ~(1 << i)) | b << i;
-			aFlags->setText(std::to_string(data.traits.comboModifier));
+			data.frame->traits.comboModifier = (data.frame->traits.comboModifier & ~(1 << i)) | b << i;
+			aFlags->setText(std::to_string(data.frame->traits.comboModifier));
 			*c = false;
 		});
 	}
@@ -1519,11 +1525,11 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		if (!*c) {
 			*c = true;
-			data.traits.comboModifier = std::stoul(t);
+			data.frame->traits.comboModifier = std::stoul(t);
 		}
 		for (int i = 0; i < 8; i++)
 			if (modsCheckboxes[i])
-				modsCheckboxes[i]->setChecked((data.traits.comboModifier & (1 << i)) != 0);
+				modsCheckboxes[i]->setChecked((data.frame->traits.comboModifier & (1 << i)) != 0);
 		if (!g)
 			*c = false;
 	});
@@ -1536,24 +1542,24 @@ void	removeBoxCallback(tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &
 
 	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-	if (selectedBox == &data.cBoxes.front()) {
+	if (selectedBox == &data.frame->cBoxes.front()) {
 		auto block = panel->get<tgui::CheckBox>("Collision");
 
 		block->setChecked(false);
 		selectBox(nullptr, nullptr);
 		return;
 	}
-	for (auto it = data.aBoxes.begin(); it < data.aBoxes.end(); it++) {
+	for (auto it = data.frame->aBoxes.begin(); it < data.frame->aBoxes.end(); it++) {
 		if (&*it == selectedBox) {
-			data.aBoxes.erase(it);
+			data.frame->aBoxes.erase(it);
 			refreshBoxes(boxes, data, object);
 			selectBox(nullptr, nullptr);
 			return;
 		}
 	}
-	for (auto it = data.hBoxes.begin(); it < data.hBoxes.end(); it++) {
+	for (auto it = data.frame->hBoxes.begin(); it < data.frame->hBoxes.end(); it++) {
 		if (&*it == selectedBox) {
-			data.hBoxes.erase(it);
+			data.frame->hBoxes.erase(it);
 			refreshBoxes(boxes, data, object);
 			selectBox(nullptr, nullptr);
 			return;
@@ -1929,7 +1935,12 @@ void savePaletteToPackageCallback(std::unique_ptr<EditableObject> &object)
 
 void	newFrameCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr panel)
 {
-	object->_moves.at(object->_action)[object->_actionBlock].insert(object->_moves.at(object->_action)[object->_actionBlock].begin() + object->_animation, object->_moves.at(object->_action)[object->_actionBlock][object->_animation]);
+	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+	auto it = object->_moves.at(object->_action)[object->_actionBlock].begin() + object->_animation;
+	auto f = new ShadyCore::Schema::Sequence::MoveFrame(*data.frame);
+
+	data.parent->frames.insert(data.parent->frames.begin() + object->_animation, f);
+	object->_moves.at(object->_action)[object->_actionBlock].insert(it, FrameData(data, *f));
 
 	auto anim = object->_animation + 1;
 	auto oldBlock = object->_actionBlock;
@@ -1960,12 +1971,27 @@ void	newEndFrameCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object
 
 void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr panel)
 {
+	auto newSequence = new ShadyCore::Schema::Sequence(object->_action, true);
 	auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
+	auto &action = object->_moves.at(object->_action);
 
-	tempSchema.objects.push_back(reinterpret_cast<ShadyCore::Schema::Object *const>(newElem));
-	object->_actionBlock = object->_moves.at(object->_action).size();
+	//TODO: Init a proper value
+	newSequence->frames.push_back(newElem);
+	if (action.size() < object->_actionBlock - 1) {
+		size_t i = 0;
+		auto it = tempSchema.objects.begin();
+
+		while (i < object->_actionBlock) {
+			i += (*it)->getType() == 9 && reinterpret_cast<ShadyCore::Schema::Sequence *>(*it)->getId() == object->_action;
+			it++;
+		}
+		tempSchema.objects.insert(it, newSequence);
+	} else
+		tempSchema.objects.push_back(newSequence);
+
+	object->_actionBlock = action.size();
 	object->_moves.at(object->_action).emplace_back();
-	object->_moves.at(object->_action).back().emplace_back(editSession.chr, tempSchema, *newElem, *editSession.palette, editSession.palName);
+	object->_moves.at(object->_action).back().emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
 	refreshRightPanel(gui, object, false);
 
 	auto block = panel->get<tgui::SpinButton>("Block");
@@ -1978,32 +2004,36 @@ static bool msgDisplayed2 = false;
 
 void	newHurtBoxCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
-	if (object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.size() >= 5 && !msgDisplayed) {
+	auto &anim = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+	if (anim.frame->hBoxes.size() >= 5 && !msgDisplayed) {
 		Utils::dispMsg("Warning", "This frame already has 5 or more hurtboxes. The game can only process 5 hurtboxes at once and adding more than that may crash the game.", MB_ICONWARNING);
 		msgDisplayed = true;
 	}
-	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.push_back({-10, -10, 10, 10});
+	anim.frame->hBoxes.push_back({-10, -10, 10, 10});
 
-	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.back();
+	auto &box = anim.frame->hBoxes.back();
 
-	refreshBoxes(boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
+	refreshBoxes(boxes, anim, object);
 	normalColor = {0x00, 0xFF, 0x00, 0xA0};
-	selectBox(boxes->get<tgui::Button>("HurtBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hBoxes.size() - 1)), &box);
+	selectBox(boxes->get<tgui::Button>("HurtBox" + std::to_string(anim.frame->hBoxes.size() - 1)), &box);
 }
 
 void	newHitBoxCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
 {
-	if (object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.size() >= 5 && !msgDisplayed2) {
+	auto &anim = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+	if (anim.frame->aBoxes.size() >= 5 && !msgDisplayed2) {
 		Utils::dispMsg("Warning", "This frame already has 5 or more hitboxes. The game can only process 5 hitboxes at once and adding more than that may crash the game.", MB_ICONWARNING);
 		msgDisplayed2 = true;
 	}
-	object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.push_back({-10, -10, 10, 10});
+	anim.frame->aBoxes.push_back({-10, -10, 10, 10});
 
-	auto &box = object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.back();
+	auto &box = anim.frame->aBoxes.back();
 
-	refreshBoxes(boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
+	refreshBoxes(boxes, anim, object);
 	normalColor = {0xFF, 0x00, 0x00, 0xA0};
-	selectBox(boxes->get<tgui::Button>("HitBox" + std::to_string(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].aBoxes.size() - 1)), &box);
+	selectBox(boxes->get<tgui::Button>("HitBox" + std::to_string(anim.frame->aBoxes.size() - 1)), &box);
 }
 
 void	removeFrameCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
@@ -2011,10 +2041,7 @@ void	removeFrameCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::P
 	auto &arr = object->_moves.at(object->_action)[object->_actionBlock];
 
 	if (arr.size() == 1) {
-		auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
-
-		tempSchema.objects.push_back(reinterpret_cast<ShadyCore::Schema::Object *const>(newElem));
-		arr.back() = FrameData(editSession.chr, tempSchema, *newElem, *editSession.palette, editSession.palName);
+		*arr.back().frame = ShadyCore::Schema::Sequence::MoveFrame();
 		refreshBoxes(boxes, arr.back(), object);
 		selectBox(nullptr, nullptr);
 		return;
@@ -2031,11 +2058,13 @@ void	removeAnimationBlockCallback(std::unique_ptr<EditableObject> &object)
 	auto &arr = object->_moves.at(object->_action);
 
 	if (arr.size() == 1) {
+		/*
 		auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 
 		tempSchema.objects.push_back(reinterpret_cast<ShadyCore::Schema::Object *const>(newElem));
 		arr.back().clear();
 		arr.back().emplace_back(editSession.chr, tempSchema, *newElem, *editSession.palette, editSession.palName);
+		 */
 		return;
 	}
 	arr.erase(arr.begin() + object->_actionBlock);
@@ -2058,8 +2087,8 @@ void	copyBoxesFromFrame(std::unique_ptr<EditableObject> &object, tgui::Panel::Pt
 {
 	auto &frame = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-	frame.hBoxes = other.hBoxes;
-	frame.aBoxes = other.aBoxes;
+	frame.frame->hBoxes = other.frame->hBoxes;
+	frame.frame->aBoxes = other.frame->aBoxes;
 	refreshBoxes(boxes, frame, object);
 }
 
@@ -2082,32 +2111,20 @@ void	flattenCollisionBoxes(std::unique_ptr<EditableObject> &object, std::vector<
 	if (!base)
 		for (auto &block : action)
 			for (auto &frame : block)
-				if (!frame.cBoxes.empty()) {
+				if (!frame.frame->cBoxes.empty()) {
 					base = &frame;
 					goto allGood;
 				}
-	if (!base || base->cBoxes.empty())
+	if (!base || base->frame->cBoxes.empty())
 		return;
 
 allGood:
 	for (auto &block : action)
 		for (auto &frame : block)
-			if (!frame.cBoxes.empty() && &frame != base) {
-				frame.cBoxes.clear();
-				frame.cBoxes.push_back(base->cBoxes.front());
+			if (!frame.frame->cBoxes.empty() && &frame != base) {
+				frame.frame->cBoxes.clear();
+				frame.frame->cBoxes.push_back(base->frame->cBoxes.front());
 			}
-}
-
-void	flattenAllCollisionBoxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
-{
-	for (auto &[id, action] : object->_moves) {
-		if (id < 100 && !action.front().front().cBoxes.empty() && id) {
-			action.front().front().cBoxes.clear();
-			action.front().front().cBoxes.push_back(object->_moves.at(0)[0][0].cBoxes.front());
-		}
-		flattenCollisionBoxes(object, action, nullptr);
-	}
-	refreshBoxes(std::move(boxes), object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
 }
 
 void	flattenThisMoveCollisionBoxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
@@ -2562,7 +2579,7 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 		});
 		button->connect("MouseEntered", [i, &object]{
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-			auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema.images.at(data.imageIndex).name);
+			auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
 			auto val = ((uint16_t*)editSession.palette->data)[i];
 			sf::Color color{
 				static_cast<sf::Uint8>(~((val & 0b0111110000000000) >> 7 | (val & 0b0111000000000000) >> 12)),
@@ -2809,7 +2826,6 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 
 	bar->connectMenuItem({"Misc", "Copy boxes from last frame"}, copyBoxesFromLastFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Copy boxes from next frame"}, copyBoxesFromNextFrame, std::ref(object), boxes);
-	bar->connectMenuItem({"Misc", "Flatten all collision boxes"}, flattenAllCollisionBoxes, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten this move collision boxes"}, flattenThisMoveCollisionBoxes, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Evil mode"}, [&gui, &object]{
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
@@ -2971,10 +2987,10 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 			Vector2i diff = Vector2i{mouseX, mouseY} - lastMouse;
 
 			diff.y *= -1;
-			data.offsetX += diff.x;
-			data.offsetY += diff.y;
-			boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.offsetX - (data.texWidth * data.blendOptions.scaleX) / 2)), "&.h / 2 + " + std::to_string(data.offsetY + 300));
-			gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.offsetX) + "," + std::to_string(data.offsetY) + ")");
+			data.frame->offsetX += diff.x;
+			data.frame->offsetY += diff.y;
+			boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.frame->offsetX - (data.frame->texWidth * data.frame->blendOptions.scaleX) / 2)), "&.h / 2 + " + std::to_string(data.frame->offsetY + 300));
+			gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.frame->offsetX) + "," + std::to_string(data.frame->offsetY) + ")");
 			arrangeButtons(&*object);*/
 		} else {
 			Vector2i diff{mouseX, mouseY};
@@ -2996,15 +3012,15 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-			if (static_cast<int>(data.texWidth * data.blendOptions.scaleX) - diff < 10) {
-				data.offsetX += data.texWidth * data.blendOptions.scaleX - 10;
-				lastMouse.x += data.texWidth * data.blendOptions.scaleX - 10;
-				data.blendOptions.scaleX = data.texWidth / 10;
+			if (static_cast<int>(data.frame->texWidth * data.frame->blendOptions.scaleX) - diff < 10) {
+				data.frame->offsetX += data.frame->texWidth * data.frame->blendOptions.scaleX - 10;
+				lastMouse.x += data.frame->texWidth * data.frame->blendOptions.scaleX - 10;
+				data.frame->blendOptions.scaleX = data.frame->texWidth / 10;
 			} else {
-				data.offsetX += diff;
+				data.frame->offsetX += diff;
 				bbb = !bbb;
 				bbb &= diff % 2;
-				data.size.x -= diff + copysign(bbb, diff);
+				data.frame->size.x -= diff + copysign(bbb, diff);
 				lastMouse.x = mouseX;
 			}*/
 		} else {
@@ -3024,15 +3040,15 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-			if (static_cast<int>(data.size.x) + diff < 10) {
-				lastMouse.x -= data.size.x - 10;
-				data.offset.x += (data.size.x - 10) / 2;
-				data.size.x = 10;
+			if (static_cast<int>(data.frame->size.x) + diff < 10) {
+				lastMouse.x -= data.frame->size.x - 10;
+				data.frame->offset.x += (data.frame->size.x - 10) / 2;
+				data.frame->size.x = 10;
 			} else {
-				data.size.x += diff;
+				data.frame->size.x += diff;
 				bbb = !bbb;
 				bbb &= diff % 2;
-				data.offset.x += diff / 2 + copysign(bbb, diff);
+				data.frame->offset.x += diff / 2 + copysign(bbb, diff);
 				lastMouse.x = mouseX;
 			}*/
 		} else {
@@ -3052,11 +3068,11 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-			if (static_cast<int>(data.size.y) - diff < 10) {
-				lastMouse.y += data.size.y - 10;
-				data.size.y = 10;
+			if (static_cast<int>(data.frame->size.y) - diff < 10) {
+				lastMouse.y += data.frame->size.y - 10;
+				data.frame->size.y = 10;
 			} else {
-				data.size.y -= diff;
+				data.frame->size.y -= diff;
 				lastMouse.y = mouseY;
 			}*/
 		} else {
@@ -3077,13 +3093,13 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 		if (spriteSelected) {/*
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-			if (static_cast<int>(data.size.y) + diff < 10) {
-				data.offset.y -= data.size.y - 10;
-				lastMouse.y -= data.size.y - 10;
-				data.size.y = 10;
+			if (static_cast<int>(data.frame->size.y) + diff < 10) {
+				data.frame->offset.y -= data.frame->size.y - 10;
+				lastMouse.y -= data.frame->size.y - 10;
+				data.frame->size.y = 10;
 			} else {
-				data.offset.y -= diff;
-				data.size.y += diff;
+				data.frame->offset.y -= diff;
+				data.frame->size.y += diff;
 				lastMouse.y = mouseY;
 			}*/
 		} else {
@@ -3100,10 +3116,10 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 	if (spriteSelected) {/*
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.offset.x - data.size.x / 2)), "&.h / 2 + " + std::to_string(data.offset.y + 300));
-		boxButton->setSize(data.size.x, data.size.y);
-		gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.offset.x) + "," + std::to_string(data.offset.y) + ")");
-		gui.get<tgui::EditBox>("Size")->setText("(" + std::to_string(data.size.x) + "," + std::to_string(data.size.y) + ")");
+		boxButton->setPosition("&.w / 2 + " + std::to_string(static_cast<int>(data.frame->offset.x - data.frame->size.x / 2)), "&.h / 2 + " + std::to_string(data.frame->offset.y + 300));
+		boxButton->setSize(data.frame->size.x, data.frame->size.y);
+		gui.get<tgui::EditBox>("Offset")->setText("(" + std::to_string(data.frame->offset.x) + "," + std::to_string(data.frame->offset.y) + ")");
+		gui.get<tgui::EditBox>("Size")->setText("(" + std::to_string(data.frame->size.x) + "," + std::to_string(data.frame->size.y) + ")");
 		arrangeButtons(&*object);*/
 	} else {
 		boxButton->setPosition("&.w / 2 + " + std::to_string(selectedBox->left), "&.h / 2 + " + std::to_string(selectedBox->up + 300));
@@ -3190,29 +3206,29 @@ void	renderTopLayer(EditableObject &object)
 	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
 	auto s = object.displayScaled ? object.scale : 1.f;
 	auto scale = SpiralOfFate::Vector2f{
-		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
-		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
+		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f,
+		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
 	};
 	auto bounds = SpiralOfFate::Vector2f{
-		static_cast<float>(data.texWidth),
-		static_cast<float>(data.texHeight)
+		static_cast<float>(data.frame->texWidth),
+		static_cast<float>(data.frame->texHeight)
 	};
 	auto texBounds = sf::IntRect{
-		data.texOffsetX,
-		data.texOffsetY,
-		data.texWidth,
-		data.texHeight
+		data.frame->texOffsetX,
+		data.frame->texOffsetY,
+		data.frame->texWidth,
+		data.frame->texHeight
 	};
 	auto result = SpiralOfFate::Vector2f{
-		static_cast<float>(-data.offsetX) * s,
-		static_cast<float>(-data.offsetY) * s
+		static_cast<float>(-data.frame->offsetX) * s,
+		static_cast<float>(-data.frame->offsetY) * s
 	};
 
-	if (data.blendOptions.flipHorz) {
+	if (data.frame->blendOptions.flipHorz) {
 		texBounds.left += texBounds.width;
 		texBounds.width *= -1;
 	}
-	if (data.blendOptions.flipVert) {
+	if (data.frame->blendOptions.flipVert) {
 		texBounds.top += texBounds.height;
 		texBounds.height *= -1;
 	}
@@ -3222,12 +3238,12 @@ void	renderTopLayer(EditableObject &object)
 	//	-static_cast<float>(size.y)
 	//};
 	result += SpiralOfFate::Vector2f{
-		data.texWidth * scale.x / 2,
-		data.texHeight * scale.y / 2
+		data.frame->texWidth * scale.x / 2,
+		data.frame->texHeight * scale.y / 2
 	};
 	result += translate;
 	selectedColorMaskSprite.setOrigin(bounds / 2.f);
-	selectedColorMaskSprite.setRotation(data.blendOptions.angle);
+	selectedColorMaskSprite.setRotation(data.frame->blendOptions.angle);
 	selectedColorMaskSprite.setPosition(result);
 	selectedColorMaskSprite.setScale(scale);
 	selectedColorMaskSprite.setTextureRect(texBounds);
@@ -3239,22 +3255,22 @@ Vector2f mousePosToImgPos(EditableObject &object, Vector2i mouse, const FrameDat
 	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
 	auto s = object.displayScaled ? object.scale : 1.f;
 	auto scale = SpiralOfFate::Vector2f{
-		s * (data.blendOptions.scaleX ? data.blendOptions.scaleX : 200) / 100.f,
-		s * (data.blendOptions.scaleY ? data.blendOptions.scaleY : 200) / 100.f
+		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f,
+		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
 	};
 	auto bounds = SpiralOfFate::Vector2f{
-		static_cast<float>(data.texWidth),
-		static_cast<float>(data.texHeight)
+		static_cast<float>(data.frame->texWidth),
+		static_cast<float>(data.frame->texHeight)
 	};
 	auto texBounds = sf::IntRect{
-		data.texOffsetX,
-		data.texOffsetY,
-		data.texWidth,
-		data.texHeight
+		data.frame->texOffsetX,
+		data.frame->texOffsetY,
+		data.frame->texWidth,
+		data.frame->texHeight
 	};
 	auto result = SpiralOfFate::Vector2f{
-		static_cast<float>(-data.offsetX) * s,
-		static_cast<float>(-data.offsetY) * s
+		static_cast<float>(-data.frame->offsetX) * s,
+		static_cast<float>(-data.frame->offsetY) * s
 	};
 	auto view = game->screen->getView();
 	auto imgPos = result + translate + object._position + SpiralOfFate::Vector2f{
@@ -3272,7 +3288,7 @@ bool	selectColor(tgui::Gui &gui, std::unique_ptr<EditableObject> &obj, int mouse
 
 	auto &object = *obj;
 	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
-	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema.images.at(data.imageIndex).name);
+	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
 
 	if (img.bitsPerPixel != 8)
 		return false;
@@ -3280,8 +3296,8 @@ bool	selectColor(tgui::Gui &gui, std::unique_ptr<EditableObject> &obj, int mouse
 	sf::RectangleShape rect;
 	auto pos = mousePosToImgPos(object, {mouseX, mouseY}, data, panel);
 	auto bounds = SpiralOfFate::Vector2f{
-		static_cast<float>(data.texWidth),
-		static_cast<float>(data.texHeight)
+		static_cast<float>(data.frame->texWidth),
+		static_cast<float>(data.frame->texHeight)
 	};
 
 	if (pos.y < 0 || pos.y > bounds.y || pos.x < 0 || pos.x > bounds.x)
@@ -3365,7 +3381,7 @@ void 	hoverImagePixel(std::unique_ptr<EditableObject> &obj, int mouseX, int mous
 
 	auto &object = *obj;
 	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
-	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema.images.at(data.imageIndex).name);
+	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
 
 	if (img.bitsPerPixel != 8) {
 		game->logger.debug("Image is not 8 bits per pixel: " + std::to_string(img.bitsPerPixel));
@@ -3376,8 +3392,8 @@ void 	hoverImagePixel(std::unique_ptr<EditableObject> &obj, int mouseX, int mous
 	sf::RectangleShape rect;
 	auto pos = mousePosToImgPos(object, {mouseX, mouseY}, data, panel);
 	auto bounds = SpiralOfFate::Vector2f{
-		static_cast<float>(data.texWidth),
-		static_cast<float>(data.texHeight)
+		static_cast<float>(data.frame->texWidth),
+		static_cast<float>(data.frame->texHeight)
 	};
 
 	if (pos.y < 0 || pos.y > bounds.y || pos.x < 0 || pos.x > bounds.x) {
