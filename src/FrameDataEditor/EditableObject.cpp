@@ -24,8 +24,8 @@ void EditableObject::render() const
 		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
 	};
 	SpiralOfFate::Vector2f scaleReal{
-		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 100) / 100.f,
-		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 100) / 100.f
+		(data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 100) / 100.f,
+		(data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 100) / 100.f
 	};
 	SpiralOfFate::Vector2f bounds{
 		static_cast<float>(data.frame->texWidth),
@@ -90,8 +90,6 @@ void EditableObject::update()
 		if (!data->frame->duration)
 			break;
 	}
-	this->_position += this->_speed;
-	this->_speed.y += this->_gravity;
 }
 
 void EditableObject::reset()

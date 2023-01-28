@@ -5,7 +5,7 @@
 #ifndef BATTLE_VERSION_H
 #define BATTLE_VERSION_H
 
-#define REAL_VERSION_STR "alpha 0.1.3"
+#define REAL_VERSION_STR "alpha 0.1.4"
 #ifdef _DEBUG
 #define VERSION_STR REAL_VERSION_STR" DEBUG"
 #else
