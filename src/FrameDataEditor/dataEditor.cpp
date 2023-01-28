@@ -963,7 +963,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	block->connect("ValueChanged", [&object, blockLabel, progress](float f){
 		int i = f;
 
-		blockLabel->setText("Block " + std::to_string(i));
+		blockLabel->setText("Block " + std::to_string(i + 1) + "/" + std::to_string(object->_moves[object->_action].size()));
 		object->_actionBlock = i;
 		if (object->_moves[object->_action][i].empty()) {
 			game->logger.warn("This block is empty so we generate a frame");
