@@ -3,12 +3,16 @@ project(SokuFDEditor CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_compile_definitions(_USE_MATH_DEFINES=1)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/pkgs)
 find_package(SFML REQUIRED)
 find_package(TGUI REQUIRED)
 include_directories(include ${SFML_INCLUDE_DIRS} ${TGUI_INCLUDE_DIRS} ${clip_INCLUDE_DIRS} src/Core shady-packer/src/Core SokuLib/src)
 
+set(SHADY_ENABLE_EXES OFF)
+set(SHADY_ENABLE_MODULE OFF)
+set(SHADY_ENABLE_TEST OFF)
 add_subdirectory(shady-packer)
 
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
