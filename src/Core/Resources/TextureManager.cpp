@@ -186,6 +186,13 @@ namespace SpiralOfFate
 		game->screen->displayElement(sprite);
 	}
 
+	void TextureManager::setTexture(Sprite &sprite) const
+	{
+		if (!sprite.textureHandle)
+			return;
+		sprite.setTexture(this->_textures.at(sprite.textureHandle));
+	}
+
 	void TextureManager::addRef(unsigned int id)
 	{
 		if (id == 0)

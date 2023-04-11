@@ -1089,7 +1089,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
-		data.frame->blendOptions.angle = std::stoul(t);
+		try {
+			data.frame->blendOptions.angle = std::stoi(t);
+		} catch (...) {}
 	});
 	hCardGain->connect("TextChanged", [&object](std::string t){
 		if (*c || t.empty())

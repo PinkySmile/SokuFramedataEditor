@@ -169,7 +169,7 @@ namespace SpiralOfFate
 	}
 
 
-	FrameData &FrameData::operator=(FrameData &other)
+	FrameData &FrameData::operator=(const FrameData &other)
 	{
 		this->_pal = other._pal;
 		this->_character = other._character;
@@ -188,7 +188,7 @@ namespace SpiralOfFate
 		return *this;
 	}
 
-	FrameData &FrameData::operator=(FrameData &&other)
+	FrameData &FrameData::operator=(FrameData &&other) noexcept
 	{
 		const void **ptr = (const void **)this;
 

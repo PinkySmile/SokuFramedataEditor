@@ -108,8 +108,8 @@ namespace SpiralOfFate
 		~FrameData();
 		FrameData(const std::string &chr, const ShadyCore::Schema &schema, ShadyCore::Schema::Sequence &parent, ShadyCore::Schema::Sequence::MoveFrame &frame, const ShadyCore::Palette &palette, const std::string &palName);
 		FrameData(const FrameData &other, ShadyCore::Schema::Sequence::MoveFrame &frame);
-		FrameData &operator=(FrameData &other);
-		FrameData &operator=(FrameData &&other);
+		FrameData &operator=(const FrameData &other);
+		FrameData &operator=(FrameData &&other) noexcept;
 		void setSlave(bool slave = true);
 		void reloadTexture();
 		void reloadSound();

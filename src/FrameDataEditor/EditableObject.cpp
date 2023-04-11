@@ -20,12 +20,12 @@ void EditableObject::render() const
 		data.reloadTexture();
 
 	SpiralOfFate::Vector2f scale{
-		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f,
-		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
+		s * (data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleX : 200) / 100.f,
+		s * (data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleY : 200) / 100.f
 	};
 	SpiralOfFate::Vector2f scaleReal{
-		(data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 100) / 100.f,
-		(data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 100) / 100.f
+		(data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleX : 100) / 100.f,
+		(data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleY : 100) / 100.f
 	};
 	SpiralOfFate::Vector2f bounds{
 		static_cast<float>(data.frame->texWidth),
@@ -60,19 +60,32 @@ void EditableObject::render() const
 		data.frame->texHeight * scale.y / 2
 	};
 	result += translate;
-	this->_sprite.setOrigin(bounds / 2.f);
-	this->_sprite.setRotation(data.frame->blendOptions.angle);
-	this->_sprite.setPosition(result);
+	this->_sprite.setOrigin(bounds / 2);
+	if (data.frame->hasBlendOptions()) {
+		this->_sprite.setRotation(data.frame->blendOptions.angle);
+		this->_sprite.setPosition(result.rotation(data.frame->blendOptions.angle * M_PI / 180, {0, 0}));
+	} else {
+		this->_sprite.setRotation(0);
+		this->_sprite.setPosition(result);
+	}
 	this->_sprite.setScale(scale);
 	this->_sprite.textureHandle = data.textureHandle;
 	this->_sprite.setTextureRect(texBounds);
-	SpiralOfFate::game->textureMgr.render(this->_sprite);
+	SpiralOfFate::game->textureMgr.setTexture(this->_sprite);
+	if (!data.frame->hasBlendOptions() || data.frame->blendOptions.mode == 0)
+		SpiralOfFate::game->screen->draw(this->_sprite);
+	else if (data.frame->blendOptions.mode == 1)
+		SpiralOfFate::game->screen->draw(this->_sprite, sf::BlendAdd);
+	else if (data.frame->blendOptions.mode == 2)
+		SpiralOfFate::game->screen->draw(this->_sprite, sf::BlendMultiply);
+	else
+		SpiralOfFate::game->screen->draw(this->_sprite);
 
-	rect.setOutlineThickness(2);
+	rect.setOutlineThickness(1);
 	rect.setOutlineColor(sf::Color::White);
 	rect.setFillColor(sf::Color::Black);
-	rect.setPosition(this->_position - SpiralOfFate::Vector2f{4, 4});
-	rect.setSize({9, 9});
+	rect.setPosition(this->_position - SpiralOfFate::Vector2f{2, 2});
+	rect.setSize({4, 4});
 	SpiralOfFate::game->screen->draw(rect);
 }
 

@@ -34,6 +34,7 @@ namespace SpiralOfFate
 		void remove(unsigned id);
 		void invalidatePalette(const std::string &palName);
 		void render(Sprite &sprite) const;
+		void setTexture(Sprite &sprite) const;
 	};
 }
 

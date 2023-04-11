@@ -1668,7 +1668,7 @@ ScrollablePanel.Panel1 {
         }
 
         EditBox.BlendAngle {
-            InputValidator = UInt;
+            InputValidator = Int;
             Position = (540, 120);
             Size = (60, 22);
             Text = 0;
