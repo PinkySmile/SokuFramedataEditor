@@ -1932,6 +1932,11 @@ MenuBar.main_bar {
     Menu {
         Items = ["Copy boxes from last frame", "Copy boxes from next frame", "Flatten this move collision boxes", "Reload textures", "Evil mode"];
         Text = Misc;
+
+        Menu {
+            Text = "Export image";
+            Items = ["Export this frame", "Export this move frames", "Export all this character frames"];
+        }
     }
 
     Menu {

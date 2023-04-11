@@ -77,7 +77,11 @@ void EditableObject::render() const
 	else if (data.frame->blendOptions.mode == 1)
 		SpiralOfFate::game->screen->draw(this->_sprite, sf::BlendAdd);
 	else if (data.frame->blendOptions.mode == 2)
-		SpiralOfFate::game->screen->draw(this->_sprite, sf::BlendMultiply);
+		SpiralOfFate::game->screen->draw(this->_sprite, sf::BlendMode{
+			sf::BlendMode::Zero,
+			sf::BlendMode::OneMinusSrcColor,
+			sf::BlendMode::Add
+		});
 	else
 		SpiralOfFate::game->screen->draw(this->_sprite);
 
