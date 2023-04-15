@@ -670,6 +670,9 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	auto pos = panel->get<tgui::EditBox>("Pos");
 	auto posExtra = panel->get<tgui::EditBox>("PosExtra");
 	auto pivot = panel->get<tgui::EditBox>("Pivot");
+	auto loop = panel->get<tgui::CheckBox>("Loop");
+	auto aCancel = panel->get<tgui::EditBox>("ACancel");
+	auto mCancel = panel->get<tgui::EditBox>("MCancel");
 
 	auto mods = panel->get<tgui::EditBox>("Modifiers");
 	auto progress = panel->get<tgui::Slider>("Progress");
@@ -732,6 +735,9 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	eHitStun->setText(std::to_string(data.frame->traits.onHitEnemyStun));
 	prorate->setText(std::to_string(data.frame->traits.proration / 10) + "." + std::to_string(data.frame->traits.proration % 10) + "%");
 	limit->setText(std::to_string(data.frame->traits.limit));
+	loop->setChecked(data.parent->loop);
+	aCancel->setText(std::to_string(data.parent->actionLock));
+	mCancel->setText(std::to_string(data.parent->moveLock));
 
 	auto newBounds = "(" + std::to_string(data.frame->texOffsetX) + "," + std::to_string(data.frame->texOffsetY) + "," + std::to_string(data.frame->texWidth) + "," + std::to_string(data.frame->texHeight) + ")";
 	auto newScale = "(" +
@@ -779,7 +785,6 @@ void	refreshRightPanel(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, 
 	auto panel = gui.get<tgui::Panel>("Panel1");
 	auto animPanel = panel->get<tgui::Panel>("AnimPanel");
 	auto action = panel->get<tgui::EditBox>("Action");
-	auto block = panel->get<tgui::SpinButton>("Block");
 	auto play = panel->get<tgui::Button>("Play");
 	auto step = panel->get<tgui::Button>("Step");
 	auto speedCtrl = panel->get<tgui::SpinButton>("Speed");
@@ -850,6 +855,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	auto fFlags = panel->get<tgui::EditBox>("fFlags");
 	auto mods = panel->get<tgui::EditBox>("Modifiers");
 	auto chip = panel->get<tgui::EditBox>("ChipDmg");
+	auto loop = panel->get<tgui::CheckBox>("Loop");
+	auto aCancel = panel->get<tgui::EditBox>("ACancel");
+	auto mCancel = panel->get<tgui::EditBox>("MCancel");
 
 	auto blendMode = panel->get<tgui::EditBox>("BlendMode");
 	auto blendColor = panel->get<tgui::EditBox>("BlendColor");
@@ -1052,7 +1060,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
 		};
 
-		Utils::makeColorPickWindow(gui, [&data, blendColor](sf::Color col){
+		Utils::makeColorPickWindow(gui, [blendColor](sf::Color col){
 			char buffer[10];
 
 			sprintf(buffer, "#%02x%02x%02x%02x", col.a, col.r, col.g, col.b);
@@ -1426,6 +1434,30 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			selectBox(nullptr, nullptr);
 		data.frame->cBoxes.clear();
 		refreshBoxes(boxes, data, object);
+	});
+	loop->connect("Changed", [&object](bool b){
+		if (*c)
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.parent->loop = b;
+	});
+	aCancel->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.parent->actionLock = std::stoul(t);
+	});
+	mCancel->connect("TextChanged", [&object](std::string t){
+		if (*c || t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.parent->moveLock = std::stoul(t);
 	});
 
 	for (int i = 0; i < 32; i++) {
@@ -2145,7 +2177,7 @@ void	switchHitboxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr bo
 	boxes->setVisible(displayHitboxes);
 }
 
-void	displayPalEditorForce(std::unique_ptr<EditableObject> &object, tgui::Gui &gui)
+inline void displayPalEditorForce(std::unique_ptr<EditableObject> &object, tgui::Gui &gui)
 {
 	displayPalEditor(object, gui, true);
 }
@@ -2419,22 +2451,22 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 		static_cast<sf::Uint8>((v & 0b0000000000011111) << 3 | (v & 0b0000000000011100) >> 2),
 		static_cast<sf::Uint8>((v & 0x8000) ? 255 : 0)
 	};
-	Utils::HSLColor c = Utils::RGBtoHSL(startColor);
+	Utils::HSLColor hslColor = Utils::RGBtoHSL(startColor);
 	auto pos = satHuePic->getPosition();
 	auto size = cross->getSize();
 
 	sprintf(buffer, "#%02X%02X%02X", startColor.r, startColor.g, startColor.b);
-	light->setValue(c.l);
-	hue->setText(std::to_string(c.h));
-	saturation->setText(std::to_string(c.s));
-	lightness->setText(std::to_string(c.l));
+	light->setValue(hslColor.l);
+	hue->setText(std::to_string(hslColor.h));
+	saturation->setText(std::to_string(hslColor.s));
+	lightness->setText(std::to_string(hslColor.l));
 	cross->setPosition({
-		(c.h * 200 / 240) + pos.x - size.x / 2,
-		((240 - c.s) * 200 / 240) + pos.y - size.y / 2
+		(hslColor.h * 200 / 240) + pos.x - size.x / 2,
+		((240 - hslColor.s) * 200 / 240) + pos.y - size.y / 2
 	});
 	edit->setText(buffer);
 	preview->getRenderer()->setBackgroundColor({buffer});
-	updateTexture(c, startColor, false);
+	updateTexture(hslColor, startColor, false);
 
 	cross->ignoreMouseEvents();
 
@@ -2973,8 +3005,6 @@ void	handleColorPickDrag(tgui::Gui &gui, std::unique_ptr<EditableObject> &object
 
 void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX, int mouseY)
 {
-	static bool bbb = false;
-
 	if (!object)
 		return;
 	if (!selectedBox && !spriteSelected)
@@ -3144,7 +3174,9 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 		quitCallback();
 	if (event.code == sf::Keyboard::N && event.control)
 		newFileCallback(object, bar, gui);
-	if (event.code == sf::Keyboard::O && event.control)
+	if (event.code == sf::Keyboard::O && event.control && event.shift)
+		openFramedataFromFile(object, bar, gui);
+	else if (event.code == sf::Keyboard::O && event.control)
 		openFramedataFromPackage(object, bar, gui);
 
 	if (object) {
@@ -3467,6 +3499,8 @@ void	run()
 
 	bool dragging = false;
 	auto panel = gui.get<tgui::Panel>("Panel1");
+	auto animpanel = gui.get<tgui::Panel>("AnimPanel");
+	auto block = panel->get<tgui::SpinButton>("Block");
 	auto progress = panel->get<tgui::Slider>("Progress");
 	sf::View view;
 	sf::View guiView{
@@ -3489,11 +3523,17 @@ void	run()
 		game->screen->draw(sprite);
 		if (object) {
 			if (timer >= updateTimer || updateAnyway) {
+				auto b = object->_actionBlock;
+				auto a = object->_animation;
+
 				object->update();
 				if (object->_animationCtr == 0)
 					game->soundMgr.play(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hitSoundHandle);
 				updateAnyway = false;
-				progress->setValue(object->_animation);
+				if (b != object->_actionBlock)
+					block->setValue(object->_actionBlock);
+				else if (a != object->_animation)
+					progress->setValue(object->_animation);
 				timer -= updateTimer;
 			}
 			object->render();
@@ -3516,7 +3556,24 @@ void	run()
 				continue;
 			}
 			if (event.type == sf::Event::KeyPressed) {
+				if (
+					!event.key.control ||
+					event.key.code == sf::Keyboard::C ||
+					event.key.code == sf::Keyboard::V
+				) {
+					if (panel->get<tgui::EditBox>("Action")->isFocused())
+						goto loopEnd;
+					for (auto &widget: animpanel->getWidgets()) {
+						auto box = widget->cast<tgui::EditBox>();
+
+						if (!box)
+							continue;
+						if (box->isFocused())
+							goto loopEnd;
+					}
+				}
 				handleKeyPress(event.key, object, gui);
+			loopEnd:
 				continue;
 			}
 			if (!handled && event.type == sf::Event::MouseWheelScrolled && object && !displayHitboxes) {

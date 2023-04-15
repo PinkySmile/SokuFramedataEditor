@@ -95,14 +95,20 @@ void EditableObject::render() const
 
 void EditableObject::update()
 {
-	auto *data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+	auto &act = this->_moves.at(this->_action);
+	auto &block = act[this->_actionBlock];
+	auto *data = &block[this->_animation];
 
 	this->_animationCtr++;
 	while (this->_animationCtr >= data->frame->duration) {
 		this->_animationCtr = 0;
 		this->_animation++;
-		this->_animation %= this->_moves.at(this->_action)[this->_actionBlock].size();
-		data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+		if (this->_animation >= block.size()) {
+			if (!data->parent->loop)
+				this->_actionBlock = (this->_actionBlock + 1) % act.size();
+			this->_animation = 0;
+		}
+		data = &act[this->_actionBlock][this->_animation];
 		SpiralOfFate::game->soundMgr.play(data->hitSoundHandle);
 		if (!data->frame->duration)
 			break;

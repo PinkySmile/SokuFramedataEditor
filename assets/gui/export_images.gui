@@ -1,0 +1,254 @@
+Renderer.1 {
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturedisabled = None;
+    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+}
+
+Renderer.2 {
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
+    texturecheckeddisabled = None;
+    texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
+    texturecheckedhover = "assets/gui/themes/Black.png" Part(188, 0, 32, 32);
+    textureunchecked = "assets/gui/themes/Black.png" Part(92, 0, 32, 32);
+    textureuncheckeddisabled = None;
+    textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
+    textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
+}
+
+Renderer.3 {
+    backgroundcolor = black;
+    backgroundcolordisabled = black;
+    backgroundcolordown = black;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolordown = black;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (0, 0, 0, 0);
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolordown = black;
+    textcolorhover = black;
+    texture = None;
+    texturedisabled = None;
+    texturedown = None;
+    texturefocused = None;
+    texturehover = None;
+}
+
+Renderer.4 {
+    backgroundcolor = white;
+    backgroundcolordisabled = white;
+    backgroundcolordown = white;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolordown = black;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (0, 0, 0, 0);
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolordown = black;
+    textcolorhover = black;
+    texture = None;
+    texturedisabled = None;
+    texturedown = None;
+    texturefocused = None;
+    texturehover = None;
+}
+
+CheckBox.Gif {
+    Position = (10, 10);
+    Size = (18, 18);
+    Text = "Export as gif";
+    TextSize = 13;
+    renderer = &2;
+}
+
+CheckBox.CBoxes {
+    Position = (10, 40);
+    Size = (18, 18);
+    Text = "Collision box";
+    TextSize = 13;
+    renderer = &2;
+}
+
+EditBox.Path {
+    Position = (10, 70);
+    Size = (210, 22);
+    TextSize = 13;
+
+    Renderer {
+        caretcolor = rgb(110, 110, 255);
+        defaulttextcolor = rgb(120, 120, 120);
+        padding = (6, 4, 6, 4);
+        selectedtextbackgroundcolor = rgb( 10, 110, 255);
+        selectedtextcolor = White;
+        textcolor = rgb(190, 190, 190);
+        texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+        texturedisabled = None;
+        texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+        texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+    }
+}
+
+Button.Browse {
+    Position = (230, 70);
+    Size = (60, 22);
+    Text = Browse;
+    TextSize = 13;
+    renderer = &1;
+}
+
+ComboBox.Palette {
+    ChangeItemOnScroll = true;
+    ExpandDirection = Down;
+    ItemsToDisplay = 0;
+    MaximumItems = 0;
+    Position = (10, 100);
+    Size = (280, 22);
+    TextSize = 13;
+
+    Renderer {
+        padding = (3, 3, 3, 3);
+        textcolor = rgb(190, 190, 190);
+        texturearrow = "assets/gui/themes/Black.png" Part(60, 0, 32, 32);
+        texturearrowdisabled = None;
+        texturearrowhover = "assets/gui/themes/Black.png" Part(60, 32, 32, 32);
+        texturebackground = "assets/gui/themes/Black.png" Part(0, 154, 48, 48) Middle(16, 16, 16, 16);
+        texturebackgrounddisabled = None;
+
+        listbox {
+            backgroundcolorhover = rgb(100, 100, 100);
+            padding = (3, 3, 3, 3);
+            selectedbackgroundcolor = rgb( 10, 110, 255);
+            selectedbackgroundcolorhover = rgb(30, 150, 255);
+            selectedtextcolor = White;
+            textcolor = rgb(190, 190, 190);
+            textcolorhover = rgb(250, 250, 250);
+            texturebackground = "assets/gui/themes/Black.png" Part(0, 154, 48, 48) Middle(16, 16, 16, 16);
+
+            scrollbar {
+                texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+                texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+                texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+                texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+                texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+                texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+                texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+                texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+            }
+        }
+    }
+}
+
+CheckBox.HitBoxes {
+    Position = (150, 40);
+    Size = (18, 18);
+    Text = "Hit box(es)";
+    TextSize = 13;
+    renderer = &2;
+}
+
+CheckBox.HurtBoxes {
+    Position = (150, 10);
+    Size = (18, 18);
+    Text = "Hurt box(es)";
+    TextSize = 13;
+    renderer = &2;
+}
+
+Button.Button1 {
+    Position = (10, 130);
+    Size = (10, 10);
+    TextSize = 13;
+    renderer = &3;
+}
+
+Button.Button2 {
+    Position = (20, 130);
+    Size = (10, 10);
+    TextSize = 13;
+    renderer = &4;
+}
+
+Button.Button3 {
+    Position = (10, 140);
+    Size = (10, 10);
+    TextSize = 13;
+    renderer = &4;
+}
+
+Button.Button4 {
+    Position = (20, 140);
+    Size = (10, 10);
+    TextSize = 13;
+    renderer = &3;
+}
+
+Button.Color {
+    Position = (10, 130);
+    Size = (20, 20);
+    TextSize = 13;
+
+    Renderer {
+        backgroundcolor = transparent;
+        backgroundcolordisabled = transparent;
+        backgroundcolordown = transparent;
+        backgroundcolorhover = transparent;
+        bordercolor = #3C3C3C;
+        bordercolordisabled = #7D7D7D;
+        bordercolordown = black;
+        bordercolorfocused = #1E1EB4;
+        bordercolorhover = black;
+        borders = (1, 1, 1, 1);
+        textcolor = #3C3C3C;
+        textcolordisabled = #7D7D7D;
+        textcolordown = black;
+        textcolorhover = black;
+        texture = None;
+        texturedisabled = None;
+        texturedown = None;
+        texturefocused = None;
+        texturehover = None;
+    }
+}
+
+Label.Label1 {
+    Position = (30, 132);
+    ScrollbarPolicy = Never;
+    Size = (117.2, 18);
+    Text = "Background color";
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        texturebackground = None;
+
+        scrollbar {
+            texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+            texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+            texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+            texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+            texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+            texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+        }
+    }
+}
+
+Button.Button5 {
+    Position = (230, 140);
+    Text = Export;
+    TextSize = 13;
+    renderer = &1;
+}
