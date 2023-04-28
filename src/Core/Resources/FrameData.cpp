@@ -44,8 +44,8 @@ namespace SpiralOfFate
 			//else
 			//	r.first->clone = object->targetId;
 		}
-		if (result.find(0) == result.end())
-			throw std::invalid_argument("Schema does not contain action with id 0");
+		if (result.begin() == result.end())
+			throw std::invalid_argument("Schema is empty!");
 		return result;
 	}
 
@@ -190,8 +190,6 @@ namespace SpiralOfFate
 
 	FrameData &FrameData::operator=(FrameData &&other) noexcept
 	{
-		const void **ptr = (const void **)this;
-
 		this->_pal = other._pal;
 		this->_character = other._character;
 		this->_palette = other._palette;

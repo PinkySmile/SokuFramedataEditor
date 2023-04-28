@@ -475,8 +475,8 @@ void loadPackages()
 	for (auto &entry : game->package) {
 		if (entry.first.name.substr(0, strlen("data_character_")) != "data_character_")
 			continue;
-		if (entry.first.name.substr(0, strlen("data_character_common_")) == "data_character_common_")
-			continue;
+		//if (entry.first.name.substr(0, strlen("data_character_common_")) == "data_character_common_")
+		//	continue;
 
 		std::string name = std::string(entry.first.name.substr(strlen("data_character_")));
 		std::string filename = name.substr(name.find_last_of('_') + 1);
@@ -800,24 +800,26 @@ void	refreshRightPanel(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, 
 		return gui.get<tgui::Panel>("Boxes")->removeAllWidgets();
 	step->onPress.emit(&*step, "Step");
 	if (resetAction) {
-		action->setText("0");
-		action->onReturnKeyPress.emit(&*action, "0");
+		auto txt = std::to_string(object->_moves.begin()->first);
+
+		action->setText(txt);
+		action->onReturnKeyPress.emit(&*action, txt);
 	}
 	if (speedCtrl->getValue() == 0)
 		speedCtrl->onValueChange.emit(&*speedCtrl, 0);
 	else
 		speedCtrl->setValue(0);
-	if (object->_moves[0].empty()) {
-		object->_moves[0].emplace_back();
+	//if (object->_moves[0].empty()) {
+	//	object->_moves[0].emplace_back();
 
-		//TODO: Properly init a default one
-		auto newSequence = new ShadyCore::Schema::Sequence(0, true);
-		auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
+	//	//TODO: Properly init a default one
+	//	auto newSequence = new ShadyCore::Schema::Sequence(0, true);
+	//	auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 
-		newSequence->frames.push_back(newElem);
-		tempSchema.objects.push_back(newSequence);
-		object->_moves[0][0].emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
-	}
+	//	newSequence->frames.push_back(newElem);
+	//	editSession.schema->objects.push_back(newSequence);
+	//	object->_moves[0][0].emplace_back(editSession.chr, *editSession.schema, *newSequence, *newElem, *editSession.palette, editSession.palName);
+	//}
 	refreshFrameDataPanel(panel, gui.get<tgui::Panel>("Boxes"), object);
 }
 
@@ -2994,6 +2996,8 @@ void	exportThisFrame(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 void	exportThisMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 {
 	openExportWindow(gui, object, [&gui, &object](bool gif, bool cb, bool hurtb, bool hitb, sf::Color bgColor){
+		gui.get<tgui::Panel>("Panel1")->get<tgui::SpinButton>("Speed")->setValue(0);
+
 		auto &act = object->_moves.at(object->_action);
 		auto panel = tgui::Panel::create({"100%", "100%"});
 
@@ -3067,6 +3071,8 @@ void	exportThisMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 void	exportAll(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 {
 	openExportWindow(gui, object, [&object, &gui](bool gif, bool cb, bool hurtb, bool hitb, sf::Color bgColor){
+		gui.get<tgui::Panel>("Panel1")->get<tgui::SpinButton>("Speed")->setValue(0);
+
 		auto panel = tgui::Panel::create({"100%", "100%"});
 
 		panel->getRenderer()->setBackgroundColor({0, 0, 0, 75});
@@ -3817,13 +3823,7 @@ void	run()
 	tgui::Gui gui{*game->screen};
 	sf::Image icon;
 	sf::Event event;
-	sf::Texture stage;
-	sf::Sprite sprite;
 
-	stage.loadFromFile("assets/stages/14687.png");
-	sprite.setTexture(stage, true);
-	sprite.setPosition({stage.getSize().x * 1.f / -2.f, stage.getSize().y * 1.f / -1.4f});
-	sprite.setScale(1, 1);
 	if (icon.loadFromFile("assets/editorIcon.png"))
 		game->screen->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
@@ -3852,7 +3852,6 @@ void	run()
 		if (!hovering)
 			timer++;
 		game->screen->clear(bgColor);
-		game->screen->draw(sprite);
 		if (object) {
 			if (timer >= updateTimer || updateAnyway) {
 				auto b = object->_actionBlock;

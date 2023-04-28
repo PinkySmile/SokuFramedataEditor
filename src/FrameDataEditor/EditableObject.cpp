@@ -7,6 +7,7 @@
 EditableObject::EditableObject(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName)
 {
 	this->_moves = SpiralOfFate::FrameData::loadSchema(chr, schema, palette, palName);
+	this->_action = this->_moves.begin()->first;
 }
 
 void EditableObject::render(bool setup) const
