@@ -1,0 +1,53 @@
+Renderer.1 {
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
+}
+
+ProgressBar.ProgressBar {
+    Maximum = 100;
+    Minimum = 0;
+    Position = (10, 10);
+    Size = (240, 20);
+    TextSize = 13;
+    Value = 0;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        textcolorfilled = rgb(250, 250, 250);
+        texturebackground = "assets/gui/themes/Black.png" Part(180, 64, 90, 40) Middle(20, 0, 50, 40);
+        texturefill = "assets/gui/themes/Black.png" Part(184, 108, 82, 32) Middle(16, 0, 50, 32);
+    }
+}
+
+Label.Label {
+    HorizontalAlignment = Center;
+    Position = (10, 40);
+    ScrollbarPolicy = Never;
+    Size = (340, 40);
+    Text = Label;
+    TextSize = 13;
+    renderer = &1;
+}
+
+Label.Progress {
+    HorizontalAlignment = Center;
+    MaximumTextWidth = 90;
+    Position = (260, 10);
+    ScrollbarPolicy = Never;
+    Size = (90, 20);
+    Text = "100/100";
+    TextSize = 13;
+    VerticalAlignment = Center;
+    renderer = &1;
+}

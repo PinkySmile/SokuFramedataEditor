@@ -13,6 +13,7 @@ public:
 	float scale = 1;
 	SpiralOfFate::Vector2f translate = {0, 0};
 	bool displayScaled = false;
+	mutable SpiralOfFate::FrameData *_setuped;
 
 	mutable SpiralOfFate::Sprite _sprite;
 	mutable std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
@@ -28,7 +29,10 @@ public:
 	EditableObject() = default;
 	EditableObject(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
 	~EditableObject() override = default;
+	void render(bool setup) const;
+
 	void render() const override;
+
 	void update() override;
 	bool collides(const SpiralOfFate::IObject &other) const override;
 	void reset() override;
@@ -43,6 +47,7 @@ public:
 	void copyToBuffer(void *data) const override;
 	void restoreFromBuffer(void *data) override;
 	unsigned int getClassId() const override;
+	std::pair<SpiralOfFate::Vector2i, SpiralOfFate::Vector2u> setupSprite() const;
 };
 
 

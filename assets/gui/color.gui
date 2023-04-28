@@ -1,53 +1,40 @@
 Renderer.1 {
-    backgroundcolor = #F5F5F5;
-    backgroundcolordisabled = #E6E6E6;
-    backgroundcolordown = #EBEBEB;
-    backgroundcolorhover = white;
-    bordercolor = #3C3C3C;
-    bordercolordisabled = #7D7D7D;
-    bordercolordown = black;
-    bordercolorfocused = #1E1EB4;
-    bordercolorhover = black;
-    borders = (1, 1, 1, 1);
-    textcolor = #3C3C3C;
-    textcolordisabled = #7D7D7D;
-    textcolordown = black;
-    textcolorhover = black;
-    texture = None;
+    textcolor = rgb(190, 190, 190);
+    textcolorhover = rgb(250, 250, 250);
+    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
     texturedisabled = None;
-    texturedown = None;
-    texturefocused = None;
-    texturehover = None;
+    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
 }
 
 Renderer.2 {
-    backgroundcolor = transparent;
-    bordercolor = #3C3C3C;
-    borders = (0, 0, 0, 0);
-    textcolor = #3C3C3C;
-    texturebackground = None;
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
 }
 
 Renderer.3 {
-    backgroundcolor = #F5F5F5;
-    backgroundcolordisabled = #E6E6E6;
-    backgroundcolorhover = white;
-    bordercolor = #3C3C3C;
-    bordercolordisabled = #7D7D7D;
-    bordercolorhover = black;
-    borders = (1, 1, 1, 1);
-    caretcolor = black;
-    caretwidth = 1;
-    defaulttextcolor = #A0A0A0;
-    padding = (0, 0, 0, 0);
-    selectedtextbackgroundcolor = #006EFF;
-    selectedtextcolor = white;
-    textcolor = #3C3C3C;
-    textcolordisabled = #7D7D7D;
-    texture = None;
-    texturedisabled = None;
-    texturefocused = None;
-    texturehover = None;
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
 }
 
 Slider.Lightness {
@@ -120,7 +107,7 @@ EditBox.Edit {
     Size = (70, 22);
     Text = "#000000";
     TextSize = 13;
-    renderer = &3;
+    renderer = &2;
 }
 
 Label.Label4 {
@@ -130,7 +117,7 @@ Label.Label4 {
     Size = (30.2, 18);
     Text = RGB;
     TextSize = 13;
-    renderer = &2;
+    renderer = &3;
 }
 
 Label.Label5 {
@@ -140,7 +127,7 @@ Label.Label5 {
     Size = (36.2, 18);
     Text = Color;
     TextSize = 13;
-    renderer = &2;
+    renderer = &3;
 }
 
 Label.Label6 {
@@ -150,7 +137,7 @@ Label.Label6 {
     Size = (76.2, 18);
     Text = "Base colors";
     TextSize = 13;
-    renderer = &2;
+    renderer = &3;
 }
 
 Button.Button1 {
@@ -1551,7 +1538,7 @@ Label.Label7 {
     Size = (29.2, 18);
     Text = Hue;
     TextSize = 13;
-    renderer = &2;
+    renderer = &3;
 }
 
 Label.Label8 {
@@ -1562,7 +1549,7 @@ Label.Label8 {
     Size = (69.2, 18);
     Text = Saturation;
     TextSize = 13;
-    renderer = &2;
+    renderer = &3;
 }
 
 Label.Label9 {
@@ -1572,7 +1559,7 @@ Label.Label9 {
     Size = (69.2, 18);
     Text = Lightness;
     TextSize = 13;
-    renderer = &2;
+    renderer = &3;
 }
 
 EditBox.Hue {
@@ -1582,7 +1569,7 @@ EditBox.Hue {
     Size = (40, 22);
     Text = 239;
     TextSize = 13;
-    renderer = &3;
+    renderer = &2;
 }
 
 EditBox.Sat {
@@ -1592,7 +1579,7 @@ EditBox.Sat {
     Size = (40, 22);
     Text = 240;
     TextSize = 13;
-    renderer = &3;
+    renderer = &2;
 }
 
 EditBox.Light {
@@ -1602,7 +1589,7 @@ EditBox.Light {
     Size = (40, 22);
     Text = 240;
     TextSize = 13;
-    renderer = &3;
+    renderer = &2;
 }
 
 Picture.SatHue {

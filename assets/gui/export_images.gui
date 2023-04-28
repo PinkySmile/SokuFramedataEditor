@@ -1,16 +1,6 @@
 Renderer.1 {
     textcolor = rgb(190, 190, 190);
     textcolorhover = rgb(250, 250, 250);
-    texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturedisabled = None;
-    texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
-}
-
-Renderer.2 {
-    textcolor = rgb(190, 190, 190);
-    textcolorhover = rgb(250, 250, 250);
     texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
     texturecheckeddisabled = None;
     texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
@@ -21,7 +11,7 @@ Renderer.2 {
     textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
 }
 
-Renderer.3 {
+Renderer.2 {
     backgroundcolor = black;
     backgroundcolordisabled = black;
     backgroundcolordown = black;
@@ -43,7 +33,7 @@ Renderer.3 {
     texturehover = None;
 }
 
-Renderer.4 {
+Renderer.3 {
     backgroundcolor = white;
     backgroundcolordisabled = white;
     backgroundcolordown = white;
@@ -70,40 +60,13 @@ CheckBox.Gif {
     Size = (18, 18);
     Text = "Export as gif";
     TextSize = 13;
-    renderer = &2;
+    renderer = &1;
 }
 
 CheckBox.CBoxes {
     Position = (10, 40);
     Size = (18, 18);
     Text = "Collision box";
-    TextSize = 13;
-    renderer = &2;
-}
-
-EditBox.Path {
-    Position = (10, 70);
-    Size = (210, 22);
-    TextSize = 13;
-
-    Renderer {
-        caretcolor = rgb(110, 110, 255);
-        defaulttextcolor = rgb(120, 120, 120);
-        padding = (6, 4, 6, 4);
-        selectedtextbackgroundcolor = rgb( 10, 110, 255);
-        selectedtextcolor = White;
-        textcolor = rgb(190, 190, 190);
-        texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
-        texturedisabled = None;
-        texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
-        texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
-    }
-}
-
-Button.Browse {
-    Position = (230, 70);
-    Size = (60, 22);
-    Text = Browse;
     TextSize = 13;
     renderer = &1;
 }
@@ -113,7 +76,7 @@ ComboBox.Palette {
     ExpandDirection = Down;
     ItemsToDisplay = 0;
     MaximumItems = 0;
-    Position = (10, 100);
+    Position = (10, 70);
     Size = (280, 22);
     TextSize = 13;
 
@@ -155,7 +118,7 @@ CheckBox.HitBoxes {
     Size = (18, 18);
     Text = "Hit box(es)";
     TextSize = 13;
-    renderer = &2;
+    renderer = &1;
 }
 
 CheckBox.HurtBoxes {
@@ -163,39 +126,39 @@ CheckBox.HurtBoxes {
     Size = (18, 18);
     Text = "Hurt box(es)";
     TextSize = 13;
-    renderer = &2;
+    renderer = &1;
 }
 
 Button.Button1 {
-    Position = (10, 130);
+    Position = (10, 100);
     Size = (10, 10);
     TextSize = 13;
-    renderer = &3;
+    renderer = &2;
 }
 
 Button.Button2 {
-    Position = (20, 130);
-    Size = (10, 10);
-    TextSize = 13;
-    renderer = &4;
-}
-
-Button.Button3 {
-    Position = (10, 140);
-    Size = (10, 10);
-    TextSize = 13;
-    renderer = &4;
-}
-
-Button.Button4 {
-    Position = (20, 140);
+    Position = (20, 100);
     Size = (10, 10);
     TextSize = 13;
     renderer = &3;
 }
 
+Button.Button3 {
+    Position = (10, 110);
+    Size = (10, 10);
+    TextSize = 13;
+    renderer = &3;
+}
+
+Button.Button4 {
+    Position = (20, 110);
+    Size = (10, 10);
+    TextSize = 13;
+    renderer = &2;
+}
+
 Button.Color {
-    Position = (10, 130);
+    Position = (10, 100);
     Size = (20, 20);
     TextSize = 13;
 
@@ -223,7 +186,7 @@ Button.Color {
 }
 
 Label.Label1 {
-    Position = (30, 132);
+    Position = (30, 102);
     ScrollbarPolicy = Never;
     Size = (117.2, 18);
     Text = "Background color";
@@ -246,9 +209,18 @@ Label.Label1 {
     }
 }
 
-Button.Button5 {
-    Position = (230, 140);
+Button.Export {
+    Position = (230, 110);
     Text = Export;
     TextSize = 13;
-    renderer = &1;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        textcolorhover = rgb(250, 250, 250);
+        texture = "assets/gui/themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
+        texturedisabled = None;
+        texturedown = "assets/gui/themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
+        texturefocused = "assets/gui/themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
+        texturehover = "assets/gui/themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+    }
 }

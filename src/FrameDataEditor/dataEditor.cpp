@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <thread>
 #include <TGUI/TGUI.hpp>
 #include <SoFGV.hpp>
 #include "EditableObject.hpp"
@@ -13,6 +14,7 @@
 #include <windows.h>
 #include <dbghelp.h>
 #include <crtdbg.h>
+#define mkdir(path, mode) mkdir(path)
 #endif
 
 using namespace SpiralOfFate;
@@ -289,6 +291,7 @@ sf::Image selectedColorMaskImage;
 sf::Sprite selectedColorMaskSprite;
 sf::Texture selectedColorMaskTexture;
 ShadyCore::Schema tempSchema;
+std::list<std::function<void()>> uiTasks;
 
 struct {
 	ShadyCore::Schema *schema = nullptr;
@@ -886,7 +889,6 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		auto window = Utils::openWindowWithFocus(gui, 500, "&.h - 100");
 		auto pan = tgui::ScrollablePanel::create({"&.w", "&.h"});
 		unsigned i = 0;
-		float current = 0;
 		auto scroll = 0;
 		std::vector<unsigned> toDisplay;
 
@@ -975,7 +977,6 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		object->_actionBlock = i;
 		if (object->_moves[object->_action][i].empty()) {
 			game->logger.warn("This block is empty so we generate a frame");
-			auto old = reinterpret_cast<ShadyCore::Schema::Sequence::MoveFrame *>(tempSchema.objects.back());
 			auto newSequence = new ShadyCore::Schema::Sequence(object->_action, true);
 			auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 
@@ -1762,7 +1763,7 @@ void openFramedataFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBa
 	});
 }
 
-void openPaletteFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr bar, tgui::Gui &gui)
+void openPaletteFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr, tgui::Gui &gui)
 {
 	//TODO: Save last folder
 	auto path = Utils::openFileDialog("Open palette file", ".", {{".*\\.pal", "Converted palette"}});
@@ -1827,7 +1828,7 @@ void openPaletteFromPackage(std::unique_ptr<EditableObject> &object, tgui::MenuB
 	window->add(list);
 }
 
-void openPaletteFromPalEditor(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr bar, tgui::Gui &gui)
+void openPaletteFromPalEditor(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr, tgui::Gui &gui)
 {
 	//TODO: Save last folder
 	auto path = Utils::openFileDialog("Open palette file", ".", {{".*\\.pal", "Palette editor palette"}});
@@ -1912,13 +1913,13 @@ void openPaletteFromPalEditor(std::unique_ptr<EditableObject> &object, tgui::Men
 	displayPalEditor(object, gui);
 }
 
-void saveFramedataToPackageCallback(std::unique_ptr<EditableObject> &object)
+void saveFramedataToPackageCallback(std::unique_ptr<EditableObject> &)
 {
 	//TODO: Save
 	Utils::dispMsg("Error", "Not implemented yet", MB_ICONERROR);
 }
 
-bool saveFramedataToFileCallback(std::unique_ptr<EditableObject> &object)
+bool saveFramedataToFileCallback(std::unique_ptr<EditableObject> &)
 {
 	auto path = Utils::saveFileDialog(
 		"Save pattern file",
@@ -1940,7 +1941,7 @@ bool saveFramedataToFileCallback(std::unique_ptr<EditableObject> &object)
 	return true;
 }
 
-void savePaletteToFileCallback(std::unique_ptr<EditableObject> &object)
+void savePaletteToFileCallback(std::unique_ptr<EditableObject> &)
 {
 	auto path = Utils::saveFileDialog(
 		"Save palette file",
@@ -1961,7 +1962,7 @@ void savePaletteToFileCallback(std::unique_ptr<EditableObject> &object)
 	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, ShadyCore::FileType::PALETTE_PAL})(editSession.palette, stream);
 }
 
-void savePaletteToPackageCallback(std::unique_ptr<EditableObject> &object)
+void savePaletteToPackageCallback(std::unique_ptr<EditableObject> &)
 {
 	//TODO: Save
 	Utils::dispMsg("Error", "Not implemented yet", MB_ICONERROR);
@@ -2140,7 +2141,7 @@ void	copyBoxesFromNextFrame(std::unique_ptr<EditableObject> &object, tgui::Panel
 	copyBoxesFromFrame(object, boxes, object->_moves.at(object->_action)[object->_actionBlock][object->_animation + 1]);
 }
 
-void	flattenCollisionBoxes(std::unique_ptr<EditableObject> &object, std::vector<std::vector<FrameData>> &action, FrameData *base)
+void	flattenCollisionBoxes(std::unique_ptr<EditableObject> &, std::vector<std::vector<FrameData>> &action, FrameData *base)
 {
 	if (!base)
 		for (auto &block : action)
@@ -2648,7 +2649,7 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 		gui.add(window, "PaletteEditor");
 }
 
-void	displayBlendingOptions(tgui::Gui &gui)
+void	displayBlendingOptions(tgui::Gui &)
 {
 	//TODO: make this a proper window
 	Utils::dispMsg("Not implemented", "Blending options are not yet implemented", MB_ICONINFORMATION);
@@ -2818,6 +2819,333 @@ void	createPalette(tgui::Gui &gui)
 	pal->setSelectedItem(editSession.palName);
 }
 
+tgui::ChildWindow::Ptr	openExportWindow(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, const std::function<void (bool, bool, bool, bool, sf::Color)> &callback)
+{
+	auto win = Utils::openWindowWithFocus(gui, 300, 140);
+
+	win->loadWidgetsFromFile("assets/gui/export_images.gui");
+
+	auto gif = win->get<tgui::CheckBox>("Gif");
+	auto cBox = win->get<tgui::CheckBox>("CBoxes");
+	auto huBox = win->get<tgui::CheckBox>("HurtBoxes");
+	auto hiBox = win->get<tgui::CheckBox>("HitBoxes");
+	auto palette = win->get<tgui::ComboBox>("Palette");
+	auto bgColorButton = win->get<tgui::Button>("Color");
+	auto exportButton = win->get<tgui::Button>("Export");
+	auto renderer = bgColorButton->getRenderer();
+	auto weak = std::weak_ptr(win);
+
+	for (auto &[name, _] : game->characterPaths[editSession.chr].palettes)
+		palette->addItem(name);
+	palette->setSelectedItem(editSession.palName);
+	palette->connect("ItemSelected", [&object, &gui](const std::string &palette) {
+		game->logger.info("Loading palette from loaded palette: " + palette);
+
+		auto &pal = game->characterPaths[editSession.chr].palettes[palette];
+
+		for (auto &action : object->_moves)
+			for (auto &block : action.second)
+				for (auto &anim : block)
+					anim.setPalette(pal, palette);
+		editSession.palette = &pal;
+		editSession.palName = palette;
+		displayPalEditor(object, gui);
+	});
+	exportButton->connect("Clicked", [weak, callback, renderer, hiBox, huBox, cBox, gif]{
+		callback(gif->isChecked(), cBox->isChecked(), huBox->isChecked(), hiBox->isChecked(), renderer->getBackgroundColor());
+		weak.lock()->close();
+	});
+	bgColorButton->connect("Clicked", [renderer, &gui]{
+		Utils::makeColorPickWindow(gui, [renderer](sf::Color color){
+			renderer->setBackgroundColor(color);
+			renderer->setBackgroundColorDisabled(color);
+			renderer->setBackgroundColorHover(color);
+			renderer->setBackgroundColorDown(color);
+			renderer->setBackgroundColorFocused(color);
+		}, renderer->getBackgroundColor())->setTitle("Select background color");
+	});
+	bgColorButton->connect("RightClicked", [renderer]{
+		auto color = sf::Color::Transparent;
+
+		renderer->setBackgroundColor(color);
+		renderer->setBackgroundColorDisabled(color);
+		renderer->setBackgroundColorHover(color);
+		renderer->setBackgroundColorDown(color);
+		renderer->setBackgroundColorFocused(color);
+	});
+	// TODO:
+	gif->setEnabled(false);
+	return win;
+}
+
+sf::Image createExportImage(std::unique_ptr<EditableObject> &object, bool cb, bool hurtb, bool hitb, sf::Color bgColor)
+{
+	auto spriteData = object->setupSprite();
+	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+	auto botright = spriteData.first + spriteData.second;
+
+	if (cb && !data.frame->cBoxes.empty()) {
+		auto &box = data.frame->cBoxes[0];
+
+		spriteData.first.x = std::min(spriteData.first.x, box.left);
+		spriteData.first.y = std::min(spriteData.first.y, box.up);
+		botright.x = std::max(botright.x, box.right);
+		botright.y = std::max(botright.y, box.down);
+	}
+	if (hurtb)
+		for (auto &box : data.frame->hBoxes) {
+			spriteData.first.x = std::min(spriteData.first.x, box.left);
+			spriteData.first.y = std::min(spriteData.first.y, box.up);
+			botright.x = std::max(botright.x, box.right);
+			botright.y = std::max(botright.y, box.down);
+		}
+	if (hitb)
+		for (auto &box : data.frame->aBoxes) {
+			spriteData.first.x = std::min(spriteData.first.x, box.left);
+			spriteData.first.y = std::min(spriteData.first.y, box.up);
+			botright.x = std::max(botright.x, box.right);
+			botright.y = std::max(botright.y, box.down);
+		}
+	spriteData.second = botright - spriteData.first;
+
+	sf::RenderStates state;
+	sf::Image img;
+	sf::RectangleShape rect;
+	sf::RenderTexture texture;
+
+	state.transform.translate(-spriteData.first.x + 10, -spriteData.first.y + 10);
+	texture.create(spriteData.second.x + 20, spriteData.second.y + 20);
+	texture.clear(bgColor);
+	if (!data.frame->hasBlendOptions() || data.frame->blendOptions.mode == 0);
+	else if (data.frame->blendOptions.mode == 1) {
+		state.blendMode = sf::BlendAdd;
+		if (!bgColor.a)
+			texture.clear(sf::Color::Black);
+	} else if (data.frame->blendOptions.mode == 2) {
+		state.blendMode = sf::BlendMode{
+			sf::BlendMode::Zero,
+			sf::BlendMode::OneMinusSrcColor,
+			sf::BlendMode::Add,
+			sf::BlendMode::One,
+			sf::BlendMode::One,
+			sf::BlendMode::Add
+		};
+		if (!bgColor.a)
+			texture.clear(sf::Color::White);
+	}
+	texture.draw(object->_sprite, state);
+	rect.setOutlineThickness(1);
+	if (hurtb) {
+		rect.setFillColor(sf::Color{0x00, 0xFF, 0x00, 0x60});
+		rect.setOutlineColor(sf::Color{0x00, 0xFF, 0x00});
+		for (auto &box : data.frame->hBoxes) {
+			rect.setPosition(-spriteData.first.x + box.left + 10, -spriteData.first.y + box.up + 10);
+			rect.setSize({
+				static_cast<float>(box.right - box.left),
+				static_cast<float>(box.down - box.up)
+			});
+			texture.draw(rect);
+		}
+	}
+	if (hitb) {
+		rect.setFillColor(sf::Color{0xFF, 0x00, 0x00, 0x60});
+		rect.setOutlineColor(sf::Color{0xFF, 0x00, 0x00});
+		for (auto &box : data.frame->aBoxes) {
+			rect.setPosition(-spriteData.first.x + box.left + 10, -spriteData.first.y + box.up + 10);
+			rect.setSize({
+				static_cast<float>(box.right - box.left),
+				static_cast<float>(box.down - box.up)
+			});
+			texture.draw(rect);
+		}
+	}
+	if (cb && !data.frame->cBoxes.empty()) {
+		auto &box = data.frame->cBoxes[0];
+
+		rect.setPosition(-spriteData.first.x + box.left + 10, -spriteData.first.y + box.up + 10);
+		rect.setSize({
+			static_cast<float>(box.right - box.left),
+			static_cast<float>(box.down - box.up)
+		});
+		rect.setFillColor(sf::Color{0xFF, 0xFF, 0x00, 0x60});
+		rect.setOutlineColor(sf::Color{0xFF, 0xFF, 0x00});
+		texture.draw(rect);
+	}
+	texture.display();
+	return texture.getTexture().copyToImage();
+}
+
+void	exportFrameToImage(std::unique_ptr<EditableObject> &object, bool cb, bool hurtb, bool hitb, sf::Color bgColor)
+{
+	auto imagePath = std::filesystem::path{"exported"} / editSession.chr / std::to_string(object->_action);
+	auto name = std::to_string(object->_actionBlock) + "_" + std::to_string(object->_animation) + ".png";
+
+	std::filesystem::create_directories(imagePath);
+	createExportImage(object, cb, hurtb, hitb, bgColor).saveToFile((imagePath / name).string().c_str());
+}
+
+void	exportThisFrame(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
+{
+	openExportWindow(gui, object, [&object](bool gif, bool cb, bool hurtb, bool hitb, sf::Color bgColor){
+		exportFrameToImage(object, cb, hurtb, hitb, bgColor);
+	})->get<tgui::CheckBox>("Gif")->setEnabled(false);
+}
+
+void	exportThisMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
+{
+	openExportWindow(gui, object, [&gui, &object](bool gif, bool cb, bool hurtb, bool hitb, sf::Color bgColor){
+		auto &act = object->_moves.at(object->_action);
+		auto panel = tgui::Panel::create({"100%", "100%"});
+
+		panel->getRenderer()->setBackgroundColor({0, 0, 0, 75});
+		gui.add(panel);
+
+		auto window = tgui::ChildWindow::create("Exporting...", tgui::ChildWindow::TitleButton::None);
+
+		window->setSize(360, 90);
+		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+		gui.add(window, "LoadingWindow");
+
+		window->setFocused(true);
+
+		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
+		auto closeWindow = [&gui, window, panel, tabUsageEnabled]{
+			gui.remove(window);
+			gui.remove(panel);
+			gui.setTabKeyUsageEnabled(tabUsageEnabled);
+		};
+		unsigned x = 0;
+
+		for (const auto &i : act)
+			x += i.size();
+		Utils::setRenderer(window);
+		window->loadWidgetsFromFile("assets/gui/loading.gui");
+
+		auto bar = window->get<tgui::ProgressBar>("ProgressBar");
+		auto progress = window->get<tgui::Label>("Progress");
+		auto label = window->get<tgui::Label>("Label");
+		auto doIt = [&object, &act, cb, hurtb, hitb, bgColor, bar, progress, x, label] {
+			auto block = object->_actionBlock;
+			auto anim = object->_animation;
+			unsigned current = 0;
+			auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
+			auto action = name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second;
+
+			for (unsigned i = 0; i < act.size(); i++) {
+				auto &blk = act[i];
+
+				object->_actionBlock = i;
+				for (unsigned j = 0; j < blk.size(); j++) {
+					uiTasks.emplace_back([&object, label, action]{
+						label->setText(action + "  Block " + std::to_string(object->_actionBlock) + "  Animation " + std::to_string(object->_animation));
+					});
+
+					object->_animation = j;
+					exportFrameToImage(object, cb, hurtb, hitb, bgColor);
+					current++;
+
+					uiTasks.emplace_back([current, bar, progress, x]{
+						bar->setValue(current);
+						progress->setText(std::to_string(current) + "/" + std::to_string(x));
+					});
+				}
+			}
+			object->_actionBlock = block;
+			object->_animation = anim;
+		};
+
+		bar->setMaximum(x);
+		progress->setText("0/" + std::to_string(x));
+		label->setText("Exporting data....");
+		std::thread{[doIt, closeWindow]{
+			doIt();
+			closeWindow();
+		}}.detach();
+	});
+}
+
+void	exportAll(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
+{
+	openExportWindow(gui, object, [&object, &gui](bool gif, bool cb, bool hurtb, bool hitb, sf::Color bgColor){
+		auto panel = tgui::Panel::create({"100%", "100%"});
+
+		panel->getRenderer()->setBackgroundColor({0, 0, 0, 75});
+		gui.add(panel);
+
+		auto window = tgui::ChildWindow::create("Exporting...", tgui::ChildWindow::TitleButton::None);
+
+		window->setSize(360, 90);
+		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+		gui.add(window, "LoadingWindow");
+
+		window->setFocused(true);
+
+		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
+		auto closeWindow = [&gui, window, panel, tabUsageEnabled]{
+			gui.remove(window);
+			gui.remove(panel);
+			gui.setTabKeyUsageEnabled(tabUsageEnabled);
+		};
+		unsigned x = 0;
+
+		for (auto &[id, act]: object->_moves)
+			for (const auto &i : act)
+				x += i.size();
+		Utils::setRenderer(window);
+		window->loadWidgetsFromFile("assets/gui/loading.gui");
+
+		auto bar = window->get<tgui::ProgressBar>("ProgressBar");
+		auto progress = window->get<tgui::Label>("Progress");
+		auto label = window->get<tgui::Label>("Label");
+		auto doIt = [&object, cb, hurtb, hitb, bgColor, bar, progress, x, label] {
+			auto anim = object->_animation;
+			auto block = object->_actionBlock;
+			auto oldAction = object->_action;
+			unsigned current = 0;
+
+			for (auto &[id, act]: object->_moves) {
+				object->_action = id;
+
+				auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
+				auto action = name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second;
+
+				for (unsigned i = 0; i < act.size(); i++) {
+					auto &blk = act[i];
+
+					object->_actionBlock = i;
+					for (unsigned j = 0; j < blk.size(); j++) {
+						uiTasks.emplace_back([&object, label, action]{
+							label->setText(action + "  Block " + std::to_string(object->_actionBlock) + "  Animation " + std::to_string(object->_animation));
+						});
+
+						object->_animation = j;
+						exportFrameToImage(object, cb, hurtb, hitb, bgColor);
+						current++;
+
+						uiTasks.emplace_back([current, bar, progress, x]{
+							bar->setValue(current);
+							progress->setText(std::to_string(current) + "/" + std::to_string(x));
+						});
+					}
+				}
+			}
+			object->_actionBlock = block;
+			object->_animation = anim;
+			object->_action = oldAction;
+		};
+
+		bar->setMaximum(x);
+		progress->setText("0/" + std::to_string(x));
+		label->setText("Exporting data....");
+		std::thread{[doIt, closeWindow]{
+			doIt();
+			uiTasks.emplace_back([closeWindow] {
+				closeWindow();
+			});
+		}}.detach();
+	});
+}
+
 void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 {
 	auto bar = gui.get<tgui::MenuBar>("main_bar");
@@ -2857,6 +3185,10 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"Remove", "Animation block (Shift + Del)"}, removeAnimationBlockCallback, std::ref(object));
 	bar->connectMenuItem({"Remove", "Action (Ctrl + Del)"}, removeActionCallback, std::ref(gui), std::ref(object));
 	bar->connectMenuItem({"Remove", "Selected box (Del)"}, removeBoxCallback, boxes, std::ref(object), panel);
+
+	bar->connectMenuItem({"Misc", "Export image", "Export this frame"}, exportThisFrame, std::ref(gui), std::ref(object));
+	bar->connectMenuItem({"Misc", "Export image", "Export this move frames"}, exportThisMove, std::ref(gui), std::ref(object));
+	bar->connectMenuItem({"Misc", "Export image", "Export all this character frames"}, exportAll, std::ref(gui), std::ref(object));
 
 	bar->connectMenuItem({"Misc", "Copy boxes from last frame"}, copyBoxesFromLastFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Copy boxes from next frame"}, copyBoxesFromNextFrame, std::ref(object), boxes);
@@ -3536,7 +3868,7 @@ void	run()
 					progress->setValue(object->_animation);
 				timer -= updateTimer;
 			}
-			object->render();
+			object->render(gui.get<tgui::ChildWindow>("LoadingWindow") == nullptr);
 			if (hovering)
 				renderTopLayer(*object);
 		}
@@ -3644,6 +3976,10 @@ void	run()
 			handleColorPickDrag(gui, object, drag->x, drag->y);
 		if (object)
 			object->displayScaled = !displayHitboxes;
+		while (!uiTasks.empty()) {
+			uiTasks.front()();
+			uiTasks.pop_front();
+		}
 		gui.draw();
 		game->screen->display();
 		if (quitRequest) {
