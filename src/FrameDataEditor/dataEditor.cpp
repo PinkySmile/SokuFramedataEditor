@@ -673,12 +673,9 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	action->connect("ReturnKeyPressed", [&object, block](const std::string &t){
 		if (t.empty())
 			return;
-
 		auto newAction = std::stoul(t);
-
 		if (object->_moves.find(newAction) == object->_moves.end())
-		//	object->_moves.emplace(newAction, object->_moves[object->_action]);
-			return;
+			object->_moves.emplace(newAction, object->_moves[object->_action]);
 		object->_action = newAction;
 		block->setMaximum(object->_moves[object->_action].size() - 1);
 		block->setMinimum(0);
@@ -3589,6 +3586,182 @@ void	run()
 	tgui::Gui gui{*game->screen};
 	sf::Image icon;
 	sf::Event event;
+	/*auto current = game->characterPaths.begin();
+	auto startExport = [&object, &gui](bool gif, bool cb, bool hurtb, bool hitb, sf::Color bgColor){
+		gui.get<tgui::Panel>("Panel1")->get<tgui::SpinButton>("Speed")->setValue(0);
+
+		auto panel = tgui::Panel::create({"100%", "100%"});
+
+		panel->getRenderer()->setBackgroundColor({0, 0, 0, 75});
+		gui.add(panel);
+
+		auto window = tgui::ChildWindow::create("Exporting...", tgui::ChildWindow::TitleButton::None);
+
+		window->setSize(360, 90);
+		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+		gui.add(window, "LoadingWindow");
+
+		window->setFocused(true);
+
+		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
+		auto closeWindow = [&gui, window, panel, tabUsageEnabled]{
+			gui.remove(window);
+			gui.remove(panel);
+			gui.setTabKeyUsageEnabled(tabUsageEnabled);
+		};
+		unsigned x = 0;
+
+		for (auto &[id, act]: object->_moves)
+			for (const auto &i : act)
+				x += i.size();
+		Utils::setRenderer(window);
+		window->loadWidgetsFromFile("assets/gui/loading.gui");
+
+		auto bar = window->get<tgui::ProgressBar>("ProgressBar");
+		auto progress = window->get<tgui::Label>("Progress");
+		auto label = window->get<tgui::Label>("Label");
+		auto doIt = [&object, cb, hurtb, hitb, bgColor, bar, progress, x, label] {
+			auto anim = object->_animation;
+			auto block = object->_actionBlock;
+			auto oldAction = object->_action;
+			unsigned current = 0;
+
+			for (auto &[id, act]: object->_moves) {
+				object->_action = id;
+
+				auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
+				auto action = name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second;
+
+				for (unsigned i = 0; i < act.size(); i++) {
+					auto &blk = act[i];
+
+					object->_actionBlock = i;
+					for (unsigned j = 0; j < blk.size(); j++) {
+						uiTasks.emplace_back([&object, label, action]{
+							label->setText(action + "  Block " + std::to_string(object->_actionBlock) + "  Animation " + std::to_string(object->_animation));
+						});
+
+						object->_animation = j;
+						exportFrameToImage(object, cb, hurtb, hitb, bgColor);
+						current++;
+
+						uiTasks.emplace_back([current, bar, progress, x]{
+							bar->setValue(current);
+							progress->setText(std::to_string(current) + "/" + std::to_string(x));
+						});
+					}
+				}
+			}
+			object->_actionBlock = block;
+			object->_animation = anim;
+			object->_action = oldAction;
+		};
+
+		bar->setMaximum(x);
+		progress->setText("0/" + std::to_string(x));
+		label->setText("Exporting data....");
+		std::thread{[doIt, closeWindow]{
+			doIt();
+			uiTasks.emplace_back([closeWindow] {
+				closeWindow();
+			});
+		}}.detach();
+	};
+	auto lff = [&object, &gui](const std::string &path, const std::string &character){
+		auto bar = gui.get<tgui::MenuBar>("main_bar");
+
+		editSession.palName = "data/character/" + character + "/palette000.pal";
+
+		//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
+		auto pal = game->characterPaths[character].palettes.find(editSession.palName);
+		std::ifstream stream{path, std::fstream::binary};
+		std::string ext = path.substr(path.find_last_of('.') + 1);
+
+		game->logger.info("Loading framedata from file: " + path);
+		if (stream.fail()) {
+			Utils::dispMsg("Loading error", "Could not find file " + path + ": " + strerror(errno), MB_ICONERROR);
+			return;
+		}
+		if (pal == game->characterPaths[character].palettes.end()) {
+			Utils::dispMsg("Loading error", "Could not find palette " + editSession.palName, MB_ICONERROR);
+			return;
+		}
+
+		editSession.chr = character;
+		editSession.palName = pal->first;
+		editSession.palette = &pal->second;
+		tempSchema.destroy();
+		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ext == "xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
+		try {
+			object.reset();
+			object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
+			loadedPath = path;
+			refreshRightPanel(gui, object);
+			bar->setMenuEnabled({"New"}, true);
+			bar->setMenuEnabled({"Remove"}, true);
+			bar->setMenuEnabled({"Misc"}, true);
+			bar->setMenuItemEnabled({"File", "Export..."}, true);
+			bar->setMenuItemEnabled({"File", "Import...", "palette..."}, true);
+		} catch (std::exception &e) {
+			Utils::dispMsg("Error", e.what(), MB_ICONERROR);
+			loadedPath = path;
+			refreshRightPanel(gui, object);
+			bar->setMenuEnabled({"New"}, false);
+			bar->setMenuEnabled({"Remove"}, false);
+			bar->setMenuEnabled({"Misc"}, false);
+			bar->setMenuItemEnabled({"File", "Export..."}, false);
+			bar->setMenuItemEnabled({"File", "Import...", "palette..."}, false);
+		}
+		displayPalEditor(object, gui);
+	};
+	auto lfp = [&object, &gui](const std::string &character){
+		auto bar = gui.get<tgui::MenuBar>("main_bar");
+
+		editSession.palName = "data/character/" + character + "/palette000.pal";
+
+		//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
+		std::string path = "data/character/" + character + "/" + character + ".pat";
+		auto pal = game->characterPaths[character].palettes.find(editSession.palName);
+		auto entry = game->package.find(path, ShadyCore::FileType::TYPE_SCHEMA);
+
+		game->logger.info("Loading framedata from package: " + path);
+		if (entry == game->package.end()) {
+			Utils::dispMsg("Loading error", "Could not find file " + path, MB_ICONERROR);
+			return;
+		}
+		if (pal == game->characterPaths[character].palettes.end()) {
+			Utils::dispMsg("Loading error", "Could not find palette " + editSession.palName, MB_ICONERROR);
+			return;
+		}
+
+		editSession.chr = character;
+		editSession.palName = pal->first;
+		editSession.palette = &pal->second;
+		tempSchema.destroy();
+		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, entry.open());
+		entry.close();
+		try {
+			object.reset();
+			object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
+			loadedPath = path;
+			refreshRightPanel(gui, object);
+			bar->setMenuEnabled({"New"}, true);
+			bar->setMenuEnabled({"Remove"}, true);
+			bar->setMenuEnabled({"Misc"}, true);
+			bar->setMenuItemEnabled({"File", "Export..."}, true);
+			bar->setMenuItemEnabled({"File", "Import...", "palette..."}, true);
+		} catch (std::exception &e) {
+			Utils::dispMsg("Error", e.what(), MB_ICONERROR);
+			loadedPath = path;
+			refreshRightPanel(gui, object);
+			bar->setMenuEnabled({"New"}, false);
+			bar->setMenuEnabled({"Remove"}, false);
+			bar->setMenuEnabled({"Misc"}, false);
+			bar->setMenuItemEnabled({"File", "Export..."}, false);
+			bar->setMenuItemEnabled({"File", "Import...", "palette..."}, false);
+		}
+		displayPalEditor(object, gui);
+	};*/
 
 	if (icon.loadFromFile("assets/editorIcon.png"))
 		game->screen->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
@@ -3614,7 +3787,19 @@ void	run()
 	view.setSize(game->screen->getSize().x, game->screen->getSize().y);
 	game->screen->setView(view);
 	gui.setView(guiView);
+	/*while (current->first != "nue")
+		current++;
+	current++;*/
 	while (game->screen->isOpen()) {
+		/*if (current != game->characterPaths.end() && !gui.get<tgui::ChildWindow>("LoadingWindow")) {
+			if (std::filesystem::exists("exported/" + current->first + ".pat"))
+				lff("exported/" + current->first + ".pat", current->first);
+			else
+				lfp(current->first);
+			startExport(false, true, true, true, sf::Color::Transparent);
+			object->render(true);
+			current++;
+		}*/
 		if (!hovering)
 			timer++;
 		game->screen->clear(bgColor);

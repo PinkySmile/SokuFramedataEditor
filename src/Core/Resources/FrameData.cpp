@@ -108,6 +108,7 @@ namespace SpiralOfFate
 		_character(other._character),
 		_palette(other._palette),
 		_schema(other._schema),
+		parent(other.parent),
 		frame(other.frame)
 	{
 		this->textureHandle = other.textureHandle;
