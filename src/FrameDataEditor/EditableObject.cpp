@@ -79,7 +79,7 @@ std::pair<SpiralOfFate::Vector2i, SpiralOfFate::Vector2u> EditableObject::setupS
 	result += translate;
 	this->_sprite.setOrigin(bounds / 2);
 	if (data.frame->hasBlendOptions()) {
-		auto pos = result.rotation(data.frame->blendOptions.angle * M_PI / 180, {0, 0});
+		auto pos = result;
 		auto trueScale = scale;
 
 		this->_sprite.setRotation(data.frame->blendOptions.angle);
@@ -89,15 +89,16 @@ std::pair<SpiralOfFate::Vector2i, SpiralOfFate::Vector2u> EditableObject::setupS
 			static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
 			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
 		});
-		// TODO: These are actually X and Y rotation
-		if (data.frame->blendOptions.flipVert) {
-			texBounds.top += texBounds.height;
-			texBounds.height *= -1;
-		}
-		if (data.frame->blendOptions.flipHorz) {
-			texBounds.left += texBounds.width;
-			texBounds.width *= -1;
-		}
+
+		// X rotation
+		pos.y *= std::cos(data.frame->blendOptions.flipVert * M_PI / 180);
+		trueScale.y *= std::cos(data.frame->blendOptions.flipVert * M_PI / 180);
+
+		// Y rotation
+		pos.x *= std::cos(data.frame->blendOptions.flipHorz * M_PI / 180);
+		trueScale.x *= std::cos(data.frame->blendOptions.flipHorz * M_PI / 180);
+
+		pos.rotate(data.frame->blendOptions.angle * M_PI / 180, {0, 0});
 		this->_sprite.setPosition(pos);
 		this->_sprite.setScale(trueScale);
 	} else {
