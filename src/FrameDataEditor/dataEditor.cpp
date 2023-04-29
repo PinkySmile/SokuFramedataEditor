@@ -673,9 +673,12 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	action->connect("ReturnKeyPressed", [&object, block](const std::string &t){
 		if (t.empty())
 			return;
+
 		auto newAction = std::stoul(t);
+
 		if (object->_moves.find(newAction) == object->_moves.end())
-			object->_moves.emplace(newAction, object->_moves[object->_action]);
+		//	object->_moves.emplace(newAction, object->_moves[object->_action]);
+			return;
 		object->_action = newAction;
 		block->setMaximum(object->_moves[object->_action].size() - 1);
 		block->setMinimum(0);
@@ -3796,7 +3799,7 @@ LONG WINAPI UnhandledExFilter(PEXCEPTION_POINTERS ExPtr)
 	time(&timer);
 	tm_info = localtime(&timer);
 	strftime(timebuffer, 26, "%Y%m%d%H%M%S", tm_info);
-	mkdir("crash_dumps");
+	mkdir("crash_dumps", 0);
 	sprintf(buf2, "crash_dumps/crash_%s.dmp", timebuffer);
 
 	HANDLE hFile = CreateFile(buf2, GENERIC_READ | GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
