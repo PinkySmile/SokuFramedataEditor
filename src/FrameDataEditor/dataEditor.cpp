@@ -1348,7 +1348,7 @@ void openFramedataFromPackage(std::unique_ptr<EditableObject> &object, tgui::Men
 
 	window->setTitle("Select character's framedata to load");
 	std::sort(chrs.begin(), chrs.end());
-	list->connect("DoubleClicked", [&object, bar, &gui, window](std::string character){
+	list->connect("DoubleClicked", [&object, bar, &gui, window](const std::string &character){
 		editSession.palName = "data/character/" + character + "/palette000.pal";
 
 		//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
@@ -2639,7 +2639,7 @@ sf::Image createExportImage(std::unique_ptr<EditableObject> &object, bool cb, bo
 				for (unsigned y = 0; y < a.getSize().y; y++) {
 					auto color = a.getPixel(x, y);
 
-					color.a = std::max(color.r, std::max(color.g, color.b));
+					color.a = color.a * std::max(color.r, std::max(color.g, color.b)) / 255;
 					a.setPixel(x, y, color);
 				}
 			tempTexture.loadFromImage(a);
@@ -2654,7 +2654,7 @@ sf::Image createExportImage(std::unique_ptr<EditableObject> &object, bool cb, bo
 				for (unsigned y = 0; y < a.getSize().y; y++) {
 					auto color = a.getPixel(x, y);
 
-					color.a = std::max(color.r, std::max(color.g, color.b));
+					color.a = color.a * std::max(color.r, std::max(color.g, color.b)) / 255;
 					color.r = 255 - color.r;
 					color.g = 255 - color.g;
 					color.b = 255 - color.b;
@@ -2675,26 +2675,52 @@ sf::Image createExportImage(std::unique_ptr<EditableObject> &object, bool cb, bo
 	texture.draw(object->_sprite, state);
 	rect.setOutlineThickness(1);
 	if (hurtb) {
-		rect.setFillColor(sf::Color{0x00, 0xFF, 0x00, 0x60});
-		rect.setOutlineColor(sf::Color{0x00, 0xFF, 0x00});
 		for (auto &box : data.frame->hBoxes) {
 			rect.setPosition(-spriteData.first.x + box.left + 10, -spriteData.first.y + box.up + 10);
-			rect.setSize({
-				static_cast<float>(box.right - box.left),
-				static_cast<float>(box.down - box.up)
-			});
+			if (box.right == box.left || box.down == box.up) {
+				auto size = sf::Vector2f{
+					static_cast<float>(box.right - box.left),
+					static_cast<float>(box.down - box.up)
+				};
+
+				size.x = std::max(size.x, 1.f);
+				size.y = std::max(size.y, 1.f);
+				rect.setFillColor(sf::Color{0x00, 0xFF, 0x00});
+				rect.setOutlineColor(sf::Color::Transparent);
+				rect.setSize(size);
+			} else {
+				rect.setFillColor(sf::Color{0x00, 0xFF, 0x00, 0x60});
+				rect.setOutlineColor(sf::Color{0x00, 0xFF, 0x00});
+				rect.setSize({
+					static_cast<float>(box.right - box.left),
+					static_cast<float>(box.down - box.up)
+				});
+			}
 			texture.draw(rect);
 		}
 	}
 	if (hitb) {
-		rect.setFillColor(sf::Color{0xFF, 0x00, 0x00, 0x60});
-		rect.setOutlineColor(sf::Color{0xFF, 0x00, 0x00});
 		for (auto &box : data.frame->aBoxes) {
 			rect.setPosition(-spriteData.first.x + box.left + 10, -spriteData.first.y + box.up + 10);
-			rect.setSize({
-				static_cast<float>(box.right - box.left),
-				static_cast<float>(box.down - box.up)
-			});
+			if (box.right == box.left || box.down == box.up) {
+				auto size = sf::Vector2f{
+					static_cast<float>(box.right - box.left),
+					static_cast<float>(box.down - box.up)
+				};
+
+				size.x = std::max(size.x, 1.f);
+				size.y = std::max(size.y, 1.f);
+				rect.setOutlineColor(sf::Color{0xFF, 0x00, 0x00});
+				rect.setOutlineColor(sf::Color::Transparent);
+				rect.setSize(size);
+			} else {
+				rect.setFillColor(sf::Color{0xFF, 0x00, 0x00, 0x60});
+				rect.setOutlineColor(sf::Color{0xFF, 0x00, 0x00});
+				rect.setSize({
+					static_cast<float>(box.right - box.left),
+					static_cast<float>(box.down - box.up)
+				});
+			}
 			texture.draw(rect);
 		}
 	}
