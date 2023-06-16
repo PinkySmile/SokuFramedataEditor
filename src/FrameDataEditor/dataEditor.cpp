@@ -2146,11 +2146,13 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 			l
 		};
 		sf::Color temp = HSLtoRGB(color);
-		tgui::Color tcolor{buffer};
 
 		sprintf(buffer, "#%02X%02X%02X", temp.r, temp.g, temp.b);
 		light->setValue(l);
 		edit->setText(buffer);
+
+		tgui::Color tcolor{buffer};
+
 		preview->getRenderer()->setBackgroundColor(tcolor);
 		updatePalButton({
 			tcolor.getRed(),
