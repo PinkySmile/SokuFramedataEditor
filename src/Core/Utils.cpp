@@ -237,6 +237,11 @@ namespace Utils
 		for (auto &entry : std::filesystem::directory_iterator(currentPath))
 			paths.push_back(entry);
 
+		std::sort(paths.begin(), paths.end(), [](std::filesystem::directory_entry &a, std::filesystem::directory_entry &b){
+			if (a.is_directory() != b.is_directory())
+				return a.is_directory();
+			return a.path() < b.path();
+		});
 		panel->removeAllWidgets();
 		for (auto &entry : paths) {
 			std::string pic;
