@@ -261,6 +261,7 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 		(data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 100) / 100.f
 	};
 
+	game->logger.debug("Refresh boxes");
 	panel->removeAllWidgets();
 	renderer->setBackgroundColor({0xFF, 0xFF, 0xFF, 0x00});
 	renderer->setBackgroundColorDown({0xFF, 0xFF, 0xFF, 0xA0});
@@ -1693,6 +1694,11 @@ void	newFrameCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, t
 
 void	newEndFrameCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr panel)
 {
+	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+	auto it = object->_moves.at(object->_action)[object->_actionBlock].begin() + object->_animation;
+	auto f = new ShadyCore::Schema::Sequence::MoveFrame(*data.frame);
+
+	data.parent->frames.push_back(f);
 	object->_moves.at(object->_action)[object->_actionBlock].push_back(object->_moves.at(object->_action)[object->_actionBlock][object->_animation]);
 
 	auto oldBlock = object->_actionBlock;
@@ -1783,7 +1789,9 @@ void	removeFrameCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::P
 		selectBox(nullptr, nullptr);
 		return;
 	}
+	arr[object->_animation].parent->frames.erase(arr[object->_animation].parent->frames.begin() + object->_animation);
 	arr.erase(arr.begin() + object->_animation);
+
 	if (object->_animation == arr.size())
 		object->_animation--;
 	refreshBoxes(boxes, arr[object->_animation], object);
@@ -3252,6 +3260,18 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 	}
 }
 
+bool	isEditBoxSelected(const tgui::Panel::Ptr &panel)
+{
+	auto &widgets = panel->getWidgets();
+
+	return std::any_of(widgets.begin(), widgets.end(), [](const tgui::Widget::Ptr &widget){
+		auto box = widget->cast<tgui::EditBox>();
+		auto pan = widget->cast<tgui::Panel>();
+
+		return (pan && isEditBoxSelected(pan)) || (box && box->isFocused());
+	});
+}
+
 void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &object, tgui::Gui &gui)
 {
 	auto bar = gui.get<tgui::MenuBar>("main_bar");
@@ -3298,6 +3318,28 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 				removeAnimationBlockCallback(object);
 			else
 				removeBoxCallback(boxes, object, panel);
+		}
+
+		if (event.code == sf::Keyboard::C) {
+			if (event.control) {
+				if (!isEditBoxSelected(panel))
+					sf::Clipboard::setString(object->_moves[object->_action][object->_actionBlock][object->_animation].saveBoxes().dump());
+			}
+		}
+
+		if (event.code == sf::Keyboard::V) {
+			if (event.control) {
+				if (isEditBoxSelected(panel))
+					return;
+				try {
+					object->_moves[object->_action][object->_actionBlock][object->_animation].loadBoxes(
+						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
+					);
+					refreshFrameDataPanel(panel, boxes, object);
+				} catch (std::exception &e) {
+					SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+				}
+			}
 		}
 	}
 }

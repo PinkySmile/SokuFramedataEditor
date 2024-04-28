@@ -208,6 +208,77 @@ namespace SpiralOfFate
 		return *this;
 	}
 
+	nlohmann::json FrameData::saveBoxes() const
+	{
+		nlohmann::json j{
+			{ "collision", std::vector<std::string>() },
+			{ "attack", std::vector<std::string>() },
+			{ "hit", std::vector<std::string>() }
+		};
+
+		for (auto &b : this->frame->cBoxes)
+			j["collision"].push_back({
+				{ "left", b.left },
+				{ "right", b.right },
+				{ "up", b.up },
+				{ "down", b.down },
+			});
+		for (auto &b : this->frame->aBoxes)
+			j["attack"].push_back({
+				{ "left", b.left },
+				{ "right", b.right },
+				{ "up", b.up },
+				{ "down", b.down },
+			});
+		for (auto &b : this->frame->hBoxes)
+			j["hit"].push_back({
+				{ "left", b.left },
+				{ "right", b.right },
+				{ "up", b.up },
+				{ "down", b.down },
+			});
+		return j;
+	}
+
+	void FrameData::loadBoxes(const nlohmann::json &j)
+	{
+		auto cBoxes = this->frame->cBoxes;
+		auto aBoxes = this->frame->aBoxes;
+		auto hBoxes = this->frame->hBoxes;
+
+		this->frame->cBoxes.clear();
+		this->frame->aBoxes.clear();
+		this->frame->hBoxes.clear();
+		try {
+			for (auto &b : j["collision"])
+				this->frame->cBoxes.push_back({
+					.left = b["left"],
+					.up = b["up"],
+					.right = b["right"],
+					.down = b["down"]
+				});
+			for (auto &b : j["attack"])
+				this->frame->aBoxes.push_back({
+					.left = b["left"],
+					.up = b["up"],
+					.right = b["right"],
+					.down = b["down"]
+				});
+			for (auto &b : j["hit"])
+				this->frame->hBoxes.push_back({
+					.left = b["left"],
+					.up = b["up"],
+					.right = b["right"],
+					.down = b["down"]
+				});
+		} catch (...) {
+			this->frame->cBoxes = cBoxes;
+			this->frame->aBoxes = aBoxes;
+			this->frame->hBoxes = hBoxes;
+			throw;
+		}
+	}
+
 	Box::operator sf::IntRect() const noexcept
 	{
 		return {
