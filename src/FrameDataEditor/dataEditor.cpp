@@ -48,6 +48,7 @@ std::array<tgui::Button::Ptr, 8> resizeButtons;
 std::string swr;
 std::string soku;
 std::string soku2;
+std::vector<std::string> extra;
 sf::Color bgColor = sf::Color::Black;
 sf::Image selectedColorMaskImage;
 sf::Sprite selectedColorMaskSprite;
@@ -222,6 +223,8 @@ void loadPackages()
 	} catch (const std::exception &e) {
 		game->logger.error("Error loading soku2: " + std::string(e.what()));
 	}
+	for (auto &path : extra)
+		paths.emplace_front(path);
 
 	game->package.clear();
 	game->characterPaths.clear();
@@ -2363,6 +2366,7 @@ void	saveSettings()
 	json["swr"] = swr;
 	json["soku"] = soku;
 	json["soku2"] = soku2;
+	json["extra"] = extra;
 	json["bgColor"] = bgColor.toInteger();
 
 	std::ofstream stream("assets/settings.json");
@@ -2403,7 +2407,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 	renderer->setBackgroundColorHover(bgColor);
 
 	sokuBrowse->connect("Clicked", [newSoku, sokuPath]{
-		auto path = Utils::openFileDialog("Select Soku dat", *newSoku + "\\th123a.dat", {{"th123.\\.dat", "Touhou 12.3 dat file"}});
+		auto path = Utils::openFileDialog("Select Soku dat", *newSoku + std::filesystem::path::preferred_separator + "th123a.dat", {{"th123.\\.dat", "Touhou 12.3 dat file"}});
 
 		if (path.empty())
 			return;
@@ -2412,7 +2416,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 		sokuPath->setText(path);
 	});
 	swrBrowse->connect("Clicked", [newSwr, swrPath]{
-		auto path = Utils::openFileDialog("Select SWR dat", *newSwr + "\\th105a.dat", {{"th105.\\.dat", "Touhou 10.5 dat file"}});
+		auto path = Utils::openFileDialog("Select SWR dat", *newSwr + std::filesystem::path::preferred_separator + "th105a.dat", {{"th105.\\.dat", "Touhou 10.5 dat file"}});
 
 		if (path.empty())
 			return;
@@ -2421,7 +2425,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 		swrPath->setText(path);
 	});
 	soku2Browse->connect("Clicked", [newSoku2, soku2Path]{
-		auto path = Utils::openFileDialog("Select Soku2 folder", newSoku2->substr(0, newSoku2->find_last_of('\\')) + "\\SOKU2.dll", {{"SOKU2\\.dll", "Soku2 mod file"}});
+		auto path = Utils::openFileDialog("Select Soku2 folder", newSoku2->substr(0, newSoku2->find_last_of(std::filesystem::path::preferred_separator)) + std::filesystem::path::preferred_separator + "SOKU2.dll", {{"SOKU2\\.dll", "Soku2 mod file"}});
 
 		if (path.empty())
 			return;
@@ -3312,6 +3316,7 @@ void	loadSettings()
 		swr = json["swr"];
 		soku = json["soku"];
 		soku2 = json["soku2"];
+		extra = json.contains("extra") ? json["extra"].get<std::vector<std::string>>() : std::vector<std::string>{};
 		bgColor = json.contains("bgColor") ? sf::Color(json["bgColor"]) : sf::Color::Black;
 		bgColor.a = 255;
 	}
