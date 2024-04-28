@@ -83,12 +83,7 @@ std::pair<SpiralOfFate::Vector2i, SpiralOfFate::Vector2u> EditableObject::setupS
 		auto trueScale = scale;
 
 		this->_sprite.setRotation(data.frame->blendOptions.angle);
-		this->_sprite.setColor(sf::Color{
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
-		});
+		this->_sprite.setColor(SokuColor(data.frame->blendOptions.color));
 
 		// X rotation
 		pos.y *= std::cos(data.frame->blendOptions.flipVert * M_PI / 180);

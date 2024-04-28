@@ -403,14 +403,9 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
 	auto renderer = blendColorBut->getRenderer();
 	char buffer[10];
-	auto color = sf::Color{
-		static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
-		static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
-		static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
-		static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
-	};
+	sf::Color color = SokuColor(data.frame->blendOptions.color);
 
-	sprintf(buffer, "#%08x", data.frame->blendOptions.color);
+	sprintf(buffer, "#%08X", data.frame->blendOptions.color);
 	game->logger.debug("Soft refresh");
 	*c = true;
 	actionName->setText(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second);
@@ -753,12 +748,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		data.frame->blendOptions.color = std::stoul(t.substr(1), nullptr, 16);
 
-		auto color = sf::Color{
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
-		};
+		sf::Color color = SokuColor(data.frame->blendOptions.color);
 
 		renderer->setBackgroundColor(color);
 		renderer->setBackgroundColorDisabled(color);
@@ -768,17 +758,12 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	});
 	blendColorBut->connect("Clicked", [&gui, &object, blendColor](){
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-		auto color = sf::Color{
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 16) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 8) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 0) & 0xFF),
-			static_cast<unsigned char>((data.frame->blendOptions.color >> 24) & 0xFF)
-		};
+		sf::Color color = SokuColor(data.frame->blendOptions.color);
 
 		Utils::makeColorPickWindow(gui, [blendColor](sf::Color col){
 			char buffer[10];
 
-			sprintf(buffer, "#%02x%02x%02x%02x", col.a, col.r, col.g, col.b);
+			sprintf(buffer, "#%08X", SokuColor(col.r, col.g, col.b, col.a).color);
 			blendColor->setText(buffer);
 		}, color);
 	});

@@ -8,6 +8,22 @@
 
 #include <SoFGV.hpp>
 
+struct SokuColor {
+	union {
+		struct {
+			unsigned char a;
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+		};
+		unsigned color;
+	};
+
+	SokuColor(unsigned c) : color(c) {}
+	SokuColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : a(a), r(r), g(g), b(b) {}
+	operator sf::Color() { return {r, g, b, a}; }
+};
+
 class EditableObject : public SpiralOfFate::IObject {
 public:
 	float scale = 1;
