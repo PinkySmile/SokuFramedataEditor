@@ -50,10 +50,20 @@ std::pair<SpiralOfFate::Vector2i, SpiralOfFate::Vector2u> EditableObject::setupS
 		data.reloadTexture();
 	this->_setuped = &data;
 
-	SpiralOfFate::Vector2f scale{
-		s * (data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleX : 200) / 100.f,
-		s * (data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleY : 200) / 100.f
-	};
+	SpiralOfFate::Vector2f scale;
+
+	if (data.frame->renderGroup == 0) {
+		scale.x = 2;
+		scale.y = 2;
+	} else if (data.frame->renderGroup == 2) {
+		scale.x = data.frame->blendOptions.scaleX / 100.f;
+		scale.y = data.frame->blendOptions.scaleY / 100.f;
+	} else {
+		scale.x = 1;
+		scale.y = 1;
+	}
+	scale.x *= s;
+	scale.y *= s;
 	SpiralOfFate::Vector2f scaleReal{
 		(data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleX : 100) / 100.f,
 		(data.frame->hasBlendOptions() ? data.frame->blendOptions.scaleY : 100) / 100.f

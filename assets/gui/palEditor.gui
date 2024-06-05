@@ -94,12 +94,12 @@ Label.Label4 {
     renderer = &2;
 }
 
-Label.Label5 {
+Label.ColorN {
     AutoSize = true;
     Position = (60, 263);
     ScrollbarPolicy = Never;
-    Size = (36.2, 18);
-    Text = Color;
+    Size = (59.2, 18);
+    Text = "Color #0";
     TextSize = 13;
     renderer = &2;
 }
@@ -1591,16 +1591,18 @@ ComboBox.Palettes {
     ExpandDirection = Down;
     ItemsToDisplay = 0;
     MaximumItems = 0;
-    Position = (120, 260);
-    Size = (360, 22);
+    Position = (140, 260);
+    Size = (340, 22);
     TextSize = 13;
 
     Renderer {
         padding = (3, 3, 3, 3);
         textcolor = rgb(190, 190, 190);
         texturearrow = "assets/gui/themes/Black.png" Part(60, 0, 32, 32);
+        texturearrowdisabled = None;
         texturearrowhover = "assets/gui/themes/Black.png" Part(60, 32, 32, 32);
         texturebackground = "assets/gui/themes/Black.png" Part(0, 154, 48, 48) Middle(16, 16, 16, 16);
+        texturebackgrounddisabled = None;
 
         listbox {
             backgroundcolorhover = rgb(100, 100, 100);

@@ -55,6 +55,7 @@ namespace SpiralOfFate
 		if (size)
 			*size = this->_textures[index].getSize();
 
+		this->_textures[index].setRepeated(true);
 		this->_allocatedTextures[file].first = index;
 		this->_allocatedTextures[file].second = 1;
 		return index;
@@ -141,6 +142,7 @@ namespace SpiralOfFate
 		if (size)
 			*size = this->_textures[index].getSize();
 
+		this->_textures[index].setRepeated(true);
 		this->_allocatedTextures[palName + "|" + file].first = index;
 		this->_allocatedTextures[palName + "|" + file].second = 1;
 		return index;
@@ -188,8 +190,10 @@ namespace SpiralOfFate
 
 	void TextureManager::setTexture(Sprite &sprite) const
 	{
-		if (!sprite.textureHandle)
+		if (!sprite.textureHandle) {
+			sprite.setTexture(*(sf::Texture *)nullptr);
 			return;
+		}
 		sprite.setTexture(this->_textures.at(sprite.textureHandle));
 	}
 

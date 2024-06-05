@@ -7,6 +7,22 @@
 #include "Game.hpp"
 #include "Utils.hpp"
 
+uint32_t getOrCreateImage(ShadyCore::Schema &schema, const std::string_view& name)
+{
+	for (size_t i = 0; i < schema.images.size(); ++i)
+		if (
+			strncmp(schema.images[i].name, name.data(), name.size()) == 0 &&
+			schema.images[i].name[name.size()] == '\0'
+			)
+			return i;
+
+	auto res = new char[name.size() + 1];
+
+	strcpy(res, name.data());
+	schema.images.emplace_back(res);
+	return schema.images.size() - 1;
+}
+
 namespace SpiralOfFate
 {
 	std::map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadSchema(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName)
@@ -208,7 +224,7 @@ namespace SpiralOfFate
 		return *this;
 	}
 
-	nlohmann::json FrameData::saveBoxes() const
+	nlohmann::json FrameData::saveData() const
 	{
 		nlohmann::json j{
 			{ "collision", std::vector<std::string>() },
@@ -237,10 +253,129 @@ namespace SpiralOfFate
 				{ "up", b.up },
 				{ "down", b.down },
 			});
+		j["sprite"] = this->_schema->images.at(this->frame->imageIndex).name;
+		j["unknown"] = this->frame->unknown;
+		j["texOffsetX"] = this->frame->texOffsetX;
+		j["texOffsetY"] = this->frame->texOffsetY;
+		j["texWidth"] = this->frame->texWidth;
+		j["texHeight"] = this->frame->texHeight;
+		j["offsetX"] = this->frame->offsetX;
+		j["offsetY"] = this->frame->offsetY;
+		j["duration"] = this->frame->duration;
+		j["renderGroup"] = this->frame->renderGroup;
+		j["blendMode"] = this->frame->blendOptions.mode;
+		j["blendColor"] = this->frame->blendOptions.color;
+		j["blendScaleX"] = this->frame->blendOptions.scaleX;
+		j["blendScaleY"] = this->frame->blendOptions.scaleY;
+		j["blendFlipVert"] = this->frame->blendOptions.flipVert;
+		j["blendFlipHorz"] = this->frame->blendOptions.flipHorz;
+		j["blendAngle"] = this->frame->blendOptions.angle;
 		return j;
 	}
 
-	void FrameData::loadBoxes(const nlohmann::json &j)
+	void FrameData::_loadSpriteInfo(const nlohmann::json &json)
+	{
+		this->frame->imageIndex = getOrCreateImage(const_cast<ShadyCore::Schema &>(*this->_schema), json["sprite"].get<std::string>());
+		this->frame->unknown = json["unknown"];
+		this->frame->texOffsetX = json["texOffsetX"];
+		this->frame->texOffsetY = json["texOffsetY"];
+		this->frame->texWidth = json["texWidth"];
+		this->frame->texHeight = json["texHeight"];
+		this->frame->offsetX = json["offsetX"];
+		this->frame->offsetY = json["offsetY"];
+		this->frame->duration = json["duration"];
+		this->frame->renderGroup = json["renderGroup"];
+		this->frame->blendOptions.mode = json["blendMode"];
+		this->frame->blendOptions.color = json["blendColor"];
+		this->frame->blendOptions.scaleX = json["blendScaleX"];
+		this->frame->blendOptions.scaleY = json["blendScaleY"];
+		this->frame->blendOptions.flipVert = json["blendFlipVert"];
+		this->frame->blendOptions.flipHorz = json["blendFlipHorz"];
+		this->frame->blendOptions.angle = json["blendAngle"];
+	}
+
+	void FrameData::_loadBoxes(const nlohmann::json &json)
+	{
+		for (auto &b : json["collision"])
+			this->frame->cBoxes.push_back({
+				.left = b["left"],
+				.up = b["up"],
+				.right = b["right"],
+				.down = b["down"]
+			});
+		for (auto &b : json["attack"])
+			this->frame->aBoxes.push_back({
+				.left = b["left"],
+				.up = b["up"],
+				.right = b["right"],
+				.down = b["down"]
+			});
+		for (auto &b : json["hit"])
+			this->frame->hBoxes.push_back({
+				.left = b["left"],
+				.up = b["up"],
+				.right = b["right"],
+				.down = b["down"]
+			});
+	}
+
+	void FrameData::loadData(const nlohmann::json &json)
+	{
+		auto cBoxes = this->frame->cBoxes;
+		auto aBoxes = this->frame->aBoxes;
+		auto hBoxes = this->frame->hBoxes;
+		ShadyCore::Schema::Sequence::Frame _frame = *this->frame;
+
+		this->frame->cBoxes.clear();
+		this->frame->aBoxes.clear();
+		this->frame->hBoxes.clear();
+		try {
+			this->_loadBoxes(json);
+			this->_loadSpriteInfo(json);
+		} catch (...) {
+			this->frame->cBoxes = cBoxes;
+			this->frame->aBoxes = aBoxes;
+			this->frame->hBoxes = hBoxes;
+			this->frame->imageIndex = _frame.imageIndex;
+			this->frame->unknown = _frame.unknown;
+			this->frame->texOffsetX = _frame.texOffsetX;
+			this->frame->texOffsetY = _frame.texOffsetY;
+			this->frame->texWidth = _frame.texWidth;
+			this->frame->texHeight = _frame.texHeight;
+			this->frame->offsetX = _frame.offsetX;
+			this->frame->offsetY = _frame.offsetY;
+			this->frame->duration = _frame.duration;
+			this->frame->renderGroup = _frame.renderGroup;
+			this->frame->blendOptions = _frame.blendOptions;
+			throw;
+		}
+		this->reloadTexture();
+	}
+
+	void FrameData::loadSpriteInfo(const nlohmann::json &json)
+	{
+		ShadyCore::Schema::Sequence::Frame _frame = *this->frame;
+
+		try {
+			this->_loadSpriteInfo(json);
+		} catch (...) {
+			this->frame->imageIndex = _frame.imageIndex;
+			this->frame->unknown = _frame.unknown;
+			this->frame->texOffsetX = _frame.texOffsetX;
+			this->frame->texOffsetY = _frame.texOffsetY;
+			this->frame->texWidth = _frame.texWidth;
+			this->frame->texHeight = _frame.texHeight;
+			this->frame->offsetX = _frame.offsetX;
+			this->frame->offsetY = _frame.offsetY;
+			this->frame->duration = _frame.duration;
+			this->frame->renderGroup = _frame.renderGroup;
+			this->frame->blendOptions = _frame.blendOptions;
+			throw;
+		}
+		this->reloadTexture();
+	}
+
+	void FrameData::loadBoxes(const nlohmann::json &json)
 	{
 		auto cBoxes = this->frame->cBoxes;
 		auto aBoxes = this->frame->aBoxes;
@@ -250,27 +385,7 @@ namespace SpiralOfFate
 		this->frame->aBoxes.clear();
 		this->frame->hBoxes.clear();
 		try {
-			for (auto &b : j["collision"])
-				this->frame->cBoxes.push_back({
-					.left = b["left"],
-					.up = b["up"],
-					.right = b["right"],
-					.down = b["down"]
-				});
-			for (auto &b : j["attack"])
-				this->frame->aBoxes.push_back({
-					.left = b["left"],
-					.up = b["up"],
-					.right = b["right"],
-					.down = b["down"]
-				});
-			for (auto &b : j["hit"])
-				this->frame->hBoxes.push_back({
-					.left = b["left"],
-					.up = b["up"],
-					.right = b["right"],
-					.down = b["down"]
-				});
+			this->_loadBoxes(json);
 		} catch (...) {
 			this->frame->cBoxes = cBoxes;
 			this->frame->aBoxes = aBoxes;

@@ -95,6 +95,9 @@ namespace SpiralOfFate
 		std::string _character;
 		const ShadyCore::Palette *_palette;
 
+		void _loadBoxes(const nlohmann::json &json);
+		void _loadSpriteInfo(const nlohmann::json &json);
+
 	public:
 		const ShadyCore::Schema *_schema;
 		unsigned textureHandle = 0;
@@ -114,8 +117,10 @@ namespace SpiralOfFate
 		void reloadTexture();
 		void reloadSound();
 		void setPalette(const ShadyCore::Palette &palette, const std::string &name);
-		nlohmann::json saveBoxes() const;
+		nlohmann::json saveData() const;
+		void loadData(const nlohmann::json &json);
 		void loadBoxes(const nlohmann::json &json);
+		void loadSpriteInfo(const nlohmann::json &json);
 
 		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadSchema(const std::string &chr, const ShadyCore::Schema &schema, const ShadyCore::Palette &palette, const std::string &palName);
 	};

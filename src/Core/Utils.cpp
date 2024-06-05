@@ -225,8 +225,9 @@ namespace Utils
 		std::filesystem::path &currentPath,
 		const tgui::ScrollablePanel::Ptr &panel,
 		const tgui::EditBox::Ptr &file,
-		const std::function<void()> &open,
-		const std::regex &pattern = std::regex(".*", std::regex_constants::icase)
+		const std::function<void(bool)> &open,
+		const std::regex &pattern = std::regex(".*", std::regex_constants::icase),
+		bool onlyFolders = false
 	) {
 		auto pos = 10;
 		std::vector<std::filesystem::directory_entry> paths = {
@@ -268,7 +269,7 @@ namespace Utils
 			button->setSize({"&.w - 40", 20});
 			button->connect("Clicked", [button, file, fileStr, &open]{
 				if (file->getText() == fileStr)
-					open();
+					open(false);
 				else
 					file->setText(fileStr);
 			});
@@ -327,72 +328,87 @@ namespace Utils
 		);
 	}
 
-	std::string openFileDialog(const std::string &title, const std::string &basePath, const std::vector<std::pair<std::string, std::string>> &patterns, bool overWriteWarning, bool mustExist)
+	std::string openFileDialog(const std::string &title, const std::string &basePath, const std::vector<std::pair<std::string, std::string>> &patterns, bool overWriteWarning, bool mustExist, bool allowFolder)
 	{
 #ifdef _WIN32
-		std::filesystem::path cwd = std::filesystem::current_path();
-		OPENFILENAME ofn;
-		char fileName[MAX_PATH];
-		char *pattern;
-		size_t size = strlen("All Files*.*") + 3;
-		std::vector<std::pair<std::string, std::string>> pats;
+		if (!allowFolder) {
+			std::filesystem::path cwd = std::filesystem::current_path();
+			OPENFILENAME ofn;
+			char fileName[MAX_PATH];
+			char *pattern;
+			size_t size = strlen("All Files*.*") + 3;
+			std::vector<std::pair<std::string, std::string>> pats;
+			std::regex reg{R"(\*\.\w+)"};
 
-		for (auto &pat : patterns) {
-			std::string result;
+			for (auto &pat : patterns) {
+				std::string result;
 
-			result.reserve(pat.first.size());
-			for (int i = 0; i < pat.first.size(); i++) {
-				if (pat.first[i] == '*')
-					continue;
-				if (pat.first[i] == '\\') {
-					result += pat.first[++i];
-					continue;
+				result.reserve(pat.first.size());
+				for (int i = 0; i < pat.first.size(); i++) {
+					if (pat.first[i] == '*')
+						continue;
+					if (pat.first[i] == '\\') {
+						result += pat.first[++i];
+						continue;
+					}
+					if (pat.first[i] == '.')
+						result += '*';
+					else
+						result += pat.first[i];
 				}
-				if (pat.first[i] == '.')
-					result += '*';
-				else
-					result += pat.first[i];
+				pats.emplace_back(result, pat.second);
 			}
-			pats.emplace_back(result, pat.second);
-		}
-		pats.emplace_back("*.*", "All Files");
-		for (auto &pat : pats)
-			size += strlen(pat.first.c_str()) + strlen(pat.second.c_str()) + 2;
-		pattern = new char[size + 1];
-		size = 0;
-		for (auto &pat : pats) {
-			strcpy(pattern + size, pat.second.c_str());
-			size += pat.second.size() + 1;
-			strcpy(pattern + size, pat.first.c_str());
-			size += pat.first.size() + 1;
-		}
-		pattern[size] = '\0';
+			pats.emplace_back("*.*", "All Files");
+			for (auto &pat : pats)
+				size += strlen(pat.first.c_str()) + strlen(pat.second.c_str()) + 2;
+			pattern = new char[size + 1];
+			size = 0;
+			for (auto &pat : pats) {
+				strcpy(pattern + size, pat.second.c_str());
+				size += pat.second.size() + 1;
+				strcpy(pattern + size, pat.first.c_str());
+				size += pat.first.size() + 1;
+			}
+			pattern[size] = '\0';
 
-		if (basePath != ".")
-			strcpy(fileName, basePath.c_str());
-		else
-			*fileName = 0;
-		ZeroMemory(&ofn, sizeof(OPENFILENAME));
-		ofn.lStructSize = sizeof(OPENFILENAME);
-		ofn.hwndOwner = NULL;
-		ofn.lpstrFilter = pattern;
-		ofn.lpstrFile = fileName;
-		ofn.nMaxFile = MAX_PATH;
-		ofn.lpstrTitle = title.c_str();
-		ofn.lpstrInitialDir = basePath.c_str();
-		ofn.Flags = OFN_ENABLESIZING | OFN_EXPLORER;
-		if (overWriteWarning)
-			ofn.Flags |= OFN_OVERWRITEPROMPT;
-		if (mustExist)
-			ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+			if (basePath != ".")
+				strcpy(fileName, std::filesystem::path(basePath).filename().string().c_str());
+			else
+				*fileName = 0;
+			ZeroMemory(&ofn, sizeof(OPENFILENAME));
+			ofn.lStructSize = sizeof(OPENFILENAME);
+			ofn.lpstrFilter = pattern;
+			ofn.lpstrFile = fileName;
+			for (auto &pat : pats) {
+				if (std::regex_search(pat.first, reg)) {
+					ofn.lpstrDefExt = pat.first.c_str() + 1;
+					break;
+				}
+			}
+			ofn.nMaxFile = MAX_PATH;
+			ofn.lpstrTitle = title.c_str();
+			ofn.lpstrInitialDir = std::filesystem::path(basePath).parent_path().string().c_str();
+			ofn.Flags = OFN_ENABLESIZING | OFN_EXPLORER;
+			if (overWriteWarning)
+				ofn.Flags |= OFN_OVERWRITEPROMPT;
+			if (mustExist)
+				ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-		bool r = GetOpenFileName(&ofn);
+			bool r = (overWriteWarning ? GetSaveFileName : GetOpenFileName)(&ofn);
 
-		std::filesystem::current_path(cwd);
-		delete[] pattern;
-		if (r)
-			return ofn.lpstrFile;
-		else {
+			std::filesystem::current_path(cwd);
+			delete[] pattern;
+			if (r) {
+				std::string result = ofn.lpstrFile;
+
+				if (ofn.nFilterIndex < pats.size() && result.find('.') == std::string::npos && overWriteWarning) {
+					auto pat = pats[ofn.nFilterIndex - 1].first;
+
+					result += pat.substr(pat.find_last_of('.'));
+				}
+				return result;
+			}
+
 			auto err = CommDlgExtendedError();
 
 			if (!err)
@@ -421,8 +437,8 @@ namespace Utils
 		auto file = gui.get<tgui::EditBox>("file");
 		auto box = gui.get<tgui::ComboBox>("Patterns");
 		auto panel = gui.get<tgui::ScrollablePanel>("Folders");
-		std::function<void()> open = [&gui, &result, &window, path, box, file, &currentPath, panel, &open, mustExist, overWriteWarning]{
-			if (file->getText().isEmpty())
+		std::function<void(bool)> open = [&gui, &result, &window, path, box, file, &currentPath, panel, &open, mustExist, overWriteWarning, allowFolder](bool fromButton){
+			if (file->getText().isEmpty() && !allowFolder)
 				return;
 
 			std::string ext = box->getSelectedItemId();
@@ -432,12 +448,12 @@ namespace Utils
 			else
 				result = file->getText();
 
-			if (std::filesystem::is_directory(result)) {
+			if (std::filesystem::is_directory(result) && (!allowFolder || !fromButton)) {
 				result = cleanPath(result);
 				currentPath = result + static_cast<char>(std::filesystem::path::preferred_separator);
 				path->setText(pathToString(currentPath));
 				file->setText("");
-				_makeFolders(currentPath, panel, file, open, std::regex(box->getSelectedItemId().toAnsiString(), std::regex_constants::icase));
+				_makeFolders(currentPath, panel, file, open, std::regex(box->getSelectedItemId().toAnsiString(), std::regex_constants::icase), allowFolder);
 				return;
 			}
 
@@ -487,22 +503,31 @@ namespace Utils
 			result = "";
 			window.close();
 		});
-		gui.get<tgui::Button>("Open")->connect("Clicked", open);
+		gui.get<tgui::Button>("Open")->connect("Clicked", open, true);
 
 		if (overWriteWarning)
 			gui.get<tgui::Button>("Open")->setText("Save");
+		if (allowFolder) {
+			auto o = gui.get<tgui::Button>("Open");
+			auto c = gui.get<tgui::Button>("Cancel");
+
+			o->setText(o->getText() + " Folder");
+			o->setSize({o->getSize().x + 40, o->getSize().y});
+			o->setPosition({o->getPosition().x - 40, o->getPosition().y});
+			c->setPosition({c->getPosition().x - 40, c->getPosition().y});
+		}
 
 		for (auto &pair : patterns)
 			box->addItem(pair.second, pair.first);
 		box->addItem("All files", ".*");
 		box->setSelectedItemByIndex(0);
-		box->connect("ItemSelected", [&currentPath, &panel, &file, &box, &open]{
-			_makeFolders(currentPath, panel, file, open, std::regex(box->getSelectedItemId().toAnsiString(), std::regex_constants::icase));
+		box->connect("ItemSelected", [&currentPath, &panel, &file, &box, &open, allowFolder]{
+			_makeFolders(currentPath, panel, file, open, std::regex(box->getSelectedItemId().toAnsiString(), std::regex_constants::icase), allowFolder);
 		});
 
 		path->setText(pathToString(currentPath));
 		file->setText(startText);
-		_makeFolders(currentPath, panel, file, open, std::regex(box->getSelectedItemId().toAnsiString(), std::regex_constants::icase));
+		_makeFolders(currentPath, panel, file, open, std::regex(box->getSelectedItemId().toAnsiString(), std::regex_constants::icase), allowFolder);
 
 		while (window.isOpen()) {
 			while (window.pollEvent(event)) {

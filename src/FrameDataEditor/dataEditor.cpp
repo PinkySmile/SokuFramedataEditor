@@ -49,6 +49,7 @@ std::string swr;
 std::string soku;
 std::string soku2;
 std::vector<std::string> extra;
+std::vector<ShadyCore::Package *> extraPackages;
 sf::Color bgColor = sf::Color::Black;
 sf::Image selectedColorMaskImage;
 sf::Sprite selectedColorMaskSprite;
@@ -64,21 +65,7 @@ struct {
 	std::string chr;
 } editSession;
 
-uint32_t getOrCreateImage(ShadyCore::Schema &schema, const std::string_view& name)
-{
-	for (size_t i = 0; i < schema.images.size(); ++i)
-		if (
-			strncmp(schema.images[i].name, name.data(), name.size()) == 0 &&
-			schema.images[i].name[name.size()] == '\0'
-		)
-			return i;
-
-	auto res = new char[name.size() + 1];
-
-	strcpy(res, name.data());
-	schema.images.emplace_back(res);
-	return schema.images.size() - 1;
-}
+extern uint32_t getOrCreateImage(ShadyCore::Schema &schema, const std::string_view& name);
 
 void	arrangeButtons(EditableObject *object)
 {
@@ -223,13 +210,20 @@ void loadPackages()
 	} catch (const std::exception &e) {
 		game->logger.error("Error loading soku2: " + std::string(e.what()));
 	}
-	for (auto &path : extra)
-		paths.emplace_front(path);
 
 	game->package.clear();
 	game->characterPaths.clear();
 	for (auto &path : paths)
-		game->package.merge(new ShadyCore::Package(path));
+		game->package.merge(path);
+
+	for (auto &e : extraPackages)
+		delete e;
+	extraPackages.clear();
+	for (auto &path : extra)
+		extraPackages.push_back(new ShadyCore::Package(path));
+	for (auto &path : extraPackages)
+		game->package.merge(path);
+
 	for (auto &entry : game->package) {
 		if (entry.first.name.substr(0, strlen("data_character_")) != "data_character_")
 			continue;
@@ -378,6 +372,8 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	auto hitSound = panel->get<tgui::EditBox>("HitSFX");
 	auto hitEffect = panel->get<tgui::EditBox>("HitEffect");
 	auto damage = panel->get<tgui::EditBox>("Damage");
+	auto spiritDamage = panel->get<tgui::EditBox>("SpiritDmg");
+	auto power = panel->get<tgui::EditBox>("Power");
 	auto chip = panel->get<tgui::EditBox>("ChipDmg");
 	auto limit = panel->get<tgui::EditBox>("Limit");
 	auto speed = panel->get<tgui::EditBox>("MoveSpeed");
@@ -442,6 +438,8 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	sprite->setText(data._schema->images[data.frame->imageIndex].name);
 	hitSound->setText(std::to_string(data.frame->traits.onHitSfx));
 	damage->setText(std::to_string(data.frame->traits.damage));
+	spiritDamage->setText(std::to_string(data.frame->traits.spiritDamage));
+	power->setText(std::to_string(data.frame->traits.power));
 	duration->setText(std::to_string(data.frame->duration));
 	pBlockStun->setText(std::to_string(data.frame->traits.onBlockPlayerStun));
 	eBlockStun->setText(std::to_string(data.frame->traits.onBlockEnemyStun));
@@ -492,6 +490,42 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	selectBox(nullptr, nullptr);
 	refreshBoxes(boxes, data, object);
 	*c = false;
+}
+
+void createAction(std::unique_ptr<EditableObject> &object, unsigned newAction)
+{
+	auto &action = object->_moves.at(object->_action);
+	auto &data = action[object->_actionBlock][object->_animation];
+
+	tempSchema.objects.reserve(tempSchema.objects.size() + action.size());
+	object->_moves[newAction] = {};
+
+	auto it = tempSchema.objects.begin();
+
+	for (;; ++it) {
+		if ((*it)->getType() != 9)
+			continue;
+		if (reinterpret_cast<ShadyCore::Schema::Sequence *>(*it)->getId() > newAction)
+			break;
+	}
+	for (auto &block : action) {
+		auto newSequence = new ShadyCore::Schema::Sequence(newAction, false);
+
+		newSequence->moveLock = block.front().parent->moveLock;
+		newSequence->actionLock = block.front().parent->actionLock;
+		newSequence->loop = block.front().parent->loop;
+		newSequence->frames.reserve(block.size());
+		tempSchema.objects.insert(it, newSequence);
+		object->_moves[newAction].emplace_back();
+		it++;
+		for (auto &frame : block) {
+			auto newElem = new ShadyCore::Schema::Sequence::MoveFrame(*frame.frame);
+
+			newSequence->frames.push_back(newElem);
+			object->_moves[newAction].back().emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
+		}
+	}
+
 }
 
 void	refreshRightPanel(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, bool resetAction = true)
@@ -563,6 +597,8 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 	auto eHitStun = panel->get<tgui::EditBox>("EHitStun");
 	auto prorate = panel->get<tgui::EditBox>("Rate");
 	auto damage = panel->get<tgui::EditBox>("Damage");
+	auto spiritDamage = panel->get<tgui::EditBox>("SpiritDmg");
+	auto power = panel->get<tgui::EditBox>("Power");
 	auto hitSpeed = panel->get<tgui::EditBox>("HitSpeed");
 	auto limit = panel->get<tgui::EditBox>("Limit");
 	auto gravity = panel->get<tgui::EditBox>("Gravity");
@@ -674,7 +710,7 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 			return;
 		auto newAction = std::stoul(t);
 		if (object->_moves.find(newAction) == object->_moves.end())
-			object->_moves.emplace(newAction, object->_moves[object->_action]);
+			createAction(object, newAction);
 		object->_action = newAction;
 		block->setMaximum(object->_moves[object->_action].size() - 1);
 		block->setMinimum(0);
@@ -688,16 +724,19 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		blockLabel->setText("Block " + std::to_string(i + 1) + "/" + std::to_string(object->_moves[object->_action].size()));
 		object->_actionBlock = i;
-		if (object->_moves[object->_action][i].empty()) {
+		/*if (object->_moves[object->_action][i].empty()) {
 			game->logger.warn("This block is empty so we generate a frame");
-			auto newSequence = new ShadyCore::Schema::Sequence(object->_action, true);
+			auto newSequence = new ShadyCore::Schema::Sequence(object->_action, false);
 			auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 
 			//TODO: Init a proper value
+			newSequence->moveLock = 0;
+			newSequence->actionLock = 0;
+			newSequence->loop = false;
 			newSequence->frames.push_back(newElem);
 			tempSchema.objects.push_back(newSequence);
 			object->_moves[object->_action][i].emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
-		}
+		}*/
 		progress->setMaximum(object->_moves[object->_action][i].size() - 1);
 		progress->setMinimum(0);
 		if (progress->getValue() == 0)
@@ -1053,6 +1092,26 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 
 		data.frame->traits.damage = std::stoul(t);
 	});
+	spiritDamage->connect("TextChanged", [&object](std::string t){
+		if (*c)
+			return;
+		if (t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.frame->traits.spiritDamage = std::stoul(t);
+	});
+	power->connect("TextChanged", [&object](std::string t){
+		if (*c)
+			return;
+		if (t.empty())
+			return;
+
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		data.frame->traits.power = std::stoul(t);
+	});
 	pBlockStun->connect("TextChanged", [&object](std::string t){
 		if (*c)
 			return;
@@ -1391,85 +1450,131 @@ void openFramedataFromPackage(std::unique_ptr<EditableObject> &object, tgui::Men
 	window->add(list);
 }
 
-void openFramedataFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr bar, tgui::Gui &gui)
+bool saveFramedataToFileCallback(std::unique_ptr<EditableObject> &)
 {
-	auto path = Utils::openFileDialog("Open framedata file", ".",{{".*\\.pat", "Pattern file"}, {".*\\.xml", "XML file"}});
+	auto path = Utils::saveFileDialog(
+		"Save pattern file",
+		editSession.chr,
+		{{".*\\.pat", "Pattern file"}, {".*\\.xml", "XML file"}}
+	);
 
 	if (path.empty())
+		return false;
+
+	std::string ext = path.substr(path.find_last_of('.') + 1);
+	std::ofstream stream{path, std::fstream::binary};
+
+	if (stream.fail()) {
+		Utils::dispMsg("Error", "Could not open file " + path, MB_ICONERROR);
+		return false;
+	}
+	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_SCHEMA, ext == "xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
+	return true;
+}
+
+void openFramedataFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr bar, tgui::Gui &gui)
+{
+	auto p = Utils::openFileDialog("Open framedata file", ".",{{".*\\.pat", "Pattern file"}, {".*\\.xml", "XML file"}});
+
+	if (p.empty())
 		return;
 
-	auto win = Utils::openWindowWithFocus(gui, 250, 70);
+	auto fct = [bar, &gui, &object, p]{
+		auto win = Utils::openWindowWithFocus(gui, 250, 70);
+		std::string path = p;
 
-	win->loadWidgetsFromFile("assets/gui/edit.gui");
+		win->loadWidgetsFromFile("assets/gui/edit.gui");
 
-	auto edit = win->get<tgui::EditBox>("EditBox");
-	auto cancel = win->get<tgui::Button>("Cancel");
-	auto ok = win->get<tgui::Button>("OK");
-	size_t pos;
+		auto edit = win->get<tgui::EditBox>("EditBox");
+		auto cancel = win->get<tgui::Button>("Cancel");
+		auto ok = win->get<tgui::Button>("OK");
+		size_t pos;
 
-	try {
-		while ((pos = path.find_last_of('\\')) != std::string::npos)
-			path[pos] = '/';
-		edit->setText(path.substr(path.find_last_of('/') + 1, path.find_last_of('.') - path.find_last_of('/') - 1));
-	} catch (...) {}
-	win->setTitle("Enter character name");
-	ok->connect("Clicked", [win, edit, &object, bar, &gui, path]{
-		std::string character = edit->getText();
-
-		editSession.palName = "data/character/" + character + "/palette000.pal";
-
-		//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
-		auto pal = game->characterPaths[character].palettes.find(editSession.palName);
-		std::ifstream stream{path, std::fstream::binary};
-		std::string ext = path.substr(path.find_last_of('.') + 1);
-
-		game->logger.info("Loading framedata from file: " + path);
-		if (stream.fail()) {
-			Utils::dispMsg("Loading error", "Could not find file " + path + ": " + strerror(errno), MB_ICONERROR);
-			return;
-		}
-		if (pal == game->characterPaths[character].palettes.end()) {
-			Utils::dispMsg("Loading error", "Could not find palette " + editSession.palName, MB_ICONERROR);
-			return;
-		}
-
-		editSession.chr = character;
-		editSession.palName = pal->first;
-		editSession.palette = &pal->second;
-		tempSchema.destroy();
-		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ext == "xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
 		try {
-			object.reset();
-			object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
-			loadedPath = path;
-			refreshRightPanel(gui, object);
-			bar->setMenuEnabled({"New"}, true);
-			bar->setMenuEnabled({"Remove"}, true);
-			bar->setMenuEnabled({"Misc"}, true);
-			bar->setMenuItemEnabled({"File", "Export..."}, true);
-			bar->setMenuItemEnabled({"File", "Import...", "palette..."}, true);
-		} catch (std::exception &e) {
-			Utils::dispMsg("Error", e.what(), MB_ICONERROR);
-			loadedPath = path;
-			refreshRightPanel(gui, object);
-			bar->setMenuEnabled({"New"}, false);
-			bar->setMenuEnabled({"Remove"}, false);
-			bar->setMenuEnabled({"Misc"}, false);
-			bar->setMenuItemEnabled({"File", "Export..."}, false);
-			bar->setMenuItemEnabled({"File", "Import...", "palette..."}, false);
-		}
-		displayPalEditor(object, gui);
-		win->close();
-	});
-	cancel->connect("Clicked", [win]{
-		win->close();
-	});
+			while ((pos = path.find_last_of('\\')) != std::string::npos)
+				path[pos] = '/';
+			edit->setText(path.substr(path.find_last_of('/') + 1, path.find_last_of('.') - path.find_last_of('/') - 1));
+		} catch (...) {}
+		win->setTitle("Enter character name");
+		ok->connect("Clicked", [win, edit, &object, bar, &gui, path]{
+			std::string character = edit->getText();
+
+			editSession.palName = "data/character/" + character + "/palette000.pal";
+
+			//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
+			auto pal = game->characterPaths[character].palettes.find(editSession.palName);
+			std::ifstream stream{path, std::fstream::binary};
+			std::string ext = path.substr(path.find_last_of('.') + 1);
+
+			game->logger.info("Loading framedata from file: " + path);
+			if (stream.fail()) {
+				Utils::dispMsg("Loading error", "Could not find file " + path + ": " + strerror(errno), MB_ICONERROR);
+				return;
+			}
+			if (pal == game->characterPaths[character].palettes.end()) {
+				Utils::dispMsg("Loading error", "Could not find palette " + editSession.palName, MB_ICONERROR);
+				return;
+			}
+
+			editSession.chr = character;
+			editSession.palName = pal->first;
+			editSession.palette = &pal->second;
+			tempSchema.destroy();
+			ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ext == "xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
+			try {
+				object.reset();
+				object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
+				loadedPath = path;
+				refreshRightPanel(gui, object);
+				bar->setMenuEnabled({"New"}, true);
+				bar->setMenuEnabled({"Remove"}, true);
+				bar->setMenuEnabled({"Misc"}, true);
+				bar->setMenuItemEnabled({"File", "Export..."}, true);
+				bar->setMenuItemEnabled({"File", "Import...", "palette..."}, true);
+			} catch (std::exception &e) {
+				Utils::dispMsg("Error", e.what(), MB_ICONERROR);
+				loadedPath = path;
+				refreshRightPanel(gui, object);
+				bar->setMenuEnabled({"New"}, false);
+				bar->setMenuEnabled({"Remove"}, false);
+				bar->setMenuEnabled({"Misc"}, false);
+				bar->setMenuItemEnabled({"File", "Export..."}, false);
+				bar->setMenuItemEnabled({"File", "Import...", "palette..."}, false);
+			}
+			displayPalEditor(object, gui);
+			win->close();
+		});
+		cancel->connect("Clicked", [win]{
+			win->close();
+		});
+	};
+
+	if (!object) {
+		fct();
+		return;
+	}
+
+	auto window = Utils::openWindowWithFocus(gui, 260, 90);
+
+	window->loadWidgetsFromFile("assets/gui/quitConfirm.gui");
+	window->get<tgui::Button>("Yes")->connect("Clicked", [&object, fct](std::weak_ptr<tgui::ChildWindow> self){
+		self.lock()->close();
+		if (saveFramedataToFileCallback(object))
+			fct();
+	}, std::weak_ptr<tgui::ChildWindow>(window));
+	window->get<tgui::Button>("No")->connect("Clicked", [fct](std::weak_ptr<tgui::ChildWindow> self){
+		self.lock()->close();
+		fct();
+	}, std::weak_ptr<tgui::ChildWindow>(window));
+	window->get<tgui::Button>("Cancel")->connect("Clicked", [](std::weak_ptr<tgui::ChildWindow> self){
+		self.lock()->close();
+	}, std::weak_ptr<tgui::ChildWindow>(window));
 }
 
 void openPaletteFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr, tgui::Gui &gui)
 {
 	//TODO: Save last folder
-	auto path = Utils::openFileDialog("Open palette file", ".", {{".*\\.pal", "Converted palette"}});
+	auto path = Utils::openFileDialog("Open palette file", ".", {{".*\\.pal", "Converted palette (.pal)"}, {".*\\.act", "Color table (.act)"}});
 
 	if (path.empty())
 		return;
@@ -1478,15 +1583,17 @@ void openPaletteFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBar:
 	auto entry = game->characterPaths[editSession.chr].palettes.find(path);
 	ShadyCore::Palette *pal;
 
+	// TODO: Don't reload only if the file wasn't modified
 	if (entry == game->characterPaths[editSession.chr].palettes.end()) {
 		std::ifstream stream(path, std::fstream::binary);
+		std::string ext = path.substr(path.find_last_of('.') + 1);
 
 		if (stream.fail()) {
 			Utils::dispMsg("Error", "Could not open " + path + ": " + strerror(errno), MB_ICONERROR);
 			return;
 		}
 		pal = &game->characterPaths[editSession.chr].palettes[path];
-		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, ShadyCore::FileType::PALETTE_PAL})(pal, stream);
+		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, ext == "act" ? ShadyCore::FileType::PALETTE_ACT : ShadyCore::FileType::PALETTE_PAL})(pal, stream);
 	} else
 		pal = &entry->second;
 
@@ -1622,47 +1729,27 @@ void saveFramedataToPackageCallback(std::unique_ptr<EditableObject> &)
 	Utils::dispMsg("Error", "Not implemented yet", MB_ICONERROR);
 }
 
-bool saveFramedataToFileCallback(std::unique_ptr<EditableObject> &)
-{
-	auto path = Utils::saveFileDialog(
-		"Save pattern file",
-		editSession.chr,
-		{{".*\\.pat", "Pattern file"}, {".*\\.xml", "XML file"}}
-	);
-
-	if (path.empty())
-		return false;
-
-	std::string ext = path.substr(path.find_last_of('.') + 1);
-	std::ofstream stream{path, std::fstream::binary};
-
-	if (stream.fail()) {
-		Utils::dispMsg("Error", "Could not open file " + path, MB_ICONERROR);
-		return false;
-	}
-	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_SCHEMA, ext == "xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
-	return true;
-}
-
 void savePaletteToFileCallback(std::unique_ptr<EditableObject> &)
 {
 	auto path = Utils::saveFileDialog(
 		"Save palette file",
 		editSession.palName.substr(0, 5) == "data/" ? "." :
 		editSession.palName,
-		{{".*\\.pal", "Converted palette"}}
+		{{".*\\.pal", "Converted palette (.pal)"}, {".*\\.act", "Color table (.act)"}}
 	);
 
 	if (path.empty())
 		return;
 
+	size_t pos = path.find_last_of('.');
+	std::string ext = path.substr(pos);
 	std::ofstream stream{path, std::fstream::binary};
 
 	if (stream.fail()) {
 		Utils::dispMsg("Error", "Could not open file " + path, MB_ICONERROR);
 		return;
 	}
-	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, ShadyCore::FileType::PALETTE_PAL})(editSession.palette, stream);
+	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, ext == "act" ? ShadyCore::FileType::PALETTE_ACT : ShadyCore::FileType::PALETTE_PAL})(editSession.palette, stream);
 }
 
 void savePaletteToPackageCallback(std::unique_ptr<EditableObject> &)
@@ -1699,7 +1786,7 @@ void	newEndFrameCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object
 	auto f = new ShadyCore::Schema::Sequence::MoveFrame(*data.frame);
 
 	data.parent->frames.push_back(f);
-	object->_moves.at(object->_action)[object->_actionBlock].push_back(object->_moves.at(object->_action)[object->_actionBlock][object->_animation]);
+	object->_moves.at(object->_action)[object->_actionBlock].push_back(FrameData(data, *f));
 
 	auto oldBlock = object->_actionBlock;
 
@@ -1714,32 +1801,35 @@ void	newEndFrameCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object
 
 void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr panel)
 {
-	auto newSequence = new ShadyCore::Schema::Sequence(object->_action, true);
-	auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
 	auto &action = object->_moves.at(object->_action);
+	auto &data = action[object->_actionBlock][object->_animation];
+	auto newSequence = new ShadyCore::Schema::Sequence(object->_action, false);
+	auto newElem = new ShadyCore::Schema::Sequence::MoveFrame(*data.frame);
 
-	//TODO: Init a proper value
+	newSequence->moveLock = data.parent->moveLock;
+	newSequence->actionLock = data.parent->actionLock;
+	newSequence->loop = data.parent->loop;
 	newSequence->frames.push_back(newElem);
-	if (action.size() < object->_actionBlock - 1) {
-		size_t i = 0;
-		auto it = tempSchema.objects.begin();
 
-		while (i < object->_actionBlock) {
-			i += (*it)->getType() == 9 && reinterpret_cast<ShadyCore::Schema::Sequence *>(*it)->getId() == object->_action;
-			it++;
-		}
-		tempSchema.objects.insert(it, newSequence);
-	} else
-		tempSchema.objects.push_back(newSequence);
+	size_t i = 0;
+	auto it = tempSchema.objects.begin();
 
-	object->_actionBlock = action.size();
-	object->_moves.at(object->_action).emplace_back();
-	object->_moves.at(object->_action).back().emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
+	while (i < object->_actionBlock) {
+		i += (*it)->getType() == 9 && reinterpret_cast<ShadyCore::Schema::Sequence *>(*it)->getId() == object->_action;
+		it++;
+	}
+	tempSchema.objects.insert(it, newSequence);
+	object->_actionBlock++;
+	action.insert(action.begin() + object->_actionBlock, {});
+
+	action[object->_actionBlock].emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
+	object->_animation = 0;
 	refreshRightPanel(gui, object, false);
 
 	auto block = panel->get<tgui::SpinButton>("Block");
 
-	block->setValue(object->_moves.at(object->_action).size() - 1);
+	block->setMaximum(action.size() - 1);
+	block->setValue(object->_actionBlock);
 }
 
 static bool msgDisplayed = false;
@@ -1798,23 +1888,29 @@ void	removeFrameCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::P
 	selectBox(nullptr, nullptr);
 }
 
-void	removeAnimationBlockCallback(std::unique_ptr<EditableObject> &object)
+void	removeAnimationBlockCallback(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr panel)
 {
 	auto &arr = object->_moves.at(object->_action);
 
-	if (arr.size() == 1) {
-		/*
-		auto newElem = new ShadyCore::Schema::Sequence::MoveFrame();
-
-		tempSchema.objects.push_back(reinterpret_cast<ShadyCore::Schema::Object *const>(newElem));
-		arr.back().clear();
-		arr.back().emplace_back(editSession.chr, tempSchema, *newElem, *editSession.palette, editSession.palName);
-		 */
+	if (arr.size() == 1)
 		return;
+
+	size_t i = 0;
+	auto it = tempSchema.objects.begin();
+
+	while (i < object->_actionBlock) {
+		i += (*it)->getType() == 9 && reinterpret_cast<ShadyCore::Schema::Sequence *>(*it)->getId() == object->_action;
+		it++;
 	}
+	tempSchema.objects.erase(it);
 	arr.erase(arr.begin() + object->_actionBlock);
 	if (object->_actionBlock == arr.size())
 		object->_actionBlock--;
+
+	auto block = panel->get<tgui::SpinButton>("Block");
+
+	block->setMaximum(arr.size() - 1);
+	block->setValue(object->_actionBlock);
 }
 
 void	removeActionCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
@@ -1824,6 +1920,14 @@ void	removeActionCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 
 	auto it = object->_moves.find(object->_action);
 
+	tempSchema.objects.erase(std::remove_if(tempSchema.objects.begin(), tempSchema.objects.end(), [&object](const ShadyCore::Schema::Object *o){
+		if (o->getType() != 9)
+			return false;
+
+		auto s = reinterpret_cast<const ShadyCore::Schema::Sequence *>(o);
+
+		return s->getId() == object->_action;
+	}), tempSchema.objects.end());
 	object->_moves.erase(it);
 	refreshRightPanel(gui, object);
 }
@@ -2388,7 +2492,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 	auto newSwr = std::make_shared<std::string>(swr);
 	auto newSoku2 = std::make_shared<std::string>(soku2);
 	auto newBgColor = std::make_shared<sf::Color>(bgColor);
-	auto window = Utils::openWindowWithFocus(gui, 500, 140);
+	auto window = Utils::openWindowWithFocus(gui, 800, 370);
 
 	window->loadWidgetsFromFile("assets/gui/settings.gui");
 	window->setTitle("Settings");
@@ -2399,11 +2503,24 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 	auto sokuBrowse = window->get<tgui::Button>("SokuBrowse");
 	auto swrBrowse = window->get<tgui::Button>("SWRBrowse");
 	auto soku2Browse = window->get<tgui::Button>("Soku2Browse");
+	auto extraBrowse = window->get<tgui::Button>("ExtraBrowse");
+	auto extraUp = window->get<tgui::BitmapButton>("ExtraUp");
+	auto extraDown = window->get<tgui::BitmapButton>("ExtraDown");
+	auto extraRemove = window->get<tgui::Button>("ExtraRemove");
+	auto extraList = window->get<tgui::ListBox>("ExtraList");
 	auto bg = window->get<tgui::Button>("BG");
 	auto save = window->get<tgui::Button>("Save");
 	auto cancel = window->get<tgui::Button>("Cancel");
 	auto renderer = bg->getRenderer();
+	auto setArrowColor = [](tgui::BitmapButton::Ptr button, sf::Color color){
+		tgui::Texture texture = button->getImage();
 
+		texture.setColor(color);
+		button->setImage(texture);
+	};
+
+	for (auto &path : extra)
+		extraList->addItem(path);
 	sokuPath->setText(soku);
 	swrPath->setText(swr);
 	soku2Path->setText(soku2);
@@ -2415,7 +2532,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 	renderer->setBackgroundColorHover(bgColor);
 
 	sokuBrowse->connect("Clicked", [newSoku, sokuPath]{
-		auto path = Utils::openFileDialog("Select Soku dat", *newSoku + std::filesystem::path::preferred_separator + "th123a.dat", {{"th123.\\.dat", "Touhou 12.3 dat file"}});
+		auto path = Utils::openFileDialog("Select Soku dat", *newSoku + (char)std::filesystem::path::preferred_separator + "th123a.dat", {{"th123.\\.dat", "Touhou 12.3 dat file"}});
 
 		if (path.empty())
 			return;
@@ -2424,7 +2541,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 		sokuPath->setText(path);
 	});
 	swrBrowse->connect("Clicked", [newSwr, swrPath]{
-		auto path = Utils::openFileDialog("Select SWR dat", *newSwr + std::filesystem::path::preferred_separator + "th105a.dat", {{"th105.\\.dat", "Touhou 10.5 dat file"}});
+		auto path = Utils::openFileDialog("Select SWR dat", *newSwr + (char)std::filesystem::path::preferred_separator + "th105a.dat", {{"th105.\\.dat", "Touhou 10.5 dat file"}});
 
 		if (path.empty())
 			return;
@@ -2433,7 +2550,7 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 		swrPath->setText(path);
 	});
 	soku2Browse->connect("Clicked", [newSoku2, soku2Path]{
-		auto path = Utils::openFileDialog("Select Soku2 folder", newSoku2->substr(0, newSoku2->find_last_of(std::filesystem::path::preferred_separator)) + std::filesystem::path::preferred_separator + "SOKU2.dll", {{"SOKU2\\.dll", "Soku2 mod file"}});
+		auto path = Utils::openFileDialog("Select Soku2 folder", newSoku2->substr(0, newSoku2->find_last_of(std::filesystem::path::preferred_separator)) + (char)std::filesystem::path::preferred_separator + "SOKU2.dll", {{"SOKU2\\.dll", "Soku2 mod file"}});
 
 		if (path.empty())
 			return;
@@ -2462,16 +2579,83 @@ void	displaySettings(tgui::Gui &gui, std::unique_ptr<EditableObject> &object, tg
 			renderer->setBackgroundColorHover(color);
 		}, *newBgColor);
 	});
+
+	setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColorDisabled());
+	setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColorDisabled());
+	extraRemove->setEnabled(false);
+	extraUp->setEnabled(false);
+	extraDown->setEnabled(false);
+
+	extraBrowse->connect("Clicked", [extraList]{
+		auto path = Utils::openFileDialog("Select extra folder", ".", {{"^$", "Resource folder"}, {".*\\.dat", "Hisoutensoku package"}}, false, false, true);
+
+		if (path.empty())
+			return;
+		path = std::filesystem::path(path).lexically_normal().string();
+		extraList->addItem(path);
+	});
+	extraList->connect("ItemSelected", [setArrowColor, extraRemove, extraUp, extraDown, extraList]{
+		const int index = extraList->getSelectedItemIndex();
+
+		if (index >= 0)
+			extraRemove->setEnabled(true);
+		else
+			extraRemove->setEnabled(false);
+
+		if (index > 0) {
+			setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColor());
+			extraUp->setEnabled(true);
+		} else {
+			setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColorDisabled());
+			extraUp->setEnabled(false);
+		}
+
+		if (index >= 0 && index + 1 < extraList->getItemCount()) {
+			setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColor());
+			extraDown->setEnabled(true);
+		} else {
+			setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColorDisabled());
+			extraDown->setEnabled(false);
+		}
+	});
+	extraUp->connect("Pressed", [extraList]{
+		const std::size_t index = extraList->getSelectedItemIndex();
+		sf::String value1 = extraList->getItemByIndex(index - 1);
+		sf::String value2 = extraList->getItemByIndex(index);
+
+		extraList->changeItemByIndex(index - 1, value2);
+		extraList->changeItemByIndex(index, value1);
+		extraList->setSelectedItemByIndex(index - 1);
+	});
+	extraDown->connect("Pressed", [extraList]{
+		const std::size_t index = extraList->getSelectedItemIndex();
+		sf::String value1 = extraList->getItemByIndex(index);
+		sf::String value2 = extraList->getItemByIndex(index + 1);
+
+		extraList->changeItemByIndex(index, value2);
+		extraList->changeItemByIndex(index + 1, value1);
+		extraList->setSelectedItemByIndex(index + 1);
+	});
+	extraRemove->connect("Pressed", [extraList]{
+		const std::size_t index = extraList->getSelectedItemIndex();
+
+		extraList->removeItemByIndex(index);
+		if (extraList->getItemCount() > 0) {
+			if (index == extraList->getItemCount())
+				extraList->setSelectedItemByIndex(index - 1);
+			else
+				extraList->setSelectedItemByIndex(index);
+		}
+	});
+
 	cancel->connect("Clicked", [](std::weak_ptr<tgui::ChildWindow> window){
 		window.lock()->close();
 	}, std::weak_ptr(window));
-	save->connect("Clicked", [&gui, bar, &object, newSoku, newSwr, newSoku2, newBgColor](std::weak_ptr<tgui::ChildWindow> window){
+	save->connect("Clicked", [&gui, bar, &object, newSoku, newSwr, newSoku2, newBgColor, extraList](std::weak_ptr<tgui::ChildWindow> window){
 		bgColor = *newBgColor;
-		if (soku == *newSoku && swr == *newSwr && soku2 == *newSoku2) {
-			saveSettings();
-			window.lock()->close();
-			return;
-		}
+		extra.clear();
+		for (auto &ex : extraList->getItems())
+			extra.push_back(ex);
 		soku = *newSoku;
 		swr = *newSwr;
 		soku2 = *newSoku2;
@@ -2950,7 +3134,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"New", "Hit box (Ctrl + Shift + H)"}, newHitBoxCallback, std::ref(object), boxes);
 
 	bar->connectMenuItem({"Remove", "Frame (Ctrl + Shift + Del)"}, removeFrameCallback, std::ref(object), boxes);
-	bar->connectMenuItem({"Remove", "Animation block (Shift + Del)"}, removeAnimationBlockCallback, std::ref(object));
+	bar->connectMenuItem({"Remove", "Animation block (Shift + Del)"}, removeAnimationBlockCallback, std::ref(object), panel);
 	bar->connectMenuItem({"Remove", "Action (Ctrl + Del)"}, removeActionCallback, std::ref(gui), std::ref(object));
 	bar->connectMenuItem({"Remove", "Selected box (Del)"}, removeBoxCallback, boxes, std::ref(object), panel);
 
@@ -2961,6 +3145,20 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"Misc", "Copy boxes from last frame"}, copyBoxesFromLastFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Copy boxes from next frame"}, copyBoxesFromNextFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten this move collision boxes"}, flattenThisMoveCollisionBoxes, std::ref(object), boxes);
+	bar->connectMenuItem({"Misc", "Reverse palette index"}, [&gui, &object]{
+		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+		for (int i = 0; i < 128; i++)
+			std::swap(((uint16_t*)editSession.palette->data)[i], ((uint16_t*)editSession.palette->data)[255 - i]);
+		((uint16_t*)editSession.palette->data)[0] &= 0x7FFF;
+		((uint16_t*)editSession.palette->data)[255] |= 0x8000;
+		game->textureMgr.invalidatePalette(editSession.palName);
+		for (auto &action : object->_moves)
+			for (auto &block : action.second)
+				for (auto &anim : block)
+					anim.setPalette(*editSession.palette, editSession.palName);
+		displayPalEditor(object, gui, false);
+	});
 	bar->connectMenuItem({"Misc", "Evil mode"}, [&gui, &object]{
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
@@ -2982,6 +3180,17 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	});
 	bar->connectMenuItem({"Misc", "Reload textures"}, [&object]{
 		game->logger.debug("Reloading textures");
+
+		for (auto &e : extraPackages) {
+			game->package.demerge(e);
+			delete e;
+		}
+		extraPackages.clear();
+		for (auto &path : extra)
+			extraPackages.push_back(new ShadyCore::Package(path));
+		for (auto &path : extraPackages)
+			game->package.merge(path);
+
 		for (auto &action : object->_moves)
 			for (auto &block : action.second)
 				for (auto &anim : block)
@@ -3315,7 +3524,7 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 			else if (event.control)
 				removeActionCallback(gui, object);
 			else if (event.shift)
-				removeAnimationBlockCallback(object);
+				removeAnimationBlockCallback(object, panel);
 			else
 				removeBoxCallback(boxes, object, panel);
 		}
@@ -3323,16 +3532,38 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 		if (event.code == sf::Keyboard::C) {
 			if (event.control) {
 				if (!isEditBoxSelected(panel))
-					sf::Clipboard::setString(object->_moves[object->_action][object->_actionBlock][object->_animation].saveBoxes().dump());
+					sf::Clipboard::setString(object->_moves[object->_action][object->_actionBlock][object->_animation].saveData().dump());
 			}
 		}
 
 		if (event.code == sf::Keyboard::V) {
-			if (event.control) {
+			if (event.control && event.shift) {
 				if (isEditBoxSelected(panel))
 					return;
 				try {
 					object->_moves[object->_action][object->_actionBlock][object->_animation].loadBoxes(
+						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
+					);
+					refreshFrameDataPanel(panel, boxes, object);
+				} catch (std::exception &e) {
+					SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+				}
+			} else if (event.control && event.alt) {
+				if (isEditBoxSelected(panel))
+					return;
+				try {
+					object->_moves[object->_action][object->_actionBlock][object->_animation].loadSpriteInfo(
+						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
+					);
+					refreshFrameDataPanel(panel, boxes, object);
+				} catch (std::exception &e) {
+					SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+				}
+			} else if (event.control) {
+				if (isEditBoxSelected(panel))
+					return;
+				try {
+					object->_moves[object->_action][object->_actionBlock][object->_animation].loadData(
 						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
 					);
 					refreshFrameDataPanel(panel, boxes, object);
@@ -3375,8 +3606,8 @@ void	renderTopLayer(EditableObject &object)
 	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
 	auto s = object.displayScaled ? object.scale : 1.f;
 	auto scale = SpiralOfFate::Vector2f{
-		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f,
-		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
+		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleX) / 100.f,
+		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleY) / 100.f
 	};
 	auto bounds = SpiralOfFate::Vector2f{
 		static_cast<float>(data.frame->texWidth),
@@ -3424,8 +3655,8 @@ Vector2f mousePosToImgPos(EditableObject &object, Vector2i mouse, const FrameDat
 	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
 	auto s = object.displayScaled ? object.scale : 1.f;
 	auto scale = SpiralOfFate::Vector2f{
-		s * (data.frame->blendOptions.scaleX ? data.frame->blendOptions.scaleX : 200) / 100.f,
-		s * (data.frame->blendOptions.scaleY ? data.frame->blendOptions.scaleY : 200) / 100.f
+		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleX) / 100.f,
+		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleY) / 100.f
 	};
 	auto bounds = SpiralOfFate::Vector2f{
 		static_cast<float>(data.frame->texWidth),
@@ -3492,6 +3723,7 @@ bool	selectColor(tgui::Gui &gui, std::unique_ptr<EditableObject> &obj, int mouse
 	auto saturation = window->get<tgui::EditBox>("Sat");
 	auto lightness = window->get<tgui::EditBox>("Light");
 	auto edit = window->get<tgui::EditBox>("Edit");
+	auto label = window->get<tgui::Label>("ColorN");
 	auto button = col->get<tgui::Button>("Color" + std::to_string(i));
 	char buffer[8];
 	auto val = ((uint16_t*)editSession.palette->data)[i];
@@ -3505,6 +3737,7 @@ bool	selectColor(tgui::Gui &gui, std::unique_ptr<EditableObject> &obj, int mouse
 	auto pos2 = satHuePic->getPosition();
 	auto size = cross->getSize();
 
+	label->setText("Color #" + std::to_string(i));
 	col->get<tgui::Button>("Color" + std::to_string(old))->setFocused(false);
 	sprintf(buffer, "#%02X%02X%02X", color.r, color.g, color.b);
 	light->onValueChange.setEnabled(false);
@@ -4050,18 +4283,21 @@ int	main()
 	SetUnhandledExceptionFilter(UnhandledExFilter);
 #endif
 	cwd = std::filesystem::current_path();
-
+#ifndef _DEBUG
 	try {
+#endif
 		new Game("./editor.log");
 		game->logger.info("Starting editor.");
 		run();
 		game->logger.info("Goodbye !");
+#ifndef _DEBUG
 	} catch (std::exception &e) {
 		game->logger.fatal(e.what());
 		Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, &*game->screen);
 		delete game;
 		return EXIT_FAILURE;
 	}
+#endif
 	saveSettings();
 	delete game;
 	return EXIT_SUCCESS;
