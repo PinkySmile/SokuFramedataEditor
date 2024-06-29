@@ -9,6 +9,6 @@
 #include <string>
 #include <Action.hpp>
 
-extern std::map<SokuLib::Action, std::string> actionNames;
+extern std::map<unsigned, std::string> defaultActionNames;
 
 #endif //SOKUFDEDITOR_ACTIONNAME_HPP

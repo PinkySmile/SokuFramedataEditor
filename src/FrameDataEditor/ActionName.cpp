@@ -4,7 +4,7 @@
 
 #include "ActionName.hpp"
 
-std::map<SokuLib::Action, std::string> actionNames{
+std::map<unsigned, std::string> defaultActionNames{
 	{ SokuLib::ACTION_IDLE,                              "Idle" },
 	{ SokuLib::ACTION_CROUCHING,                         "Crouching" },
 	{ SokuLib::ACTION_CROUCHED,                          "Crouched" },

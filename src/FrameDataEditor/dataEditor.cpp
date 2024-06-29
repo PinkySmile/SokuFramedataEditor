@@ -57,6 +57,7 @@ sf::Texture selectedColorMaskTexture;
 sf::Texture tempTexture;
 ShadyCore::Schema tempSchema;
 std::list<std::function<void()>> uiTasks;
+std::map<unsigned, std::string> actionNames;
 
 struct {
 	ShadyCore::Schema *schema = nullptr;
@@ -352,6 +353,26 @@ void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<Edita
 	}
 }
 
+template<typename T>
+std::string parseActionName(const std::string &name, T wid)
+{
+	auto r = wid->getRenderer();
+
+	if (name.front() != '$') {
+		r->setTextColor(tgui::Color{190, 190, 190});
+		return name;
+	}
+
+	try {
+		tgui::Color color{"#" + name.substr(1, 6)};
+
+		r->setTextColor(color);
+		return name.substr(7);
+	} catch (...) {
+		return name;
+	}
+}
+
 void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::unique_ptr<EditableObject> &object)
 {
 	auto blendMode = panel->get<tgui::EditBox>("BlendMode");
@@ -400,7 +421,7 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	auto aFlags = panel->get<tgui::EditBox>("aFlags");
 	auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 	auto actionName = panel->get<tgui::Button>("ActionName");
-	auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
+	auto name = actionNames.find(object->_action);
 	auto renderer = blendColorBut->getRenderer();
 	char buffer[10];
 	sf::Color color = SokuColor(data.frame->blendOptions.color);
@@ -408,7 +429,7 @@ void	refreshFrameDataPanel(tgui::Panel::Ptr panel, tgui::Panel::Ptr boxes, std::
 	sprintf(buffer, "#%08X", data.frame->blendOptions.color);
 	game->logger.debug("Soft refresh");
 	*c = true;
-	actionName->setText(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second);
+	actionName->setText(parseActionName(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second, actionName));
 	fFlags->setText(std::to_string(data.frame->traits.frameFlags));
 	aFlags->setText(std::to_string(data.frame->traits.attackFlags));
 	mods->setText(std::to_string(data.frame->traits.comboModifier));
@@ -652,15 +673,16 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		window->setTitle("Default character moves");
 		window->add(pan);
 		for (auto &moveId : toDisplay) {
-			auto it = actionNames.find(static_cast<SokuLib::Action>(moveId));
+			auto it = actionNames.find(moveId);
 			auto label = tgui::Label::create(std::to_string(moveId));
-			auto button = tgui::Button::create(it == actionNames.end() ? "Unnamed move #" + std::to_string(moveId) : it->second);
+			auto button = tgui::Button::create();
 
 			label->setPosition(10, i * 25 + 12);
 			button->setPosition(50, i * 25 + 10);
 			button->setSize(430, 20);
 			Utils::setRenderer(button);
 			Utils::setRenderer(label);
+			button->setText(parseActionName(it == actionNames.end() ? "Unnamed move #" + std::to_string(moveId) : it->second, button));
 			if (moveId == object->_action) {
 				if (i > 30)
 					scroll = (i - 20) * 25;
@@ -1385,6 +1407,41 @@ void	newFileCallback(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr
 	bar->setMenuItemEnabled({"File", "Import...", "palette..."}, true);
 }
 
+bool loadLabel(const std::string &path)
+{
+	std::ifstream stream{path};
+	nlohmann::json json;
+
+	if (!stream) {
+		game->logger.error("Failed loading " + path + ": " + strerror(errno));
+		return false;
+	}
+	stream >> json;
+	for (auto &j : json.items()) {
+		unsigned long id = std::stoul(j.key());
+
+		if (!j.value().is_null())
+			actionNames[id] = j.value();
+		else if (actionNames.find(id) != actionNames.end())
+			actionNames.erase(actionNames.find(id));
+	}
+	return true;
+}
+
+void loadLabels(const std::string &character)
+{
+	actionNames.clear();
+	try {
+		if (!loadLabel("assets/labels/common.json"))
+			actionNames = defaultActionNames;
+		loadLabel("assets/labels/" + character + ".json");
+	} catch (const std::exception &e) {
+		game->logger.error("Error loading labels for " + character + ": " + e.what());
+		Utils::dispMsg("Error", "Error loading labels: " + std::string(e.what()), MB_ICONERROR);
+		actionNames = defaultActionNames;
+	}
+}
+
 void openFramedataFromPackage(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr bar, tgui::Gui &gui)
 {
 	auto window = Utils::openWindowWithFocus(gui, 300, 300);
@@ -1424,6 +1481,7 @@ void openFramedataFromPackage(std::unique_ptr<EditableObject> &object, tgui::Men
 			object.reset();
 			object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
 			loadedPath = path;
+			loadLabels(character);
 			refreshRightPanel(gui, object);
 			bar->setMenuEnabled({"New"}, true);
 			bar->setMenuEnabled({"Remove"}, true);
@@ -1504,7 +1562,7 @@ void openFramedataFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBa
 			//auto path = Utils::openFileDialog("Open framedata", "assets", {{".*\\.json", "Frame data file"}});
 			auto pal = game->characterPaths[character].palettes.find(editSession.palName);
 			std::ifstream stream{path, std::fstream::binary};
-			std::string ext = path.substr(path.find_last_of('.') + 1);
+			std::string ext = std::filesystem::path(path).extension().string();
 
 			game->logger.info("Loading framedata from file: " + path);
 			if (stream.fail()) {
@@ -1520,11 +1578,13 @@ void openFramedataFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBa
 			editSession.palName = pal->first;
 			editSession.palette = &pal->second;
 			tempSchema.destroy();
-			ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ext == "xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
+			ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ext == ".xml" ? ShadyCore::FileType::SCHEMA_XML : ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
 			try {
 				object.reset();
 				object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
 				loadedPath = path;
+				loadLabels(character);
+				loadLabel((std::filesystem::path(path).parent_path() / (character + "_labels.json")).string());
 				refreshRightPanel(gui, object);
 				bar->setMenuEnabled({"New"}, true);
 				bar->setMenuEnabled({"Remove"}, true);
@@ -1820,7 +1880,7 @@ void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 	}
 	tempSchema.objects.insert(it, newSequence);
 	object->_actionBlock++;
-	action.insert(action.begin() + object->_actionBlock, {});
+	action.insert(action.begin() + object->_actionBlock, std::vector<FrameData>{});
 
 	action[object->_actionBlock].emplace_back(editSession.chr, tempSchema, *newSequence, *newElem, *editSession.palette, editSession.palName);
 	object->_animation = 0;
@@ -2979,7 +3039,7 @@ void	exportThisMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 			auto anim = object->_animation;
 			unsigned current = 0;
 			auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
-			auto action = name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second;
+			auto action = parseActionName(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second, label);
 
 			for (unsigned i = 0; i < act.size(); i++) {
 				auto &blk = act[i];
@@ -3059,7 +3119,7 @@ void	exportAll(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 				object->_action = id;
 
 				auto name = actionNames.find(static_cast<SokuLib::Action>(object->_action));
-				auto action = name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second;
+				auto action = parseActionName(name == actionNames.end() ? "Action #" + std::to_string(object->_action) : name->second, label);
 
 				for (unsigned i = 0; i < act.size(); i++) {
 					auto &blk = act[i];
