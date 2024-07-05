@@ -759,7 +759,7 @@ ScrollablePanel.Panel1 {
             CheckBox.fFlag22 {
                 Position = (10, 750);
                 Size = (20, 20);
-                Text = "Rotate boxes";
+                Text = "Rotate hitboxes";
                 TextSize = 13;
                 renderer = &11;
             }
@@ -767,7 +767,7 @@ ScrollablePanel.Panel1 {
             CheckBox.fFlag23 {
                 Position = (170, 750);
                 Size = (20, 20);
-                Text = "Loop Animation";
+                Text = "Rotate hurtboxes";
                 TextSize = 13;
                 renderer = &11;
             }

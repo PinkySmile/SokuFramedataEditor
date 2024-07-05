@@ -1874,7 +1874,7 @@ void	newAnimBlockCallback(tgui::Gui &gui, std::unique_ptr<EditableObject> &objec
 	size_t i = 0;
 	auto it = tempSchema.objects.begin();
 
-	while (i < object->_actionBlock) {
+	while (i <= object->_actionBlock) {
 		i += (*it)->getType() == 9 && reinterpret_cast<ShadyCore::Schema::Sequence *>(*it)->getId() == object->_action;
 		it++;
 	}
@@ -3665,10 +3665,7 @@ void	renderTopLayer(EditableObject &object)
 	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
 	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
 	auto s = object.displayScaled ? object.scale : 1.f;
-	auto scale = SpiralOfFate::Vector2f{
-		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleX) / 100.f,
-		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleY) / 100.f
-	};
+	SpiralOfFate::Vector2f scale;
 	auto bounds = SpiralOfFate::Vector2f{
 		static_cast<float>(data.frame->texWidth),
 		static_cast<float>(data.frame->texHeight)
@@ -3684,6 +3681,20 @@ void	renderTopLayer(EditableObject &object)
 		static_cast<float>(-data.frame->offsetY) * s
 	};
 
+	if (data.frame->renderGroup == 0) {
+		scale.x = 2;
+		scale.y = 2;
+	} else if (data.frame->renderGroup == 2) {
+		scale.x = data.frame->blendOptions.scaleX / 100.f;
+		scale.y = data.frame->blendOptions.scaleY / 100.f;
+		result.x *= scale.x;
+		result.y *= scale.y;
+	} else {
+		scale.x = 1;
+		scale.y = 1;
+	}
+	scale.x *= s;
+	scale.y *= s;
 	if (data.frame->blendOptions.flipHorz) {
 		texBounds.left += texBounds.width;
 		texBounds.width *= -1;
@@ -3714,10 +3725,7 @@ Vector2f mousePosToImgPos(EditableObject &object, Vector2i mouse, const FrameDat
 {
 	auto translate = object.displayScaled ? object.translate : SpiralOfFate::Vector2f{0, 0};
 	auto s = object.displayScaled ? object.scale : 1.f;
-	auto scale = SpiralOfFate::Vector2f{
-		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleX) / 100.f,
-		s * (data.frame->renderGroup == 0 ? 200 : data.frame->renderGroup == 1 ? 100 : data.frame->blendOptions.scaleY) / 100.f
-	};
+	SpiralOfFate::Vector2f scale;
 	auto bounds = SpiralOfFate::Vector2f{
 		static_cast<float>(data.frame->texWidth),
 		static_cast<float>(data.frame->texHeight)
@@ -3733,6 +3741,22 @@ Vector2f mousePosToImgPos(EditableObject &object, Vector2i mouse, const FrameDat
 		static_cast<float>(-data.frame->offsetY) * s
 	};
 	auto view = game->screen->getView();
+
+	if (data.frame->renderGroup == 0) {
+		scale.x = 2;
+		scale.y = 2;
+	} else if (data.frame->renderGroup == 2) {
+		scale.x = data.frame->blendOptions.scaleX / 100.f;
+		scale.y = data.frame->blendOptions.scaleY / 100.f;
+		result.x *= scale.x;
+		result.y *= scale.y;
+	} else {
+		scale.x = 1;
+		scale.y = 1;
+	}
+	scale.x *= s;
+	scale.y *= s;
+
 	auto imgPos = result + translate + object._position + SpiralOfFate::Vector2f{
 		(game->screen->getSize().x / 2 - panel->getSize().x / 2),
 		static_cast<float>(game->screen->getSize().y / 2 + 300)
