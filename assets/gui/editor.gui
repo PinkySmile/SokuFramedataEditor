@@ -2274,6 +2274,10 @@ MenuBar.main_bar {
         }
 
         Menu {
+            Text = "Flatten this move properties";
+        }
+
+        Menu {
             Text = "Reload textures";
         }
 

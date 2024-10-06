@@ -214,8 +214,6 @@ void loadPackages()
 
 	game->package.clear();
 	game->characterPaths.clear();
-	for (auto &path : paths)
-		game->package.merge(path);
 
 	for (auto &e : extraPackages)
 		delete e;
@@ -223,6 +221,9 @@ void loadPackages()
 	for (auto &path : extra)
 		extraPackages.push_back(new ShadyCore::Package(path));
 	for (auto &path : extraPackages)
+		game->package.merge(path);
+
+	for (auto &path : paths)
 		game->package.merge(path);
 
 	for (auto &entry : game->package) {
@@ -1471,12 +1472,14 @@ void openFramedataFromPackage(std::unique_ptr<EditableObject> &object, tgui::Men
 			return;
 		}
 
+		auto &stream = entry.open();
+
 		editSession.chr = character;
 		editSession.palName = pal->first;
 		editSession.palette = &pal->second;
 		tempSchema.destroy();
-		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, entry.open());
-		entry.close();
+		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, ShadyCore::FileType::SCHEMA_GAME_PATTERN})(&tempSchema, stream);
+		entry.close(stream);
 		try {
 			object.reset();
 			object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
@@ -2040,6 +2043,14 @@ void	flattenThisMoveCollisionBoxes(std::unique_ptr<EditableObject> &object, tgui
 {
 	flattenCollisionBoxes(object, object->_moves.at(object->_action), &object->_moves.at(object->_action)[object->_actionBlock][object->_animation]);
 	refreshBoxes(std::move(boxes), object->_moves.at(object->_action)[object->_actionBlock][object->_animation], object);
+}
+
+void	flattenThisMoveProperties(std::unique_ptr<EditableObject> &object)
+{
+	auto &anim = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
+
+	for (auto &a : object->_moves.at(object->_action)[object->_actionBlock])
+		a.frame->traits = anim.frame->traits;
 }
 
 void	switchHitboxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr boxes)
@@ -3205,6 +3216,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"Misc", "Copy boxes from last frame"}, copyBoxesFromLastFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Copy boxes from next frame"}, copyBoxesFromNextFrame, std::ref(object), boxes);
 	bar->connectMenuItem({"Misc", "Flatten this move collision boxes"}, flattenThisMoveCollisionBoxes, std::ref(object), boxes);
+	bar->connectMenuItem({"Misc", "Flatten this move properties"}, flattenThisMoveProperties, std::ref(object));
 	bar->connectMenuItem({"Misc", "Reverse palette index"}, [&gui, &object]{
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
@@ -3246,6 +3258,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 			delete e;
 		}
 		extraPackages.clear();
+		game->textureMgr.invalidateAll();
 		for (auto &path : extra)
 			extraPackages.push_back(new ShadyCore::Package(path));
 		for (auto &path : extraPackages)
@@ -3253,8 +3266,10 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 
 		for (auto &action : object->_moves)
 			for (auto &block : action.second)
-				for (auto &anim : block)
+				for (auto &anim : block) {
+					anim.textureHandle = 0;
 					anim.reloadTexture();
+				}
 	});
 	bar->connectMenuItem({"Misc", "Reload palettes"}, []{
 		game->logger.debug("Reloading palettes");
@@ -3529,16 +3544,76 @@ void	handleDrag(tgui::Gui &, std::unique_ptr<EditableObject> &object, int mouseX
 	}
 }
 
-bool	isEditBoxSelected(const tgui::Panel::Ptr &panel)
+bool	isEditBoxSelected(const tgui::Panel::Ptr &panel, const tgui::ChildWindow::Ptr &window)
 {
 	auto &widgets = panel->getWidgets();
-
-	return std::any_of(widgets.begin(), widgets.end(), [](const tgui::Widget::Ptr &widget){
+	auto cb = [](const tgui::Widget::Ptr &widget){
 		auto box = widget->cast<tgui::EditBox>();
 		auto pan = widget->cast<tgui::Panel>();
 
-		return (pan && isEditBoxSelected(pan)) || (box && box->isFocused());
-	});
+		return (pan && isEditBoxSelected(pan, nullptr)) || (box && box->isFocused());
+	};
+
+	return std::any_of(widgets.begin(), widgets.end(), cb) || (window && std::any_of(window->getWidgets().begin(), window->getWidgets().end(), cb));
+}
+
+void	updatePalsBulk(tgui::ChildWindow::Ptr window, const std::string &clipboard, std::unique_ptr<EditableObject> &object)
+{
+	auto pal = window->get<tgui::ComboBox>("Palettes");
+	auto col = window->get<tgui::ScrollablePanel>("Colors");
+	size_t pos = 0;
+	std::string s = clipboard;
+	std::string token;
+	std::vector<std::string> tokens;
+
+	for (pos = s.find('\n'); pos != std::string::npos; pos = s.find('\n')) {
+		token = s.substr(0, pos);
+		tokens.push_back(token);
+		s.erase(0, pos + 1);
+	}
+	tokens.push_back(s);
+
+	for (auto &str : tokens) {
+		try {
+			auto button = col->get<tgui::Button>("Color" + std::to_string(selectedColor));
+			tgui::Color color{str};
+			sf::Color bufferColor{
+				color.getRed(),
+				color.getGreen(),
+				color.getBlue()
+			};
+
+
+			if (!button)
+				return;
+			if (!editSession.palette)
+				return;
+
+			auto renderer = button->getRenderer();
+			auto &newpal = ((uint16_t *) editSession.palette->data)[selectedColor];
+
+			newpal = 0;
+			newpal |= (bufferColor.r >> 3 & 0x1F) << 10;
+			newpal |= (bufferColor.g >> 3 & 0x1F) << 5;
+			newpal |= (bufferColor.b >> 3 & 0x1F) << 0;
+			if (selectedColor)
+				newpal |= 0x8000;
+			renderer->setBackgroundColor(bufferColor);
+			renderer->setBackgroundColorDown(bufferColor);
+			renderer->setBackgroundColorDisabled(bufferColor);
+			renderer->setBackgroundColorFocused(bufferColor);
+			renderer->setBackgroundColorHover(bufferColor);
+		} catch (std::exception &e) {
+			game->logger.error(e.what());
+		}
+		selectedColor++;
+	}
+
+	game->textureMgr.invalidatePalette(editSession.palName);
+	for (auto &action : object->_moves)
+		for (auto &block : action.second)
+			for (auto &anim : block)
+				anim.setPalette(*editSession.palette, editSession.palName);
 }
 
 void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &object, tgui::Gui &gui)
@@ -3546,6 +3621,7 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 	auto bar = gui.get<tgui::MenuBar>("main_bar");
 	auto panel = gui.get<tgui::Panel>("Panel1");
 	auto boxes = gui.get<tgui::Panel>("Boxes");
+	auto window = gui.get<tgui::ChildWindow>("PaletteEditor");
 
 	if (event.code == sf::Keyboard::S) {
 		if (event.control)
@@ -3591,46 +3667,102 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 
 		if (event.code == sf::Keyboard::C) {
 			if (event.control) {
-				if (!isEditBoxSelected(panel))
+				if (!isEditBoxSelected(panel, window))
 					sf::Clipboard::setString(object->_moves[object->_action][object->_actionBlock][object->_animation].saveData().dump());
 			}
 		}
 
 		if (event.code == sf::Keyboard::V) {
-			if (event.control && event.shift) {
-				if (isEditBoxSelected(panel))
-					return;
-				try {
-					object->_moves[object->_action][object->_actionBlock][object->_animation].loadBoxes(
-						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
-					);
-					refreshFrameDataPanel(panel, boxes, object);
-				} catch (std::exception &e) {
-					SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+			std::string clipboard = sf::Clipboard::getString().toAnsiString();
+
+			if (clipboard.front() == '{') {
+				if (event.control && event.shift) {
+					if (isEditBoxSelected(panel, window))
+						return;
+					try {
+						object->_moves[object->_action][object->_actionBlock][object->_animation].loadBoxes(
+							nlohmann::json::parse(clipboard)
+						);
+						refreshFrameDataPanel(panel, boxes, object);
+					} catch (std::exception &e) {
+						SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+					}
+				} else if (event.control && event.alt) {
+					if (isEditBoxSelected(panel, window))
+						return;
+					try {
+						object->_moves[object->_action][object->_actionBlock][object->_animation].loadSpriteInfo(
+							nlohmann::json::parse(clipboard)
+						);
+						refreshFrameDataPanel(panel, boxes, object);
+					} catch (std::exception &e) {
+						SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+					}
+				} else if (event.control) {
+					if (isEditBoxSelected(panel, window))
+						return;
+					try {
+						object->_moves[object->_action][object->_actionBlock][object->_animation].loadData(
+							nlohmann::json::parse(clipboard)
+						);
+						refreshFrameDataPanel(panel, boxes, object);
+					} catch (std::exception &e) {
+						SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
+					}
 				}
-			} else if (event.control && event.alt) {
-				if (isEditBoxSelected(panel))
-					return;
-				try {
-					object->_moves[object->_action][object->_actionBlock][object->_animation].loadSpriteInfo(
-						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
-					);
-					refreshFrameDataPanel(panel, boxes, object);
-				} catch (std::exception &e) {
-					SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
-				}
-			} else if (event.control) {
-				if (isEditBoxSelected(panel))
-					return;
-				try {
-					object->_moves[object->_action][object->_actionBlock][object->_animation].loadData(
-						nlohmann::json::parse(sf::Clipboard::getString().toAnsiString())
-					);
-					refreshFrameDataPanel(panel, boxes, object);
-				} catch (std::exception &e) {
-					SpiralOfFate::game->logger.info("Clipboard contains invalid data: " + std::string(e.what()));
-				}
+			} else if (clipboard.front() == '#') {
+				if (event.control && window)
+					updatePalsBulk(window, clipboard, object);
+			} else
+				game->logger.error("Invalid format: " + clipboard);
+		}
+
+		static int offset = 0;
+
+		if (event.code == sf::Keyboard::Down) {
+			auto &data = object->_moves[object->_action][object->_actionBlock][object->_animation];
+
+			for (auto &b : data.frame->cBoxes) {
+				b.up   += offset;
+				b.down += offset;
 			}
+			for (auto &b : data.frame->hBoxes) {
+				b.up   += offset;
+				b.down += offset;
+			}
+			for (auto &b : data.frame->aBoxes) {
+				b.up   += offset;
+				b.down += offset;
+			}
+			if (data.frame->hasBlendOptions())
+				data.frame->offsetY -= offset / (data.frame->blendOptions.scaleY / 100);
+			else
+				data.frame->offsetY -= offset;
+			refreshBoxes(boxes, data, object);
+		}
+		if (event.code == sf::Keyboard::Up) {
+			auto &data = object->_moves[object->_action][object->_actionBlock][object->_animation];
+
+			for (auto &b : data.frame->cBoxes) {
+				b.up   -= offset;
+				b.down -= offset;
+			}
+			for (auto &b : data.frame->hBoxes) {
+				b.up   -= offset;
+				b.down -= offset;
+			}
+			for (auto &b : data.frame->aBoxes) {
+				b.up   -= offset;
+				b.down -= offset;
+			}
+			if (data.frame->hasBlendOptions())
+				data.frame->offsetY += offset / (data.frame->blendOptions.scaleY / 100);
+			else
+				data.frame->offsetY += offset;
+			refreshBoxes(boxes, data, object);
+		}
+		if (event.code == sf::Keyboard::P) {
+			std::cin >> offset;
 		}
 	}
 }

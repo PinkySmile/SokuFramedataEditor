@@ -28,8 +28,10 @@ namespace SpiralOfFate
 		ShadyCore::Sfx &resourceSfx = this->_loadedSounds[file];
 
 		if (sfxEntry == this->_loadedSounds.end()) {
-			ShadyCore::getResourceReader(entry.fileType())(&resourceSfx, entry.open());
-			entry.close();
+			auto &stream = entry.open();
+
+			ShadyCore::getResourceReader(entry.fileType())(&resourceSfx, stream);
+			entry.close(stream);
 		}
 		if (this->_freedIndexes.empty()) {
 			this->_lastIndex += this->_lastIndex == 0;

@@ -32,8 +32,10 @@ namespace SpiralOfFate
 		unsigned index;
 
 		if (imageEntry == this->_loadedImages.end()) {
-			ShadyCore::getResourceReader(entry.fileType())(&resourceImage, entry.open());
-			entry.close();
+			auto &stream = entry.open();
+
+			ShadyCore::getResourceReader(entry.fileType())(&resourceImage, stream);
+			entry.close(stream);
 		}
 		image.create(resourceImage.width, resourceImage.height, resourceImage.raw);
 
@@ -85,8 +87,10 @@ namespace SpiralOfFate
 		unsigned index;
 
 		if (imageEntry == this->_loadedImages.end()) {
-			ShadyCore::getResourceReader(entry.fileType())(&resourceImage, entry.open());
-			entry.close();
+			auto &stream = entry.open();
+
+			ShadyCore::getResourceReader(entry.fileType())(&resourceImage, stream);
+			entry.close(stream);
 		}
 		if (resourceImage.bitsPerPixel == 8) {
 			image.create(resourceImage.width, resourceImage.height);
@@ -241,5 +245,18 @@ namespace SpiralOfFate
 			node.key() = "INVALID" + node.key();
 			this->_allocatedTextures.insert(std::move(node));
 		}
+	}
+
+	void TextureManager::invalidateAll()
+	{
+		for (auto &[loadedPath, attr] : this->_allocatedTextures) {
+			if (attr.second) {
+				attr.second = 0;
+				this->remove(attr.first);
+			}
+		}
+		this->_allocatedTextures.clear();
+		this->_loadedImages.clear();
+		this->_textures.clear();
 	}
 }
