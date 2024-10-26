@@ -219,10 +219,14 @@ void loadPackages()
 		delete e;
 	extraPackages.clear();
 	for (auto &path : extra)
-		extraPackages.push_back(new ShadyCore::Package(path));
+		try {
+			extraPackages.push_back(new ShadyCore::Package(path));
+		} catch (std::exception &e) {
+			Utils::dispMsg("Custom package loading error", path + ": " + e.what(), MB_ICONERROR);
+		}
+
 	for (auto &path : extraPackages)
 		game->package.merge(path);
-
 	for (auto &path : paths)
 		game->package.merge(path);
 
