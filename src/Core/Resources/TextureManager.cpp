@@ -8,6 +8,20 @@
 
 namespace SpiralOfFate
 {
+	TextureManager::TextureManager()
+	{
+		sf::RectangleShape shape;
+
+		shape.setPosition(0, 0);
+		shape.setSize({100, 100});
+		shape.setOutlineThickness(0);
+		shape.setFillColor(sf::Color::White);
+		this->_texture.create(100, 100);
+		this->_texture.setRepeated(true);
+		this->_texture.draw(shape);
+		this->_texture.display();
+	}
+
 	unsigned TextureManager::load(ShadyCore::PackageEx &package, const std::string &file, Vector2u *size)
 	{
 		if (this->_allocatedTextures[file].second != 0) {
@@ -186,16 +200,14 @@ namespace SpiralOfFate
 
 	void TextureManager::render(Sprite &sprite) const
 	{
-		if (!sprite.textureHandle)
-			return;
-		sprite.setTexture(this->_textures.at(sprite.textureHandle));
+		this->setTexture(sprite);
 		game->screen->displayElement(sprite);
 	}
 
 	void TextureManager::setTexture(Sprite &sprite) const
 	{
 		if (!sprite.textureHandle) {
-			sprite.setTexture(*(sf::Texture *)nullptr);
+			sprite.setTexture(this->_texture.getTexture());
 			return;
 		}
 		sprite.setTexture(this->_textures.at(sprite.textureHandle));
@@ -219,11 +231,6 @@ namespace SpiralOfFate
 		if (id == 0)
 			return {0, 0};
 		return this->_textures.at(id).getSize();
-	}
-
-	TextureManager::~TextureManager()
-	{
-		game->logger.debug("~TextureManager()");
 	}
 
 	const ShadyCore::Image &TextureManager::getUnderlyingImage(const std::string &file)

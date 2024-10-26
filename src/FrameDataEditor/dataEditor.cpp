@@ -2505,7 +2505,7 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 		});
 		button->connect("MouseEntered", [i, &object]{
 			auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
-			auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
+			const ShadyCore::Image *_img;
 			auto val = ((uint16_t*)editSession.palette->data)[i];
 			sf::Color color{
 				static_cast<sf::Uint8>(~((val & 0b0111110000000000) >> 7 | (val & 0b0111000000000000) >> 12)),
@@ -2513,6 +2513,15 @@ void	displayPalEditor(std::unique_ptr<EditableObject> &object, tgui::Gui &gui, b
 				static_cast<sf::Uint8>(~((val & 0b0000000000011111) << 3 | (val & 0b0000000000011100) >> 2)),
 				static_cast<sf::Uint8>((val & 0x8000) ? 255 : 0)
 			};
+
+			try {
+				_img = &game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
+			} catch (std::out_of_range &e) {
+				game->logger.debug("displayPalEditor:button[" + std::to_string(i) + "]: Invalid image: " + std::string(e.what()));
+				return;
+			}
+
+			auto &img = *_img;
 
 			hovering = true;
 			if (img.bitsPerPixel != 8 )
@@ -3908,7 +3917,16 @@ bool	selectColor(tgui::Gui &gui, std::unique_ptr<EditableObject> &obj, int mouse
 
 	auto &object = *obj;
 	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
-	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
+	const ShadyCore::Image *_img;
+
+	try {
+		_img = &game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
+	} catch (std::out_of_range &e) {
+		game->logger.debug("selectColor: Invalid image: " + std::string(e.what()));
+		return false;
+	}
+
+	auto &img = *_img;
 
 	if (img.bitsPerPixel != 8)
 		return false;
@@ -4001,9 +4019,18 @@ void 	hoverImagePixel(std::unique_ptr<EditableObject> &obj, int mouseX, int mous
 	if (!obj)
 		return;
 
+	const ShadyCore::Image *_img;
 	auto &object = *obj;
 	auto &data = object._moves.at(object._action)[object._actionBlock][object._animation];
-	auto &img = game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
+
+	try {
+		_img = &game->textureMgr.getUnderlyingImage("data/character/" + editSession.chr + "/" + data._schema->images.at(data.frame->imageIndex).name);
+	} catch (std::out_of_range &e) {
+		game->logger.debug("hoverImagePixel: Invalid image: " + std::string(e.what()));
+		return;
+	}
+
+	auto &img = *_img;
 
 	if (img.bitsPerPixel != 8) {
 		game->logger.debug("Image is not 8 bits per pixel: " + std::to_string(img.bitsPerPixel));

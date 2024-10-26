@@ -19,13 +19,14 @@ namespace SpiralOfFate
 	class TextureManager {
 	private:
 		unsigned _lastIndex = 0;
+		sf::RenderTexture _texture;
 		std::vector<unsigned> _freedIndexes;
 		std::map<unsigned, sf::Texture> _textures;
 		std::map<std::string, ShadyCore::Image> _loadedImages;
 		std::map<std::string, std::pair<unsigned, unsigned>> _allocatedTextures;
 
 	public:
-		~TextureManager();
+		TextureManager();
 		const ShadyCore::Image &getUnderlyingImage(const std::string &file);
 		unsigned load(ShadyCore::PackageEx &package, const std::string &file, Vector2u *size = nullptr);
 		unsigned load(ShadyCore::PackageEx &package, const ShadyCore::Palette &palette, const std::string &palName, const std::string &file, Vector2u *size = nullptr);
