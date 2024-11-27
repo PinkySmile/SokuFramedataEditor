@@ -214,10 +214,8 @@ void loadPackages()
 
 	game->package.clear();
 	game->characterPaths.clear();
-
-	for (auto &e : extraPackages)
-		delete e;
 	extraPackages.clear();
+
 	for (auto &path : extra)
 		try {
 			extraPackages.push_back(new ShadyCore::Package(path));
