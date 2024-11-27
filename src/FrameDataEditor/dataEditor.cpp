@@ -240,11 +240,13 @@ void loadPackages()
 			game->logger.debug("Found schema " + std::string(entry.first.name));
 		else if (entry.first.fileType == ShadyCore::FileType::TYPE_PALETTE) {
 			auto &pal = game->characterPaths[name].palettes["data/character/" + name + "/" + filename + ".pal"];
+			auto &stream = entry.second->open();
 
 			game->logger.debug("Found palette " + std::string(entry.first.name));
-			ShadyCore::getResourceReader(entry.first.fileType)(&pal, entry.second->open());
+			ShadyCore::getResourceReader(entry.first.fileType)(&pal, stream);
 			if (pal.bitsPerPixel > 16)
 				pal.pack();
+			entry.second->close(stream);
 		}
 	}
 }

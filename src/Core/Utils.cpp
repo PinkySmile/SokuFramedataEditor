@@ -336,6 +336,7 @@ namespace Utils
 			OPENFILENAME ofn;
 			char fileName[MAX_PATH];
 			char *pattern;
+			std::string parent;
 			size_t size = strlen("All Files*.*") + 3;
 			std::vector<std::pair<std::string, std::string>> pats;
 			std::regex reg{R"(\*\.\w+)"};
@@ -371,10 +372,14 @@ namespace Utils
 			}
 			pattern[size] = '\0';
 
-			if (basePath != ".")
-				strcpy(fileName, std::filesystem::path(basePath).filename().string().c_str());
-			else
+			try {
+				if (basePath != ".")
+					strcpy(fileName, std::filesystem::path(basePath).filename().string().c_str());
+				else
+					*fileName = 0;
+			} catch (...) {
 				*fileName = 0;
+			}
 			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.lpstrFilter = pattern;
@@ -387,7 +392,12 @@ namespace Utils
 			}
 			ofn.nMaxFile = MAX_PATH;
 			ofn.lpstrTitle = title.c_str();
-			ofn.lpstrInitialDir = std::filesystem::path(basePath).parent_path().string().c_str();
+			try {
+				parent = std::filesystem::path(basePath).parent_path().string();
+				ofn.lpstrInitialDir = parent.c_str();
+			} catch (...) {
+				ofn.lpstrInitialDir = nullptr;
+			}
 			ofn.Flags = OFN_ENABLESIZING | OFN_EXPLORER;
 			if (overWriteWarning)
 				ofn.Flags |= OFN_OVERWRITEPROMPT;
