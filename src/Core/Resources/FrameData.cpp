@@ -129,10 +129,8 @@ namespace SpiralOfFate
 	{
 		this->textureHandle = other.textureHandle;
 		this->hitSoundHandle = other.hitSoundHandle;
-		if (!this->_slave) {
-			game->textureMgr.addRef(this->textureHandle);
-			game->soundMgr.addRef(this->hitSoundHandle);
-		}
+		game->textureMgr.addRef(this->textureHandle);
+		game->soundMgr.addRef(this->hitSoundHandle);
 	}
 
 	FrameData::FrameData(const FrameData &other, ShadyCore::Schema::Sequence::MoveFrame &frame) :

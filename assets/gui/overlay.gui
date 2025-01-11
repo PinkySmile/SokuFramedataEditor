@@ -1,0 +1,202 @@
+Renderer.1 {
+    caretcolor = rgb(110, 110, 255);
+    defaulttextcolor = rgb(120, 120, 120);
+    padding = (6, 4, 6, 4);
+    selectedtextbackgroundcolor = rgb( 10, 110, 255);
+    selectedtextcolor = White;
+    textcolor = rgb(190, 190, 190);
+    texture = "assets/gui/themes/Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturedisabled = None;
+    texturefocused = "assets/gui/themes/Black.png" Part(120, 114, 60, 40) Middle(15, 0, 30, 40);
+    texturehover = "assets/gui/themes/Black.png" Part(60, 114, 60, 40) Middle(15, 0, 30, 40);
+}
+
+Renderer.2 {
+    textcolor = rgb(190, 190, 190);
+    texturebackground = None;
+
+    scrollbar {
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
+        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
+        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
+    }
+}
+
+Label.BlockLabel {
+    MaximumTextWidth = 161;
+    Position = (230, 52);
+    ScrollbarPolicy = Never;
+    Size = (161, 18);
+    Text = "Block 0/0";
+    TextSize = 13;
+    renderer = &2;
+}
+
+Label.FrameLabel {
+    MaximumTextWidth = 157;
+    Position = (13, 90);
+    ScrollbarPolicy = Never;
+    Size = (157, 18);
+    Text = "Frame 0";
+    TextSize = 13;
+    renderer = &2;
+}
+
+EditBox.Action {
+    InputValidator = UInt;
+    Position = (70, 10);
+    Size = (60, 22);
+    TextSize = 13;
+    renderer = &1;
+}
+
+Label.Label1 {
+    Position = (9, 12);
+    ScrollbarPolicy = Never;
+    Size = (61, 18);
+    Text = "Action ID";
+    TextSize = 13;
+    renderer = &2;
+}
+
+EditBox.Offset {
+    InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4}\\)";
+    Position = (190, 10);
+    Size = (120, 22);
+    TextSize = 13;
+    renderer = &1;
+}
+
+Label.Label2 {
+    Position = (146, 12);
+    ScrollbarPolicy = Never;
+    Size = (44, 18);
+    Text = Offset;
+    TextSize = 13;
+    renderer = &2;
+}
+
+CheckBox.Front {
+    Position = (50, 50);
+    Size = (20, 20);
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        textcolorhover = rgb(250, 250, 250);
+        texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
+        texturecheckeddisabled = None;
+        texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
+        texturecheckedhover = "assets/gui/themes/Black.png" Part(188, 0, 32, 32);
+        textureunchecked = "assets/gui/themes/Black.png" Part(92, 0, 32, 32);
+        textureuncheckeddisabled = None;
+        textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
+        textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
+    }
+}
+
+Label.Label3 {
+    Position = (13, 52);
+    ScrollbarPolicy = Never;
+    Size = (37, 18);
+    Text = Front;
+    TextSize = 13;
+    renderer = &2;
+}
+
+Label.Label4 {
+    AutoSize = true;
+    Position = (80, 52);
+    ScrollbarPolicy = Never;
+    Size = (50.2, 18);
+    Text = Display;
+    TextSize = 13;
+    renderer = &2;
+}
+
+CheckBox.Display {
+    Position = (130, 50);
+    Size = (20, 20);
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        textcolorhover = rgb(250, 250, 250);
+        texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
+        texturecheckeddisabled = None;
+        texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
+        texturecheckedhover = "assets/gui/themes/Black.png" Part(188, 0, 32, 32);
+        textureunchecked = "assets/gui/themes/Black.png" Part(92, 0, 32, 32);
+        textureuncheckeddisabled = None;
+        textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
+        textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
+    }
+}
+
+SpinButton.Block {
+    Maximum = 10;
+    Minimum = 0;
+    Position = (290, 40);
+    Size = (20, 42);
+    Step = 1;
+    Value = 0;
+
+    Renderer {
+        borderbetweenarrows = 0;
+        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
+        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
+        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
+    }
+}
+
+Slider.Frame {
+    ChangeValueOnScroll = true;
+    InvertedDirection = false;
+    Maximum = 10;
+    Minimum = 0;
+    Position = (80, 90);
+    Size = (220, 16);
+    Step = 1;
+    Value = 0;
+
+    Renderer {
+        texturethumb = "assets/gui/themes/Black.png" Part(243, 150, 30, 30);
+        texturethumbhover = None;
+        texturetrack = "assets/gui/themes/Black.png" Part(203, 150, 20, 45) Middle(0, 15, 20, 15);
+        texturetrackhover = "assets/gui/themes/Black.png" Part(223, 150, 20, 45) Middle(0, 15, 20, 15);
+    }
+}
+
+CheckBox.Play {
+    Position = (200, 50);
+    Size = (20, 20);
+    TextSize = 13;
+
+    Renderer {
+        textcolor = rgb(190, 190, 190);
+        textcolorhover = rgb(250, 250, 250);
+        texturechecked = "assets/gui/themes/Black.png" Part(124, 0, 32, 32);
+        texturecheckeddisabled = None;
+        texturecheckedfocused = "assets/gui/themes/Black.png" Part(252, 0, 32, 32);
+        texturecheckedhover = "assets/gui/themes/Black.png" Part(188, 0, 32, 32);
+        textureunchecked = "assets/gui/themes/Black.png" Part(92, 0, 32, 32);
+        textureuncheckeddisabled = None;
+        textureuncheckedfocused = "assets/gui/themes/Black.png" Part(220, 0, 32, 32);
+        textureuncheckedhover = "assets/gui/themes/Black.png" Part(156, 0, 32, 32);
+    }
+}
+
+Label.Label5 {
+    Position = (170, 52);
+    ScrollbarPolicy = Never;
+    Size = (37, 18);
+    Text = Play;
+    TextSize = 13;
+    renderer = &2;
+}

@@ -2291,7 +2291,7 @@ MenuBar.main_bar {
     }
 
     Menu {
-        Items = ["Palette editor", "Blending options", "Hitboxes (H)"];
+        Items = ["Palette editor", "Blending options", "Hitboxes (H)", "Overlay move"];
         Text = View;
     }
 

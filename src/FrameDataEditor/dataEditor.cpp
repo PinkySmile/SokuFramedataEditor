@@ -60,6 +60,14 @@ std::list<std::function<void()>> uiTasks;
 std::map<unsigned, std::string> actionNames;
 
 struct {
+	bool display = false;
+	bool front = true;
+	bool play = true;
+	SpiralOfFate::Vector2u offset = {0, 0};
+	std::unique_ptr<OverlayObject> object;
+} overlayData;
+
+struct {
 	ShadyCore::Schema *schema = nullptr;
 	ShadyCore::Palette *palette = nullptr;
 	std::string palName;
@@ -1402,6 +1410,8 @@ void	newFileCallback(std::unique_ptr<EditableObject> &object, tgui::MenuBar::Ptr
 	Utils::dispMsg("Error", "Not implemented yet", MB_ICONERROR);
 	return;
 	object = std::make_unique<EditableObject>();
+	overlayData.object = std::make_unique<OverlayObject>(object->_moves);
+	overlayData.object->displayScaled = true;
 	loadedPath.clear();
 	object->_moves[0].emplace_back();
 	refreshRightPanel(gui, object);
@@ -1487,6 +1497,8 @@ void openFramedataFromPackage(std::unique_ptr<EditableObject> &object, tgui::Men
 		try {
 			object.reset();
 			object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
+			overlayData.object = std::make_unique<OverlayObject>(object->_moves);
+			overlayData.object->displayScaled = true;
 			loadedPath = path;
 			loadLabels(character);
 			refreshRightPanel(gui, object);
@@ -1589,6 +1601,8 @@ void openFramedataFromFile(std::unique_ptr<EditableObject> &object, tgui::MenuBa
 			try {
 				object.reset();
 				object = std::make_unique<EditableObject>(editSession.chr, tempSchema, *editSession.palette, editSession.palName);
+				overlayData.object = std::make_unique<OverlayObject>(object->_moves);
+				overlayData.object->displayScaled = true;
 				loadedPath = path;
 				loadLabels(character);
 				loadLabel((std::filesystem::path(path).parent_path() / (character + "_labels.json")).string());
@@ -2063,6 +2077,8 @@ void	switchHitboxes(std::unique_ptr<EditableObject> &object, tgui::Panel::Ptr bo
 	if (object) {
 		object->scale = 1;
 		object->translate = {0, 0};
+		overlayData.object->scale = 1;
+		overlayData.object->translate = object->translate + overlayData.offset;
 	}
 	boxes->setVisible(displayHitboxes);
 }
@@ -3182,6 +3198,125 @@ void	exportAll(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	});
 }
 
+void overlayMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
+{
+	auto window = gui.get<tgui::ChildWindow>("Overlay move");
+
+	if (window) {
+		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+		window->setFocused(true);
+		return;
+	}
+
+	window = tgui::ChildWindow::create();
+	window->setSize(320, 120);
+		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+	window->setTitle("Overlay move");
+	gui.add(window, "Overlay move");
+	Utils::setRenderer(window);
+	window->connect("Closed", [&gui, window]{
+		gui.remove(window);
+	});
+	window->loadWidgetsFromFile("assets/gui/overlay.gui");
+
+	auto display = window->get<tgui::CheckBox>("Display");
+	auto front = window->get<tgui::CheckBox>("Front");
+	auto play = window->get<tgui::CheckBox>("Play");
+	auto offset = window->get<tgui::EditBox>("Offset");
+	auto action = window->get<tgui::EditBox>("Action");
+	auto block = window->get<tgui::SpinButton>("Block");
+	auto frame = window->get<tgui::Slider>("Frame");
+	auto blockLabel = window->get<tgui::Label>("BlockLabel");
+	auto frameLabel = window->get<tgui::Label>("FrameLabel");
+
+	display->setChecked(overlayData.display);
+	front->setChecked(overlayData.front);
+	play->setChecked(overlayData.play);
+	offset->setText("(" + std::to_string(overlayData.offset.x) + "," + std::to_string(overlayData.offset.y) + ")");
+	action->setText(std::to_string(overlayData.object->_action));
+	if (overlayData.object->_moves.count(overlayData.object->_action)) {
+		block->setMaximum(overlayData.object->_moves.at(overlayData.object->_action).size() - 1);
+		block->setValue(overlayData.object->_actionBlock);
+		if (overlayData.object->_actionBlock < overlayData.object->_moves.at(overlayData.object->_action).size()) {
+			frame->setMaximum(overlayData.object->_moves.at(overlayData.object->_action)[overlayData.object->_actionBlock].size() - 1);
+			frame->setValue(overlayData.object->_animation);
+		}
+	}
+	blockLabel->setText("Block " + std::to_string(overlayData.object->_actionBlock + 1) + "/" + std::to_string(overlayData.object->_moves[overlayData.object->_action].size()));
+	frameLabel->setText("Frame " + std::to_string(overlayData.object->_animation));
+
+	display->connect("Changed", [] (bool f){
+		overlayData.display = f;
+	});
+	front->connect("Changed", [] (bool f){
+		overlayData.front = f;
+	});
+	play->connect("Changed", [] (bool f){
+		overlayData.play = f;
+	});
+	offset->connect("TextChanged", [&object](const std::string &t) {
+		if (t.empty())
+			return;
+
+		auto pos = t.find(',');
+		auto x = t.substr(1, pos - 1);
+
+		auto remainder = t.substr(pos + 1);
+		auto y = remainder.substr(0, remainder.size() - 1);
+
+		try {
+			std::stoul(x);
+			overlayData.offset.x = std::stoul(x);
+			overlayData.offset.y = std::stoul(y);
+			overlayData.object->translate = object->translate + overlayData.offset;
+		} catch (...) {}
+	});
+	action->connect("TextChanged", [block, frame, blockLabel, frameLabel](const std::string &t) {
+		try {
+			overlayData.object->_action = std::stoul(t);
+			overlayData.object->_actionBlock = 0;
+			overlayData.object->_animation = 0;
+			overlayData.object->_animationCtr = 0;
+			*c = true;
+			if (overlayData.object->_moves.count(overlayData.object->_action)) {
+				block->setMaximum(overlayData.object->_moves.at(overlayData.object->_action).size() - 1);
+				block->setValue(overlayData.object->_actionBlock);
+				blockLabel->setText("Block " + std::to_string(overlayData.object->_actionBlock + 1) + "/" + std::to_string(overlayData.object->_moves[overlayData.object->_action].size()));
+				if (overlayData.object->_actionBlock < overlayData.object->_moves.at(overlayData.object->_action).size()) {
+					frame->setMaximum(overlayData.object->_moves.at(overlayData.object->_action)[overlayData.object->_actionBlock].size() - 1);
+					frame->setValue(overlayData.object->_animation);
+					frameLabel->setText("Frame " + std::to_string(overlayData.object->_animation));
+				}
+			}
+			*c = false;
+		} catch (...) {}
+	});
+	block->connect("ValueChanged", [frame, frameLabel, blockLabel](float f){
+		if (*c)
+			return;
+		overlayData.object->_actionBlock = f;
+		overlayData.object->_animation = 0;
+		overlayData.object->_animationCtr = 0;
+		*c = true;
+		if (overlayData.object->_moves.count(overlayData.object->_action)) {
+			blockLabel->setText("Block " + std::to_string(overlayData.object->_actionBlock + 1) + "/" + std::to_string(overlayData.object->_moves[overlayData.object->_action].size()));
+			if (overlayData.object->_actionBlock < overlayData.object->_moves.at(overlayData.object->_action).size()) {
+				frame->setMaximum(overlayData.object->_moves.at(overlayData.object->_action)[overlayData.object->_actionBlock].size() - 1);
+				frame->setValue(overlayData.object->_animation);
+				frameLabel->setText("Frame " + std::to_string(overlayData.object->_animation));
+			}
+		}
+		*c = false;
+	});
+	frame->connect("ValueChanged", [frameLabel](float f){
+		if (*c)
+			return;
+		overlayData.object->_animation = f;
+		overlayData.object->_animationCtr = 0;
+		frameLabel->setText("Frame " + std::to_string(overlayData.object->_animation));
+	});
+}
+
 void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 {
 	auto bar = gui.get<tgui::MenuBar>("main_bar");
@@ -3292,6 +3427,7 @@ void	placeGuiHooks(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	bar->connectMenuItem({"View", "Palette editor"}, displayPalEditorForce, std::ref(object), std::ref(gui));
 	bar->connectMenuItem({"View", "Blending options"}, displayBlendingOptions, std::ref(gui));
 	bar->connectMenuItem({"View", "Hitboxes (H)"}, switchHitboxes, std::ref(object), boxes);
+	bar->connectMenuItem({"View", "Overlay move"}, overlayMove, std::ref(gui), std::ref(object));
 
 	bar->connectMenuItem({"Help", "About"}, displayAbout, std::ref(gui));
 
@@ -3620,8 +3756,12 @@ void	updatePalsBulk(tgui::ChildWindow::Ptr window, const std::string &clipboard,
 			game->logger.error(e.what());
 		}
 		selectedColor++;
+		if (selectedColor == 256) {
+			selectedColor = 255;
+			break;
+		}
 	}
-
+	// TODO: Properly update the palette editor UI to reflect which color is now selected
 	game->textureMgr.invalidatePalette(editSession.palName);
 	for (auto &action : object->_moves)
 		for (auto &block : action.second)
@@ -3724,6 +3864,7 @@ void	handleKeyPress(sf::Event::KeyEvent event, std::unique_ptr<EditableObject> &
 					}
 				}
 			} else if (clipboard.front() == '#') {
+				// TODO: Disable if an editbox is selected
 				if (event.control && window)
 					updatePalsBulk(window, clipboard, object);
 			} else
@@ -4331,8 +4472,28 @@ void	run()
 				else if (a != object->_animation)
 					progress->setValue(object->_animation);
 				timer -= updateTimer;
+				if (overlayData.play) {
+					auto window = gui.get<tgui::ChildWindow>("Overlay move");
+
+					b = overlayData.object->_actionBlock;
+					a = overlayData.object->_animation;
+					overlayData.object->update();
+					if (window) {
+						auto block2 = window->get<tgui::SpinButton>("Block");
+						auto frame = window->get<tgui::Slider>("Frame");
+
+						if (b != overlayData.object->_actionBlock)
+							block2->setValue(overlayData.object->_actionBlock);
+						else if (a != overlayData.object->_animation)
+							frame->setValue(overlayData.object->_animation);
+					}
+				}
 			}
+			if (overlayData.display && !overlayData.front)
+				overlayData.object->render();
 			object->render(gui.get<tgui::ChildWindow>("LoadingWindow") == nullptr);
+			if (overlayData.display && overlayData.front)
+				overlayData.object->render();
 			if (hovering)
 				renderTopLayer(*object);
 		}
@@ -4378,6 +4539,7 @@ void	run()
 					object->scale = 1;
 				if (object->scale > 4)
 					object->scale = 4;
+				overlayData.object->scale = object->scale;
 				continue;
 			}
 			if (event.type == sf::Event::Resized) {
@@ -4430,6 +4592,7 @@ void	run()
 						static_cast<float>(event.mouseMove.x - lastMouse.x),
 						static_cast<float>(event.mouseMove.y - lastMouse.y)
 					};
+					overlayData.object->translate = object->translate + overlayData.offset;
 					lastMouse = Vector2i{event.mouseMove.x, event.mouseMove.y};
 				} else if (!handled)
 					hoverImagePixel(object, event.mouseMove.x, event.mouseMove.y, panel);

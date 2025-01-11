@@ -119,7 +119,12 @@ add_executable(
 	FrameDataEditor
 	${FDICON}
 	src/FrameDataEditor/dataEditor.cpp
+	src/FrameDataEditor/OverlayObject.cpp
+	src/FrameDataEditor/OverlayObject.hpp
 	src/FrameDataEditor/EditableObject.cpp
 	src/FrameDataEditor/EditableObject.hpp
-	src/Core/SoFGV.hpp src/FrameDataEditor/ActionName.cpp src/FrameDataEditor/ActionName.hpp)
+	src/Core/SoFGV.hpp
+	src/FrameDataEditor/ActionName.cpp
+	src/FrameDataEditor/ActionName.hpp
+)
 target_link_libraries(FrameDataEditor SoFGVCore)
