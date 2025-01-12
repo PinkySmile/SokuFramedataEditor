@@ -12,81 +12,109 @@
 #
 
 IF (NOT SFML_INCLUDE_DIRS OR NOT SFML_GRAPHICS_LIBRARY OR NOT SFML_AUDIO_LIBRARY OR NOT SFML_NETWORK_LIBRARY OR NOT SFML_SYSTEM_LIBRARY OR NOT SFML_WINDOW_LIBRARY)
-        IF (MSVC)      # Visual Studio
-                SET(CMAKE_FIND_LIBRARY_PREFIXES ";lib")
-                SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.dll.lib;.dll.a;.a")
-        ELSEIF (MINGW) # Windows
-                SET(CMAKE_FIND_LIBRARY_PREFIXES ";lib")
-                SET(CMAKE_FIND_LIBRARY_SUFFIXES ".dll.a;.dll;.a;.lib")
-        ELSE (MSVC)    # Linux and MacOS
-                SET(CMAKE_FIND_LIBRARY_PREFIXES "lib")
-                SET(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.dylib;.a")
-        ENDIF(MSVC)
+        IF (STATIC_BUILD)
+                IF (MSVC)      # Visual Studio
+                        SET(CMAKE_FIND_LIBRARY_PREFIXES ";lib")
+                        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.dll.lib;.dll.a;.a")
+                ELSEIF (MINGW) # Windows
+                        SET(CMAKE_FIND_LIBRARY_PREFIXES ";lib")
+                        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.lib")
+                ELSE (MSVC)    # Linux and MacOS
+                        SET(CMAKE_FIND_LIBRARY_PREFIXES "lib")
+                        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+                ENDIF(MSVC)
 
-        FIND_LIBRARY(SFML_GRAPHICS_LIBRARY
-                NAMES
-                sfml-graphics
-                PATHS
-                ${SFML_DIR}/lib/              # SFML root directory (if provided)
-                ${SFML_DIR}                   # SFML root directory (if provided)
-                /usr/lib64/                   # Default Fedora28 library path
-                /usr/lib/                     # Some more Linux library path
-                /usr/lib/x86_64-linux-gnu/    # Some more Linux library path
-                /usr/local/lib/               # Some more Linux library path
-                /usr/local/lib64/             # Some more Linux library path
-        )
+                FIND_LIBRARY(SFML_GRAPHICS_LIBRARY
+                        NAMES
+                        sfml-graphics-s
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
 
-        FIND_LIBRARY(SFML_AUDIO_LIBRARY
-                NAMES
-                sfml-audio
-                PATHS
-                ${SFML_DIR}/lib/              # SFML root directory (if provided)
-                ${SFML_DIR}                   # SFML root directory (if provided)
-                /usr/lib64/                   # Default Fedora28 library path
-                /usr/lib/                     # Some more Linux library path
-                /usr/lib/x86_64-linux-gnu/    # Some more Linux library path
-                /usr/local/lib/               # Some more Linux library path
-                /usr/local/lib64/             # Some more Linux library path
-        )
+                FIND_LIBRARY(SFML_AUDIO_LIBRARY
+                        NAMES
+                        sfml-audio-s
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
 
-        FIND_LIBRARY(SFML_NETWORK_LIBRARY
-                NAMES
-                sfml-network
-                PATHS
-                ${SFML_DIR}/lib/              # SFML root directory (if provided)
-                ${SFML_DIR}                   # SFML root directory (if provided)
-                /usr/lib64/                   # Default Fedora28 library path
-                /usr/lib/                     # Some more Linux library path
-                /usr/lib/x86_64-linux-gnu/    # Some more Linux library path
-                /usr/local/lib/               # Some more Linux library path
-                /usr/local/lib64/             # Some more Linux library path
-        )
+                FIND_LIBRARY(SFML_NETWORK_LIBRARY
+                        NAMES
+                        sfml-network-s
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
 
-        FIND_LIBRARY(SFML_SYSTEM_LIBRARY
-                NAMES
-                sfml-system
-                PATHS
-                ${SFML_DIR}/lib/              # SFML root directory (if provided)
-                ${SFML_DIR}                   # SFML root directory (if provided)
-                /usr/lib64/                   # Default Fedora28 library path
-                /usr/lib/                     # Some more Linux library path
-                /usr/lib/x86_64-linux-gnu/    # Some more Linux library path
-                /usr/local/lib/               # Some more Linux library path
-                /usr/local/lib64/             # Some more Linux library path
-        )
+                FIND_LIBRARY(SFML_SYSTEM_LIBRARY
+                        NAMES
+                        sfml-system-s
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
 
-        FIND_LIBRARY(SFML_WINDOW_LIBRARY
-                NAMES
-                sfml-window
-                PATHS
-                ${SFML_DIR}/lib/              # SFML root directory (if provided)
-                ${SFML_DIR}                   # SFML root directory (if provided)
-                /usr/lib64/                   # Default Fedora28 library path
-                /usr/lib/                     # Some more Linux library path
-                /usr/lib/x86_64-linux-gnu/    # Some more Linux library path
-                /usr/local/lib/               # Some more Linux library path
-                /usr/local/lib64/             # Some more Linux library path
-        )
+                FIND_LIBRARY(SFML_WINDOW_LIBRARY
+                        NAMES
+                        sfml-window-s
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
+        ELSE (STATIC_BUILD)
+                IF (MSVC)      # Visual Studio
+                        SET(CMAKE_FIND_LIBRARY_PREFIXES ";lib")
+                        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.dll.lib;.dll.a;.a")
+                ELSEIF (MINGW) # Windows
+                        SET(CMAKE_FIND_LIBRARY_PREFIXES ";lib")
+                        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".dll.a;.dll;.a;.lib")
+                ELSE (MSVC)    # Linux and MacOS
+                        SET(CMAKE_FIND_LIBRARY_PREFIXES "lib")
+                        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.dylib;.a")
+                ENDIF(MSVC)
+
+                FIND_LIBRARY(SFML_GRAPHICS_LIBRARY
+                        NAMES
+                        sfml-graphics
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
+
+                FIND_LIBRARY(SFML_AUDIO_LIBRARY
+                        NAMES
+                        sfml-audio
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
+
+                FIND_LIBRARY(SFML_NETWORK_LIBRARY
+                        NAMES
+                        sfml-network
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
+
+                FIND_LIBRARY(SFML_SYSTEM_LIBRARY
+                        NAMES
+                        sfml-system
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
+
+                FIND_LIBRARY(SFML_WINDOW_LIBRARY
+                        NAMES
+                        sfml-window
+                        PATHS
+                        ${SFML_DIR}/lib/              # SFML root directory (if provided)
+                        ${SFML_DIR}                   # SFML root directory (if provided)
+                )
+        ENDIF ()
 
         FIND_PATH(SFML_INCLUDE_DIRS
                 NAMES

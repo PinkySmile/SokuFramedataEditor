@@ -158,7 +158,6 @@ void OverlayObject::update()
 			this->_animation = 0;
 		}
 		data = &act[this->_actionBlock][this->_animation];
-		SpiralOfFate::game->soundMgr.play(data->hitSoundHandle);
 		if (!data->frame->duration)
 			break;
 	}

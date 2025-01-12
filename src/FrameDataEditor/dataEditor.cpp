@@ -236,6 +236,7 @@ void loadPackages()
 	for (auto &path : paths)
 		game->package.merge(path);
 
+	game->logger.debug("Starting to load packages");
 	for (auto &entry : game->package) {
 		if (entry.first.name.substr(0, strlen("data_character_")) != "data_character_")
 			continue;
@@ -257,6 +258,7 @@ void loadPackages()
 			entry.second->close(stream);
 		}
 	}
+	game->logger.debug("Packages are loaded");
 }
 
 void	refreshBoxes(tgui::Panel::Ptr panel, FrameData &data, std::unique_ptr<EditableObject> &object)
@@ -996,7 +998,6 @@ void	placeAnimPanelHooks(tgui::Gui &gui, tgui::Panel::Ptr panel, tgui::Panel::Pt
 		auto &data = object->_moves.at(object->_action)[object->_actionBlock][object->_animation];
 
 		data.frame->traits.onHitSfx = std::stoul(t);
-		data.reloadSound();
 	});
 	speed->connect("TextChanged", [boxes, &object](std::string t){
 		if (*c)
@@ -4418,10 +4419,13 @@ void	run()
 		displayPalEditor(object, gui);
 	};*/
 
+	game->logger.debug("Load icon");
 	if (icon.loadFromFile("assets/editorIcon.png"))
 		game->screen->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
+	game->logger.debug("Load widgets");
 	gui.loadWidgetsFromFile("assets/gui/editor.gui");
+	game->logger.debug("Done");
 
 	bool dragging = false;
 	auto panel = gui.get<tgui::Panel>("Panel1");
@@ -4464,8 +4468,6 @@ void	run()
 				auto a = object->_animation;
 
 				object->update();
-				if (object->_animationCtr == 0)
-					game->soundMgr.play(object->_moves.at(object->_action)[object->_actionBlock][object->_animation].hitSoundHandle);
 				updateAnyway = false;
 				if (b != object->_actionBlock)
 					block->setValue(object->_actionBlock);
@@ -4675,13 +4677,14 @@ LONG WINAPI UnhandledExFilter(PEXCEPTION_POINTERS ExPtr)
 		BOOL win = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &md, 0, 0);
 
 		if (!win)
-			sprintf(buf, "Fatal exception caught.\nMiniDumpWriteDump failed.\n%s: %s", getLastError().c_str(), buf2);
+			sprintf(buf, "Fatal exception %x caught.\nMiniDumpWriteDump failed.\n%s: %s", ExPtr->ExceptionRecord->ExceptionCode, getLastError().c_str(), buf2);
 		else
-			sprintf(buf, "Fatal exception caught.\nMinidump created %s", buf2);
+			sprintf(buf, "Fatal exception %x caught.\nMinidump created %s", ExPtr->ExceptionRecord->ExceptionCode, buf2);
 		CloseHandle(hFile);
 	} else
-		sprintf(buf, "Fatal exception caught.\nCould not create file %s\n%s", buf2, getLastError().c_str());
+		sprintf(buf, "Fatal exception %x caught.\nCould not create file %s\n%s", ExPtr->ExceptionRecord->ExceptionCode, buf2, getLastError().c_str());
 	game->logger.fatal(buf);
+	game->logger.flush();
 	Utils::dispMsg("Fatal error", buf, MB_ICONERROR, &*game->screen);
 	exit(EXIT_FAILURE);
 }

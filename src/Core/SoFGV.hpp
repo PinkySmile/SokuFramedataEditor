@@ -12,7 +12,6 @@
 #include "Resources/FrameData.hpp"
 #include "Resources/Game.hpp"
 #include "Resources/Screen.hpp"
-#include "Resources/SoundManager.hpp"
 #include "Resources/Sprite.hpp"
 #include "Resources/TextureManager.hpp"
 #include "Resources/version.h"

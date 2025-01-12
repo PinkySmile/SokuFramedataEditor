@@ -56,15 +56,19 @@ namespace SpiralOfFate
 	{
 		this->msg(content, "[FATAL]");
 	}
+
+	void Logger::flush() noexcept
+	{
+		this->file.flush();
+		std::cout.flush();
+	}
 #else
-	Logger::Logger(const std::string &filepath) noexcept :
-			file(std::ofstream(filepath, std::ios::out))
+	Logger::Logger(const std::string &filepath) noexcept
 	{
 	}
 
 	Logger::~Logger() noexcept
 	{
-		this->file.close();
 	}
 
 	void Logger::msg(const std::string &content, int prio) noexcept
@@ -95,6 +99,10 @@ namespace SpiralOfFate
 	void Logger::fatal(const std::string &content) noexcept
 	{
 		this->msg(content, ANDROID_LOG_FATAL);
+	}
+
+	void Logger::flush() noexcept
+	{
 	}
 #endif
 }

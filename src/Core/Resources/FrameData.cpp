@@ -94,12 +94,6 @@ namespace SpiralOfFate
 		} catch (std::exception &e) {
 			game->logger.error("Error loading texture: " + std::string(e.what()) + "\n");
 		}
-		if (this->frame->traits.onHitSfx) {
-			char buffer[4];
-
-			sprintf(buffer, "%03d", this->frame->traits.onHitSfx);
-			this->hitSoundHandle = game->soundMgr.load(game->package, "data/se/" + std::string(buffer) + ".cv3");
-		}
 		if (this->frame->cBoxes.size() > 1)
 			throw std::runtime_error("FrameData::FrameData: More than one collision box is not supported");
 		for (auto &box : this->frame->cBoxes)
@@ -128,9 +122,7 @@ namespace SpiralOfFate
 		frame(other.frame)
 	{
 		this->textureHandle = other.textureHandle;
-		this->hitSoundHandle = other.hitSoundHandle;
 		game->textureMgr.addRef(this->textureHandle);
-		game->soundMgr.addRef(this->hitSoundHandle);
 	}
 
 	FrameData::FrameData(const FrameData &other, ShadyCore::Schema::Sequence::MoveFrame &frame) :
@@ -151,28 +143,12 @@ namespace SpiralOfFate
 		}
 	}
 
-	void FrameData::reloadSound()
-	{
-		my_assert(!this->_slave);
-		game->soundMgr.remove(this->hitSoundHandle);
-		this->hitSoundHandle = 0;
-		if (this->frame->traits.onHitSfx) {
-			char buffer[4];
-
-			sprintf(buffer, "%03d", this->frame->traits.onHitSfx);
-			this->hitSoundHandle = game->soundMgr.load(game->package, "data/se/" + std::string(buffer) + ".cv0");
-		}
-	}
-
 	void FrameData::setSlave(bool slave)
 	{
-		if (!slave && this->_slave) {
+		if (!slave && this->_slave)
 			game->textureMgr.addRef(this->textureHandle);
-			game->soundMgr.addRef(this->hitSoundHandle);
-		} else if (slave && !this->_slave) {
+		else if (slave && !this->_slave)
 			game->textureMgr.remove(this->textureHandle);
-			game->soundMgr.remove(this->hitSoundHandle);
-		}
 		this->_slave = slave;
 	}
 
@@ -191,12 +167,9 @@ namespace SpiralOfFate
 		this->_palette = other._palette;
 		if (!this->_slave) {
 			game->textureMgr.remove(this->textureHandle);
-			game->soundMgr.remove(this->hitSoundHandle);
 			game->textureMgr.addRef(other.textureHandle);
-			game->soundMgr.addRef(other.hitSoundHandle);
 		}
 		this->textureHandle = other.textureHandle;
-		this->hitSoundHandle = other.hitSoundHandle;
 		this->needReload = other.needReload;
 		this->_schema = other._schema;
 		this->frame = other.frame;
@@ -210,12 +183,9 @@ namespace SpiralOfFate
 		this->_palette = other._palette;
 		if (!this->_slave) {
 			game->textureMgr.remove(this->textureHandle);
-			game->soundMgr.remove(this->hitSoundHandle);
 			game->textureMgr.addRef(other.textureHandle);
-			game->soundMgr.addRef(other.hitSoundHandle);
 		}
 		this->textureHandle = other.textureHandle;
-		this->hitSoundHandle = other.hitSoundHandle;
 		this->needReload = other.needReload;
 		this->_schema = other._schema;
 		this->frame = other.frame;

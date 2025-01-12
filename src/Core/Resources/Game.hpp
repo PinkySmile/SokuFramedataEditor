@@ -10,7 +10,6 @@
 #include <random>
 #include "Screen.hpp"
 #include "TextureManager.hpp"
-#include "SoundManager.hpp"
 #include "../Logger.hpp"
 
 #ifdef _MSC_VER
@@ -110,7 +109,6 @@ namespace SpiralOfFate
 		std::string lastIp = "127.0.0.1";
 		std::unique_ptr<Screen> screen;
 		TextureManager textureMgr;
-		SoundManager soundMgr;
 		ShadyCore::PackageEx package;
 		std::map<std::string, CharacterData> characterPaths;
 

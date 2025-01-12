@@ -101,7 +101,6 @@ namespace SpiralOfFate
 	public:
 		const ShadyCore::Schema *_schema;
 		unsigned textureHandle = 0;
-		unsigned hitSoundHandle = 0;
 		bool needReload = false;
 		ShadyCore::Schema::Sequence *parent;
 		ShadyCore::Schema::Sequence::MoveFrame *frame;
@@ -115,7 +114,6 @@ namespace SpiralOfFate
 		FrameData &operator=(FrameData &&other) noexcept;
 		void setSlave(bool slave = true);
 		void reloadTexture();
-		void reloadSound();
 		void setPalette(const ShadyCore::Palette &palette, const std::string &name);
 		nlohmann::json saveData() const;
 		void loadData(const nlohmann::json &json);

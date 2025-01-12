@@ -15,6 +15,9 @@ set(SHADY_ENABLE_MODULE OFF)
 set(SHADY_ENABLE_TEST OFF)
 add_subdirectory(shady-packer)
 
+if (STATIC_BUILD)
+	add_compile_definitions(SFML_STATIC)
+endif ()
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(-W -Wall -Wextra)
@@ -62,8 +65,21 @@ else ()
 	set(SFML_NETWORK_LIB "${SFML_NETWORK_LIBRARY}")
 endif ()
 
-add_library(
-	SoFGVCore SHARED
+message("TGUI is ${TGUI_LIB}")
+message("SFML-graphics is ${SFML_GRAPHICS_LIB}")
+message("SFML-audio is ${SFML_AUDIO_LIB}")
+message("SFML-system is ${SFML_SYSTEM_LIB}")
+message("SFML-window is ${SFML_WINDOW_LIB}")
+message("SFML-network is ${SFML_NETWORK_LIB}")
+
+if (STATIC_BUILD)
+	add_library(SoFGVCore STATIC)
+else ()
+	add_library(SoFGVCore SHARED)
+endif ()
+
+target_sources(
+	SoFGVCore PUBLIC
 	src/Core/Data/Color.hpp
 	src/Core/Data/Vector.hpp
 	src/Core/Logger.cpp
@@ -75,8 +91,6 @@ add_library(
 	src/Core/Resources/Game.hpp
 	src/Core/Resources/Screen.cpp
 	src/Core/Resources/Screen.hpp
-	src/Core/Resources/SoundManager.cpp
-	src/Core/Resources/SoundManager.hpp
 	src/Core/Resources/Sprite.hpp
 	src/Core/Resources/TextureManager.cpp
 	src/Core/Resources/TextureManager.hpp
@@ -84,36 +98,35 @@ add_library(
 	src/Core/Utils.hpp
 	src/Core/Resources/version.h
 )
+
 target_compile_definitions(SoFGVCore PRIVATE MYDLL_EXPORTS=1)
 
 if (WIN32)
-	target_link_libraries(
-		SoFGVCore
+	set(
+		FINAL_LIBS
 		dbghelp
-		${SFML_GRAPHICS_LIB}
-		${SFML_AUDIO_LIB}
-		${SFML_SYSTEM_LIB}
-		${SFML_WINDOW_LIB}
-		${SFML_NETWORK_LIB}
 		${TGUI_LIB}
+		${SFML_GRAPHICS_LIB}
+		${SFML_WINDOW_LIB}
+		${SFML_SYSTEM_LIB}
 		shady-core
-		ws2_32
 	)
 else ()
-	target_link_libraries(
-		SoFGVCore
-		${SFML_GRAPHICS_LIB}
-		${SFML_AUDIO_LIB}
-		${SFML_SYSTEM_LIB}
-		${SFML_WINDOW_LIB}
-		${SFML_NETWORK_LIB}
+	set(
+		FINAL_LIBS
 		${TGUI_LIB}
+		${SFML_GRAPHICS_LIB}
+		${SFML_WINDOW_LIB}
+		${SFML_SYSTEM_LIB}
 		shady-core
 		pthread
 		png
 		xcb
 	)
 endif ()
+if (NOT STATIC_BUILD)
+	target_link_libraries(SoFGVCore ${FINAL_LIBS})
+endif()
 
 add_executable(
 	FrameDataEditor
@@ -127,4 +140,8 @@ add_executable(
 	src/FrameDataEditor/ActionName.cpp
 	src/FrameDataEditor/ActionName.hpp
 )
-target_link_libraries(FrameDataEditor SoFGVCore)
+if (STATIC_BUILD)
+	target_link_libraries(FrameDataEditor SoFGVCore ${FINAL_LIBS} opengl32 freetype brotlidec brotlicommon bz2 gdi32 winmm -static)
+else ()
+	target_link_libraries(FrameDataEditor SoFGVCore)
+endif ()

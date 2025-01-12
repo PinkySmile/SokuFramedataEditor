@@ -31,6 +31,7 @@ namespace SpiralOfFate
 		void warn(const std::string &content) noexcept;
 		void error(const std::string &content) noexcept;
 		void fatal(const std::string &content) noexcept;
+		void flush() noexcept;
 	};
 }
 
