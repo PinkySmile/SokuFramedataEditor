@@ -63,7 +63,7 @@ struct {
 	bool display = false;
 	bool front = true;
 	bool play = true;
-	SpiralOfFate::Vector2u offset = {0, 0};
+	SpiralOfFate::Vector2i offset = {0, 0};
 	std::unique_ptr<OverlayObject> object;
 } overlayData;
 
@@ -3233,7 +3233,7 @@ void overlayMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 	display->setChecked(overlayData.display);
 	front->setChecked(overlayData.front);
 	play->setChecked(overlayData.play);
-	offset->setText("(" + std::to_string(overlayData.offset.x) + "," + std::to_string(overlayData.offset.y) + ")");
+	offset->setText("(" + std::to_string(overlayData.offset.x) + "," + std::to_string(-overlayData.offset.y) + ")");
 	action->setText(std::to_string(overlayData.object->_action));
 	if (overlayData.object->_moves.count(overlayData.object->_action)) {
 		block->setMaximum(overlayData.object->_moves.at(overlayData.object->_action).size() - 1);
@@ -3267,8 +3267,8 @@ void overlayMove(tgui::Gui &gui, std::unique_ptr<EditableObject> &object)
 
 		try {
 			std::stoul(x);
-			overlayData.offset.x = std::stoul(x);
-			overlayData.offset.y = std::stoul(y);
+			overlayData.offset.x = std::stol(x);
+			overlayData.offset.y = -std::stol(y);
 			overlayData.object->translate = object->translate + overlayData.offset;
 		} catch (...) {}
 	});
