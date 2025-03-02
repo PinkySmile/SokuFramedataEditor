@@ -8,6 +8,12 @@
 
 namespace SpiralOfFate
 {
+	TextureManager::TextureManager()
+	{
+		this->_dummy.clear(Color::Transparent);
+		this->_dummy.display();
+	}
+
 	unsigned TextureManager::load(std::string path, Vector2u *size, bool repeated)
 	{
 		for (auto pos = path.find('\\'); pos != std::string::npos; pos = path.find('\\'))
@@ -35,9 +41,13 @@ namespace SpiralOfFate
 			this->_freedIndexes.pop_back();
 		}
 
-		game->logger.debug("Loading file " + file + " (" + path + ")");
+		if (file != path)
+			game->logger.debug("Loading file " + file + " (" + path + ")");
+		else
+			game->logger.debug("Loading file " + file);
 		if (!this->_textures[index].loadFromFile(file)) {
 			this->_freedIndexes.push_back(index);
+			game->logger.error("Failed to load " + file);
 			return 0;
 		}
 
@@ -47,6 +57,7 @@ namespace SpiralOfFate
 		this->_textures[index].setRepeated(repeated);
 		this->_allocatedTextures[file].first = index;
 		this->_allocatedTextures[file].second = 1;
+		game->logger.verbose("Loaded " + file + " successfully");
 		return index;
 	}
 
@@ -128,9 +139,8 @@ namespace SpiralOfFate
 
 	unsigned TextureManager::load(const Color *pixels, Vector2u size)
 	{
-		sf::Image image;
+		sf::Image image{size, reinterpret_cast<const uint8_t *>(pixels)};
 
-		image.create(size.x, size.y, reinterpret_cast<const sf::Uint8 *>(pixels));
 		if (!this->_textures[this->_lastIndex].loadFromImage(image))
 			return 0;
 		return this->_lastIndex++;
@@ -151,17 +161,17 @@ namespace SpiralOfFate
 
 		for (unsigned x = 0; x < size.x; x++)
 			for (unsigned y = 0; y < size.y; y++) {
-				buffer[x + y * size.x].r = reinterpret_cast<const sf::Color *>(ptr)[x + y * size.x].r;
-				buffer[x + y * size.x].g = reinterpret_cast<const sf::Color *>(ptr)[x + y * size.x].g;
-				buffer[x + y * size.x].b = reinterpret_cast<const sf::Color *>(ptr)[x + y * size.x].b;
-				buffer[x + y * size.x].a = reinterpret_cast<const sf::Color *>(ptr)[x + y * size.x].a;
+				buffer[x + y * size.x].r = reinterpret_cast<const Color *>(ptr)[x + y * size.x].r;
+				buffer[x + y * size.x].g = reinterpret_cast<const Color *>(ptr)[x + y * size.x].g;
+				buffer[x + y * size.x].b = reinterpret_cast<const Color *>(ptr)[x + y * size.x].b;
+				buffer[x + y * size.x].a = reinterpret_cast<const Color *>(ptr)[x + y * size.x].a;
 			}
 		return buffer;
 	}
 
 	void TextureManager::remove(unsigned int id)
 	{
-		if (!id)
+		if (id == 0)
 			return;
 
 		for (auto &[loadedPath, attr] : this->_allocatedTextures)
@@ -182,21 +192,11 @@ namespace SpiralOfFate
 		this->_freedIndexes.push_back(id);
 	}
 
-	sf::Texture *TextureManager::setTexture(Sprite &sprite)
+	const sf::Texture &TextureManager::getTexture(unsigned handle) const
 	{
-		if (!sprite.textureHandle)
-			return nullptr;
-		//assert_exp(sprite.textureHandle);
-		sprite.setTexture(this->_textures.at(sprite.textureHandle));
-		return &this->_textures.at(sprite.textureHandle);
-	}
-
-	void TextureManager::render(Sprite &sprite) const
-	{
-		if (!sprite.textureHandle)
-			return;
-		sprite.setTexture(this->_textures.at(sprite.textureHandle));
-		game->screen->displayElement(sprite);
+		if (!handle)
+			return this->_dummy.getTexture();
+		return this->_textures.at(handle);
 	}
 
 	void TextureManager::addRef(unsigned int id)
@@ -234,7 +234,6 @@ namespace SpiralOfFate
 		std::string p = path;
 		size_t pos = p.find(':');
 		auto elem = p.substr(0, pos);
-		sf::Image image;
 		auto oit = this->_overrideList.find(elem);
 		auto real = oit == this->_overrideList.end() ? elem : oit->second;
 		Color *pixels = TextureManager::loadPixels(real, realSize);
@@ -273,8 +272,11 @@ namespace SpiralOfFate
 				}
 
 		game->logger.debug("Reloading resulting image (" + std::to_string(pal1.size()) + " paletted colors)");
-		image.create(realSize.x, realSize.y, reinterpret_cast<const sf::Uint8 *>(pixels));
-		this->_textures[id].loadFromImage(image);
+
+		sf::Image image{realSize, reinterpret_cast<const uint8_t *>(pixels)};
+
+		if (!this->_textures[id].loadFromImage(image))
+			game->logger.error("Failed loading texture");
 		delete[] pixels;
 	}
 

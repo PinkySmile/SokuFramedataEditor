@@ -12,8 +12,9 @@ namespace SpiralOfFate
 {
 	MYDLL_API Game *game = nullptr;
 
-	Game::Game(const std::string &loggerPath) :
-		logger(loggerPath)
+	Game::Game(const std::string &fontPath, const std::string &loggerPath) :
+		logger(loggerPath),
+		font(fontPath)
 	{
 		assert_exp(!game);
 		game = this;

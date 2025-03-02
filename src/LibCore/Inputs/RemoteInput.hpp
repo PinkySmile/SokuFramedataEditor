@@ -8,8 +8,9 @@
 
 #include <array>
 #include <bitset>
+#include <algorithm>
 #include "RollbackInput.hpp"
-#include <Resources/Network/IConnection.hpp>
+#include "Resources/Network/IConnection.hpp"
 
 namespace SpiralOfFate
 {

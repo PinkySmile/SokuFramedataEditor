@@ -1026,11 +1026,11 @@ namespace SpiralOfFate
 		return sizeof(Data) + sizeof(Box) * (dat->hurtBoxesCount + dat->hitBoxesCount);
 	}
 
-	Box::operator sf::IntRect() const noexcept
+	Box::operator IntRect() const noexcept
 	{
 		return {
-			this->pos.x, this->pos.y,
-			static_cast<int>(this->size.x), static_cast<int>(this->size.y)
+			this->pos,
+			this->size.to<int>()
 		};
 	}
 }

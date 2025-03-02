@@ -36,7 +36,7 @@ namespace SpiralOfFate
 		SceneState currentState = SCENESTATE_TITLE_SCREEN;
 
 		VirtualController();
-		~VirtualController() override;
+		~VirtualController() override = default;
 
 		void render();
 		void onFrameStart();

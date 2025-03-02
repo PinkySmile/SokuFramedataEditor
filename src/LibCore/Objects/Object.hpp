@@ -86,7 +86,7 @@ namespace SpiralOfFate
 		unsigned short _baseHp = 0;
 		bool _newAnim = false;
 
-		void _drawBox(const Rectangle &box, const sf::Color &color) const;
+		void _drawBox(const Rectangle &box, const Color &color) const;
 		std::vector<Rectangle> _getModifiedBoxes(const FrameData &data, const std::vector<Box> &) const;
 		std::vector<Rectangle> _getModifiedHurtBoxes() const;
 		std::vector<Rectangle> _getModifiedHitBoxes() const;

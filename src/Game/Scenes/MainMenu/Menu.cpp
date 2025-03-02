@@ -14,38 +14,33 @@
 
 namespace SpiralOfFate
 {
-	Menu::Menu(const std::string &buttonFont, const std::string &descFont, const std::vector<std::vector<MenuItemSkeleton>> &&arr)
+	Menu::Menu(const std::string &buttonFont, const std::string &descFont, const std::vector<std::vector<MenuItemSkeleton>> &&arr) :
+		_buttonFont(buttonFont),
+		_descFont(descFont),
+		_separatorBody{ game->textureMgr.load("assets/ui/separator.png") },
+		_separatorTopTip{ game->textureMgr.load("assets/ui/separator.png") },
+		_separatorBotTip{ game->textureMgr.load("assets/ui/separator.png") }
 	{
-		Sprite descBox;
+		Sprite descBox{ game->textureMgr.load("assets/ui/box.png") };
 
-		assert_exp(this->_buttonFont.loadFromFile(buttonFont));
-		assert_exp(this->_descFont.loadFromFile(descFont));
-
-		descBox.textureHandle = game->textureMgr.load("assets/ui/box.png");
-		game->textureMgr.setTexture(descBox);
 		this->_descBox = game->screen->prepareShrunkRect(descBox);
-		game->textureMgr.remove(descBox.textureHandle);
-
 		this->_descTimer = DESC_FADE_TIME;
 
 		this->_descText.setFont(this->_descFont);
 		this->_descText.setCharacterSize(DESC_FONT_SIZE);
 		this->_descText.setOutlineThickness(0);
-		this->_descText.setFillColor(sf::Color::White);
-		this->_descText.setOutlineColor(sf::Color::Transparent);
+		this->_descText.setFillColor(Color::White);
+		this->_descText.setOutlineColor(Color::Transparent);
 
-		this->_separatorBody.textureHandle = game->textureMgr.load("assets/ui/separator.png");
 		this->_separatorBody.setTextureRect({47, 0, 47, 5});
 		this->_separatorBody.setPosition({817, 312});
 
-		this->_separatorTopTip.textureHandle = game->textureMgr.load("assets/ui/separator.png");
 		this->_separatorTopTip.setTextureRect({0, 0, 47, 63});
 		this->_separatorTopTip.setPosition({817, 249});
 
-		this->_separatorBotTip.textureHandle = game->textureMgr.load("assets/ui/separator.png");
 		this->_separatorBotTip.setPosition({840, 339});
 		this->_separatorBotTip.setOrigin({23, 32});
-		this->_separatorBotTip.setRotation(180);
+		this->_separatorBotTip.setRotation(sf::degrees(180));
 		this->_separatorBotTip.setTextureRect({0, 0, 47, 63});
 
 		this->_selected.resize(arr.size());
@@ -62,13 +57,6 @@ namespace SpiralOfFate
 		}
 		this->_items.front().front()->selected = true;
 		this->_computeExpectedDescBoxSize();
-	}
-
-	Menu::~Menu()
-	{
-		game->textureMgr.remove(this->_separatorBody.textureHandle);
-		game->textureMgr.remove(this->_separatorTopTip.textureHandle);
-		game->textureMgr.remove(this->_separatorBotTip.textureHandle);
 	}
 
 	void Menu::update(InputStruct inputs)
@@ -139,17 +127,18 @@ namespace SpiralOfFate
 
 	void Menu::render() const
 	{
-		game->textureMgr.render(this->_separatorBody);
-		game->textureMgr.render(this->_separatorTopTip);
-		game->textureMgr.render(this->_separatorBotTip);
+		game->screen->displayElement(this->_separatorBody);
+		game->screen->displayElement(this->_separatorTopTip);
+		game->screen->displayElement(this->_separatorBotTip);
 		for (auto &elem : this->_items[this->_nextIndex])
 			elem->render();
 		if (this->_currentIndex != this->_nextIndex)
 			for (auto &elem : this->_items[this->_currentIndex])
 				elem->render();
 		game->screen->displayShrunkRect(*this->_descBox, {
-			static_cast<int>(DESC_POS.x + MAX_DESC_WIDTH - this->_descBoxSize.x), DESC_POS.y,
-			static_cast<int>(this->_descBoxSize.x + this->_descBox->texSize.x + 2), static_cast<int>(this->_descBoxSize.y + this->_descBox->texSize.y)});
+			{static_cast<int>(DESC_POS.x + MAX_DESC_WIDTH - this->_descBoxSize.x), DESC_POS.y},
+			{static_cast<int>(this->_descBoxSize.x + this->_descBox->texSize.x + 2), static_cast<int>(this->_descBoxSize.y + this->_descBox->texSize.y)}
+		});
 		game->screen->draw(this->_descText);
 	}
 

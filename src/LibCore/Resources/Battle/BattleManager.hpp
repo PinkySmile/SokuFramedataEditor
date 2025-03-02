@@ -10,6 +10,7 @@
 #include "Objects/Platform.hpp"
 #include "Resources/Assets/MoveListData.hpp"
 
+#define FIRST_TO 2
 #define STAGE_X_MIN (-500)
 #define STAGE_X_MAX 500
 #define STAGE_Y_MIN 0
@@ -71,7 +72,7 @@ namespace SpiralOfFate
 			unsigned char score = 0;
 
 			HUDData(BattleManager &mgr, Character &base, Sprite &icon, bool side);
-			void renderMeterBar(sf::RenderTarget &output, Vector2i pos, float bar, sf::Color minColor, sf::Color maxColor) const;
+			void renderMeterBar(sf::RenderTarget &output, Vector2i pos, float bar, Color minColor, Color maxColor) const;
 			void render(sf::RenderTarget &output) const;
 			void renderNoReverse(sf::RenderTarget &output) const;
 			void update();
@@ -142,9 +143,9 @@ namespace SpiralOfFate
 		Sprite _oosBubbleMask;
 		Sprite _battleUi[BATTLEUI_NB_SPRITES];
 		Sprite _limitSprites[8];
-		sf::Sprite _roundSprite;
 		sf::Texture _cross;
-		std::vector<sf::Texture> _roundSprites;
+		std::array<sf::Texture, 5 + FIRST_TO * 2 - 1> _roundSprites;
+		sf::Sprite _roundSprite;
 		unsigned char _speed = 60;
 		//TODO: Also save these in the rollback
 		std::vector<std::unique_ptr<Object>> _stageObjects;

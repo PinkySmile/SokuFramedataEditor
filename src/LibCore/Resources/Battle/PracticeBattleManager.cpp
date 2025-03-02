@@ -52,7 +52,7 @@ namespace SpiralOfFate
 		}
 		BattleManager::render();
 		if (this->_showBoxes) {
-			game->screen->borderColor(2, sf::Color::White);
+			game->screen->borderColor(2, Color::White);
 			game->screen->displayElement({STAGE_X_MIN, -STAGE_Y_MIN, STAGE_X_MAX - STAGE_X_MIN, STAGE_Y_MIN - STAGE_Y_MAX}, sf::Color::Transparent);
 			game->screen->borderColor(0, sf::Color::Transparent);
 		}
@@ -62,28 +62,30 @@ namespace SpiralOfFate
 	void PracticeBattleManager::consumeEvent(const sf::Event &event)
 	{
 		BattleManager::consumeEvent(event);
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F11)
-			this->_step = !this->_step;
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::F11)
+				this->_step = !this->_step;
 #ifdef _DEBUG
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2)
+			if (e->code == sf::Keyboard::Key::F2)
 #else
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F12)
+			if (e->code == sf::Keyboard::Key::F12)
 #endif
-			this->_next = true;
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F9)
-			this->_speed--;
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F10)
-			this->_speed++;
-		if (!this->replay) {
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F8 && this->_savedState)
-				this->restoreFromBuffer(this->_savedState);
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F7) {
-				delete[] this->_savedState;
-				this->_savedState = new unsigned char[this->getBufferSize()];
-				this->copyToBuffer(this->_savedState);
+				this->_next = true;
+			if (e->code == sf::Keyboard::Key::F9)
+				this->_speed--;
+			if (e->code == sf::Keyboard::Key::F10)
+				this->_speed++;
+			if (!this->replay) {
+				if (e->code == sf::Keyboard::Key::F8 && this->_savedState)
+					this->restoreFromBuffer(this->_savedState);
+				if (e->code == sf::Keyboard::Key::F7) {
+					delete[] this->_savedState;
+					this->_savedState = new unsigned char[this->getBufferSize()];
+					this->copyToBuffer(this->_savedState);
+				}
+				if (e->code == sf::Keyboard::Key::F6)
+					this->restoreFromBuffer(this->_startingState);
 			}
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F6)
-				this->restoreFromBuffer(this->_startingState);
 		}
 	}
 

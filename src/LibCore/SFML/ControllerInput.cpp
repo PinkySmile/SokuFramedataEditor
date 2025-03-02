@@ -103,19 +103,27 @@ namespace SpiralOfFate
 
 	void ControllerButton::consumeEvent(const sf::Event &event)
 	{
-		if (event.type == sf::Event::JoystickDisconnected && (
-			event.joystickConnect.joystickId == this->_joystickId || this->_joystickId == (unsigned)-1
-		)) {
+		auto pDisconnected = event.getIf<sf::Event::JoystickDisconnected>();
+
+		if (pDisconnected && (pDisconnected->joystickId == this->_joystickId || this->_joystickId == (unsigned)-1)) {
 			this->_state = false;
 			return;
 		}
-		if (event.type != sf::Event::JoystickButtonPressed && event.type != sf::Event::JoystickButtonReleased)
-			return;
-		if (event.joystickButton.joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
-			return;
-		if (event.joystickButton.button != this->_buttonId)
-			return;
-		this->_state = event.type == sf::Event::JoystickButtonPressed;
+
+		if (auto e = event.getIf<sf::Event::JoystickButtonPressed>()) {
+			if (e->joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
+				return;
+			if (e->button != this->_buttonId)
+				return;
+			this->_state = true;
+		}
+		if (auto e = event.getIf<sf::Event::JoystickButtonReleased>()) {
+			if (e->joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
+				return;
+			if (e->button != this->_buttonId)
+				return;
+			this->_state = false;
+		}
 	}
 
 	void ControllerButton::setJoystickId(unsigned int id)
@@ -148,19 +156,22 @@ namespace SpiralOfFate
 
 	void ControllerAxis::consumeEvent(const sf::Event &event)
 	{
-		if (event.type == sf::Event::JoystickDisconnected && (
-			event.joystickConnect.joystickId == this->_joystickId || this->_joystickId == (unsigned)-1
-		)) {
+		auto pDisconnected = event.getIf<sf::Event::JoystickDisconnected>();
+
+		if (pDisconnected && (pDisconnected->joystickId == this->_joystickId || this->_joystickId == (unsigned)-1)) {
 			this->_state = 0;
 			return;
 		}
-		if (event.type != sf::Event::JoystickMoved)
+
+		auto moved = event.getIf<sf::Event::JoystickMoved>();
+
+		if (!moved)
 			return;
-		if (event.joystickMove.joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
+		if (moved->joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
 			return;
-		if (event.joystickMove.axis != this->_axis)
+		if (moved->axis != this->_axis)
 			return;
-		this->_state = event.joystickMove.position;
+		this->_state = moved->position;
 	}
 
 	void ControllerAxis::setJoystickId(unsigned int id)
@@ -181,11 +192,11 @@ namespace SpiralOfFate
 			"PadY"
 		};
 
-		return "Axis " + axis[this->_axis] + (this->_threshHold < 0 ? "-" : "+");
+		return "Axis " + axis[(int)this->_axis] + (this->_threshHold < 0 ? "-" : "+");
 	}
 
 	std::pair<bool, int> ControllerAxis::save()
 	{
-		return {true, (this->_axis) | ((int)(char)(this->_threshHold)) << 3};
+		return {true, ((int)this->_axis) | ((int)(char)(this->_threshHold)) << 3};
 	}
 }

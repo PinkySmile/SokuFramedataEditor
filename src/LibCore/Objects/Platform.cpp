@@ -72,7 +72,7 @@ namespace SpiralOfFate
 		if (this->showBoxes) {
 			if (this->_deathTimer) {
 				game->screen->textSize(20);
-				game->screen->fillColor(sf::Color::Red);
+				game->screen->fillColor(Color::Red);
 				game->screen->displayElement(std::to_string(this->_deathTimer), {this->_position.x - 200, -this->_position.y}, 400, Screen::ALIGN_CENTER);
 				game->screen->textSize(30);
 			} else
@@ -81,7 +81,7 @@ namespace SpiralOfFate
 					static_cast<int>(-this->_position.y - 1),
 					static_cast<int>(this->_width),
 					2
-				}, sf::Color::White);
+				}, Color::White);
 		}
 	}
 

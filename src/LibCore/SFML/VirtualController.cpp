@@ -4,6 +4,7 @@
 
 #include "VirtualController.hpp"
 #include "Resources/Game.hpp"
+#include "Utils.hpp"
 
 #ifdef __ANDROID__
 #define MIN_ALPHA 100
@@ -35,36 +36,34 @@ namespace SpiralOfFate
 		{(1660 - 64 * BUTTON_SCALE) / 2, 20},
 	};
 
-	VirtualController::VirtualController()
+	VirtualController::VirtualController() :
+		_stickTop(game->textureMgr.load("assets/icons/inputs/stick_top.png")),
+		_stickBack(game->textureMgr.load("assets/icons/inputs/stick_back.png")),
+		_buttons{
+			{game->textureMgr.load(buttonAssets[0])},
+			{game->textureMgr.load(buttonAssets[1])},
+			{game->textureMgr.load(buttonAssets[2])},
+			{game->textureMgr.load(buttonAssets[3])},
+			{game->textureMgr.load(buttonAssets[4])},
+			{game->textureMgr.load(buttonAssets[5])},
+			{game->textureMgr.load(buttonAssets[6])},
+		},
+		_canvas{{1680, 960}}
 	{
-		assert_exp(this->_stickBack.textureHandle = game->textureMgr.load("assets/icons/inputs/stick_back.png"));
-		this->_stickBack.setPosition(20, 940 - game->textureMgr.getTextureSize(this->_stickBack.textureHandle).y * STICK_SCALE);
-		this->_stickBack.setScale(STICK_SCALE, STICK_SCALE);
-		this->_stickBack.setColor(sf::Color{255, 255, 255, MIN_ALPHA});
-		game->textureMgr.setTexture(this->_stickBack)->setSmooth(true);
+		this->_stickBack.setPosition({20, 940.f - this->_stickBack.getTextureSize().y * STICK_SCALE});
+		this->_stickBack.setScale({STICK_SCALE, STICK_SCALE});
+		this->_stickBack.setColor(Color{255, 255, 255, MIN_ALPHA});
 
-		assert_exp(this->_stickTop.textureHandle = game->textureMgr.load("assets/icons/inputs/stick_top.png"));
-		this->_stickTop.setPosition(20, 940 - game->textureMgr.getTextureSize(this->_stickTop.textureHandle).y * STICK_SCALE);
-		this->_stickTop.setScale(STICK_SCALE, STICK_SCALE);
-		this->_stickTop.setColor(sf::Color{255, 255, 255, MIN_ALPHA});
-		game->textureMgr.setTexture(this->_stickTop)->setSmooth(true);
+		this->_stickTop.setPosition({20, 940.f - this->_stickTop.getTextureSize().y * STICK_SCALE});
+		this->_stickTop.setScale({STICK_SCALE, STICK_SCALE});
+		this->_stickTop.setColor(Color{255, 255, 255, MIN_ALPHA});
 
 		for (int i = 0; i < 7; i++) {
-			assert_exp(this->_buttons[i].textureHandle = game->textureMgr.load(buttonAssets[i]));
 			this->_buttons[i].setPosition(buttonPos[i]);
-			this->_buttons[i].setScale(BUTTON_SCALE, BUTTON_SCALE);
-			this->_buttons[i].setColor(sf::Color{255, 255, 255, MIN_ALPHA});
-			game->textureMgr.setTexture(this->_buttons[i])->setSmooth(true);
+			this->_buttons[i].setScale({BUTTON_SCALE, BUTTON_SCALE});
+			this->_buttons[i].setColor(Color{255, 255, 255, MIN_ALPHA});
 		}
-
-		this->_canvas.create(1680, 960);
 		this->_indexes.fill(-30);
-	}
-
-	VirtualController::~VirtualController()
-	{
-		game->textureMgr.remove(this->_stickBack.textureHandle);
-		game->textureMgr.remove(this->_stickTop.textureHandle);
 	}
 
 	static Vector2f getScreenCoords(sf::Vector2i coords)
@@ -81,36 +80,28 @@ namespace SpiralOfFate
 	{
 		static bool _mousePressed = false;
 
-		switch (event.type) {
-		case sf::Event::MouseButtonPressed:
-			(this->*(_mousePressed ? &VirtualController::_onDrag : &VirtualController::_onPress))(getScreenCoords({event.mouseButton.x, event.mouseButton.y}), -1);
+		if (auto e = event.getIf<sf::Event::MouseButtonPressed>()) {
+			(this->*(_mousePressed ? &VirtualController::_onDrag : &VirtualController::_onPress))(getScreenCoords({e->position.x, e->position.y}), -1);
 			_mousePressed = true;
-			break;
-		case sf::Event::MouseButtonReleased:
-			this->_onRelease(getScreenCoords({event.mouseButton.x, event.mouseButton.y}), -1);
-			_mousePressed = false;
-			break;
-		case sf::Event::MouseMoved:
-			if (_mousePressed)
-				this->_onDrag(getScreenCoords({event.mouseMove.x, event.mouseMove.y}), -1);
-			break;
-		case sf::Event::TouchBegan:
-			this->_onPress(getScreenCoords({event.touch.x, event.touch.y}), event.touch.finger);
-			break;
-		case sf::Event::TouchEnded:
-			this->_onRelease(getScreenCoords({event.touch.x, event.touch.y}), event.touch.finger);
-			break;
-		case sf::Event::TouchMoved:
-			this->_onDrag(getScreenCoords({event.touch.x, event.touch.y}), event.touch.finger);
-			break;
-		default:
-			break;
 		}
+		if (auto e = event.getIf<sf::Event::MouseButtonReleased>()) {
+			this->_onRelease(getScreenCoords({e->position.x, e->position.y}), -1);
+			_mousePressed = false;
+		}
+		if (auto e = event.getIf<sf::Event::MouseMoved>()) {
+			if (_mousePressed)
+				this->_onDrag(getScreenCoords({e->position.x, e->position.y}), -1);
+		}
+		if (auto e = event.getIf<sf::Event::TouchBegan>())
+			this->_onPress(getScreenCoords({e->position.x, e->position.y}), e->finger);
+		if (auto e = event.getIf<sf::Event::TouchEnded>())
+			this->_onRelease(getScreenCoords({e->position.x, e->position.y}), e->finger);
+		if (auto e = event.getIf<sf::Event::TouchMoved>())
+			this->_onDrag(getScreenCoords({e->position.x, e->position.y}), e->finger);
 	}
 
 	void VirtualController::render()
 	{
-		sf::Sprite sprite;
 		auto view = game->screen->getView();
 		auto size = view.getSize();
 		auto top = view.getCenter();
@@ -123,19 +114,22 @@ namespace SpiralOfFate
 		this->_canvas.draw(this->_stickBack, sf::BlendNone);
 		this->_canvas.draw(this->_stickTop);
 		this->_canvas.display();
+
+		sf::Sprite sprite{this->_canvas.getTexture()};
+
 		sprite.setTexture(this->_canvas.getTexture());
 		sprite.setPosition(top);
-		sprite.setScale(size.x / 1680, size.y / 960);
+		sprite.setScale({size.x / 1680, size.y / 960});
 		game->screen->draw(sprite);
 	}
 
 	void VirtualController::_onPress(const Vector2f &location, int index)
 	{
 		Vector2u center{
-			20 + this->_stickBack.getTexture()->getSize().x * STICK_SCALE / 2,
-			940 - this->_stickBack.getTexture()->getSize().y * STICK_SCALE / 2
+			20 + this->_stickBack.getTextureSize().x * STICK_SCALE / 2,
+			940 - this->_stickBack.getTextureSize().y * STICK_SCALE / 2
 		};
-		auto sqr = this->_stickBack.getTexture()->getSize().x * STICK_SCALE / 2;
+		auto sqr = this->_stickBack.getTextureSize().x * STICK_SCALE / 2;
 		auto distance2 = center.distance2(location);
 
 		sqr *= sqr;
@@ -147,7 +141,7 @@ namespace SpiralOfFate
 		}
 		for (int i = 0; i < 7; i++) {
 			auto &button = this->_buttons[i];
-			auto sqr2 = button.getTexture()->getSize().x * BUTTON_SCALE / 2;
+			auto sqr2 = button.getTextureSize().x * BUTTON_SCALE / 2;
 			auto center2 = buttonPos[i] + Vector2u{sqr2, sqr2};
 
 			sqr2 *= sqr2;
@@ -168,7 +162,7 @@ namespace SpiralOfFate
 				continue;
 
 			auto &button = this->_buttons[i];
-			auto sqr2 = button.getTexture()->getSize().x * BUTTON_SCALE / 2;
+			auto sqr2 = button.getTextureSize().x * BUTTON_SCALE / 2;
 			auto center2 = buttonPos[i] + Vector2u{sqr2, sqr2};
 
 			sqr2 *= sqr2;
@@ -188,7 +182,7 @@ namespace SpiralOfFate
 			this->_indexes[0] = -30;
 			this->_stickBack.setColor(sf::Color{255, 255, 255, MIN_ALPHA});
 			this->_stickTop.setColor(sf::Color{255, 255, 255, MIN_ALPHA});
-			this->_stickTop.setPosition(20, 940 - this->_stickTop.getTexture()->getSize().y * 6);
+			this->_stickTop.setPosition({20, 940 - this->_stickTop.getTextureSize().y * 6.f});
 			this->_keyStates[INPUT_LEFT] = false;
 			this->_keyStates[INPUT_RIGHT] = false;
 			this->_keyStates[INPUT_UP] = false;
@@ -208,8 +202,8 @@ namespace SpiralOfFate
 
 	void VirtualController::_onMoveStick(const Vector2f &location)
 	{
-		auto backSize = Vector2(this->_stickBack.getTexture()->getSize());
-		auto size = Vector2(this->_stickTop.getTexture()->getSize());
+		auto backSize = Vector2(this->_stickBack.getTextureSize());
+		auto size = Vector2(this->_stickTop.getTextureSize());
 		auto result = location - size * 3;
 		auto base = Vector2f{20, 940.f - size.y * 6};
 		auto dist = result.distance2(base);

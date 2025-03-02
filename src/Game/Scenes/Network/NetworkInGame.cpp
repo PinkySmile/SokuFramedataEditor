@@ -125,8 +125,8 @@ namespace SpiralOfFate
 		float myAvgTime = avgTimes.second / 1000.f;
 		float opAvgTime = avgTimes.first / 1000.f;
 
-		game->screen->borderColor(2, sf::Color::Black);
-		game->screen->fillColor(sf::Color::White);
+		game->screen->borderColor(2, Color::Black);
+		game->screen->fillColor(Color::White);
 		game->screen->textSize(20);
 
 		sprintf(buffer, "Rand %08llx|%llu", (unsigned long long)game->battleRandom.ser.seed, (unsigned long long)game->battleRandom.ser.invoke_count);
@@ -145,14 +145,14 @@ namespace SpiralOfFate
 		game->screen->displayElement(game->connection->getNames().first, {-50, -592}, 340, Screen::ALIGN_CENTER);
 		game->screen->displayElement(game->connection->getNames().second, {710, -592}, 340, Screen::ALIGN_CENTER);
 		game->screen->textSize(30);
-		game->screen->borderColor(0, sf::Color::Transparent);
+		game->screen->borderColor(0, Color::Transparent);
 		if (this->_error) {
 			this->_errorMutex.lock();
-			game->screen->fillColor(sf::Color::Red);
+			game->screen->fillColor(Color::Red);
 			game->screen->displayElement("Desync detected!", {STAGE_X_MIN - 50, -262}, 1100, Screen::ALIGN_CENTER);
 			game->screen->displayElement(this->_error, {STAGE_X_MIN  - 50, -232}, 1100, Screen::ALIGN_CENTER);
 			game->screen->displayElement(this->_error + strlen(this->_error) + 1, {STAGE_X_MIN - 50, -202}, 1100, Screen::ALIGN_CENTER);
-			game->screen->fillColor(sf::Color::White);
+			game->screen->fillColor(Color::White);
 			this->_errorMutex.unlock();
 		}
 #ifdef _DEBUG
@@ -168,18 +168,18 @@ namespace SpiralOfFate
 		this->_rMachine.consumeEvent(event);
 		InGame::consumeEvent(event);
 #ifdef _DEBUG
-		if (event.type == sf::Event::KeyPressed) {
-			if (event.key.code == sf::Keyboard::F11)
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::F11)
 				stepMode = !stepMode;
-			if (event.key.code == sf::Keyboard::F10)
+			if (e->code == sf::Keyboard::Key::F10)
 				step = true;
-			if (event.key.code == sf::Keyboard::F2)
+			if (e->code == sf::Keyboard::Key::F2)
 				this->_leftChr->showAttributes = this->_rightChr->showAttributes = !this->_rightChr->showAttributes;
-			if (event.key.code == sf::Keyboard::F3)
+			if (e->code == sf::Keyboard::Key::F3)
 				this->_leftChr->showBoxes = this->_rightChr->showBoxes = !this->_rightChr->showBoxes;
-			if (event.key.code == sf::Keyboard::F4)
+			if (e->code == sf::Keyboard::Key::F4)
 				this->_displayInputs = !this->_displayInputs;
-			if (event.key.code == sf::Keyboard::F5)
+			if (e->code == sf::Keyboard::Key::F5)
 				game->battleRandom();
 		}
 #endif

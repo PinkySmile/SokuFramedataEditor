@@ -93,7 +93,7 @@ if (USE_SDL2)
 	set(NETWORK_EXTRA_SRC)
 	set(VIRTUAL_CONTROLLER OFF)
 	add_compile_definitions(USE_SDL=1)
-else (USE_SDL2)
+else ()
 	set(NETWORK_CLASSES IP_CLASS=sf::IpAddress SOCKET_CLASS=sf::UdpSocket)
 	set(NETWORK_EXTRA_SRC)
 	set(
@@ -115,16 +115,20 @@ else (USE_SDL2)
 	set(
 		SCREEN_SRCS
 		src/LibCore/SFML/Color.hpp
+		src/LibCore/SFML/Color.cpp
 		src/LibCore/SFML/Sprite.hpp
 		src/LibCore/SFML/Screen.cpp
 		src/LibCore/SFML/Screen.hpp
+		src/LibCore/SFML/Sprite.cpp
 	)
 
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		if ("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
-			set(TGUI_INCLUDE_DIRS "${TGUI_DIR}/include")
+			if (NOT NO_TGUI)
+				set(TGUI_INCLUDE_DIRS "${TGUI_DIR}/include")
+				set(TGUI_LIB "${TGUI_DIR}/lib/tgui-d.lib")
+			endif ()
 			set(SFML_INCLUDE_DIRS "${SFML_DIR}/include")
-			set(TGUI_LIB "${TGUI_DIR}/lib/tgui-d.lib")
 			set(SFML_GRAPHICS_LIB "${SFML_DIR}/lib/sfml-graphics-d.lib")
 			set(SFML_AUDIO_LIB "${SFML_DIR}/lib/sfml-audio-d.lib")
 			set(SFML_SYSTEM_LIB "${SFML_DIR}/lib/sfml-system-d.lib")
@@ -132,8 +136,10 @@ else (USE_SDL2)
 			set(SFML_NETWORK_LIB "${SFML_DIR}/lib/sfml-network-d.lib")
 		else ()
 			find_package(SFML REQUIRED)
-			find_package(TGUI REQUIRED)
-			set(TGUI_LIB "${TGUI_LIBRARIES}")
+			if (NOT NO_TGUI)
+				find_package(TGUI REQUIRED)
+				set(TGUI_LIB "${TGUI_LIBRARIES}")
+			endif ()
 			set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
 			set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
 			set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
@@ -149,18 +155,22 @@ else (USE_SDL2)
 			add_compile_definitions(_GLIBCXX_DEBUG=1)
 			add_compile_definitions(_GLIBCXX_DEBUG_PEDANTIC=1)
 			if (WIN32)
-				set(TGUI_INCLUDE_DIRS "${TGUI_LIB_MAX_DEBUG_DIR}/include")
+				if (NOT NO_TGUI)
+					set(TGUI_INCLUDE_DIRS "${TGUI_LIB_MAX_DEBUG_DIR}/include")
+					set(TGUI_LIB "${TGUI_LIB_MAX_DEBUG_DIR}/lib/tgui-d.lib")
+				endif ()
 				set(SFML_INCLUDE_DIRS "${SFML_LIB_MAX_DEBUG_DIR}/include")
-				set(TGUI_LIB "${TGUI_LIB_MAX_DEBUG_DIR}/lib/tgui-d.lib")
 				set(SFML_GRAPHICS_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-graphics-d.lib")
 				set(SFML_AUDIO_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-audio-d.lib")
 				set(SFML_SYSTEM_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-system-d.lib")
 				set(SFML_WINDOW_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-window-d.lib")
 				set(SFML_NETWORK_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-network-d.lib")
 			else ()
-				set(TGUI_INCLUDE_DIRS "${TGUI_LIB_MAX_DEBUG_DIR}/include")
+				if (NOT NO_TGUI)
+					set(TGUI_INCLUDE_DIRS "${TGUI_LIB_MAX_DEBUG_DIR}/include")
+					set(TGUI_LIB "${TGUI_LIB_MAX_DEBUG_DIR}/lib/libtgui-d.so")
+				endif ()
 				set(SFML_INCLUDE_DIRS "${SFML_LIB_MAX_DEBUG_DIR}/include")
-				set(TGUI_LIB "${TGUI_LIB_MAX_DEBUG_DIR}/lib/libtgui-d.so")
 				set(SFML_GRAPHICS_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-graphics-d.so")
 				set(SFML_AUDIO_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-audio-d.so")
 				set(SFML_SYSTEM_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-system-d.so")
@@ -169,8 +179,10 @@ else (USE_SDL2)
 			endif ()
 		else ()
 			find_package(SFML REQUIRED)
-			find_package(TGUI REQUIRED)
-			set(TGUI_LIB "${TGUI_LIBRARIES}")
+			if (NOT NO_TGUI)
+				find_package(TGUI REQUIRED)
+				set(TGUI_LIB "${TGUI_LIBRARIES}")
+			endif ()
 			set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
 			set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
 			set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
@@ -179,8 +191,10 @@ else (USE_SDL2)
 		endif ()
 	else ()
 		find_package(SFML REQUIRED)
-		find_package(TGUI REQUIRED)
-		set(TGUI_LIB "${TGUI_LIBRARIES}")
+		if (NOT NO_TGUI)
+			find_package(TGUI REQUIRED)
+			set(TGUI_LIB "${TGUI_LIBRARIES}")
+		endif ()
 		set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
 		set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
 		set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
@@ -193,8 +207,10 @@ else (USE_SDL2)
 	message("SFML system library is ${SFML_SYSTEM_LIB}")
 	message("SFML window library is ${SFML_WINDOW_LIB}")
 	message("SFML network library is ${SFML_NETWORK_LIB}")
-	message("TGUI include dir is ${TGUI_INCLUDE_DIRS}")
-	message("TGUI library is ${TGUI_LIB}")
+	if (NOT NO_TGUI)
+		message("TGUI include dir is ${TGUI_INCLUDE_DIRS}")
+		message("TGUI library is ${TGUI_LIB}")
+	endif ()
 	set(
 		EXTRA_LINK_LIBRARIES
 		${SFML_GRAPHICS_LIB}
@@ -205,13 +221,15 @@ else (USE_SDL2)
 		${TGUI_LIB}
 	)
 	add_compile_definitions(USE_SFML=1)
-	add_compile_definitions(USE_TGUI=1)
+	if (NOT NO_TGUI)
+		add_compile_definitions(USE_TGUI=1)
+	endif()
 	set(EXTRA_LIBRARY_INCLUDES ${SFML_INCLUDE_DIRS} ${TGUI_INCLUDE_DIRS} src/LibCore/SFML)
-endif (USE_SDL2)
+endif ()
 
 if (VIRTUAL_CONTROLLER)
 	add_compile_definitions(VIRTUAL_CONTROLLER=1)
-endif()
+endif ()
 if (NETWORK_CLASSES)
 	find_package(zlib REQUIRED)
 	message("zlib include dir is ${ZLIB_INCLUDE_DIRS}")
@@ -320,7 +338,6 @@ endif()
 
 add_library(
 	SoFGVCore SHARED
-	src/LibCore/SFML/Color.hpp
 	src/LibCore/Data/Vector.hpp
 	src/LibCore/Inputs/DelayInput.cpp
 	src/LibCore/Inputs/DelayInput.hpp
@@ -456,16 +473,18 @@ target_link_libraries(SoFGV SoFGVCore ${EXTRA_LINK_LIBRARIES})
 target_include_directories(SoFGV PRIVATE src/LibCore src/Game)
 
 if (NOT USE_SDL2)
-	message("${FDICON}")
-	add_executable(
-		FrameDataEditor
-		${FDICON}
-		src/FrameDataEditor/dataEditor.cpp
-		src/FrameDataEditor/EditableObject.cpp
-		src/FrameDataEditor/EditableObject.hpp
-		src/LibCore/LibCore.hpp
-	)
-	target_link_libraries(FrameDataEditor SoFGVCore)
+	if (NOT NO_TGUI)
+		message("${FDICON}")
+		add_executable(
+			FrameDataEditor
+			${FDICON}
+			src/FrameDataEditor/dataEditor.cpp
+			src/FrameDataEditor/EditableObject.cpp
+			src/FrameDataEditor/EditableObject.hpp
+			src/LibCore/LibCore.hpp
+		)
+		target_link_libraries(FrameDataEditor SoFGVCore)
+	endif ()
 
 	add_executable(FrameComparer src/FrameComparer/main.cpp)
 	target_link_libraries(

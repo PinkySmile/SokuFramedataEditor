@@ -2,6 +2,7 @@
 // Created by PinkySmile on 25/09/2021.
 //
 
+#include <algorithm>
 #include <fstream>
 #include "KeyboardInput.hpp"
 
@@ -128,16 +129,23 @@ namespace SpiralOfFate
 
 	void KeyboardInput::consumeEvent(const sf::Event &event)
 	{
-		if (event.type != sf::Event::KeyPressed && event.type != sf::Event::KeyReleased)
-			return;
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			auto it = this->_keyMap.find(e->code);
 
-		auto it = this->_keyMap.find(event.key.code);
+			if (it == this->_keyMap.end())
+				return;
+			if (!this->_keyStates[it->second])
+				this->_keyStates[it->second] = true;
+		}
+		if (auto e = event.getIf<sf::Event::KeyReleased>()) {
+			auto it = this->_keyMap.find(e->code);
 
-		if (it == this->_keyMap.end())
-			return;
-		if (this->_keyStates[it->second] != (event.type == sf::Event::KeyPressed)) {
-			this->_keyDuration[it->second] = 0;
-			this->_keyStates[it->second] = event.type == sf::Event::KeyPressed;
+			if (it == this->_keyMap.end())
+				return;
+			if (this->_keyStates[it->second]) {
+				this->_keyDuration[it->second] = 0;
+				this->_keyStates[it->second] = false;
+			}
 		}
 	}
 
@@ -177,9 +185,9 @@ namespace SpiralOfFate
 		result.resize(INPUT_NUMBER, "Not mapped");
 		for (auto &pair : this->_keyMap)
 			try {
-				result[pair.second] = keyToString.at(pair.first + 1);
+				result[pair.second] = keyToString.at((int)pair.first + 1);
 			} catch (std::out_of_range &e) {
-				result[pair.second] = "Invalid key " + std::to_string(pair.first + 1);
+				result[pair.second] = "Invalid key " + std::to_string((int)pair.first + 1);
 			}
 		return result;
 	}

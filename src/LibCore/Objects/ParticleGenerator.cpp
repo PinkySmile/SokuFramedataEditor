@@ -42,18 +42,19 @@ namespace SpiralOfFate
 	void ParticleGenerator::render() const
 	{
 		if (this->showAttributes) {
-			game->screen->borderColor(1, sf::Color::Black);
+			game->screen->borderColor(1, Color::Black);
 			game->screen->displayElement({
 				static_cast<int>(this->_position.x + this->_data.spawnBoundary.pos.x),
 				-static_cast<int>(this->_position.y + this->_data.spawnBoundary.pos.y),
 				static_cast<int>(this->_data.spawnBoundary.size.x),
 				static_cast<int>(this->_data.spawnBoundary.size.y)
-			}, sf::Color{0, 0, 0, 0});
+			}, Color{0, 0, 0, 0});
 			game->screen->borderColor();
 		}
 		if (this->showBoxes) {
-			sf::VertexArray arr{sf::Quads, 4};
-			sf::VertexArray arr2{sf::LineStrip, 5};
+			// TODO: Check if it works
+			sf::VertexArray arr{sf::PrimitiveType::TriangleFan, 4};
+			sf::VertexArray arr2{sf::PrimitiveType::LineStrip, 5};
 			Rectangle box = {
 				{this->_position.x - 4.5f, -this->_position.y - 4.5f},
 				{this->_position.x + 4.5f, -this->_position.y - 4.5f},
@@ -62,14 +63,14 @@ namespace SpiralOfFate
 			};
 
 			for (int i = 0; i < 4; i++) {
-				arr[i].color = sf::Color::Black;
+				arr[i].color = Color::Black;
 				arr[i].color.a *= 0x30 / 255.f;
 				arr[i].position = (&box.pt1)[i];
 			}
 			game->screen->draw(arr);
 
 			for (unsigned i = 0; i < 5; i++) {
-				arr2[i].color = sf::Color::Black;
+				arr2[i].color = Color::Black;
 				arr2[i].position = (&box.pt1)[i % 4];
 			}
 			game->screen->draw(arr2);

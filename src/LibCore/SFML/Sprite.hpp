@@ -7,11 +7,24 @@
 
 
 #include <SFML/Graphics.hpp>
+#include "Screen.hpp"
 
 namespace SpiralOfFate
 {
 	struct Sprite : public sf::Sprite {
-		unsigned textureHandle = 0;
+	private:
+		unsigned _textureHandle = 0;
+
+	public:
+		Sprite();
+		Sprite(unsigned handle);
+		Sprite(const Sprite &o);
+		~Sprite();
+
+		void setTexture(unsigned handle, bool resetRect = false);
+		unsigned getHandle() const;
+		Vector2u getTextureSize() const;
+		void setTextureRect(SpiralOfFate::IntRect rect);
 	};
 }
 

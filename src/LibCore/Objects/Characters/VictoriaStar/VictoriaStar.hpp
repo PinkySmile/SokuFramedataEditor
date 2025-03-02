@@ -64,7 +64,6 @@ namespace SpiralOfFate
 	public:
 		static constexpr unsigned char CLASS_ID = 4;
 
-		VictoriaStar() = default;
 		VictoriaStar(
 			unsigned index,
 			const std::string &folder,
@@ -72,7 +71,7 @@ namespace SpiralOfFate
 			std::shared_ptr<IInput> input,
 			const std::string &opName
 		);
-		~VictoriaStar() override;
+		~VictoriaStar() override = default;
 
 		unsigned int getClassId() const override;
 		unsigned int getBufferSize() const override;

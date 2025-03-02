@@ -10,7 +10,9 @@
 #include <vector>
 #include <filesystem>
 #ifndef __ANDROID__
+#ifdef USE_TGUI
 #include <TGUI/TGUI.hpp>
+#endif
 #endif
 
 #ifndef _WIN32
@@ -167,7 +169,7 @@ namespace SpiralOfFate::Utils
 	//! @param onFinish Function to call when exiting the window.
 	//! @param startColor The color to initialize the picker.
 	//! @return A pointer to the window
-	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(sf::Color color)> &onFinish, sf::Color startColor);
+	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(Color color)> &onFinish, Color startColor);
 	tgui::Theme &getTheme();
 	void setRenderer(const tgui::Widget::Ptr &widget);
 #else
@@ -188,8 +190,11 @@ namespace SpiralOfFate::Utils
 	std::filesystem::path __nothing3();
 #endif
 
+	template<class... Ts>
+	struct overloads : Ts... { using Ts::operator()...; };
+
 	HSLColor RGBtoHSL(const sf::Color &color);
-	sf::Color HSLtoRGB(const HSLColor &color);
+	Color HSLtoRGB(const HSLColor &color);
 }
 
 

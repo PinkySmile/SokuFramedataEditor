@@ -6,6 +6,8 @@
 #include "Logger.hpp"
 #include "Screen.hpp"
 #include "Resources/Game.hpp"
+#include "SFML/Screen.hpp"
+
 
 namespace SpiralOfFate
 {
@@ -41,7 +43,7 @@ namespace SpiralOfFate
 		SDL_SetWindowTitle(this->_window, title.c_str());
 	}
 
-	void Screen::displayElement(sf::IntRect rect, sf::Color color)
+	void Screen::displayElement(sf::IntRect rect, Color color)
 	{
 		//this->_rect.setPosition(sf::Vector2f(rect.left, rect.top));
 		//this->_rect.setSize(sf::Vector2f(rect.width, rect.height));
@@ -49,7 +51,7 @@ namespace SpiralOfFate
 		//this->draw(this->_rect);
 	}
 
-	void Screen::borderColor(float thickness, const sf::Color &color)
+	void Screen::borderColor(float thickness, const Color &color)
 	{
 		//this->_rect.setOutlineColor(color);
 		//this->_text.setOutlineColor(color);
@@ -57,7 +59,7 @@ namespace SpiralOfFate
 		//this->_text.setOutlineThickness(thickness);
 	}
 
-	void Screen::fillColor(const sf::Color &color)
+	void Screen::fillColor(const Color &color)
 	{
 		//this->_rect.setFillColor(color);
 		//this->_text.setFillColor(color);

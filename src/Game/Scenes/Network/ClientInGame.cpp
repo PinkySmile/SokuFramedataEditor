@@ -29,10 +29,12 @@ namespace SpiralOfFate
 
 	void ClientInGame::consumeEvent(const sf::Event &event)
 	{
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-			game->soundMgr.play(BASICSOUND_MENU_CANCEL);
-			game->connection->quitGame();
-			return;
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::Escape) {
+				game->soundMgr.play(BASICSOUND_MENU_CANCEL);
+				game->connection->quitGame();
+				return;
+			}
 		}
 		NetworkInGame::consumeEvent(event);
 	}

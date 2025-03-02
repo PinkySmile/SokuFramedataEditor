@@ -103,7 +103,7 @@ namespace SpiralOfFate
 		std::mutex sceneMutex;
 		std::shared_ptr<IInput> activeNetInput;
 
-		Game(const std::string &loggerPath = "./latest.log");
+		Game(const std::string &fontPath, const std::string &loggerPath = "./latest.log");
 		std::vector<std::string> getCharacters();
 		Color getColor(const std::string &name);
 	};

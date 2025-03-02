@@ -30,7 +30,7 @@ void EditableObject::render() const
 		data.textureBounds.size.x * data.scale.x / 2,
 		data.textureBounds.size.y * data.scale.y / 2
 	};
-	this->_sprite.setColor(sf::Color::White);
+	this->_sprite.setColor(Color::White);
 	this->_sprite.setOrigin(data.textureBounds.size / 2.f);
 	this->_sprite.setRotation(data.rotation * 180 / M_PI);
 	this->_sprite.setPosition(result);
@@ -50,8 +50,8 @@ void EditableObject::render() const
 	SpiralOfFate::game->textureMgr.render(this->_sprite);
 
 	rect.setOutlineThickness(2);
-	rect.setOutlineColor(sf::Color::White);
-	rect.setFillColor(sf::Color::Black);
+	rect.setOutlineColor(Color::White);
+	rect.setFillColor(Color::Black);
 	rect.setPosition(SpiralOfFate::Vector2f{-4, -4});
 	rect.setSize({9, 9});
 	SpiralOfFate::game->screen->draw(rect);

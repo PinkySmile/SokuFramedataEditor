@@ -31,8 +31,8 @@ namespace SpiralOfFate
 		sf::RenderTexture _blurredText;
 		mutable Sprite _btnImg;
 		mutable Sprite _cursImg;
-		mutable Sprite _textImg;
-		mutable Sprite _textImgBlur;
+		mutable sf::Sprite _textImg;
+		mutable sf::Sprite _textImgBlur;
 		unsigned _index;
 		int _enableTimer = 0;
 		int _displayTimer = 0;
@@ -47,7 +47,7 @@ namespace SpiralOfFate
 		std::string description;
 
 		MenuItem(const sf::Font &font, unsigned index, const MenuItemSkeleton &skeleton);
-		~MenuItem();
+
 		void update(bool pressed);
 		void render() const;
 		void resetAnimation(bool skipButtonGrowAnimation, bool wasEnabled);

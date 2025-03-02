@@ -663,7 +663,7 @@ namespace SpiralOfFate::Utils
 	std::filesystem::path __nothing3() { return "Not implemented"; }
 #endif
 
-	sf::Color HSLtoRGB(const HSLColor &color)
+	Color HSLtoRGB(const HSLColor &color)
 	{
 		struct {
 			double h;

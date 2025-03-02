@@ -93,29 +93,29 @@ using namespace SpiralOfFate;
 std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> loadPlayerInputs(std::ifstream &stream)
 {
 	std::map<InputEnum, sf::Keyboard::Key> keyboardMap{
-		{ INPUT_LEFT,    sf::Keyboard::Left },
-		{ INPUT_RIGHT,   sf::Keyboard::Right },
-		{ INPUT_UP,      sf::Keyboard::Up },
-		{ INPUT_DOWN,    sf::Keyboard::Down },
-		{ INPUT_NEUTRAL, sf::Keyboard::W },
-		{ INPUT_MATTER,  sf::Keyboard::X },
-		{ INPUT_SPIRIT,  sf::Keyboard::C },
-		{ INPUT_VOID,    sf::Keyboard::Q },
-		{ INPUT_ASCEND,  sf::Keyboard::S },
-		{ INPUT_DASH,    sf::Keyboard::LShift },
-		{ INPUT_PAUSE,   sf::Keyboard::Tab }
+		{ INPUT_LEFT,    sf::Keyboard::Key::Left },
+		{ INPUT_RIGHT,   sf::Keyboard::Key::Right },
+		{ INPUT_UP,      sf::Keyboard::Key::Up },
+		{ INPUT_DOWN,    sf::Keyboard::Key::Down },
+		{ INPUT_NEUTRAL, sf::Keyboard::Key::W },
+		{ INPUT_MATTER,  sf::Keyboard::Key::X },
+		{ INPUT_SPIRIT,  sf::Keyboard::Key::C },
+		{ INPUT_VOID,    sf::Keyboard::Key::Q },
+		{ INPUT_ASCEND,  sf::Keyboard::Key::S },
+		{ INPUT_DASH,    sf::Keyboard::Key::LShift },
+		{ INPUT_PAUSE,   sf::Keyboard::Key::Tab }
 	};
 	std::map<InputEnum, std::pair<bool, int>> controllerMap{
-		{ INPUT_LEFT,    {true,  sf::Joystick::Axis::X | (256 - 30) << 3} },
-		{ INPUT_RIGHT,   {true,  sf::Joystick::Axis::X | 30 << 3} },
-		{ INPUT_UP,      {true,  sf::Joystick::Axis::Y | (256 - 30) << 3} },
-		{ INPUT_DOWN,    {true,  sf::Joystick::Axis::Y | 30 << 3} },
+		{ INPUT_LEFT,    {true,  (int)sf::Joystick::Axis::X | (256 - 30) << 3} },
+		{ INPUT_RIGHT,   {true,  (int)sf::Joystick::Axis::X | 30 << 3} },
+		{ INPUT_UP,      {true,  (int)sf::Joystick::Axis::Y | (256 - 30) << 3} },
+		{ INPUT_DOWN,    {true,  (int)sf::Joystick::Axis::Y | 30 << 3} },
 		{ INPUT_NEUTRAL, {false, 0} },
 		{ INPUT_MATTER,  {false, 2} },
 		{ INPUT_SPIRIT,  {false, 1} },
 		{ INPUT_VOID,    {false, 3} },
-		{ INPUT_ASCEND,  {true,  sf::Joystick::Z | (30 << 3)} },
-		{ INPUT_DASH,    {true,  sf::Joystick::Z | ((256 - 30) << 3)} },
+		{ INPUT_ASCEND,  {true,  (int)sf::Joystick::Axis::Z | (30 << 3)} },
+		{ INPUT_DASH,    {true,  (int)sf::Joystick::Axis::Z | ((256 - 30) << 3)} },
 		{ INPUT_PAUSE,   {false, 7} }
 	};
 	std::map<InputEnum, ControllerKey *> realControllerMap;
@@ -150,19 +150,19 @@ std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> load
 std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> loadMenuInputs(std::ifstream &stream)
 {
 	std::map<InputEnum, sf::Keyboard::Key> keyboardMap{
-		{ INPUT_LEFT,    sf::Keyboard::Left },
-		{ INPUT_RIGHT,   sf::Keyboard::Right },
-		{ INPUT_UP,      sf::Keyboard::Up },
-		{ INPUT_DOWN,    sf::Keyboard::Down },
-		{ INPUT_NEUTRAL, sf::Keyboard::W },
-		{ INPUT_SPIRIT,  sf::Keyboard::C },
-		{ INPUT_PAUSE,   sf::Keyboard::Tab }
+		{ INPUT_LEFT,    sf::Keyboard::Key::Left },
+		{ INPUT_RIGHT,   sf::Keyboard::Key::Right },
+		{ INPUT_UP,      sf::Keyboard::Key::Up },
+		{ INPUT_DOWN,    sf::Keyboard::Key::Down },
+		{ INPUT_NEUTRAL, sf::Keyboard::Key::W },
+		{ INPUT_SPIRIT,  sf::Keyboard::Key::C },
+		{ INPUT_PAUSE,   sf::Keyboard::Key::Tab }
 	};
 	std::map<InputEnum, std::pair<bool, int>> controllerMap{
-		{ INPUT_LEFT,    {true,  sf::Joystick::Axis::X | (256 - 30) << 3} },
-		{ INPUT_RIGHT,   {true,  sf::Joystick::Axis::X | 30 << 3} },
-		{ INPUT_UP,      {true,  sf::Joystick::Axis::Y | (256 - 30) << 3} },
-		{ INPUT_DOWN,    {true,  sf::Joystick::Axis::Y | 30 << 3} },
+		{ INPUT_LEFT,    {true,  (int)sf::Joystick::Axis::X | (256 - 30) << 3} },
+		{ INPUT_RIGHT,   {true,  (int)sf::Joystick::Axis::X | 30 << 3} },
+		{ INPUT_UP,      {true,  (int)sf::Joystick::Axis::Y | (256 - 30) << 3} },
+		{ INPUT_DOWN,    {true,  (int)sf::Joystick::Axis::Y | 30 << 3} },
 		{ INPUT_NEUTRAL, {false, 0} },
 		{ INPUT_SPIRIT,  {false, 1} },
 		{ INPUT_PAUSE,   {false, 7} }
@@ -380,7 +380,6 @@ void	run()
 {
 	bool step = false;
 	bool force = false;
-	Event event;
 	sf::Image icon;
 	double timer = 0;
 	sf::Clock clock;
@@ -397,13 +396,9 @@ void	run()
 #ifdef VIRTUAL_CONTROLLER
 	game->virtualController = std::make_shared<VirtualController>();
 #endif
-	if (getenv("BATTLE_FONT"))
-		font = getenv("BATTLE_FONT");
-	if (!game->font.loadFromFile(font))
-		assert_exp(game->font.loadFromFile("assets/fonts/Retro Gaming.ttf"));
 	game->screen = std::make_unique<Screen>("Spiral of Fate: Grand Vision | version " VERSION_STR);
 	if (icon.loadFromFile("assets/gameIcon.png"))
-		game->screen->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+		game->screen->setIcon(icon.getSize(), icon.getPixelsPtr());
 	game->screen->setFont(game->font);
 	game->scene.switchScene("title_screen");
 	clock.restart();
@@ -432,15 +427,21 @@ void	run()
 	#endif
 		game->screen->display();
 
-		while (game->screen->pollEvent(event)) {
-			if (event.type == EVENT_WINDOW_CLOSED)
+		while (auto event = game->screen->pollEvent()) {
+			if (event->is<EVENT_WINDOW_CLOSED>())
 				game->screen->close();
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F12 && event.key.control && event.key.shift)
-				step = !step;
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F11 && event.key.control && event.key.shift)
-				force = true;
+		#ifdef _DEBUG
+			if (auto e = event->getIf<sf::Event::KeyPressed>()) {
+				if (e->code == sf::Keyboard::Key::F12 && e->control && e->shift)
+					step = !step;
+			}
+			if (auto e = event->getIf<sf::Event::KeyPressed>()) {
+				if (e->code == sf::Keyboard::Key::F11 && e->control && e->shift)
+					force = true;
+			}
+		#endif
 		#ifdef USE_SFML
-			game->scene.consumeEvent(event);
+			game->scene.consumeEvent(*event);
 		#endif
 		#ifdef VIRTUAL_CONTROLLER
 			game->virtualController->consumeEvent(event);
@@ -463,7 +464,10 @@ int	main()
 #if !defined(_DEBUG) || defined(_WIN32) || defined(__ANDROID__)
 	try {
 #endif
-		new Game();
+		if (getenv("BATTLE_FONT"))
+			new Game(getenv("BATTLE_FONT"));
+		else
+			new Game("assets/fonts/Retro Gaming.ttf");
 		game->logger.info("Starting game->");
 		run();
 		game->logger.info("Goodbye !");

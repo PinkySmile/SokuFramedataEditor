@@ -18,11 +18,12 @@ namespace SpiralOfFate
 		std::shared_ptr<IInput> rightInput,
 		const std::string &inGameName
 	) :
+		_randomSprite(game->textureMgr.load("assets/stages/random.png")),
 		_leftInput(std::move(leftInput)),
 		_rightInput(std::move(rightInput)),
 		_inGameName(inGameName)
 	{
-		ViewPort view{{0, 0, 1680, 960}};
+		ViewPort view{{{0, 0}, {1680, 960}}};
 		nlohmann::json json;
 		auto chrList = game->getCharacters();
 
@@ -53,7 +54,6 @@ namespace SpiralOfFate
 		this->_stages.reserve(json.size());
 		for (auto &elem: json)
 			this->_stages.emplace_back(elem);
-		this->_randomSprite.textureHandle = game->textureMgr.load("assets/stages/random.png");
 	}
 
 	CharacterSelect::CharacterSelect(
@@ -88,11 +88,6 @@ namespace SpiralOfFate
 	{
 	}
 
-	CharacterSelect::~CharacterSelect()
-	{
-		game->textureMgr.remove(this->_randomSprite.textureHandle);
-	}
-
 	void CharacterSelect::render() const
 	{
 		this->_selectingStage ? this->_selectStageRender() : this->_selectCharacterRender();
@@ -115,8 +110,10 @@ namespace SpiralOfFate
 	{
 		this->_leftInput->consumeEvent(event);
 		this->_rightInput->consumeEvent(event);
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-			this->_quit = true;
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::Escape)
+				this->_quit = true;
+		}
 	}
 
 	Character *CharacterSelect::_createCharacter(int pos, int posOp, int palette, std::shared_ptr<IInput> input)
@@ -189,9 +186,9 @@ namespace SpiralOfFate
 
 		game->screen->fillColor(sf::Color::Black);
 		game->screen->displayElement({0, 0, 1680, 960}, sf::Color{
-			static_cast<sf::Uint8>(lInputs.d),
-			static_cast<sf::Uint8>(rInputs.d),
-			static_cast<sf::Uint8>((lInputs.d + rInputs.d) / 2)
+			static_cast<uint8_t>(lInputs.d),
+			static_cast<uint8_t>(rInputs.d),
+			static_cast<uint8_t>((lInputs.d + rInputs.d) / 2)
 		});
 		game->screen->displayElement({0, 0, 560, 480}, sf::Color{0xA0, 0xA0, 0xA0, 0xFF});
 		game->screen->displayElement({0, 480, 560, 480}, sf::Color::White);
@@ -210,16 +207,17 @@ namespace SpiralOfFate
 		int realRPal = this->_rightPos == -1 ? 0 : this->_rightPalette;
 		auto &leftSprite  = leftSprites[realLPal % leftSprites.size()];
 		auto &rightSprite = rightSprites[realRPal % rightSprites.size()];
-		auto leftTexture  = game->textureMgr.getTextureSize(leftSprite.textureHandle);
-		auto rightTexture = game->textureMgr.getTextureSize(rightSprite.textureHandle);
+		auto leftTexture  = leftSprite.getTextureSize();
+		auto rightTexture = rightSprite.getTextureSize();
 
-		leftSprite.setPosition(0, 0);
-		leftSprite.setScale(560.f / leftTexture.x, 480.f / leftTexture.y);
-		game->textureMgr.render(leftSprite);
+		leftSprite.setPosition({0, 0});
+		leftSprite.setScale({560.f / leftTexture.x, 480.f / leftTexture.y});
+		game->screen->displayElement(leftSprite);
 
-		rightSprite.setPosition(1680, 0);
-		rightSprite.setScale(-560.f / rightTexture.x, 480.f / rightTexture.y);
-		game->textureMgr.render(rightSprite);
+		rightSprite.setPosition({1680, 0});
+		rightSprite.setScale({-560.f / rightTexture.x, 480.f / rightTexture.y});
+		game->screen->displayElement(rightSprite);
+
 		game->screen->displayElement({540, 0, 600, 40}, sf::Color{0xB0, 0xB0, 0xB0, 0xFF});
 		game->screen->displayElement("Character select", {540, 0}, 600, Screen::ALIGN_CENTER);
 	}
@@ -228,12 +226,12 @@ namespace SpiralOfFate
 	{
 		Sprite &sprite = this->_stage == -1 ? this->_randomSprite : this->_stageSprite;
 
-		sprite.setPosition(0, 0);
+		sprite.setPosition({0, 0});
 		sprite.setScale({
-			1680.f / game->textureMgr.getTextureSize(sprite.textureHandle).x,
-			960.f / game->textureMgr.getTextureSize(sprite.textureHandle).y
+			1680.f / sprite.getTextureSize().x,
+			960.f / sprite.getTextureSize().y
 		});
-		game->textureMgr.render(sprite);
+		game->screen->displayElement(sprite);
 		this->_displayPlatformPreview();
 		game->screen->displayElement({540, 0, 600, 40}, sf::Color{0xB0, 0xB0, 0xB0, 0xFF});
 		game->screen->displayElement("Stage select", {540, 0}, 600, Screen::ALIGN_CENTER);
@@ -319,7 +317,7 @@ namespace SpiralOfFate
 		if (lInputs.n == 1 || rInputs.n == 1) {
 			game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
 			this->_selectingStage = true;
-			this->_stageSprite.textureHandle = this->_stages[0].imageHandle;
+			this->_stageSprite.setTexture(this->_stages[0].imageHandle, true);
 		}
 	}
 
@@ -347,7 +345,7 @@ namespace SpiralOfFate
 				this->_stage = static_cast<int>(this->_stages.size());
 			this->_stage--;
 			if (this->_stage != -1)
-				this->_stageSprite.textureHandle = this->_stages[this->_stage].imageHandle;
+				this->_stageSprite.setTexture(this->_stages[this->_stage].imageHandle, true);
 			this->_platform = 0;
 		} else if (lInputs.verticalAxis == 1 || rInputs.verticalAxis == 1) {
 			game->soundMgr.play(BASICSOUND_MENU_MOVE);
@@ -355,7 +353,7 @@ namespace SpiralOfFate
 			if (this->_stage == static_cast<int>(this->_stages.size()))
 				this->_stage = -1;
 			if (this->_stage != -1)
-				this->_stageSprite.textureHandle = this->_stages[this->_stage].imageHandle;
+				this->_stageSprite.setTexture(this->_stages[this->_stage].imageHandle, true);
 			this->_platform = 0;
 		}
 
@@ -378,7 +376,6 @@ namespace SpiralOfFate
 			1680.f / 1100,
 			960.f / 700
 		};
-		Sprite sprite;
 
 		for (auto &platform : this->_stages[this->_stage].platforms[plat]) {
 			auto scale2 = Vector2f{
@@ -390,6 +387,7 @@ namespace SpiralOfFate
 				platform.data.textureBounds.size.y * platform.data.scale.y
 			};
 			auto result = platform.data.offset + platform.pos;
+			Sprite sprite{platform.data.textureHandle};
 
 			result.y *= -1;
 			result += Vector2f{
@@ -403,9 +401,8 @@ namespace SpiralOfFate
 			sprite.setOrigin(platform.data.textureBounds.size / 2.f);
 			sprite.setPosition({(result.x + 50 - STAGE_X_MIN) * scale.x, (result.y + 600) * scale.y});
 			sprite.setScale({scale.x * scale2.x, scale.y * scale2.y});
-			sprite.textureHandle = platform.data.textureHandle;
 			sprite.setTextureRect(platform.data.textureBounds);
-			game->textureMgr.render(sprite);
+			game->screen->displayElement(sprite);
 		}
 	}
 
@@ -485,8 +482,8 @@ namespace SpiralOfFate
 			stage,
 			lchr,
 			rchr,
-			licon.textureHandle,
-			ricon.textureHandle,
+			licon.getHandle(),
+			ricon.getHandle(),
 			lentry.entry,
 			rentry.entry
 		};
@@ -562,8 +559,8 @@ namespace SpiralOfFate
 			stage,
 			lchr,
 			rchr,
-			licon.textureHandle,
-			ricon.textureHandle,
+			licon.getHandle(),
+			ricon.getHandle(),
 			lentry.entry,
 			rentry.entry
 		};
@@ -701,14 +698,12 @@ namespace SpiralOfFate
 		this->folder = folder;
 		this->data = FrameData::loadFile(folder + "/charSelect.json", folder);
 		if (this->palettes.empty())
-			this->icon.emplace_back(), this->icon.back().textureHandle = game->textureMgr.load(folder + "/icon.png");
-		else
-			for (auto &palette : this->palettes) {
-				this->icon.emplace_back();
-				this->icon.back().textureHandle = game->textureMgr.load(
-					folder + "/icon.png", {this->palettes[0], palette}
-				);
-			}
+			this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png"));
+		else {
+			this->icon.reserve(this->palettes.size());
+			for (auto &palette : this->palettes)
+				this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png", {this->palettes[0], palette}));
+		}
 	}
 
 	CharacterEntry::CharacterEntry(const CharacterEntry &entry) :
@@ -721,14 +716,6 @@ namespace SpiralOfFate
 		icon(entry.icon),
 		data(entry.data)
 	{
-		for (auto &_icon : this->icon)
-			game->textureMgr.addRef(_icon.textureHandle);
-	}
-
-	CharacterEntry::~CharacterEntry()
-	{
-		for (auto &_icon : this->icon)
-			game->textureMgr.remove(_icon.textureHandle);
 	}
 
 	PlatformSkeleton::PlatformSkeleton(const nlohmann::json &json) :

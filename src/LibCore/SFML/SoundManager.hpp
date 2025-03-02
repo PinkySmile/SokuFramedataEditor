@@ -18,13 +18,15 @@ namespace SpiralOfFate
 	class SoundManager {
 	private:
 		mutable unsigned _lastSound = 0;
-		mutable sf::Sound _sound[64];
+		mutable std::vector<sf::Sound> _sound;
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
 		std::map<unsigned, sf::SoundBuffer> _sounds;
 		std::map<std::string, std::pair<unsigned, unsigned>> _allocatedSounds;
 
 	public:
+		SoundManager();
+
 		unsigned load(std::string file);
 		void addRef(unsigned id);
 		void remove(unsigned id);

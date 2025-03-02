@@ -90,7 +90,7 @@ extern std::pair<std::shared_ptr<SpiralOfFate::KeyboardInput>, std::shared_ptr<S
 
 namespace SpiralOfFate
 {
-	static const unsigned inputs[]{
+	static const unsigned inputsOrder[]{
 		INPUT_LEFT,
 		INPUT_RIGHT,
 		INPUT_UP,
@@ -101,6 +101,22 @@ namespace SpiralOfFate
 	};
 
 	TitleScreen::TitleScreen() :
+		_titleBg{ game->textureMgr.load("assets/ui/titlebackground.png") },
+		_titleLogo{ game->textureMgr.load("assets/ui/title.png") },
+		_titleSpiral{ game->textureMgr.load("assets/ui/spiral.png") },
+		_inputs{
+			{ game->textureMgr.load("assets/icons/inputs/4.png") },
+			{ game->textureMgr.load("assets/icons/inputs/6.png") },
+			{ game->textureMgr.load("assets/icons/inputs/8.png") },
+			{ game->textureMgr.load("assets/icons/inputs/2.png") },
+			{ game->textureMgr.load("assets/icons/inputs/neutral.png") },
+			{ game->textureMgr.load("assets/icons/inputs/matter.png") },
+			{ game->textureMgr.load("assets/icons/inputs/spirit.png") },
+			{ game->textureMgr.load("assets/icons/inputs/void.png") },
+			{ game->textureMgr.load("assets/icons/inputs/ascend.png") },
+			{ game->textureMgr.load("assets/icons/inputs/dash.png") },
+			{ game->textureMgr.load("assets/icons/inputs/pause.png") }
+		},
 		_menuObject{"assets/ui/copperplate-gothic-light.ttf", "assets/ui/gillsansmt.ttf", {
 			{
 				{"Solo mode", "Fight by yourself", [this]{
@@ -191,25 +207,10 @@ namespace SpiralOfFate
 		}}
 	{
 		game->logger.info("Title scene created");
-		this->_titleBg.textureHandle = game->textureMgr.load("assets/ui/titlebackground.png");
-		this->_titleLogo.textureHandle = game->textureMgr.load("assets/ui/title.png");
 		this->_titleLogo.setPosition({275, 31});
-		this->_titleSpiral.textureHandle = game->textureMgr.load("assets/ui/spiral.png");
 		this->_titleSpiral.setOrigin({140, 131});
 		this->_titleSpiral.setPosition({328, 139});
 		this->_netbellSound = game->soundMgr.load("assets/sfxs/se/057.ogg");
-		this->_inputs.resize(INPUT_NUMBER);
-		this->_inputs[INPUT_LEFT].textureHandle = game->textureMgr.load("assets/icons/inputs/4.png");
-		this->_inputs[INPUT_RIGHT].textureHandle = game->textureMgr.load("assets/icons/inputs/6.png");
-		this->_inputs[INPUT_UP].textureHandle = game->textureMgr.load("assets/icons/inputs/8.png");
-		this->_inputs[INPUT_DOWN].textureHandle = game->textureMgr.load("assets/icons/inputs/2.png");
-		this->_inputs[INPUT_N].textureHandle = game->textureMgr.load("assets/icons/inputs/neutral.png");
-		this->_inputs[INPUT_M].textureHandle = game->textureMgr.load("assets/icons/inputs/matter.png");
-		this->_inputs[INPUT_S].textureHandle = game->textureMgr.load("assets/icons/inputs/spirit.png");
-		this->_inputs[INPUT_V].textureHandle = game->textureMgr.load("assets/icons/inputs/void.png");
-		this->_inputs[INPUT_A].textureHandle = game->textureMgr.load("assets/icons/inputs/ascend.png");
-		this->_inputs[INPUT_D].textureHandle = game->textureMgr.load("assets/icons/inputs/dash.png");
-		this->_inputs[INPUT_PAUSE].textureHandle = game->textureMgr.load("assets/icons/inputs/pause.png");
 		this->_lastInput = &*game->menu.first;
 	}
 
@@ -219,36 +220,22 @@ namespace SpiralOfFate
 			this->onDestruct();
 		game->logger.debug("~TitleScreen");
 		game->soundMgr.remove(this->_netbellSound);
-		game->textureMgr.remove(this->_titleBg.textureHandle);
-		game->textureMgr.remove(this->_titleLogo.textureHandle);
-		game->textureMgr.remove(this->_titleSpiral.textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_LEFT].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_RIGHT].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_UP].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_DOWN].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_N].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_M].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_S].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_V].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_A].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_D].textureHandle);
-		game->textureMgr.remove(this->_inputs[INPUT_PAUSE].textureHandle);
 		if (this->_thread.joinable())
 			this->_thread.join();
 	}
 
 	void TitleScreen::render() const
 	{
-		ViewPort view{{0, 0, 1680, 960}};
+		ViewPort view{{{0, 0}, {1680, 960}}};
 
 		game->screen->setView(view);
-		game->textureMgr.render(this->_titleBg);
-		game->textureMgr.render(this->_titleSpiral);
-		game->textureMgr.render(this->_titleLogo);
+		game->screen->displayElement(this->_titleBg);
+		game->screen->displayElement(this->_titleSpiral);
+		game->screen->displayElement(this->_titleLogo);
 		this->_menuObject.render();
 		if (!this->_errorMsg.empty()) {
-			game->screen->fillColor(sf::Color::White);
-			game->screen->displayElement({540, 280, 600, 100}, sf::Color{0x50, 0x50, 0x50});
+			game->screen->fillColor(Color::White);
+			game->screen->displayElement({540, 280, 600, 100}, Color{0x50, 0x50, 0x50});
 			game->screen->displayElement(this->_errorMsg, {540, 300}, 600, Screen::ALIGN_CENTER);
 		}
 	#ifdef HAS_NETWORK
@@ -267,7 +254,7 @@ namespace SpiralOfFate
 
 	void TitleScreen::update()
 	{
-		this->_titleSpiral.setRotation(std::fmod(this->_titleSpiral.getRotation() - 0.25, 360));
+		this->_titleSpiral.setRotation(this->_titleSpiral.getRotation() - sf::degrees(0.25));
 		game->random();
 		this->_oldRemote = this->_remote;
 		game->menu.first->update();
@@ -321,33 +308,31 @@ namespace SpiralOfFate
 
 	void TitleScreen::consumeEvent(const sf::Event &event)
 	{
-		switch (event.type) {
-		case sf::Event::KeyPressed:
-			if (this->_onKeyPressed(event.key))
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (this->_onKeyPressed(*e))
 				return;
-			break;
-		case sf::Event::JoystickButtonPressed:
-			if (this->_onJoystickPressed(event.joystickButton))
-				return;
-			break;
-		case sf::Event::JoystickMoved:
-			if (this->_onJoystickMoved(event.joystickMove))
-				return;
-			break;
-#ifdef VIRTUAL_CONTROLLER
-		case sf::Event::MouseMoved:
-		case sf::Event::MouseButtonPressed:
-		case sf::Event::TouchBegan:
-		case sf::Event::TouchMoved:
-			if (this->_changingInputs)
-				break;
-			this->_latestJoystickId = STICK_ID_VPAD;
-			this->_lastInput = &*game->virtualController;
-			break;
-#endif
-		default:
-			break;
 		}
+		if (auto e = event.getIf<sf::Event::JoystickButtonPressed>()) {
+			if (this->_onJoystickPressed(*e))
+				return;
+		}
+		if (auto e = event.getIf<sf::Event::JoystickMoved>()) {
+			if (this->_onJoystickMoved(*e))
+				return;
+		}
+#ifdef VIRTUAL_CONTROLLER
+		if (
+			event.is<sf::Event::MouseMoved>() ||
+			event.is<sf::Event::MouseButtonPressed>() ||
+			event.is<sf::Event::TouchBegan>() ||
+			event.is<sf::Event::TouchMoved>()
+		) {
+			if (!this->_changingInputs) {
+				this->_latestJoystickId = STICK_ID_VPAD;
+				this->_lastInput = &*game->virtualController;
+			}
+		}
+#endif
 		game->menu.first->consumeEvent(event);
 		game->menu.second->consumeEvent(event);
 	}
@@ -355,7 +340,7 @@ namespace SpiralOfFate
 #ifdef HAS_NETWORK
 	void TitleScreen::_host(bool spec)
 	{
-		game->activeNetInput = this->_leftInput == 1 ? static_cast<std::shared_ptr<IInput>>(game->P1.first) : static_cast<std::shared_ptr<IInput>>(game->P1.second);
+		game->activeNetInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
 
 		// TODO: Handle names
 		auto con = new ServerConnection("SpiralOfFate::ServerConnection");
@@ -388,30 +373,30 @@ namespace SpiralOfFate
 
 	void TitleScreen::_connect()
 	{
-		game->activeNetInput = this->_leftInput == 1 ? static_cast<std::shared_ptr<IInput>>(game->P1.first) : static_cast<std::shared_ptr<IInput>>(game->P1.second);
+		game->activeNetInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
 
 		// TODO: Handle names
 		auto con = new ClientConnection("SpiralOfFate::ClientConnection");
-		auto ipString = sf::Clipboard::getString();
+		auto ipString = sf::Clipboard::getString().toAnsiString();
 
-		if (ipString.isEmpty()) {
+		if (ipString.empty()) {
 			Utils::dispMsg("Error", "No ip is copied to the clipboard", MB_ICONERROR, &*game->screen);
 			delete con;
 			return;
 		}
 
 		size_t pos = ipString.find(':');
-		sf::IpAddress ip = static_cast<std::string>(ipString.substring(0, pos));
+		auto ip = sf::IpAddress::resolve(ipString.substr(0, pos));
 		unsigned short port = 10800;
 
-		if (ip == sf::IpAddress()) {
+		if (!ip) {
 			Utils::dispMsg("Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR, &*game->screen);
 			delete con;
 			return;
 		}
 		if (pos != std::string::npos) {
 			try {
-				auto p = std::stoul(static_cast<std::string>(ipString.substring(pos + 1)));
+				auto p = std::stoul(static_cast<std::string>(ipString.substr(pos + 1)));
 
 				if (p > UINT16_MAX)
 					throw std::exception();
@@ -423,7 +408,7 @@ namespace SpiralOfFate
 			}
 		}
 		game->connection.reset(con);
-		game->lastIp = ip.toString();
+		game->lastIp = ip->toString();
 		game->lastPort = port;
 		con->onConnection = [this](Connection::Remote &remote, PacketInitSuccess &packet){
 			std::string name{packet.player1Name, strnlen(packet.player1Name, sizeof(packet.player1Name))};
@@ -439,7 +424,7 @@ namespace SpiralOfFate
 		con->onDisconnect = [this](Connection::Remote &remote){
 			this->_onDisconnect(remote.ip.toString());
 		};
-		con->connect(ip, port);
+		con->connect(*ip, port);
 		this->_connecting = true;
 		this->onDestruct = [con]{
 			con->onConnection = nullptr;
@@ -450,26 +435,26 @@ namespace SpiralOfFate
 	void TitleScreen::_spectate()
 	{
 		auto con = new SpectatorConnection();
-		auto ipString = sf::Clipboard::getString();
+		auto ipString = sf::Clipboard::getString().toAnsiString();
 
-		if (ipString.isEmpty()) {
+		if (ipString.empty()) {
 			Utils::dispMsg("Error", "No ip is copied to the clipboard", MB_ICONERROR, &*game->screen);
 			delete con;
 			return;
 		}
 
 		size_t pos = ipString.find(':');
-		sf::IpAddress ip = static_cast<std::string>(ipString.substring(0, pos));
+		auto ip = sf::IpAddress::resolve(ipString.substr(0, pos));
 		unsigned short port = 10800;
 
-		if (ip == sf::IpAddress()) {
+		if (!ip) {
 			Utils::dispMsg("Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR, &*game->screen);
 			delete con;
 			return;
 		}
 		if (pos != std::string::npos) {
 			try {
-				auto p = std::stoul(static_cast<std::string>(ipString.substring(pos + 1)));
+				auto p = std::stoul(static_cast<std::string>(ipString.substr(pos + 1)));
 
 				if (p > UINT16_MAX)
 					throw std::exception();
@@ -481,7 +466,7 @@ namespace SpiralOfFate
 			}
 		}
 		game->connection.reset(con);
-		game->lastIp = ip.toString();
+		game->lastIp = ip->toString();
 		game->lastPort = port;
 		con->onConnection = [this](Connection::Remote &remote, PacketInitSuccess &packet){
 			std::string name{packet.player1Name, strnlen(packet.player1Name, sizeof(packet.player1Name))};
@@ -497,7 +482,7 @@ namespace SpiralOfFate
 		con->onDisconnect = [this](Connection::Remote &remote){
 			this->_onDisconnect(remote.ip.toString());
 		};
-		con->connect(ip, port);
+		con->connect(*ip, port);
 		this->_connecting = true;
 		this->onDestruct = [con]{
 			con->onConnection = nullptr;
@@ -513,15 +498,15 @@ namespace SpiralOfFate
 		switch (this->_menuObject.getEnabledMenu() << 8 | this->_menuObject.getSelectedItem()) {
 		case TITLE_SCREEN_BUTTON(3, OFFLINE):
 			args = new CharacterSelect::Arguments();
-			args->leftInput = _getInputFromId(this->_leftInput - 1, game->P1);
-			args->rightInput = _getInputFromId(this->_rightInput - 1, game->P2);
+			args->leftInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
+			args->rightInput = TitleScreen::_getInputFromId(this->_rightInput - 1, game->P2);
 			args->inGameName = "in_game";
 			game->scene.switchScene("char_select", args);
 			break;
 		case TITLE_SCREEN_BUTTON(2, PRACTICE):
 			args = new CharacterSelect::Arguments();
-			args->leftInput = _getInputFromId(this->_leftInput - 1, game->P1);
-			args->rightInput = _getInputFromId(this->_rightInput - 1, game->P2);
+			args->leftInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
+			args->rightInput = TitleScreen::_getInputFromId(this->_rightInput - 1, game->P2);
 			args->inGameName = "practice_in_game";
 			game->scene.switchScene("char_select", args);
 			break;
@@ -536,8 +521,8 @@ namespace SpiralOfFate
 	#ifdef HAS_SYNC_TEST
 		case TITLE_SCREEN_BUTTON(3, SYNC_TEST):
 			args = new CharacterSelect::Arguments();
-			args->leftInput = _getInputFromId(this->_leftInput - 1, game->P1);
-			args->rightInput = _getInputFromId(this->_rightInput - 1, game->P2);
+			args->leftInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
+			args->rightInput = TitleScreen::_getInputFromId(this->_rightInput - 1, game->P2);
 			args->inGameName = "sync_test_in_game";
 			game->scene.switchScene("char_select", args);
 			break;
@@ -545,9 +530,9 @@ namespace SpiralOfFate
 		}
 	}
 
-	bool TitleScreen::_onKeyPressed(sf::Event::KeyEvent ev)
+	bool TitleScreen::_onKeyPressed(const sf::Event::KeyPressed &ev)
 	{
-		if (ev.code == sf::Keyboard::F2 && this->_changingInputs > 1) {
+		if (ev.code == sf::Keyboard::Key::F2 && this->_changingInputs > 1) {
 			auto path = Utils::saveFileDialog("Save inputs", "./profiles", {{".*\\.in", "Input files"}});
 
 			if (path.empty())
@@ -565,7 +550,7 @@ namespace SpiralOfFate
 			game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
 			return false;
 		}
-		if (ev.code == sf::Keyboard::F3 && this->_changingInputs > 1) {
+		if (ev.code == sf::Keyboard::Key::F3 && this->_changingInputs > 1) {
 			auto path = Utils::openFileDialog("Load inputs", "./profiles", {{".*\\.in", "Input files"}});
 
 			if (path.empty())
@@ -583,7 +568,7 @@ namespace SpiralOfFate
 			return false;
 		}
 		if (this->_changeInput && this->_changingInputs) {
-			if (sf::Keyboard::Escape == ev.code) {
+			if (sf::Keyboard::Key::Escape == ev.code) {
 				game->soundMgr.play(BASICSOUND_MENU_CANCEL);
 				this->_changeInput = false;
 				return false;
@@ -602,7 +587,7 @@ namespace SpiralOfFate
 		this->_latestJoystickId = STICK_ID_KEYBOARD;
 		this->_lastInput = &*game->menu.first;
 		switch (ev.code) {
-		case sf::Keyboard::Escape:
+		case sf::Keyboard::Key::Escape:
 			this->_onCancel();
 			break;
 		default:
@@ -611,7 +596,7 @@ namespace SpiralOfFate
 		return false;
 	}
 
-	bool TitleScreen::_onJoystickMoved(sf::Event::JoystickMoveEvent ev)
+	bool TitleScreen::_onJoystickMoved(const sf::Event::JoystickMoved &ev)
 	{
 		this->_oldStickValues[ev.joystickId][ev.axis] = ev.position;
 		if (this->_changeInput && this->_changingInputs) {
@@ -632,7 +617,7 @@ namespace SpiralOfFate
 		return false;
 	}
 
-	bool TitleScreen::_onJoystickPressed(sf::Event::JoystickButtonEvent ev)
+	bool TitleScreen::_onJoystickPressed(const sf::Event::JoystickButtonPressed &ev)
 	{
 		if (this->_changeInput && this->_changingInputs) {
 			if (this->_latestJoystickId < STICK_ID_PPAD1)
@@ -652,9 +637,9 @@ namespace SpiralOfFate
 
 	void TitleScreen::_showAskInputBox() const
 	{
-		game->screen->displayElement({540, 180, 600, 300}, sf::Color{0x50, 0x50, 0x50});
+		game->screen->displayElement({540, 180, 600, 300}, Color{0x50, 0x50, 0x50});
 
-		game->screen->fillColor(this->_leftInput ? sf::Color::Green : sf::Color::White);
+		game->screen->fillColor(this->_leftInput ? Color::Green : Color::White);
 		game->screen->displayElement("P1", {540 + 120, 190});
 		game->screen->fillColor(sf::Color::White);
 		if (this->_leftInput)
@@ -784,8 +769,8 @@ namespace SpiralOfFate
 		if (this->_changingInputs == 1) {
 			game->screen->displayElement("Menu | " + input->getName(), {640, 85}, 400, Screen::ALIGN_CENTER);
 			game->screen->fillColor(sf::Color::White);
-			for (size_t j = 0; j < sizeof(inputs) / sizeof(*inputs); j++) {
-				auto i = inputs[j];
+			for (size_t j = 0; j < sizeof(inputsOrder) / sizeof(*inputsOrder); j++) {
+				auto i = inputsOrder[j];
 
 				if (this->_changeInput && this->_cursorInputs == i) {
 					game->screen->fillColor(sf::Color{0xFF, 0x80, 0x00});
@@ -801,7 +786,7 @@ namespace SpiralOfFate
 			game->screen->fillColor(sf::Color::White);
 			for (unsigned i = 0; i < this->_inputs.size(); i++) {
 				this->_inputs[i].setPosition({680, 135 + i * 68.f});
-				game->textureMgr.render(this->_inputs[i]);
+				game->screen->displayElement(this->_inputs[i]);
 				if (this->_changeInput && this->_cursorInputs == i) {
 					game->screen->fillColor(sf::Color{0xFF, 0x80, 0x00});
 					game->screen->displayElement("Press a key", {760, 146 + i * 68.f});
@@ -827,7 +812,7 @@ namespace SpiralOfFate
 				this->_cursorInputs += this->_inputs.size();
 				this->_cursorInputs--;
 				this->_cursorInputs %= this->_inputs.size();
-			} while (std::find(inputs, inputs + 7, this->_cursorInputs) == inputs + 7 && this->_changingInputs == 1);
+			} while (std::find(inputsOrder, std::end(inputsOrder), this->_cursorInputs) == std::end(inputsOrder) && this->_changingInputs == 1);
 			return;
 		}
 		if (this->_askingInputs)
@@ -847,7 +832,7 @@ namespace SpiralOfFate
 			do {
 				this->_cursorInputs++;
 				this->_cursorInputs %= this->_inputs.size();
-			} while (std::find(inputs, inputs + 7, this->_cursorInputs) == inputs + 7 && this->_changingInputs == 1);
+			} while (std::find(inputsOrder, std::end(inputsOrder), this->_cursorInputs) == std::end(inputsOrder) && this->_changingInputs == 1);
 			return;
 		}
 	#ifdef HAS_NETWORK
@@ -874,7 +859,7 @@ namespace SpiralOfFate
 			game->soundMgr.play(BASICSOUND_MENU_MOVE);
 			this->_changingInputs--;
 			this->_changingInputs += (this->_changingInputs == 0) * 3;
-			while (std::find(inputs, inputs + 7, this->_cursorInputs) == inputs + 7 && this->_changingInputs == 1) {
+			while (std::find(inputsOrder, std::end(inputsOrder), this->_cursorInputs) == std::end(inputsOrder) && this->_changingInputs == 1) {
 				this->_cursorInputs += this->_inputs.size();
 				this->_cursorInputs--;
 				this->_cursorInputs %= this->_inputs.size();
@@ -897,7 +882,7 @@ namespace SpiralOfFate
 			game->soundMgr.play(BASICSOUND_MENU_MOVE);
 			this->_changingInputs = (this->_changingInputs + 1) % 4;
 			this->_changingInputs += this->_changingInputs == 0;
-			while (std::find(inputs, inputs + 7, this->_cursorInputs) == inputs + 7 && this->_changingInputs == 1) {
+			while (std::find(inputsOrder, std::end(inputsOrder), this->_cursorInputs) == std::end(inputsOrder) && this->_changingInputs == 1) {
 				this->_cursorInputs += this->_inputs.size();
 				this->_cursorInputs--;
 				this->_cursorInputs %= this->_inputs.size();
@@ -1131,8 +1116,8 @@ namespace SpiralOfFate
 		args->params = params;
 		args->frameCount = frameCount;
 		args->platforms = stages[params.stage].platforms[params.platforms];
-		args->licon = entries[P1pos].icon[P1palette].textureHandle;
-		args->ricon = entries[P2pos].icon[P2palette].textureHandle;
+		args->licon = entries[P1pos].icon[P1palette].getHandle();
+		args->ricon = entries[P2pos].icon[P2palette].getHandle();
 		args->lJson = entries[P1pos].entry;
 		args->rJson = entries[P2pos].entry;
 		game->scene.switchScene("replay_in_game", args);

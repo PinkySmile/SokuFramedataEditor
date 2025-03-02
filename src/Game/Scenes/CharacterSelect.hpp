@@ -31,7 +31,6 @@ namespace SpiralOfFate
 
 		CharacterEntry(const nlohmann::json &json, const std::string &folder);
 		CharacterEntry(const CharacterEntry &entry);
-		~CharacterEntry();
 	};
 
 	struct PlatformSkeleton {
@@ -63,7 +62,6 @@ namespace SpiralOfFate
 
 	class CharacterSelect : public IScene {
 	protected:
-		sf::Font _font;
 		mutable Sprite _stageSprite;
 		mutable Sprite _randomSprite;
 		std::shared_ptr<IInput> _leftInput;
@@ -120,7 +118,7 @@ namespace SpiralOfFate
 			int stage, int platformCfg,
 			const std::string &inGameName
 		);
-		~CharacterSelect();
+
 		void render() const override;
 		void update() override;
 		void consumeEvent(const sf::Event &event) override;

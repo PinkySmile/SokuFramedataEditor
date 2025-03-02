@@ -604,7 +604,7 @@ namespace SpiralOfFate
 		// Non-game state
 		sf::Text _text;
 		sf::Text _text2;
-		const FrameData *_oldData;
+		const FrameData *_oldData = nullptr;
 		Character *_opponent = nullptr;
 		std::map<unsigned, SubObjectData> _projectileData;
 		std::map<unsigned, std::vector<std::vector<FrameData>>> _subObjectsData;
@@ -740,7 +740,7 @@ namespace SpiralOfFate
 		bool startedAttack = false;
 		const std::vector<ParticleGenerator::InitData> *systemParticles = nullptr;
 
-		Character() = default;
+		Character();
 		Character(unsigned index, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette, std::shared_ptr<IInput> input);
 		~Character() override = default;
 		void setOpponent(Character *opponent);

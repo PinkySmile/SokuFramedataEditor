@@ -36,7 +36,9 @@ namespace SpiralOfFate
 		const std::string &opName
 	) :
 		Character(index, folder, palette, std::move(input)),
-		_stacks(MAX_STACKS / 2)
+		_stacks(MAX_STACKS / 2),
+		_hudScale(game->textureMgr.load(folder + "/hud.png")),
+		_hudCursor(game->textureMgr.load(folder + "/cursor.png"))
 	{
 		auto spriteName = "shadow_" + opName + ".png";
 		auto opHandle = game->textureMgr.load(folder + "/" + spriteName);
@@ -63,21 +65,11 @@ namespace SpiralOfFate
 				frame.setSlave(false);
 			}
 		game->textureMgr.remove(opHandle);
-		this->_hudScale.textureHandle = game->textureMgr.load(folder + "/hud.png");
-		this->_hudCursor.textureHandle = game->textureMgr.load(folder + "/cursor.png");
-		game->textureMgr.setTexture(this->_hudScale);
-		game->textureMgr.setTexture(this->_hudCursor);
 
-		auto size = game->textureMgr.getTextureSize(this->_hudScale.textureHandle);
+		auto size = this->_hudScale.getTextureSize();
 
-		this->_hudScale.setPosition(SCALE_MIDDLE_X - size.x / 2, SCALE_POS_Y);
-		this->_hudCursor.setPosition(0, SCALE_POS_Y + size.y);
-	}
-
-	VictoriaStar::~VictoriaStar()
-	{
-		game->textureMgr.remove(this->_hudScale.textureHandle);
-		game->textureMgr.remove(this->_hudCursor.textureHandle);
+		this->_hudScale.setPosition(Vector2f(SCALE_MIDDLE_X - size.x / 2, SCALE_POS_Y));
+		this->_hudCursor.setPosition(Vector2f(0, SCALE_POS_Y + size.y));
 	}
 
 	bool VictoriaStar::_startMove(unsigned int action)
@@ -496,10 +488,10 @@ namespace SpiralOfFate
 	void VictoriaStar::drawSpecialHUD(sf::RenderTarget &texture)
 	{
 		texture.draw(this->_hudScale);
-		this->_hudCursor.setPosition(
-			(SCALE_MIDDLE_X - SCALE_SIZE / 2) + (this->_stacks * SCALE_SIZE / MAX_STACKS) - game->textureMgr.getTextureSize(this->_hudCursor.textureHandle).x / 2,
+		this->_hudCursor.setPosition(Vector2i(
+			(SCALE_MIDDLE_X - SCALE_SIZE / 2) + (this->_stacks * SCALE_SIZE / MAX_STACKS) - this->_hudCursor.getTextureSize().x / 2,
 			this->_hudCursor.getPosition().y
-		);
+		));
 		texture.draw(this->_hudCursor);
 		Character::drawSpecialHUD(texture);
 	}

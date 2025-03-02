@@ -187,7 +187,7 @@ namespace SpiralOfFate
 
 		while (true) {
 			size_t realSize = 0;
-			sf::IpAddress ip;
+			std::optional<sf::IpAddress> ip;
 			unsigned short port;
 			auto res = this->_socket.receive(packet, RECV_BUFFER_SIZE, realSize, ip, port);
 			auto iter = this->_remotes.begin();
@@ -213,10 +213,10 @@ namespace SpiralOfFate
 				iter = this->_remotes.begin();
 			}
 
-			if (res == sf::Socket::NotReady)
+			if (res == sf::Socket::Status::NotReady)
 				break;
-			else if (res != sf::Socket::Done) {
-				game->logger.error("[<" + ip.toString() + ":" + std::to_string(port) + "] Error receiving packet " + std::to_string(res));
+			else if (res != sf::Socket::Status::Done) {
+				game->logger.error("[<" + ip->toString() + ":" + std::to_string(port) + "] Error receiving packet " + std::to_string((int)res));
 				break;
 			}
 
@@ -225,7 +225,7 @@ namespace SpiralOfFate
 			});
 
 			if (it == this->_remotes.end()) {
-				this->_remotes.emplace_back(*this, ip, port);
+				this->_remotes.emplace_back(*this, *ip, port);
 				it = std::prev(this->_remotes.end());
 			}
 
@@ -233,7 +233,7 @@ namespace SpiralOfFate
 				// TODO: Handle split/merged packet(s)
 				this->_handlePacket(*it, *packet, realSize);
 			} catch (ErrorPacketException &e) {
-				game->logger.error("[<" + ip.toString() + ":" + std::to_string(port) + "] Peer responded with " + e.getPacket().toString());
+				game->logger.error("[<" + ip->toString() + ":" + std::to_string(port) + "] Peer responded with " + e.getPacket().toString());
 				if (this->onError)
 					this->onError(*it, e.getPacket());
 			}

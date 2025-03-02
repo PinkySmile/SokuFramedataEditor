@@ -27,12 +27,15 @@ namespace SpiralOfFate
 
 	void ServerCharacterSelect::consumeEvent(const sf::Event &event)
 	{
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::B) {
-			if (game->connection->getCurrentDelay() > 0)
-				game->connection->updateDelay(game->connection->getCurrentDelay() - 1);
-		} else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N) {
-			if (game->connection->getCurrentDelay() < 8)
-				game->connection->updateDelay(game->connection->getCurrentDelay() + 1);
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::B) {
+				if (game->connection->getCurrentDelay() > 0)
+					game->connection->updateDelay(game->connection->getCurrentDelay() - 1);
+			}
+			if (e->code == sf::Keyboard::Key::N) {
+				if (game->connection->getCurrentDelay() < 10)
+					game->connection->updateDelay(game->connection->getCurrentDelay() + 1);
+			}
 		}
 		CharacterSelect::consumeEvent(event);
 	}

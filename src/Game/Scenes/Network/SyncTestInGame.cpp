@@ -63,16 +63,16 @@ namespace SpiralOfFate
 
 	void SyncTestInGame::consumeEvent(const sf::Event &event)
 	{
-		if (event.type == sf::Event::KeyPressed) {
-			if (event.key.code == sf::Keyboard::F11)
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::F11)
 				this->_paused = !this->_paused;
-			if (event.key.code == sf::Keyboard::F10)
+			if (e->code == sf::Keyboard::Key::F10)
 				this->_step = true;
-			if (event.key.code == sf::Keyboard::F2)
+			if (e->code == sf::Keyboard::Key::F2)
 				this->_leftChr->showAttributes = this->_rightChr->showAttributes = !this->_rightChr->showAttributes;
-			if (event.key.code == sf::Keyboard::F3)
+			if (e->code == sf::Keyboard::Key::F3)
 				this->_leftChr->showBoxes = this->_rightChr->showBoxes = !this->_rightChr->showBoxes;
-			if (event.key.code == sf::Keyboard::F4)
+			if (e->code == sf::Keyboard::Key::F4)
 				this->_displayInputs = !this->_displayInputs;
 		}
 		this->_rollback.consumeEvent(event);

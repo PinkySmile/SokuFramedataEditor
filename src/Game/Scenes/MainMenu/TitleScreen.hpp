@@ -67,9 +67,9 @@ namespace SpiralOfFate
 		void _connect();
 		void _spectate();
 	#endif
-		bool _onKeyPressed(sf::Event::KeyEvent ev);
-		bool _onJoystickMoved(sf::Event::JoystickMoveEvent ev);
-		bool _onJoystickPressed(sf::Event::JoystickButtonEvent ev);
+		bool _onKeyPressed(const sf::Event::KeyPressed &ev);
+		bool _onJoystickMoved(const sf::Event::JoystickMoved &ev);
+		bool _onJoystickPressed(const sf::Event::JoystickButtonPressed &ev);
 		void _showAskInputBox() const;
 		void _showEditKeysMenu() const;
 	#ifdef HAS_NETWORK

@@ -119,12 +119,12 @@ namespace SpiralOfFate
 		tint.a = a;
 		this->_sprite.setColor(tint);
 		this->_sprite.setOrigin(data.textureBounds.size / 2.f);
-		this->_sprite.setRotation(this->_rotation * 180 / M_PI);
+		this->_sprite.setRotation(sf::radians(this->_rotation));
 		this->_sprite.setPosition(spritePos);
 		this->_sprite.setScale(scale);
 		this->_sprite.setTextureRect(data.textureBounds);
-		this->_sprite.textureHandle = data.textureHandle;
-		game->textureMgr.render(this->_sprite);
+		this->_sprite.setTexture(data.textureHandle);
+		game->screen->displayElement(this->_sprite);
 		if (data.oFlag.spiritElement == data.oFlag.matterElement && data.oFlag.matterElement == data.oFlag.voidElement)
 			tint = game->typeColors[data.oFlag.spiritElement ? TYPECOLOR_NEUTRAL : TYPECOLOR_NON_TYPED];
 		else if (data.oFlag.spiritElement)
@@ -135,8 +135,8 @@ namespace SpiralOfFate
 			tint = game->typeColors[TYPECOLOR_VOID];
 		tint.a = a;
 		this->_sprite.setColor(tint);
-		this->_sprite.textureHandle = data.textureHandleEffects;
-		game->textureMgr.render(this->_sprite);
+		this->_sprite.setTexture(data.textureHandleEffects);
+		game->screen->displayElement(this->_sprite);
 		this->_sprite.setColor(baseTint);
 
 		realPos.y *= -1;
@@ -144,9 +144,9 @@ namespace SpiralOfFate
 			return;
 
 		for (auto &hurtBox : this->_getModifiedHurtBoxes())
-			this->_drawBox(hurtBox, sf::Color::Green);
+			this->_drawBox(hurtBox, Color::Green);
 		for (auto &hitBox : this->_getModifiedHitBoxes())
-			this->_drawBox(hitBox, sf::Color::Red);
+			this->_drawBox(hitBox, Color::Red);
 
 		if (data.collisionBox) {
 			auto box = this->_applyModifiers(*data.collisionBox);
@@ -162,7 +162,7 @@ namespace SpiralOfFate
 					static_cast<float>(box.pos.x) + box.size.x,
 					static_cast<float>(box.pos.y)
 				}
-			}, sf::Color::Yellow);
+			}, Color::Yellow);
 		}
 
 		this->_drawBox({
@@ -170,14 +170,14 @@ namespace SpiralOfFate
 			{realPos.x + 4.5f, realPos.y - 4.5f},
 			{realPos.x + 4.5f, realPos.y + 4.5f},
 			{realPos.x - 4.5f, realPos.y + 4.5f},
-		}, sf::Color::Black);
+		}, Color::Black);
 		if (dynamic_cast<const Character *>(this) == nullptr)
 			game->screen->displayElement({
 				static_cast<int>(this->_position.x - this->_hitStop),
 				static_cast<int>(10 - this->_position.y),
 				static_cast<int>(this->_hitStop * 2),
 				10
-			}, sf::Color::Cyan);
+			}, Color::Cyan);
 
 		if (data.hurtBoxes.empty())
 			return;
@@ -188,8 +188,8 @@ namespace SpiralOfFate
 		opPos.y += data.textureBounds.size.y * data.scale.y / 2.f + data.offset.y;
 		opPos.y *= -1;
 		opPos -= Vector2i{1, 1};
-		rect.setFillColor(sf::Color::Black);
-		rect.setOutlineColor(sf::Color::White);
+		rect.setFillColor(Color::Black);
+		rect.setOutlineColor(Color::White);
 		rect.setOutlineThickness(1);
 		rect.setSize({3, 3});
 		rect.setPosition(opPos);
@@ -548,10 +548,11 @@ namespace SpiralOfFate
 		return this->_getModifiedBoxes(*this->getCurrentFrameData(), this->getCurrentFrameData()->hitBoxes);
 	}
 
-	void Object::_drawBox(const Rectangle &box, const sf::Color &color) const
+	void Object::_drawBox(const Rectangle &box, const Color &color) const
 	{
-		sf::VertexArray arr{sf::Quads, 4};
-		sf::VertexArray arr2{sf::LineStrip, 5};
+		// TODO: Check if still working
+		sf::VertexArray arr{ sf::PrimitiveType::TriangleFan, 4 };
+		sf::VertexArray arr2{ sf::PrimitiveType::LineStrip, 5 };
 
 		for (int i = 0; i < 4; i++) {
 			arr[i].color = color;

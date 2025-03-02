@@ -14,13 +14,14 @@
 #include <SFML/Graphics/Rect.hpp>
 #include "Data/Vector.hpp"
 #include "Color.hpp"
+#include "Screen.hpp"
 
 namespace SpiralOfFate
 {
 	struct Box {
 		Vector2i pos;
 		Vector2u size;
-		operator sf::IntRect() const noexcept;
+		operator IntRect() const noexcept;
 	};
 
 	union DefensiveFlags {

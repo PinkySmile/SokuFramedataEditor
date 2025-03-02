@@ -372,16 +372,21 @@ namespace SpiralOfFate
 		return name == SpiralOfFate::actionNames.end() ? "Action #" + std::to_string(action) : name->second;
 	}
 
-	Character::Character(unsigned index, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette, std::shared_ptr<IInput> input)
+	Character::Character() :
+		_text(game->font),
+		_text2(game->font)
+	{
+	}
+
+	Character::Character(unsigned index, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette, std::shared_ptr<IInput> input) :
+		Character()
 	{
 		this->index = index;
 		this->_input = std::move(input);
-		this->_text.setFont(game->font);
-		this->_text.setFillColor(sf::Color::White);
+		this->_text.setFillColor(Color::White);
 		this->_text.setOutlineColor(sf::Color::Black);
 		this->_text.setOutlineThickness(2);
 		this->_text.setCharacterSize(10);
-		this->_text2.setFont(game->font);
 		this->_text2.setFillColor(sf::Color::White);
 		this->_text2.setOutlineColor(sf::Color::Black);
 		this->_text2.setOutlineThickness(2);
@@ -4240,7 +4245,6 @@ namespace SpiralOfFate
 		this->_forceStartMove(actions[random_distrib(game->battleRandom, 0, actions.size())]);
 	}
 
-
 	bool Character::matchEndUpdate()
 	{
 		if (this->_action < ACTION_WIN_MATCH1)
@@ -4249,8 +4253,12 @@ namespace SpiralOfFate
 		return this->_animation + this->_animationCtr;
 	}
 
-	void Character::_mutateHitFramedata(FrameData &) const
+	void Character::_mutateHitFramedata(FrameData &d) const
 	{
+		if (isParryAction(this->_action) && this->_animation == 0) {
+			d.oFlag.airUnblockable = false;
+			d.oFlag.unblockable = false;
+		}
 	}
 
 	void Character::_tickMove()

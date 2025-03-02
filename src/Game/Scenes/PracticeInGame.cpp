@@ -114,7 +114,7 @@ namespace SpiralOfFate
 			return;
 		if (this->_practice)
 			return this->_practiceRender();
-		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 240 - 600, 400, 175}, sf::Color{0x50, 0x50, 0x50, 0xC0});
+		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 240 - 600, 400, 175}, Color{0x50, 0x50, 0x50, 0xC0});
 
 		game->screen->textSize(20);
 		game->screen->fillColor(sf::Color::White);
@@ -476,7 +476,7 @@ namespace SpiralOfFate
 
 	void PracticeInGame::render() const
 	{
-		ViewPort view{{STAGE_X_MIN - 50, -600, 1100, 700}};
+		ViewPort view{{{STAGE_X_MIN - 50, -600}, {1100, 700}}};
 
 		game->screen->setView(view);
 		game->battleMgr->render();

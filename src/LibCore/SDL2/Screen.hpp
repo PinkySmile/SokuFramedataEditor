@@ -50,11 +50,11 @@ namespace SpiralOfFate
 		void clear(const Color &color = {255, 255, 255});
 		void display();
 		void setSize(const sf::Vector2i &);
-		void borderColor(float thickness = 0, const sf::Color &color = sf::Color(0, 0, 0, 255));
-		void fillColor(const sf::Color &color = sf::Color(255, 255, 255, 255));
+		void borderColor(float thickness = 0, const Color &color = Color(0, 0, 0, 255));
+		void fillColor(const Color &color = Color(255, 255, 255, 255));
 		void setFont(const sf::Font &font);
 		void textSize(const size_t &size);
-		void displayElement(sf::IntRect rect, sf::Color color);
+		void displayElement(sf::IntRect rect, Color color);
 		void displayElement(const sf::String &str, sf::Vector2f pos, float size = 0, TextAlign = ALIGN_LEFT);
 		void displayElement(const sf::Texture &texture, sf::Vector2f);
 		void displayElement(sf::Sprite &sprite, sf::Vector2f);

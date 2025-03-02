@@ -21,7 +21,7 @@ namespace SpiralOfFate
 
 	void SpiralOfFate::SpectatorCharacterSelect::render() const
 	{
-		ViewPort view{{0, 0, 1680, 960}};
+		ViewPort view{{{0, 0}, {1680, 960}}};
 
 		game->screen->setView(view);
 		game->screen->clear({0xA0, 0xA0, 0xA0});

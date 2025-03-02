@@ -17,6 +17,7 @@ namespace SpiralOfFate
 {
 	class TextureManager {
 	private:
+		sf::RenderTexture _dummy{{1, 1}};
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
 		std::map<unsigned, sf::Texture> _textures;
@@ -25,14 +26,15 @@ namespace SpiralOfFate
 
 		void _reload(const std::string &path, unsigned id);
 	public:
+		TextureManager();
+
 		unsigned load(std::string file, Vector2u *size = nullptr, bool repeated = false);
 		unsigned load(const std::string &file, std::pair<std::vector<Color>, std::vector<Color>> palette, Vector2u *size = nullptr);
 		unsigned load(const Color *pixels, Vector2u size);
 		Vector2u getTextureSize(unsigned id) const;
 		void addRef(unsigned id);
 		void remove(unsigned id);
-		sf::Texture *setTexture(Sprite &sprite);
-		void render(Sprite &sprite) const;
+		const sf::Texture &getTexture(unsigned id) const;
 		void reloadEverything();
 		void addOverride(const std::string &base, const std::string &newVal);
 		void removeOverride(const std::string &base);

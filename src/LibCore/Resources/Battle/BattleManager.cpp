@@ -8,7 +8,6 @@
 #include "Resources/Game.hpp"
 #include "Objects/Characters/SubObject.hpp"
 
-#define FIRST_TO 2
 #define INPUT_DISPLAY_SIZE 24
 #define LIMIT_SPRITE_VOID 0
 #define LIMIT_SPRITE_MATTER 2
@@ -46,6 +45,57 @@ namespace SpiralOfFate
 	};
 
 	BattleManager::BattleManager(const StageParams &stage, const CharacterParams &leftCharacter, const CharacterParams &rightCharacter) :
+		_stage{ game->textureMgr.load(stage.path) },
+		_font{ "assets/battleui/AERO_03.ttf" },
+		_hud{ {1100, 700} },
+		_leftHUD{ {550, 700} },
+		_rightHUD{ {550, 700} },
+		_stallWarn{ game->textureMgr.load("assets/battleui/meter_warning.png") },
+		_stallDown{ game->textureMgr.load("assets/battleui/meter_penalty.png", nullptr, true) },
+		_leftIcon{ leftCharacter.icon },
+		_rightIcon{ rightCharacter.icon },
+		_leftHUDIcon{ leftCharacter.icon },
+		_rightHUDIcon{ rightCharacter.icon },
+		_oosBubble{ game->textureMgr.load("assets/effects/oosBubble.png") },
+		_oosBubbleMask{ game->textureMgr.load("assets/effects/oosBubbleMask.png") },
+		_battleUi{
+			game->textureMgr.load(battleHudSprite[BATTLEUI_HUD_SEAT],           nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_MANA_BAR],           nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_MANA_BAR_CROSS],     nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_GUARD_TEXT],         nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_GUARD_BAR],          nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_GUARD_BAR_TMP],      nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_GUARD_BAR_DISABLED], nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_LIFE_BAR],           nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_LIFE_BAR_RED],       nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_LIFE_BAR_EFFECT],    nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_OVERDRIVE],          nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_OVERDRIVE_OUTLINE],  nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_SCORE_SEAT],         nullptr, true),
+			game->textureMgr.load(battleHudSprite[BATTLEUI_SCORE_BULLET],       nullptr, true),
+		},
+		_limitSprites{
+			game->textureMgr.load(limitSprites[0]),
+			game->textureMgr.load(limitSprites[1]),
+			game->textureMgr.load(limitSprites[2]),
+			game->textureMgr.load(limitSprites[3]),
+			game->textureMgr.load(limitSprites[4]),
+			game->textureMgr.load(limitSprites[5]),
+			game->textureMgr.load(limitSprites[6]),
+			game->textureMgr.load(limitSprites[7])
+		},
+		_cross{"assets/icons/netplay/twitter.png"},
+		_roundSprites{
+			sf::Texture{ "assets/icons/rounds/ko.png" },
+			sf::Texture{ "assets/icons/rounds/start.png" },
+			sf::Texture{ "assets/icons/rounds/p1win.png" },
+			sf::Texture{ "assets/icons/rounds/p2win.png" },
+			sf::Texture{ "assets/icons/rounds/id.png" },
+			sf::Texture{ "assets/icons/rounds/round1.png" },
+			sf::Texture{ "assets/icons/rounds/round2.png" },
+			sf::Texture{ "assets/icons/rounds/round3.png" }
+		},
+		_roundSprite{ this->_roundSprites[1] },
 		_leftCharacter(leftCharacter.character),
 		_rightCharacter(rightCharacter.character),
 		_leftHUDData{*this, *this->_leftCharacter, this->_leftHUDIcon, false},
@@ -68,7 +118,6 @@ namespace SpiralOfFate
 			this->_moveSprites[i] = game->textureMgr.load(spritesPaths[i]);
 
 		//TODO: Move this in another function
-		this->_stage.textureHandle = game->textureMgr.load(stage.path);
 		this->_stage.setPosition({STAGE_X_MIN - 50, -600});
 		for (auto object : stage.objects())
 			this->_stageObjects.emplace_back(object);
@@ -82,38 +131,10 @@ namespace SpiralOfFate
 		this->_rightCharacter->init(*this, rightCharacter.data);
 		this->_leftCharacter->setAttacksDisabled(true);
 		this->_rightCharacter->setAttacksDisabled(true);
-		this->_roundSprites.resize(5 + FIRST_TO * 2 - 1);
-		this->_cross.loadFromFile("assets/icons/netplay/twitter.png");
-		this->_roundSprites[0].loadFromFile("assets/icons/rounds/ko.png");
-		this->_roundSprites[1].loadFromFile("assets/icons/rounds/start.png");
-		this->_roundSprites[2].loadFromFile("assets/icons/rounds/p1win.png");
-		this->_roundSprites[3].loadFromFile("assets/icons/rounds/p2win.png");
-		this->_roundSprites[4].loadFromFile("assets/icons/rounds/id.png");
-		for (int i = 1; i < FIRST_TO * 2; i++)
-			this->_roundSprites[4 + i].loadFromFile("assets/icons/rounds/round" + std::to_string(i) + ".png");
-		game->textureMgr.addRef(leftCharacter.icon);
-		game->textureMgr.addRef(rightCharacter.icon);
-		this->_leftIcon.textureHandle = leftCharacter.icon;
-		this->_rightIcon.textureHandle = rightCharacter.icon;
-		this->_leftHUDIcon.textureHandle = leftCharacter.icon;
-		this->_rightHUDIcon.textureHandle = rightCharacter.icon;
-		this->_oosBubble.textureHandle = game->textureMgr.load("assets/effects/oosBubble.png");
-		this->_oosBubbleMask.textureHandle = game->textureMgr.load("assets/effects/oosBubbleMask.png");
-		this->_stallWarn.textureHandle = game->textureMgr.load("assets/battleui/meter_warning.png");
-		assert_exp(this->_stallDown.textureHandle = game->textureMgr.load("assets/battleui/meter_penalty.png", nullptr, true));
-		game->textureMgr.setTexture(this->_stallWarn);
-		game->textureMgr.setTexture(this->_stallDown);
-		game->textureMgr.setTexture(this->_oosBubbleMask);
-		game->textureMgr.setTexture(this->_oosBubble);
-		game->textureMgr.setTexture(this->_leftIcon);
-		game->textureMgr.setTexture(this->_rightIcon);
-		game->textureMgr.setTexture(this->_leftHUDIcon);
-		game->textureMgr.setTexture(this->_rightHUDIcon);
-		this->_font.loadFromFile("assets/battleui/AERO_03.ttf");
 
-		auto texSize1 = game->textureMgr.getTextureSize(this->_leftIcon.textureHandle).to<float>();
-		auto texSize2 = game->textureMgr.getTextureSize(this->_rightIcon.textureHandle).to<float>();
-		auto texSize = game->textureMgr.getTextureSize(this->_oosBubble.textureHandle);
+		auto texSize1 = this->_leftIcon.getTextureSize().to<float>();
+		auto texSize2 = this->_rightIcon.getTextureSize().to<float>();
+		auto texSize = this->_oosBubble.getTextureSize();
 		auto s1 = texSize.x / texSize1.x;
 		auto s2 = texSize.x / texSize2.x;
 		auto s3 = 65 / texSize1.x;
@@ -134,37 +155,24 @@ namespace SpiralOfFate
 		this->_rightHUDIcon.setScale({s4, s4});
 		this->_rightHUDIcon.setPosition({0, 0});
 
-		for (int i = 0; i < 8; i++) {
-			this->_limitSprites[i].textureHandle = game->textureMgr.load(limitSprites[i]);
-			game->textureMgr.setTexture(this->_limitSprites[i]);
-			this->_limitSprites[i].setOrigin(
-				this->_limitSprites[i].getTexture()->getSize().x / 2.f,
-				this->_limitSprites[i].getTexture()->getSize().y / 2.f
-			);
-		}
-		for (int i = 0; i < BATTLEUI_NB_SPRITES; i++) {
-			this->_battleUi[i].textureHandle = game->textureMgr.load(battleHudSprite[i], nullptr, true);
-			game->textureMgr.setTexture(this->_battleUi[i]);
-		}
+		for (auto &limitSprite : this->_limitSprites)
+			limitSprite.setOrigin(limitSprite.getTextureSize() / 2.f);
 
 		this->_battleUi[BATTLEUI_GUARD_TEXT].setOrigin({
-			static_cast<float>(game->textureMgr.getTextureSize(this->_battleUi[BATTLEUI_GUARD_TEXT].textureHandle).x / 2),
+			static_cast<float>(this->_battleUi[BATTLEUI_GUARD_TEXT].getTextureSize().x / 2),
 			0,
 		});
 		this->_battleUi[BATTLEUI_OVERDRIVE].setOrigin({
-			static_cast<float>(game->textureMgr.getTextureSize(this->_battleUi[BATTLEUI_OVERDRIVE].textureHandle).x / 2),
-			static_cast<float>(game->textureMgr.getTextureSize(this->_battleUi[BATTLEUI_OVERDRIVE].textureHandle).y / 2),
+			static_cast<float>(this->_battleUi[BATTLEUI_OVERDRIVE].getTextureSize().x / 2),
+			static_cast<float>(this->_battleUi[BATTLEUI_OVERDRIVE].getTextureSize().y / 2),
 		});
 		this->_battleUi[BATTLEUI_OVERDRIVE_OUTLINE].setOrigin({
-			static_cast<float>(game->textureMgr.getTextureSize(this->_battleUi[BATTLEUI_OVERDRIVE_OUTLINE].textureHandle).x / 2),
-			static_cast<float>(game->textureMgr.getTextureSize(this->_battleUi[BATTLEUI_OVERDRIVE_OUTLINE].textureHandle).y / 2),
+			static_cast<float>(this->_battleUi[BATTLEUI_OVERDRIVE_OUTLINE].getTextureSize().x / 2),
+			static_cast<float>(this->_battleUi[BATTLEUI_OVERDRIVE_OUTLINE].getTextureSize().y / 2),
 		});
 
-		assert_exp(this->_leftHUDData.target.create(texSize.x, texSize.y));
-		assert_exp(this->_rightHUDData.target.create(texSize.x, texSize.y));
-		assert_exp(this->_leftHUD.create(550, 700));
-		assert_exp(this->_rightHUD.create(550, 700));
-		assert_exp(this->_hud.create(1100, 700));
+		assert_exp(this->_leftHUDData.target.resize(texSize));
+		assert_exp(this->_rightHUDData.target.resize(texSize));
 	}
 
 	BattleManager::~BattleManager()
@@ -177,7 +185,10 @@ namespace SpiralOfFate
 	{
 		this->_leftCharacter->consumeEvent(event);
 		this->_rightCharacter->consumeEvent(event);
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F1)
+
+		auto e = event.getIf<sf::Event::KeyPressed>();
+
+		if (e && e->code == sf::Keyboard::Key::F1)
 			game->screen->setSize({1100, 700});
 	}
 
@@ -212,7 +223,7 @@ namespace SpiralOfFate
 				obj->render();
 			it++;
 		}
-		game->textureMgr.render(this->_stage);
+		game->screen->displayElement(this->_stage);
 		// <= -500, behind HUD
 		while (it != objectLayers.end() && it->first <= -500) {
 			for (auto obj : it->second)
@@ -220,29 +231,28 @@ namespace SpiralOfFate
 			it++;
 		}
 
-		sf::Sprite sprite;
-
 		this->_leftHUDData.render(this->_leftHUD);
 		this->_leftHUD.display();
 		this->_rightHUDData.render(this->_rightHUD);
 		this->_rightHUD.display();
 
-		this->_hud.clear(sf::Color::Transparent);
-		sprite.setTexture(this->_leftHUD.getTexture(), true);
-		sprite.setScale(1, 1);
-		sprite.setPosition(0, 0);
+		sf::Sprite sprite{ this->_leftHUD.getTexture() };
+
+		this->_hud.clear(Color::Transparent);
+		sprite.setScale({1, 1});
+		sprite.setPosition({0, 0});
 		this->_hud.draw(sprite);
 		sprite.setTexture(this->_rightHUD.getTexture(), true);
-		sprite.setScale(-1, 1);
-		sprite.setPosition(1100, 0);
+		sprite.setScale({-1, 1});
+		sprite.setPosition({1100, 0});
 		this->_hud.draw(sprite);
 
 		this->_leftHUDData.renderNoReverse(this->_hud);
 		this->_rightHUDData.renderNoReverse(this->_hud);
 
 		this->_hud.display();
-		sprite.setScale(1, 1);
-		sprite.setPosition(STAGE_X_MIN - 50, -600);
+		sprite.setScale({1, 1});
+		sprite.setPosition({STAGE_X_MIN - 50, -600});
 		sprite.setTexture(this->_hud.getTexture(), true);
 		game->screen->draw(sprite);
 
@@ -252,12 +262,12 @@ namespace SpiralOfFate
 			char buffer[12];
 
 			sprintf(buffer, "%.2f TPS", 1000000.f / (total / this->_tpsTimes.size()));
-			game->screen->borderColor(2, sf::Color::Black);
-			game->screen->fillColor(sf::Color::White);
+			game->screen->borderColor(2, Color::Black);
+			game->screen->fillColor(Color::White);
 			game->screen->textSize(20);
 			game->screen->displayElement(buffer, {900 + STAGE_X_MIN, 75}, 145, Screen::ALIGN_RIGHT);
 			game->screen->textSize(30);
-			game->screen->borderColor(0, sf::Color::Transparent);
+			game->screen->borderColor(0, Color::Transparent);
 		}
 		total = 0;
 		for (auto time : this->_fpsTimes)
@@ -266,12 +276,12 @@ namespace SpiralOfFate
 			char buffer[12];
 
 			sprintf(buffer, "%.2f FPS", 1000000.f / (total / this->_fpsTimes.size()));
-			game->screen->borderColor(2, sf::Color::Black);
-			game->screen->fillColor(sf::Color::White);
+			game->screen->borderColor(2, Color::Black);
+			game->screen->fillColor(Color::White);
 			game->screen->textSize(20);
 			game->screen->displayElement(buffer, {900 + STAGE_X_MIN, 50}, 145, Screen::ALIGN_RIGHT);
 			game->screen->textSize(30);
-			game->screen->borderColor(0, sf::Color::Transparent);
+			game->screen->borderColor(0, Color::Transparent);
 		}
 
 		// < -50, behind characters
@@ -382,11 +392,11 @@ namespace SpiralOfFate
 
 		this->_roundSprite.setTexture(this->_roundSprites[0], true);
 		this->_roundSprite.setScale({scale, scale});
-		this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<sf::Uint8>(alpha)});
-		this->_roundSprite.setOrigin(
-			this->_roundSprite.getTexture()->getSize().x / 2.f,
-			this->_roundSprite.getTexture()->getSize().y / 2.f
-		);
+		this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<uint8_t>(alpha)});
+		this->_roundSprite.setOrigin({
+			this->_roundSprite.getTexture().getSize().x / 2.f,
+			this->_roundSprite.getTexture().getSize().y / 2.f
+		});
 		this->_roundSprite.setPosition({(STAGE_X_MIN + STAGE_X_MAX) / 2.f, -250});
 		this->_roundEndTimer++;
 	}
@@ -419,19 +429,19 @@ namespace SpiralOfFate
 			else
 				this->_roundSprite.setTexture(this->_roundSprites[5 + this->_currentRound], true);
 			this->_roundSprite.setScale({scale, scale});
-			this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<sf::Uint8>(alpha)});
+			this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<uint8_t>(alpha)});
 		} else {
 			auto scale = std::exp((this->_roundStartTimer - 120) / 10.f);
 			auto alpha = (20 - (this->_roundStartTimer - 120)) / 20.f * 0xFF;
 
 			this->_roundSprite.setTexture(this->_roundSprites[1], true);
 			this->_roundSprite.setScale({scale, scale});
-			this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<sf::Uint8>(alpha)});
+			this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<uint8_t>(alpha)});
 		}
-		this->_roundSprite.setOrigin(
-			this->_roundSprite.getTexture()->getSize().x / 2.f,
-			this->_roundSprite.getTexture()->getSize().y / 2.f
-		);
+		this->_roundSprite.setOrigin({
+			this->_roundSprite.getTexture().getSize().x / 2.f,
+			this->_roundSprite.getTexture().getSize().y / 2.f
+		});
 		this->_roundSprite.setPosition({(STAGE_X_MIN + STAGE_X_MAX) / 2.f, -250});
 		this->_roundStartTimer++;
 	}
@@ -485,11 +495,11 @@ namespace SpiralOfFate
 
 		this->_roundSprite.setTexture(this->_roundSprites[2 + (this->_rightHUDData.score == FIRST_TO)], true);
 		this->_roundSprite.setScale({scale, scale});
-		this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<sf::Uint8>(alpha)});
-		this->_roundSprite.setOrigin(
-			this->_roundSprite.getTexture()->getSize().x / 2.f,
-			this->_roundSprite.getTexture()->getSize().y / 2.f
-		);
+		this->_roundSprite.setColor(sf::Color{0xFF, 0xFF, 0xFF, static_cast<uint8_t>(alpha)});
+		this->_roundSprite.setOrigin({
+			this->_roundSprite.getTexture().getSize().x / 2.f,
+			this->_roundSprite.getTexture().getSize().y / 2.f
+		});
 		this->_roundSprite.setPosition({(STAGE_X_MIN + STAGE_X_MAX) / 2.f, -250});
 		this->_roundStartTimer++;
 		return this->_roundStartTimer <= 140;
@@ -824,65 +834,65 @@ namespace SpiralOfFate
 	void BattleManager::_renderCharacter(const Character &chr)
 	{
 		for (int i = 0; i < 4; i++) {
-			this->_limitSprites[i * 2].setRotation(i * 33 - this->_limitAnimTimer);
-			this->_limitSprites[i * 2 + 1].setRotation(i * 33 + this->_limitAnimTimer);
+			this->_limitSprites[i * 2].setRotation(sf::degrees(i * 33 - this->_limitAnimTimer));
+			this->_limitSprites[i * 2 + 1].setRotation(sf::degrees(i * 33 + this->_limitAnimTimer));
 		}
 		if (chr._limitEffects & NEUTRAL_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_NEUTRAL].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_NEUTRAL].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_NEUTRAL].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_NEUTRAL]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_NEUTRAL]);
 		}
 		if (chr._limitEffects & MATTER_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_MATTER].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_MATTER].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_MATTER].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_MATTER]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_MATTER]);
 		}
 		if (chr._limitEffects & SPIRIT_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_SPIRIT].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_SPIRIT].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_SPIRIT].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_SPIRIT]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_SPIRIT]);
 		}
 		if (chr._limitEffects & VOID_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_VOID].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_VOID].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_VOID].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_VOID]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_VOID]);
 		}
 		chr.render();
 		if (chr._limitEffects & NEUTRAL_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_NEUTRAL + 1].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_NEUTRAL + 1].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_NEUTRAL + 1].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_NEUTRAL + 1]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_NEUTRAL + 1]);
 		}
 		if (chr._limitEffects & MATTER_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_MATTER + 1].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_MATTER + 1].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_MATTER + 1].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_MATTER + 1]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_MATTER + 1]);
 		}
 		if (chr._limitEffects & SPIRIT_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_SPIRIT + 1].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_SPIRIT + 1].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_SPIRIT + 1].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_SPIRIT + 1]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_SPIRIT + 1]);
 		}
 		if (chr._limitEffects & VOID_LIMIT_EFFECT) {
 			this->_limitSprites[LIMIT_SPRITE_VOID + 1].setPosition({
 				chr._position.x,
-				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_VOID + 1].getTexture()->getSize().y / 2
+				-chr._position.y - this->_limitSprites[LIMIT_SPRITE_VOID + 1].getTextureSize().y / 2
 			});
-			game->textureMgr.render(this->_limitSprites[LIMIT_SPRITE_VOID + 1]);
+			game->screen->displayElement(this->_limitSprites[LIMIT_SPRITE_VOID + 1]);
 		}
 	}
 
@@ -904,14 +914,12 @@ namespace SpiralOfFate
 
 	void BattleManager::_renderButton(unsigned spriteId, float offset, int k, Vector2f pos)
 	{
-		Sprite sprite;
+		Sprite sprite{ this->_moveSprites[spriteId] };
 
-		sprite.textureHandle = this->_moveSprites[spriteId];
 		sprite.setScale({
-			(INPUT_DISPLAY_SIZE - 4.f) / game->textureMgr.getTextureSize(this->_moveSprites[spriteId]).x,
-			(INPUT_DISPLAY_SIZE - 4.f) / game->textureMgr.getTextureSize(this->_moveSprites[spriteId]).y
+			(INPUT_DISPLAY_SIZE - 4.f) / sprite.getTextureSize().x,
+			(INPUT_DISPLAY_SIZE - 4.f) / sprite.getTextureSize().y
 		});
-		game->textureMgr.setTexture(sprite);
 		game->screen->displayElement(sprite, {
 			2 + pos.x + 4 + offset,
 			2 + pos.y + k * (INPUT_DISPLAY_SIZE + 4)
@@ -920,31 +928,31 @@ namespace SpiralOfFate
 
 	void BattleManager::_renderInputs(const std::vector<ReplayData> &data, Vector2f pos, bool side)
 	{
-		Sprite sprite;
-		sf::Sprite s;
 		unsigned total = 0;
 		sf::RectangleShape shape;
 		float off = 0;
 
-		this->_tex.create(150, INPUT_DISPLAY_SIZE);
+		assert_exp(this->_tex.resize({150, INPUT_DISPLAY_SIZE}));
 		this->_tex.clear(sf::Color::Transparent);
 		shape.setOutlineThickness(0);
 		shape.setSize({INPUT_DISPLAY_SIZE, INPUT_DISPLAY_SIZE});
 		shape.setFillColor(sf::Color{0, 0, 0, 0xA0});
 		this->_tex.draw(shape);
-		shape.setPosition(INPUT_DISPLAY_SIZE, 0);
+
+		shape.setPosition({INPUT_DISPLAY_SIZE, 0});
 		shape.setSize({150 - INPUT_DISPLAY_SIZE, INPUT_DISPLAY_SIZE});
 		shape.setFillColor(sf::Color{0xA0, 0xA0, 0xA0, 0xA0});
 		this->_tex.draw(shape);
 		this->_tex.display();
 
-		s.setTexture(this->_tex.getTexture());
+		sf::Sprite s{this->_tex.getTexture()};
+
 		if (!side) {
 			s.setScale({-1, 1});
 			off = 150;
 		}
 		for (unsigned k = 0; k < 18; k++) {
-			s.setPosition(pos.x + off, pos.y + k * (INPUT_DISPLAY_SIZE + 4));
+			s.setPosition({pos.x + off, pos.y + k * (INPUT_DISPLAY_SIZE + 4)});
 			game->screen->draw(s);
 		}
 		if (!side)
@@ -977,12 +985,13 @@ namespace SpiralOfFate
 			if (dir != 5) {
 				if (spriteId > SPRITE_4)
 					spriteId -= 1;
-				sprite.textureHandle = this->_moveSprites[spriteId];
+
+				Sprite sprite{ this->_moveSprites[spriteId] };
+
 				sprite.setScale({
-					(INPUT_DISPLAY_SIZE - 4.f) / game->textureMgr.getTextureSize(this->_moveSprites[spriteId]).x,
-					(INPUT_DISPLAY_SIZE - 4.f) / game->textureMgr.getTextureSize(this->_moveSprites[spriteId]).y
+					(INPUT_DISPLAY_SIZE - 4.f) / sprite.getTextureSize().x,
+					(INPUT_DISPLAY_SIZE - 4.f) / sprite.getTextureSize().y
 				});
-				game->textureMgr.setTexture(sprite);
 				game->screen->displayElement(sprite, {
 					pos.x + 2 + offset,
 					pos.y + 2 + k * (INPUT_DISPLAY_SIZE + 4)
@@ -1460,7 +1469,7 @@ namespace SpiralOfFate
 		float size = 0;
 
 		for (char c : str)
-			size += txt.getFont()->getGlyph(c, txt.getCharacterSize(), false).advance;
+			size += txt.getFont().getGlyph(c, txt.getCharacterSize(), false).advance;
 		return size;
 	}
 
@@ -1499,11 +1508,11 @@ namespace SpiralOfFate
 	{
 	}
 
-	void BattleManager::HUDData::renderMeterBar(sf::RenderTarget &output, Vector2i pos, float bar, sf::Color minColor, sf::Color maxColor) const
+	void BattleManager::HUDData::renderMeterBar(sf::RenderTarget &output, Vector2i pos, float bar, Color minColor, Color maxColor) const
 	{
-		sf::VertexArray buffer{sf::TriangleStrip, 4};
+		sf::VertexArray buffer{sf::PrimitiveType::TriangleStrip, 4};
 		sf::Vertex vertex;
-		sf::Text text;
+		sf::Text text{ this->mgr._font };
 
 		vertex.color = minColor;
 		vertex.position = pos;
@@ -1512,9 +1521,9 @@ namespace SpiralOfFate
 		buffer[2] = vertex;
 
 		vertex.color = sf::Color{
-			static_cast<sf::Uint8>(minColor.r + (maxColor.r - minColor.r) * bar),
-			static_cast<sf::Uint8>(minColor.g + (maxColor.g - minColor.g) * bar),
-			static_cast<sf::Uint8>(minColor.b + (maxColor.b - minColor.b) * bar),
+			static_cast<uint8_t>(minColor.r + (maxColor.r - minColor.r) * bar),
+			static_cast<uint8_t>(minColor.g + (maxColor.g - minColor.g) * bar),
+			static_cast<uint8_t>(minColor.b + (maxColor.b - minColor.b) * bar),
 		};
 		vertex.position = {pos.x + bar * 169, pos.y * 1.f};
 		buffer[1] = vertex;
@@ -1533,95 +1542,96 @@ namespace SpiralOfFate
 
 			for (auto c : str)
 				size += this->mgr._font.getGlyph(c, 14, false).advance;
-			text.setScale(-1, 1);
-			text.setPosition(pos.x + 190 + size, pos.y - 1);
+			text.setScale({-1, 1});
+			text.setPosition(Vector2f(pos.x + 190 + size, pos.y - 1));
 		} else
-			text.setPosition(pos.x + 190, pos.y - 1);
+			text.setPosition(Vector2f(pos.x + 190, pos.y - 1));
 		text.setString(str);
 		output.draw(text);
 	}
 
 	void BattleManager::HUDData::render(sf::RenderTarget &output) const
 	{
+		float side = this->side ? -1.f : 1.f;
+
 		output.clear(sf::Color::Transparent);
 
-		this->mgr._battleUi[BATTLEUI_HUD_SEAT].setPosition(20, 20);
+		this->mgr._battleUi[BATTLEUI_HUD_SEAT].setPosition({20, 20});
 		output.draw(this->mgr._battleUi[BATTLEUI_HUD_SEAT], sf::BlendNone);
 
-		this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].setPosition(69, 40);
+		this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].setPosition({69, 40});
 		this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].setTextureRect({
 			0, 0,
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].textureHandle).x * std::min<float>(
+			static_cast<int>(this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].getTextureSize().x * std::min<float>(
 				this->base._hp + static_cast<float>(this->base._totalDamage), this->base._baseHp
 			) / this->base._baseHp),
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].textureHandle).y)
+			static_cast<int>(this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED].getTextureSize().y)
 		});
 		output.draw(this->mgr._battleUi[BATTLEUI_LIFE_BAR_RED], sf::BlendAlpha);
 
-		this->mgr._battleUi[BATTLEUI_LIFE_BAR].setPosition(69, 40);
+		this->mgr._battleUi[BATTLEUI_LIFE_BAR].setPosition({69, 40});
 		this->mgr._battleUi[BATTLEUI_LIFE_BAR].setTextureRect({
 			0, 0,
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR].textureHandle).x * this->base._hp / this->base._baseHp),
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR].textureHandle).y)
+			static_cast<int>(this->mgr._battleUi[BATTLEUI_LIFE_BAR].getTextureSize().x * this->base._hp / this->base._baseHp),
+			static_cast<int>(this->mgr._battleUi[BATTLEUI_LIFE_BAR].getTextureSize().y)
 		});
 		output.draw(this->mgr._battleUi[BATTLEUI_LIFE_BAR], sf::BlendAlpha);
 
-		this->mgr._battleUi[BATTLEUI_LIFE_BAR_EFFECT].setPosition(69, 40);
+		this->mgr._battleUi[BATTLEUI_LIFE_BAR_EFFECT].setPosition({69, 40});
 		this->mgr._battleUi[BATTLEUI_LIFE_BAR_EFFECT].setTextureRect({
 			static_cast<int>(this->lifeBarEffect), 0,
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR].textureHandle).x * this->base._hp / this->base._baseHp),
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR].textureHandle).y)
+			static_cast<int>(this->mgr._battleUi[BATTLEUI_LIFE_BAR].getTextureSize().x * this->base._hp / this->base._baseHp),
+			static_cast<int>(this->mgr._battleUi[BATTLEUI_LIFE_BAR].getTextureSize().y)
 		});
 		output.draw(this->mgr._battleUi[BATTLEUI_LIFE_BAR_EFFECT], sf::BlendMode{
-			sf::BlendMode::DstColor, sf::BlendMode::Zero, sf::BlendMode::Add,
-			sf::BlendMode::Zero,     sf::BlendMode::One,  sf::BlendMode::Add
+			sf::BlendMode::Factor::DstColor, sf::BlendMode::Factor::Zero, sf::BlendMode::Equation::Add,
+			sf::BlendMode::Factor::Zero,     sf::BlendMode::Factor::One,  sf::BlendMode::Equation::Add
 		});
 
 		auto guardVals = this->base._guardCooldown ?
 		                 std::pair<int, int>(this->base._maxGuardCooldown - this->base._guardCooldown, this->base._maxGuardCooldown) :
 		                 std::pair<int, int>(this->base._guardBar, this->base._maxGuardBar);
 		auto guardId = this->base._guardCooldown ? BATTLEUI_GUARD_BAR_DISABLED : BATTLEUI_GUARD_BAR;
-		auto width = game->textureMgr.getTextureSize(this->mgr._battleUi[guardId].textureHandle).x * guardVals.first / guardVals.second;
+		auto width = this->mgr._battleUi[guardId].getTextureSize().x * guardVals.first / guardVals.second;
 
-		this->mgr._battleUi[guardId].setPosition(260, 78);
+		this->mgr._battleUi[guardId].setPosition({260, 78});
 		this->mgr._battleUi[guardId].setTextureRect({
 			0, 0, static_cast<int>(width),
-			static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[guardId].textureHandle).y)
+			static_cast<int>(this->mgr._battleUi[guardId].getTextureSize().y)
 		});
 		output.draw(this->mgr._battleUi[guardId], sf::BlendNone);
 
 		if (!this->base._guardCooldown) {
-			auto sizeX = game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].textureHandle).x;
+			auto sizeX = this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].getTextureSize().x;
 
-			this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].setPosition(260 + width, 78);
+			this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].setPosition(Vector2f(260 + width, 78));
 			this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].setTextureRect({
 				static_cast<int>(width), 0,
 				static_cast<int>(sizeX * (this->base._guardBarTmp / 2 + this->base._guardBar) / this->base._maxGuardBar - width),
-				static_cast<int>(game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].textureHandle).y)
+				static_cast<int>(this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP].getTextureSize().y)
 			});
 			output.draw(this->mgr._battleUi[BATTLEUI_GUARD_BAR_TMP], sf::BlendNone);
 		}
 
-		this->mgr._battleUi[BATTLEUI_GUARD_TEXT].setScale(this->side ? -1 : 1, 1);
-		this->mgr._battleUi[BATTLEUI_GUARD_TEXT].setPosition(222 + game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_GUARD_TEXT].textureHandle).x / 2, 62);
+		this->mgr._battleUi[BATTLEUI_GUARD_TEXT].setScale({side, 1});
+		this->mgr._battleUi[BATTLEUI_GUARD_TEXT].setPosition({222.f + this->mgr._battleUi[BATTLEUI_GUARD_TEXT].getTextureSize().x / 2, 62});
 		this->mgr._battleUi[BATTLEUI_GUARD_TEXT].setColor(this->base._guardCooldown ? sf::Color{0x40, 0x40, 0x40} : sf::Color::White);
 		output.draw(this->mgr._battleUi[BATTLEUI_GUARD_TEXT], sf::BlendAlpha);
 
 		if (this->base._guardCooldown && this->guardCrossTimer % 60 > 30) {
-			sf::Sprite sprite;
+			sf::Sprite sprite{ this->mgr._cross };
 
-			sprite.setTexture(this->mgr._cross, true);
-			sprite.setPosition(237, 65);
+			sprite.setPosition({237, 65});
 			output.draw(sprite, sf::BlendAlpha);
 		}
 
-		auto size = game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_OVERDRIVE].textureHandle);
+		auto size = this->mgr._battleUi[BATTLEUI_OVERDRIVE].getTextureSize();
 
-		this->mgr._battleUi[BATTLEUI_OVERDRIVE].setScale(this->side ? -1 : 1, 1);
-		this->mgr._battleUi[BATTLEUI_OVERDRIVE].setPosition(
-			420 + game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_OVERDRIVE].textureHandle).x / 2,
-			65 + game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_OVERDRIVE].textureHandle).y / 2
-		);
+		this->mgr._battleUi[BATTLEUI_OVERDRIVE].setScale({side, 1});
+		this->mgr._battleUi[BATTLEUI_OVERDRIVE].setPosition({
+			420.f + this->mgr._battleUi[BATTLEUI_OVERDRIVE].getTextureSize().x / 2,
+			65.f + this->mgr._battleUi[BATTLEUI_OVERDRIVE].getTextureSize().y / 2
+		});
 		this->mgr._battleUi[BATTLEUI_OVERDRIVE].setTextureRect({
 			0, 0,
 			static_cast<int>(size.x),
@@ -1631,11 +1641,11 @@ namespace SpiralOfFate
 		output.draw(this->mgr._battleUi[BATTLEUI_OVERDRIVE], sf::BlendAlpha);
 
 		if (this->base._odCooldown) {
-			this->mgr._battleUi[BATTLEUI_OVERDRIVE].setScale(this->side ? -1 : 1, 1);
-			this->mgr._battleUi[BATTLEUI_OVERDRIVE].setPosition(
-				420 + size.x / 2 + (this->side ? 0 : size.x * this->base._odCooldown / this->base._barMaxOdCooldown),
-				65 + size.y / 2
-			);
+			this->mgr._battleUi[BATTLEUI_OVERDRIVE].setScale({side, 1});
+			this->mgr._battleUi[BATTLEUI_OVERDRIVE].setPosition({
+				420.f + size.x / 2 + (this->side ? 0 : size.x * this->base._odCooldown / this->base._barMaxOdCooldown),
+				65.f + size.y / 2
+			});
 			this->mgr._battleUi[BATTLEUI_OVERDRIVE].setTextureRect({
 				(this->side ? 0 : static_cast<int>(size.x * this->base._odCooldown / this->base._barMaxOdCooldown)),
 				0,
@@ -1646,52 +1656,51 @@ namespace SpiralOfFate
 			output.draw(this->mgr._battleUi[BATTLEUI_OVERDRIVE], sf::BlendAlpha);
 		}
 
-		this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].setScale(this->side ? -1 : 1, 1);
-		this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].setPosition(
-			420 + game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].textureHandle).x / 2,
-			65 + game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].textureHandle).y / 2
-		);
+		this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].setScale({side, 1});
+		this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].setPosition({
+			420.f + this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].getTextureSize().x / 2,
+			65.f + this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE].getTextureSize().y / 2
+		});
 		output.draw(this->mgr._battleUi[BATTLEUI_OVERDRIVE_OUTLINE], sf::BlendAlpha);
 
 		if (this->base._odCooldown && this->overdriveCrossTimer % 60 > 30) {
-			sf::Sprite sprite;
+			sf::Sprite sprite{ this->mgr._cross };
 
-			sprite.setScale(2, 2);
-			sprite.setOrigin(8, 8);
-			sprite.setTexture(this->mgr._cross, true);
-			sprite.setPosition(420 + size.x / 2, 65 + size.y / 2);
+			sprite.setScale({2, 2});
+			sprite.setOrigin({8, 8});
+			sprite.setPosition({420 + size.x / 2.f, 65 + size.y / 2.f});
 			output.draw(sprite, sf::BlendAlpha);
 		}
 		for (int i = 0; i < FIRST_TO; i++) {
-			this->mgr._battleUi[BATTLEUI_SCORE_SEAT].setPosition(162 - i * 46, 69);
+			this->mgr._battleUi[BATTLEUI_SCORE_SEAT].setPosition({162 - i * 46.f, 69});
 			output.draw(this->mgr._battleUi[BATTLEUI_SCORE_SEAT], sf::BlendNone);
 		}
 		for (int i = 0; i < this->score; i++) {
-			this->mgr._battleUi[BATTLEUI_SCORE_BULLET].setPosition(167 - i * 46, 72);
+			this->mgr._battleUi[BATTLEUI_SCORE_BULLET].setPosition({167 - i * 46.f, 72});
 			output.draw(this->mgr._battleUi[BATTLEUI_SCORE_BULLET], sf::BlendNone);
 		}
 
-		this->mgr._battleUi[BATTLEUI_MANA_BAR].setPosition(130, 655);
+		this->mgr._battleUi[BATTLEUI_MANA_BAR].setPosition({130, 655});
 		output.draw(this->mgr._battleUi[BATTLEUI_MANA_BAR], sf::BlendNone);
 		output.draw(this->icon);
 
 		if (LIMIT_EFFECT_TIMER(this->base._limitEffects)) {
 			this->renderMeterBar(output, {134, 660}, (float)this->base._mana / this->base._manaMax, {50, 50, 50}, {50, 50, 0});
-			this->mgr._battleUi[BATTLEUI_MANA_BAR_CROSS].setPosition(130, 655);
+			this->mgr._battleUi[BATTLEUI_MANA_BAR_CROSS].setPosition({130, 655});
 			output.draw(this->mgr._battleUi[BATTLEUI_MANA_BAR_CROSS], sf::BlendAlpha);
 		} else
 			this->renderMeterBar(output, {134, 660}, (float)this->base._mana / this->base._manaMax, {200, 200, 200}, {200, 200, 0});
 		if (this->base._stallingFactor > STALLING_PENALTY_THRESHOLD) {
-			this->mgr._stallDown.setPosition(320, 620);
+			this->mgr._stallDown.setPosition({320, 620});
 			this->mgr._stallDown.setTextureRect({
 				0,
 				static_cast<int>(this->penaltyTimer / -200),
-				static_cast<int>(this->mgr._stallDown.getTexture()->getSize().x),
-				static_cast<int>(this->mgr._stallDown.getTexture()->getSize().y)
+				static_cast<int>(this->mgr._stallDown.getTextureSize().x),
+				static_cast<int>(this->mgr._stallDown.getTextureSize().y)
 			});
 			output.draw(this->mgr._stallDown, sf::BlendNone);
 		} else if (this->base._stallingFactor > START_STALLING_THRESHOLD) {
-			this->mgr._stallWarn.setPosition(320, 620);
+			this->mgr._stallWarn.setPosition({320, 620});
 			output.draw(this->mgr._stallWarn, sf::BlendNone);
 		}
 		this->base.drawSpecialHUD(output);
@@ -1699,9 +1708,8 @@ namespace SpiralOfFate
 
 	void BattleManager::HUDData::renderNoReverse(sf::RenderTarget &output) const
 	{
-		sf::Text text;
+		sf::Text text{ this->mgr._font };
 
-		text.setFont(this->mgr._font);
 		if (this->comboCtr) {
 			unsigned char alpha = this->comboCtr > 51 ? 0xFF : this->comboCtr * 5;
 
@@ -1733,12 +1741,12 @@ namespace SpiralOfFate
 			this->target.clear(sf::Color::Transparent);
 			this->target.draw(this->mgr._oosBubbleMask, sf::BlendNone);
 			this->target.draw(side ? this->mgr._rightIcon : this->mgr._leftIcon, sf::BlendMode{
-				sf::BlendMode::DstColor,
-				sf::BlendMode::Zero,
-				sf::BlendMode::Add,
-				sf::BlendMode::Zero,
-				sf::BlendMode::DstColor,
-				sf::BlendMode::Add
+				sf::BlendMode::Factor::DstColor,
+				sf::BlendMode::Factor::Zero,
+				sf::BlendMode::Equation::Add,
+				sf::BlendMode::Factor::Zero,
+				sf::BlendMode::Factor::DstColor,
+				sf::BlendMode::Equation::Add
 			});
 			this->target.draw(this->mgr._oosBubble);
 			this->target.display();
@@ -1747,7 +1755,7 @@ namespace SpiralOfFate
 			auto pos = this->base._position;
 
 			if (!this->base._direction) {
-				sprite.setScale(-1, 1);
+				sprite.setScale({-1, 1});
 				pos.x += this->target.getSize().x / 2;
 			} else
 				pos.x -= this->target.getSize().x / 2;
@@ -1771,7 +1779,7 @@ namespace SpiralOfFate
 		if (this->base._stallingFactor > STALLING_PENALTY_THRESHOLD)
 			this->penaltyTimer += (this->base._stallingFactor - STALLING_PENALTY_THRESHOLD) / 8 + 100;
 		this->lifeBarEffect++;
-		this->lifeBarEffect %= game->textureMgr.getTextureSize(this->mgr._battleUi[BATTLEUI_LIFE_BAR_EFFECT].textureHandle).x;
+		this->lifeBarEffect %= this->mgr._battleUi[BATTLEUI_LIFE_BAR_EFFECT].getTextureSize().x;
 		if (this->base._opponent->_comboCtr) {
 			this->hitCtr       = this->base._opponent->_comboCtr;
 			this->neutralLimit = this->base._opponent->_limit[LIMIT_NEUTRAL];

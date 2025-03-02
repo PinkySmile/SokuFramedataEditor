@@ -8,6 +8,7 @@
 
 #include <thread>
 #include <list>
+#include <algorithm>
 #include <SFML/Network.hpp>
 #include "Packet.hpp"
 #include "Inputs/InputEnum.hpp"

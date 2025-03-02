@@ -7,8 +7,19 @@
 #include "Resources/Game.hpp"
 #include "Logger.hpp"
 
+#define MAX_SOUND 64
+
 namespace SpiralOfFate
 {
+	SoundManager::SoundManager()
+	{
+		sf::SoundBuffer buffer;
+
+		this->_sound.reserve(MAX_SOUND);
+		for (int i = 0; i < MAX_SOUND; i++)
+			this->_sound.emplace_back(buffer);
+	}
+
 	unsigned SoundManager::load(std::string file)
 	{
 		for (auto pos = file.find('\\'); pos != std::string::npos; pos = file.find('\\'))

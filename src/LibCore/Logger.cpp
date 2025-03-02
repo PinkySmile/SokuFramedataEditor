@@ -30,6 +30,7 @@ namespace SpiralOfFate
 
 		logged_str << std::put_time(tm, "[%d-%m-%Y][%H:%M:%S]") << prepend << ": " << content << std::endl;
 		this->file << logged_str.str();
+		this->file.flush();
 		if (toStdout)
 			std::cout << logged_str.str();
 		this->mutex.unlock();

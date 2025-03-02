@@ -90,7 +90,7 @@ namespace SpiralOfFate
 			circle.setOutlineColor(sf::Color::Green);
 		circle.setFillColor(sf::Color::Transparent);
 		circle.setRadius(TRIGGER_RADIUS);
-		circle.setOrigin(TRIGGER_RADIUS, TRIGGER_RADIUS);
+		circle.setOrigin({TRIGGER_RADIUS, TRIGGER_RADIUS});
 		circle.setPosition(myPos);
 		circle.setOutlineThickness(2);
 		game->screen->draw(circle);

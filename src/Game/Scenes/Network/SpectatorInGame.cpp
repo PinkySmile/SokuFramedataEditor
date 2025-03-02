@@ -32,10 +32,12 @@ namespace SpiralOfFate
 	void SpectatorInGame::consumeEvent(const sf::Event &event)
 	{
 		InGame::consumeEvent(event);
-		if (event.type == sf::Event::JoystickButtonPressed || event.type == sf::Event::JoystickButtonReleased)
-			game->P1.second->setJoystickId(event.joystickButton.joystickId);
-		if (event.type == sf::Event::JoystickMoved)
-			game->P1.second->setJoystickId(event.joystickMove.joystickId);
+		if (auto e = event.getIf<sf::Event::JoystickButtonPressed>())
+			game->P1.second->setJoystickId(e->joystickId);
+		if (auto e = event.getIf<sf::Event::JoystickButtonReleased>())
+			game->P1.second->setJoystickId(e->joystickId);
+		if (auto e = event.getIf<sf::Event::JoystickMoved>())
+			game->P1.second->setJoystickId(e->joystickId);
 		game->P1.first->consumeEvent(event);
 		game->P1.second->consumeEvent(event);
 	}

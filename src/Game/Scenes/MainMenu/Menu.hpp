@@ -17,9 +17,9 @@ namespace SpiralOfFate
 {
 	class Menu {
 	private:
-		sf::Text _descText;
 		sf::Font _buttonFont;
 		sf::Font _descFont;
+		sf::Text _descText{ this->_descFont };
 		std::vector<std::vector<std::unique_ptr<MenuItem>>> _items;
 		std::unique_ptr<PreparedShrunkRect> _descBox;
 		mutable Sprite _separatorBody;
@@ -41,7 +41,7 @@ namespace SpiralOfFate
 
 	public:
 		Menu(const std::string &buttonFont, const std::string &descFont, const std::vector<std::vector<MenuItemSkeleton>> &&arr);
-		~Menu();
+
 		void update(InputStruct inputs);
 		void render() const;
 		unsigned getSelectedItem() const;

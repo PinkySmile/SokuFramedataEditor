@@ -185,7 +185,7 @@ namespace SpiralOfFate
 
 	void InGame::render() const
 	{
-		ViewPort view{{STAGE_X_MIN - 50, -600, 1100, 700}};
+		ViewPort view{{{STAGE_X_MIN - 50, -600}, {1100, 700}}};
 
 		game->screen->setView(view);
 		game->battleMgr->render();
@@ -236,7 +236,9 @@ namespace SpiralOfFate
 	void InGame::consumeEvent(const sf::Event &event)
 	{
 		game->battleMgr->consumeEvent(event);
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code != sf::Keyboard::Key::Escape)
+				return;
 			this->_moveList = nullptr;
 			if (this->_paused) {
 				this->_paused = 3;
@@ -252,16 +254,16 @@ namespace SpiralOfFate
 	{
 		if (this->_paused == 3)
 			return;
-		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 240 - 600, 400, 175}, sf::Color{0x50, 0x50, 0x50, 0xC0});
+		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 240 - 600, 400, 175}, Color{0x50, 0x50, 0x50, 0xC0});
 
 		game->screen->textSize(20);
-		game->screen->fillColor(sf::Color::White);
+		game->screen->fillColor(Color::White);
 		game->screen->displayElement("P" + std::to_string(this->_paused) + " | Paused", {340 - 50 + STAGE_X_MIN, 245 - 600}, 400, Screen::ALIGN_CENTER);
 		for (size_t i = 0; i < sizeof(InGame::_menuStrings) / sizeof(*InGame::_menuStrings); i++) {
-			game->screen->fillColor(i == this->_pauseCursor ? sf::Color::Yellow : sf::Color::White);
+			game->screen->fillColor(i == this->_pauseCursor ? Color::Yellow : Color::White);
 			game->screen->displayElement(InGame::_menuStrings[i], {350 - 50 + STAGE_X_MIN, 285 - 600 + 25.f * i});
 		}
-		game->screen->fillColor(sf::Color::White);
+		game->screen->fillColor(Color::White);
 		game->screen->textSize(30);
 	}
 
@@ -358,7 +360,6 @@ namespace SpiralOfFate
 
 	void InGame::_renderMoveList(Character *relevent, const std::wstring &title) const
 	{
-		Sprite sprite;
 		unsigned noText[] = {
 			ACTION_NEUTRAL_OVERDRIVE,
 			ACTION_MATTER_OVERDRIVE,
@@ -370,8 +371,7 @@ namespace SpiralOfFate
 			ACTION_GROUND_HIGH_VOID_PARRY
 		};
 
-		sprite.setScale(0.5f, 0.5f);
-		game->screen->displayElement({140 - 50 + STAGE_X_MIN, 10 - 600, 800, 680}, sf::Color{0x50, 0x50, 0x50, 0xF0});
+		game->screen->displayElement({140 - 50 + STAGE_X_MIN, 10 - 600, 800, 680}, Color{0x50, 0x50, 0x50, 0xF0});
 
 		game->screen->textSize(20);
 		game->screen->displayElement(title, {140 - 50 + STAGE_X_MIN, 15 - 600}, 800, Screen::ALIGN_CENTER);
@@ -428,9 +428,11 @@ namespace SpiralOfFate
 
 			for (auto input : data->second.input) {
 				if (input < NB_SPRITES) {
+					Sprite sprite{ this->_moveSprites[input] };
+
+					sprite.setScale({0.5f, 0.5f});
 					sprite.setPosition(pos + Vector2f{0, 18});
-					sprite.textureHandle = this->_moveSprites[input];
-					game->textureMgr.render(sprite);
+					game->screen->displayElement(sprite);
 					pos.x += 35;
 				} else {
 					game->screen->displayElement(text[input - NB_SPRITES], pos + Vector2f{0, 25});

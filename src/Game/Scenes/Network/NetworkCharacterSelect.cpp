@@ -90,8 +90,8 @@ namespace SpiralOfFate
 			stage,
 			lchr,
 			rchr,
-			licon.textureHandle,
-			ricon.textureHandle,
+			licon.getHandle(),
+			ricon.getHandle(),
 			lentry.entry,
 			rentry.entry
 		};

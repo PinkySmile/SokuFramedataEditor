@@ -44,7 +44,7 @@ namespace SpiralOfFate
 			this->_rotation = this->_copy->_rotation;
 			this->_sprite.setColor(sf::Color{
 				255, 255, 255,
-				static_cast<sf::Uint8>(this->_copy->_maxAlpha * (1 - this->_copy->_alpha))
+				static_cast<uint8_t>(this->_copy->_maxAlpha * (1 - this->_copy->_alpha))
 			});
 			return;
 		}
@@ -57,14 +57,14 @@ namespace SpiralOfFate
 			if (this->_actionBlock >= 2) {
 				this->_sprite.setColor(sf::Color{
 					255, 255, 255,
-					static_cast<sf::Uint8>(this->_maxAlpha * this->_alpha)
+					static_cast<uint8_t>(this->_maxAlpha * this->_alpha)
 				});
 				Object::update();
 				return;
 			} else if (!this->_attackFadeCtr) {
 				this->_sprite.setColor(sf::Color{
 					255, 255, 255,
-					static_cast<sf::Uint8>(this->_maxAlpha * this->_alpha)
+					static_cast<uint8_t>(this->_maxAlpha * this->_alpha)
 				});
 				return;
 			}
@@ -166,7 +166,7 @@ namespace SpiralOfFate
 		}
 		this->_sprite.setColor(sf::Color{
 			255, 255, 255,
-			static_cast<sf::Uint8>(this->_maxAlpha * this->_alpha)
+			static_cast<uint8_t>(this->_maxAlpha * this->_alpha)
 		});
 		this->_direction = this->_dir == 1;
 	}
@@ -292,7 +292,7 @@ namespace SpiralOfFate
 			this->_maxAlpha = MAX_ALPHA;
 			this->_sprite.setColor(sf::Color{
 				255, 255, 255,
-				static_cast<sf::Uint8>(this->_maxAlpha * this->_alpha)
+				static_cast<uint8_t>(this->_maxAlpha * this->_alpha)
 			});
 			return;
 		}
@@ -315,7 +315,7 @@ namespace SpiralOfFate
 		this->_ctr = 0;
 		this->_sprite.setColor(sf::Color{
 			255, 255, 255,
-			static_cast<sf::Uint8>(this->_maxAlpha * this->_alpha)
+			static_cast<uint8_t>(this->_maxAlpha * this->_alpha)
 		});
 		this->_defenseCtr = 15;
 	}

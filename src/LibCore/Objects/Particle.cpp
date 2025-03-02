@@ -14,9 +14,9 @@ namespace SpiralOfFate
 		_source(std::move(source)),
 		_owner(owner),
 		_data(initData),
+		_sprite(sprite),
 		_position(position)
 	{
-		this->_sprite.textureHandle = sprite;
 		if (compute) {
 			this->_aliveTimer = random_distrib(game->battleRandom, initData.lifeSpan.first, initData.lifeSpan.second);
 			this->_maxFadeTime = random_distrib(game->battleRandom, initData.fadeTime.first, initData.fadeTime.second);
@@ -24,13 +24,13 @@ namespace SpiralOfFate
 			this->_scale = random_distrib(game->battleRandom, initData.scale.first, initData.scale.second);
 			this->_fadeTime = this->_maxFadeTime;
 		}
-		game->textureMgr.setTexture(this->_sprite);
 	}
 
 	void Particle::render() const
 	{
 		{
-			sf::VertexArray arr{sf::Quads, 4};
+			// TODO: Check if it works
+			sf::VertexArray arr{sf::PrimitiveType::TriangleFan, 4};
 			auto size = this->_data.textureBounds.size * this->_scale;
 			Rectangle box = {
 				{this->_position.x - size.x / 2.f, -this->_position.y - size.y / 2.f},
@@ -62,11 +62,11 @@ namespace SpiralOfFate
 				static_cast<float>(this->_data.textureBounds.pos.x),
 				static_cast<float>(this->_data.textureBounds.pos.y + this->_data.textureBounds.size.y)
 			};
-			game->screen->draw(arr, this->_sprite.getTexture());
+			game->screen->draw(arr, sf::RenderStates(&this->_sprite.getTexture()));
 		}
 		if (this->showBoxes) {
-			sf::VertexArray arr{sf::Quads, 4};
-			sf::VertexArray arr2{sf::LineStrip, 5};
+			sf::VertexArray arr{sf::PrimitiveType::TriangleFan, 4};
+			sf::VertexArray arr2{sf::PrimitiveType::LineStrip, 5};
 			Rectangle box = {
 				{this->_position.x - 4.5f, -this->_position.y - 4.5f},
 				{this->_position.x + 4.5f, -this->_position.y - 4.5f},
@@ -75,14 +75,14 @@ namespace SpiralOfFate
 			};
 
 			for (int i = 0; i < 4; i++) {
-				arr[i].color = sf::Color::Black;
+				arr[i].color = Color::Black;
 				arr[i].color.a *= 0x30 / 255.f;
 				arr[i].position = (&box.pt1)[i];
 			}
 			game->screen->draw(arr);
 
 			for (unsigned i = 0; i < 5; i++) {
-				arr2[i].color = sf::Color::Black;
+				arr2[i].color = Color::Black;
 				arr2[i].position = (&box.pt1)[i % 4];
 			}
 			game->screen->draw(arr2);
