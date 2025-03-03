@@ -3947,8 +3947,12 @@ namespace SpiralOfFate
 	{
 		if (other->getTeam() == !this->_team) {
 			this->_opponent->_mana -= this->_opponent->_manaMax * (10 + isStrongest * 10) / 100;
-			if (this->_opponent->_mana < 0)
-				this->_opponent->_manaCrush();
+			if (this->_opponent->_mana < 0) {
+				if (isStrongest)
+					this->_opponent->_manaCrush();
+				else
+					this->_opponent->_mana = 0;
+			}
 		}
 	}
 
