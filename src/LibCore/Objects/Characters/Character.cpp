@@ -1400,6 +1400,7 @@ namespace SpiralOfFate
 
 		FrameData data;
 		auto myData = this->getCurrentFrameData();
+		bool isParried = isParryAction(this->_action) && this->_animation == 0;
 
 		data.setSlave();
 		data = *dat;
@@ -1411,10 +1412,9 @@ namespace SpiralOfFate
 		}
 		this->_restand = false;
 		if (
-			!this->_isBlocking() ||
-			(myData->dFlag.airborne && data.oFlag.airUnblockable) ||
-			data.oFlag.unblockable ||
-			data.oFlag.grab
+			!this->_isBlocking() || data.oFlag.grab ||
+			(!isParried && myData->dFlag.airborne && data.oFlag.airUnblockable) ||
+			(!isParried && data.oFlag.unblockable)
 		)
 			this->_getHitByMove(&other, data);
 		else
