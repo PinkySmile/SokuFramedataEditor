@@ -91,7 +91,7 @@ namespace SpiralOfFate
 
 	void SoundManager::play(unsigned id) const
 	{
-		if (!id)
+		if (id == 0)
 			return;
 		game->logger.debug("Playing sound " + std::to_string(id));
 

@@ -9,14 +9,19 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#ifndef __ANDROID__
-#ifdef USE_TGUI
+
+#if !defined(__ANDROID__) && defined(USE_TGUI)
 #include <TGUI/TGUI.hpp>
+#ifdef USE_SDL
+#include <TGUI/Backend/SDL-Renderer.hpp>
+#else
+#include <TGUI/Backend/SFML-Graphics.hpp>
 #endif
 #endif
 
-#ifndef _WIN32
-#ifdef USE_SDL
+#ifdef _WIN32
+#include <windows.h>
+#elif defined(USE_SDL)
 #include <SDL2/SDL.h>
 #define MB_ICONERROR SDL_MESSAGEBOX_ERROR
 #define MB_ICONINFORMATION SDL_MESSAGEBOX_INFORMATION
@@ -25,9 +30,6 @@
 #define MB_ICONERROR 0x10
 #define MB_ICONINFORMATION 0x20
 #define MB_ICONWARNING 0x30
-#endif
-#else
-#include <windows.h>
 #endif
 
 
@@ -128,6 +130,13 @@ namespace SpiralOfFate::Utils
 	}
 
 #ifdef USE_TGUI
+	//! @brief Display a focused window.
+	//! @param gui The gui handling the window.
+	//! @param width The width of the window.
+	//! @param height The height of the window.
+	//! @return A pointer to the window
+	tgui::ChildWindow::Ptr openWindowWithFocus(tgui::Gui &gui, tgui::Layout width, tgui::Layout height, tgui::ChildWindow::Ptr win = nullptr);
+
 	//! @brief Display a Windows dialog box.
 	//! @details This functions opens a Windows dialog box and return the button clicked by the user.
 	//! @param title The title of the window.
@@ -135,28 +144,21 @@ namespace SpiralOfFate::Utils
 	//! @param variate A bit combination of the window attributes (see Windows MessageBox function for a list of the enums).
 	//! @return The button clicked by the user.
 	//! @note On Non-Windows systems, it will simulate the Windows dialog box. Only MB_ICONERROR and MB_OK are simulated on those systems.
-	int	dispMsg(const std::string &title, const std::string &content, int variate, Screen *win = nullptr);
+	tgui::MessageBox::Ptr dispMsg(tgui::Gui &gui, const std::string &title, const std::string &content, int variate);
 
 	//! @brief Opens a FileDialog
 	//! @param title Title of the FileDialog
 	//! @param basePath The path of the FileDialog
 	//! @param patterns The patterns of the FileDialog
 	//! @return std::string FileDialog message
-	std::filesystem::path openFileDialog(const std::string &title = "Open file", const std::string &basePath = ".", const std::vector<std::pair<std::string, std::string>> &patterns = {}, bool overWriteWarning = false, bool mustExist = true);
+	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title = "Open file", const std::string &basePath = ".", bool overWriteWarning = false, bool mustExist = true);
 
 	//! @brief Saves a file dialog
 	//! @param title Title of the FileDialog
 	//! @param basePath The path of the FileDialog
 	//! @param patterns The patterns of the FileDialog
 	//! @return std::string FileDialog message
-	std::filesystem::path saveFileDialog(const std::string &title = "Save file", const std::string &basePath = ".", const std::vector<std::pair<std::string, std::string>> &patterns = {});
-
-	//! @brief Display a focused window.
-	//! @param gui The gui handling the window.
-	//! @param width The width of the window.
-	//! @param height The height of the window.
-	//! @return A pointer to the window
-	tgui::ChildWindow::Ptr openWindowWithFocus(tgui::Gui &gui, tgui::Layout width, tgui::Layout height);
+	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title = "Save file", const std::string &basePath = ".");
 
 	//! @brief Display a window with a slider.
 	//! @param gui The gui handling the window.

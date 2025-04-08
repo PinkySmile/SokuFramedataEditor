@@ -4,7 +4,6 @@ project(SoFGV CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 add_compile_definitions(_USE_MATH_DEFINES=1)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/pkgs)
 
 if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
 	set(USE_SDL2 ON)
@@ -40,42 +39,9 @@ if (USE_SDL2)
 		src/LibCore/SDL2/Screen.hpp
 	)
 
+	find_package(SFML 3 REQUIRED COMPONENTS Graphics Audio Network)
+	find_package(TGUI 1 REQUIRED)
 
-	find_package(SFML REQUIRED)
-	find_package(TGUI REQUIRED)
-	message("SFML include dir is ${SFML_INCLUDE_DIRS}")
-	message("SFML graphics library is ${SFML_GRAPHICS_LIBRARY}")
-	message("SFML audio library is ${SFML_AUDIO_LIBRARY}")
-	message("SFML system library is ${SFML_SYSTEM_LIBRARY}")
-	message("SFML window library is ${SFML_WINDOW_LIBRARY}")
-	message("SFML network library is ${SFML_NETWORK_LIBRARY}")
-	message("TGUI include dir is ${TGUI_INCLUDE_DIRS}")
-	message("TGUI library is ${TGUI_LIBRARIES}")
-
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-		if ("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
-			set(TGUI_LIB "${TGUI_DIR}/lib/tgui-d.lib")
-			set(SFML_GRAPHICS_LIB "${SFML_DIR}/lib/sfml-graphics-d.lib")
-			set(SFML_AUDIO_LIB "${SFML_DIR}/lib/sfml-audio-d.lib")
-			set(SFML_SYSTEM_LIB "${SFML_DIR}/lib/sfml-system-d.lib")
-			set(SFML_WINDOW_LIB "${SFML_DIR}/lib/sfml-window-d.lib")
-			set(SFML_NETWORK_LIB "${SFML_DIR}/lib/sfml-network-d.lib")
-		else ()
-			set(TGUI_LIB "${TGUI_LIBRARIES}")
-			set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
-			set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
-			set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
-			set(SFML_WINDOW_LIB "${SFML_WINDOW_LIBRARY}")
-			set(SFML_NETWORK_LIB "${SFML_NETWORK_LIBRARY}")
-		endif ()
-	else ()
-		set(TGUI_LIB "${TGUI_LIBRARIES}")
-		set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
-		set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
-		set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
-		set(SFML_WINDOW_LIB "${SFML_WINDOW_LIBRARY}")
-		set(SFML_NETWORK_LIB "${SFML_NETWORK_LIBRARY}")
-	endif ()
 	set(
 		EXTRA_LINK_LIBRARIES
 		${SDL2_LIBRARY}
@@ -85,9 +51,8 @@ if (USE_SDL2)
 		${SFML_SYSTEM_LIB}
 		${SFML_WINDOW_LIB}
 		${SFML_NETWORK_LIB}
-		${TGUI_LIB}
+		TGUI::TGUI
 	)
-
 
 	set(NETWORK_CLASSES)
 	set(NETWORK_EXTRA_SRC)
@@ -122,124 +87,41 @@ else ()
 		src/LibCore/SFML/Sprite.cpp
 	)
 
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-		if ("${CMAKE_BUILD_TYPE}" STREQUAL Debug)
-			if (NOT NO_TGUI)
-				set(TGUI_INCLUDE_DIRS "${TGUI_DIR}/include")
-				set(TGUI_LIB "${TGUI_DIR}/lib/tgui-d.lib")
-			endif ()
-			set(SFML_INCLUDE_DIRS "${SFML_DIR}/include")
-			set(SFML_GRAPHICS_LIB "${SFML_DIR}/lib/sfml-graphics-d.lib")
-			set(SFML_AUDIO_LIB "${SFML_DIR}/lib/sfml-audio-d.lib")
-			set(SFML_SYSTEM_LIB "${SFML_DIR}/lib/sfml-system-d.lib")
-			set(SFML_WINDOW_LIB "${SFML_DIR}/lib/sfml-window-d.lib")
-			set(SFML_NETWORK_LIB "${SFML_DIR}/lib/sfml-network-d.lib")
-		else ()
-			find_package(SFML REQUIRED)
-			if (NOT NO_TGUI)
-				find_package(TGUI REQUIRED)
-				set(TGUI_LIB "${TGUI_LIBRARIES}")
-			endif ()
-			set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
-			set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
-			set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
-			set(SFML_WINDOW_LIB "${SFML_WINDOW_LIBRARY}")
-			set(SFML_NETWORK_LIB "${SFML_NETWORK_LIBRARY}")
-		endif ()
-	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		if (
-			CMAKE_BUILD_TYPE STREQUAL Debug AND
-			DEFINED TGUI_LIB_MAX_DEBUG_DIR AND
-			DEFINED SFML_LIB_MAX_DEBUG_DIR
+	find_package(SFML 3 REQUIRED COMPONENTS Graphics Audio Network)
+	find_package(TGUI 1 REQUIRED)
+
+	if (NO_TGUI)
+		set(
+			EXTRA_LINK_LIBRARIES
+			SFML::Graphics
+			SFML::Audio
+			SFML::Network
 		)
-			add_compile_definitions(_GLIBCXX_DEBUG=1)
-			add_compile_definitions(_GLIBCXX_DEBUG_PEDANTIC=1)
-			if (WIN32)
-				if (NOT NO_TGUI)
-					set(TGUI_INCLUDE_DIRS "${TGUI_LIB_MAX_DEBUG_DIR}/include")
-					set(TGUI_LIB "${TGUI_LIB_MAX_DEBUG_DIR}/lib/tgui-d.lib")
-				endif ()
-				set(SFML_INCLUDE_DIRS "${SFML_LIB_MAX_DEBUG_DIR}/include")
-				set(SFML_GRAPHICS_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-graphics-d.lib")
-				set(SFML_AUDIO_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-audio-d.lib")
-				set(SFML_SYSTEM_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-system-d.lib")
-				set(SFML_WINDOW_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-window-d.lib")
-				set(SFML_NETWORK_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/sfml-network-d.lib")
-			else ()
-				if (NOT NO_TGUI)
-					set(TGUI_INCLUDE_DIRS "${TGUI_LIB_MAX_DEBUG_DIR}/include")
-					set(TGUI_LIB "${TGUI_LIB_MAX_DEBUG_DIR}/lib/libtgui-d.so")
-				endif ()
-				set(SFML_INCLUDE_DIRS "${SFML_LIB_MAX_DEBUG_DIR}/include")
-				set(SFML_GRAPHICS_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-graphics-d.so")
-				set(SFML_AUDIO_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-audio-d.so")
-				set(SFML_SYSTEM_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-system-d.so")
-				set(SFML_WINDOW_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-window-d.so")
-				set(SFML_NETWORK_LIB "${SFML_LIB_MAX_DEBUG_DIR}/lib/libsfml-network-d.so")
-			endif ()
-		else ()
-			find_package(SFML REQUIRED)
-			if (NOT NO_TGUI)
-				find_package(TGUI REQUIRED)
-				set(TGUI_LIB "${TGUI_LIBRARIES}")
-			endif ()
-			set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
-			set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
-			set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
-			set(SFML_WINDOW_LIB "${SFML_WINDOW_LIBRARY}")
-			set(SFML_NETWORK_LIB "${SFML_NETWORK_LIBRARY}")
-		endif ()
 	else ()
-		find_package(SFML REQUIRED)
-		if (NOT NO_TGUI)
-			find_package(TGUI REQUIRED)
-			set(TGUI_LIB "${TGUI_LIBRARIES}")
-		endif ()
-		set(SFML_GRAPHICS_LIB "${SFML_GRAPHICS_LIBRARY}")
-		set(SFML_AUDIO_LIB "${SFML_AUDIO_LIBRARY}")
-		set(SFML_SYSTEM_LIB "${SFML_SYSTEM_LIBRARY}")
-		set(SFML_WINDOW_LIB "${SFML_WINDOW_LIBRARY}")
-		set(SFML_NETWORK_LIB "${SFML_NETWORK_LIBRARY}")
-	endif ()
-	message("SFML include dir is ${SFML_INCLUDE_DIRS}")
-	message("SFML graphics library is ${SFML_GRAPHICS_LIB}")
-	message("SFML audio library is ${SFML_AUDIO_LIB}")
-	message("SFML system library is ${SFML_SYSTEM_LIB}")
-	message("SFML window library is ${SFML_WINDOW_LIB}")
-	message("SFML network library is ${SFML_NETWORK_LIB}")
-	if (NOT NO_TGUI)
-		message("TGUI include dir is ${TGUI_INCLUDE_DIRS}")
-		message("TGUI library is ${TGUI_LIB}")
-	endif ()
-	set(
-		EXTRA_LINK_LIBRARIES
-		${SFML_GRAPHICS_LIB}
-		${SFML_AUDIO_LIB}
-		${SFML_SYSTEM_LIB}
-		${SFML_WINDOW_LIB}
-		${SFML_NETWORK_LIB}
-		${TGUI_LIB}
-	)
-	add_compile_definitions(USE_SFML=1)
-	if (NOT NO_TGUI)
+		set(
+			EXTRA_LINK_LIBRARIES
+			SFML::Graphics
+			SFML::Audio
+			SFML::Network
+			TGUI::TGUI
+		)
 		add_compile_definitions(USE_TGUI=1)
 	endif()
-	set(EXTRA_LIBRARY_INCLUDES ${SFML_INCLUDE_DIRS} ${TGUI_INCLUDE_DIRS} src/LibCore/SFML)
+	add_compile_definitions(USE_SFML=1)
+	set(EXTRA_LIBRARY_INCLUDES src/LibCore/SFML)
 endif ()
 
 if (VIRTUAL_CONTROLLER)
 	add_compile_definitions(VIRTUAL_CONTROLLER=1)
 endif ()
 if (NETWORK_CLASSES)
-	find_package(zlib REQUIRED)
-	message("zlib include dir is ${ZLIB_INCLUDE_DIRS}")
+	find_library(ZLIB_LIBRARY z NAMES zlib z REQUIRED)
 	message("zlib library is ${ZLIB_LIBRARY}")
 	set(
 		EXTRA_LINK_LIBRARIES
 		${EXTRA_LINK_LIBRARIES}
 		${ZLIB_LIBRARY}
 	)
-	include_directories(${ZLIB_INCLUDE_DIRS})
 	set(
 		NETWORK_SRCS
 		${NETWORK_EXTRA_SRC}

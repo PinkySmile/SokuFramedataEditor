@@ -607,12 +607,12 @@ namespace SpiralOfFate
 
 		if (makedir("replays", 0755) && errno != EEXIST) {
 			SpiralOfFate::game->logger.error("Failed to create replays folder: " + std::string(strerror(errno)));
-			Utils::dispMsg("Replay saving failure", "Failed to create replays folder: " + std::string(strerror(errno)), MB_ICONERROR, &*game->screen);
+			Utils::dispMsg(game->gui, "Replay saving failure", "Failed to create replays folder: " + std::string(strerror(errno)), MB_ICONERROR);
 			return;
 		}
 		if (makedir(buf, 0755) && errno != EEXIST) {
 			SpiralOfFate::game->logger.error("Failed to create " + std::string(buf) + " folder: " + strerror(errno));
-			Utils::dispMsg("Replay saving failure", "Failed to create " + std::string(buf) + " folder: " + strerror(errno), MB_ICONERROR, &*game->screen);
+			Utils::dispMsg(game->gui, "Replay saving failure", "Failed to create " + std::string(buf) + " folder: " + strerror(errno), MB_ICONERROR);
 			return;
 		}
 
@@ -620,7 +620,7 @@ namespace SpiralOfFate
 
 		if (stream.fail()) {
 			SpiralOfFate::game->logger.error("Failed to create " + std::string(buf2) + ": " + strerror(errno));
-			Utils::dispMsg("Replay saving failure", "Failed to create " + std::string(buf2) + ": " + strerror(errno), MB_ICONERROR, &*game->screen);
+			Utils::dispMsg(game->gui, "Replay saving failure", "Failed to create " + std::string(buf2) + ": " + strerror(errno), MB_ICONERROR);
 			return;
 		}
 		stream.write(reinterpret_cast<char *>(&magic), sizeof(magic));

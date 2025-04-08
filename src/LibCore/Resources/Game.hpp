@@ -9,6 +9,14 @@
 #include <mutex>
 #include <memory>
 #include <random>
+#if !defined(__ANDROID__) && defined(USE_TGUI)
+#include <TGUI/TGUI.hpp>
+#ifdef USE_SDL
+#include <TGUI/Backend/SDL-Renderer.hpp>
+#else
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#endif
+#endif
 #include "Screen.hpp"
 #include "TextureManager.hpp"
 #include "Resources/Battle/BattleManager.hpp"
@@ -100,6 +108,9 @@ namespace SpiralOfFate
 		std::shared_ptr<class Connection> connection;
 	#endif
 		SceneManager scene;
+	#ifndef NO_TGUI
+		tgui::Gui gui;
+	#endif
 		std::mutex sceneMutex;
 		std::shared_ptr<IInput> activeNetInput;
 

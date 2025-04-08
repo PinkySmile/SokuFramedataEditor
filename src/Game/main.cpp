@@ -213,16 +213,16 @@ void	loadSettings()
 	std::ifstream stream{"settings.dat", std::istream::binary};
 
 	if (stream.fail() && errno != ENOENT)
-		Utils::dispMsg("Cannot load settings", "Cannot open settings file: " + std::string(strerror(errno)), MB_ICONERROR);
+		Utils::dispMsg(game->gui, "Cannot load settings", "Cannot open settings file: " + std::string(strerror(errno)), MB_ICONERROR);
 
 	struct stat s;
 	auto result = stat("settings.dat", &s);
 
 	if (result == -1) {
 		if (errno != ENOENT)
-			Utils::dispMsg("Cannot load settings", "Cannot stat file: " + std::string(strerror(errno)), MB_ICONERROR);
+			Utils::dispMsg(game->gui, "Cannot load settings", "Cannot stat file: " + std::string(strerror(errno)), MB_ICONERROR);
 	} else if (s.st_size != 348)
-		Utils::dispMsg("Cannot load settings", "Old settings or corrupted settings detected.\nYou might need to set your settings again in the menu.", MB_ICONWARNING);
+		Utils::dispMsg(game->gui, "Cannot load settings", "Old settings or corrupted settings detected.\nYou might need to set your settings again in the menu.", MB_ICONWARNING);
 	game->P1 = loadPlayerInputs(stream);
 	game->P2 = loadPlayerInputs(stream);
 	game->menu = loadMenuInputs(stream);
@@ -318,13 +318,13 @@ void	checkCompilationEnv()
 	// Regardless, the game should work in singleplayer.
 	if (*(unsigned *)magic != 0x01020304)
 		Utils::dispMsg(
+			game->gui,
 			"Warning",
-			"Your version of the game has not been compiled in " + std::string(*(unsigned *)magic == 0x04030201 ? "big endian" : "middle endian") + " but only little endian is supported\n" +
+			"Your version of the game has been compiled in " + std::string(*(unsigned *)magic == 0x04030201 ? "big endian" : "middle endian") + " but only little endian is supported\n" +
 			"You will not be able to play with players using a different endianness.\n" +
 			"Moreover, you won't be able to load replays generated with a different endianness.\n"
 			"Your replays will also not be compatible with a different version of the game.",
-			MB_ICONWARNING,
-			nullptr
+			MB_ICONWARNING
 		);
 
 	game->battleRandom.seed(0);
@@ -403,6 +403,7 @@ void	run()
 	game->scene.switchScene("title_screen");
 	clock.restart();
 	game->screen->setFramerateLimit(60);
+	game->gui.setWindow(*game->screen);
 	while (game->screen->isOpen()) {
 		game->sceneMutex.lock();
 	#ifdef HAS_NETWORK
@@ -425,6 +426,9 @@ void	run()
 	#ifdef VIRTUAL_CONTROLLER
 		game->virtualController->render();
 	#endif
+	#ifndef NO_TGUI
+		game->gui.draw();
+	#endif
 		game->screen->display();
 
 		while (auto event = game->screen->pollEvent()) {
@@ -445,6 +449,9 @@ void	run()
 		#endif
 		#ifdef VIRTUAL_CONTROLLER
 			game->virtualController->consumeEvent(event);
+		#endif
+		#ifndef NO_TGUI
+			game->gui.handleEvent(*event);
 		#endif
 		}
 		game->sceneMutex.unlock();

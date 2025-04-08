@@ -188,15 +188,15 @@ namespace SpiralOfFate
 			},
 			{
 				{"Replays", "Select a replay to watch", [this]{
-					auto path = Utils::openFileDialog("Open replay", "./replays", {{".+[.]replay", "Replay file"}});
+					auto window = Utils::openFileDialog(game->gui, "Open replay", "./replays");
 
-					if (!path.empty()) {
+					window->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
 						try {
-							this->_loadReplay(path);
+							this->_loadReplay(arr[0]);
 						} catch (std::exception &e) {
-							Utils::dispMsg("Replay loading failed", "This replay is invalid, corrupted or was created for an different version of the game: " + std::string(e.what()), MB_ICONERROR);
+							Utils::dispMsg(game->gui, "Replay loading failed", "This replay is invalid, corrupted or was created for a different version of the game: " + std::string(e.what()), MB_ICONERROR);
 						}
-					}
+					});
 				}},
 				{"Music Room", "Catchy tune!", nullptr},
 				{"Credits", "", nullptr},
@@ -344,6 +344,7 @@ namespace SpiralOfFate
 
 		// TODO: Handle names
 		auto con = new ServerConnection("SpiralOfFate::ServerConnection");
+		// TODO: Handle port better
 		std::ifstream stream{"hostPort.txt"};
 
 		if (stream) {
@@ -373,25 +374,20 @@ namespace SpiralOfFate
 
 	void TitleScreen::_connect()
 	{
-		game->activeNetInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
+		auto _ipString = sf::Clipboard::getString();
 
-		// TODO: Handle names
-		auto con = new ClientConnection("SpiralOfFate::ClientConnection");
-		auto ipString = sf::Clipboard::getString().toAnsiString();
-
-		if (ipString.empty()) {
-			Utils::dispMsg("Error", "No ip is copied to the clipboard", MB_ICONERROR, &*game->screen);
-			delete con;
+		if (_ipString.isEmpty()) {
+			Utils::dispMsg(game->gui, "Error", "No ip is copied to the clipboard", MB_ICONERROR);
 			return;
 		}
 
+		auto ipString = _ipString.toAnsiString();
 		size_t pos = ipString.find(':');
 		auto ip = sf::IpAddress::resolve(ipString.substr(0, pos));
 		unsigned short port = 10800;
 
 		if (!ip) {
-			Utils::dispMsg("Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR, &*game->screen);
-			delete con;
+			Utils::dispMsg(game->gui, "Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR);
 			return;
 		}
 		if (pos != std::string::npos) {
@@ -402,11 +398,15 @@ namespace SpiralOfFate
 					throw std::exception();
 				port = p;
 			} catch (...) {
-				Utils::dispMsg("Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR, &*game->screen);
-				delete con;
+				Utils::dispMsg(game->gui, "Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR);
 				return;
 			}
 		}
+		game->activeNetInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
+
+		// TODO: Handle names
+		auto con = new ClientConnection("SpiralOfFate::ClientConnection");
+
 		game->connection.reset(con);
 		game->lastIp = ip->toString();
 		game->lastPort = port;
@@ -434,22 +434,21 @@ namespace SpiralOfFate
 
 	void TitleScreen::_spectate()
 	{
-		auto con = new SpectatorConnection();
-		auto ipString = sf::Clipboard::getString().toAnsiString();
+		auto _ipString = sf::Clipboard::getString();
 
-		if (ipString.empty()) {
-			Utils::dispMsg("Error", "No ip is copied to the clipboard", MB_ICONERROR, &*game->screen);
-			delete con;
+		if (_ipString.isEmpty()) {
+			Utils::dispMsg(game->gui, "Error", "No ip is copied to the clipboard", MB_ICONERROR);
 			return;
 		}
+
+		auto ipString = _ipString.toAnsiString();
 
 		size_t pos = ipString.find(':');
 		auto ip = sf::IpAddress::resolve(ipString.substr(0, pos));
 		unsigned short port = 10800;
 
 		if (!ip) {
-			Utils::dispMsg("Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR, &*game->screen);
-			delete con;
+			Utils::dispMsg(game->gui, "Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR);
 			return;
 		}
 		if (pos != std::string::npos) {
@@ -460,11 +459,13 @@ namespace SpiralOfFate
 					throw std::exception();
 				port = p;
 			} catch (...) {
-				Utils::dispMsg("Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR, &*game->screen);
-				delete con;
+				Utils::dispMsg(game->gui, "Error", "Clipboard doesn't contain a valid IP address", MB_ICONERROR);
 				return;
 			}
 		}
+
+		auto con = new SpectatorConnection();
+
 		game->connection.reset(con);
 		game->lastIp = ip->toString();
 		game->lastPort = port;
@@ -533,38 +534,36 @@ namespace SpiralOfFate
 	bool TitleScreen::_onKeyPressed(const sf::Event::KeyPressed &ev)
 	{
 		if (ev.code == sf::Keyboard::Key::F2 && this->_changingInputs > 1) {
-			auto path = Utils::saveFileDialog("Save inputs", "./profiles", {{".*\\.in", "Input files"}});
+			auto dialog = Utils::saveFileDialog(game->gui, "Save inputs", "./profiles");
 
-			if (path.empty())
-				return false;
+			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
+				std::ofstream stream{static_cast<std::filesystem::path>(arr[0])};
 
-			std::ofstream stream{path};
+				if (!stream)
+					Utils::dispMsg(game->gui, "Saving error", strerror(errno), MB_ICONERROR);
 
-			if (!stream)
-				Utils::dispMsg("Saving error", strerror(errno), MB_ICONERROR, &*game->screen);
+				auto &pair = (this->_changingInputs == 2 ? game->P1 : game->P2);
 
-			auto &pair = (this->_changingInputs == 2 ? game->P1 : game->P2);
-
-			pair.first->save(stream);
-			pair.second->save(stream);
-			game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
+				pair.first->save(stream);
+				pair.second->save(stream);
+				game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
+			});
 			return false;
 		}
 		if (ev.code == sf::Keyboard::Key::F3 && this->_changingInputs > 1) {
-			auto path = Utils::openFileDialog("Load inputs", "./profiles", {{".*\\.in", "Input files"}});
+			auto dialog = Utils::openFileDialog(game->gui, "Load inputs", "./profiles");
 
-			if (path.empty())
-				return false;
+			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+				std::ifstream stream{static_cast<std::filesystem::path>(arr[0])};
 
-			std::ifstream stream{path};
+				if (!stream)
+					Utils::dispMsg(game->gui, "Loading error", strerror(errno), MB_ICONERROR);
 
-			if (!stream)
-				Utils::dispMsg("Loading error", strerror(errno), MB_ICONERROR, &*game->screen);
+				auto &pair = (this->_changingInputs == 2 ? game->P1 : game->P2);
 
-			auto &pair = (this->_changingInputs == 2 ? game->P1 : game->P2);
-
-			pair = loadPlayerInputs(stream);
-			game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
+				pair = loadPlayerInputs(stream);
+				game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
+			});
 			return false;
 		}
 		if (this->_changeInput && this->_changingInputs) {
