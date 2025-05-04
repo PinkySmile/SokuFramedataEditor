@@ -502,7 +502,7 @@ namespace SpiralOfFate
 
 		auto input = this->_updateInputs();
 
-		if (Object::_isOnPlatform() && this->_specialInputs._22)
+		if (Object::_isOnPlatform() && this->_specialInputs._22 && !this->_blockStun)
 			this->_forceStartMove(ACTION_PLATFORM_DROP);
 		if (this->_neutralEffectTimer) {
 			this->_neutralEffectTimer--;
@@ -1860,7 +1860,7 @@ namespace SpiralOfFate
 	{
 		auto updatedY = this->_position.y;
 
-		if (this->_specialInputs._22) {
+		if (this->_specialInputs._22 && !this->_blockStun) {
 			if (this->_isOnPlatform())
 				this->_position.y -= 0.01;
 			return;
@@ -3388,7 +3388,7 @@ namespace SpiralOfFate
 
 	bool Character::_isOnPlatform() const
 	{
-		if (this->_specialInputs._22)
+		if (this->_specialInputs._22 && !this->_blockStun)
 			return false;
 		return Object::_isOnPlatform();
 	}
