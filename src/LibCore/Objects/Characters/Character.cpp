@@ -1068,18 +1068,18 @@ namespace SpiralOfFate
 		        (this->_specialInputs._c46a && this->_startMove(ACTION_c46A)) ||
 		        (this->_specialInputs._c64a && this->_startMove(ACTION_c64A)) ||
 
-		        (this->_specialInputs._623n     && this->_startMove(ACTION_623N)) ||
-		        (this->_specialInputs._421n > 0 && this->_startMove(ACTION_421N)) ||
-		        (this->_specialInputs._623v     && this->_startMove(ACTION_623V)) ||
-		        (this->_specialInputs._421v > 0 && this->_startMove(ACTION_421V)) ||
-		        (this->_specialInputs._623s     && this->_startMove(ACTION_623S)) ||
-		        (this->_specialInputs._421s > 0 && this->_startMove(ACTION_421S)) ||
-		        (this->_specialInputs._623m     && this->_startMove(ACTION_623M)) ||
-		        (this->_specialInputs._421m > 0 && this->_startMove(ACTION_421M)) ||
-		        (this->_specialInputs._623d     && this->_startMove(ACTION_623D)) ||
-		        (this->_specialInputs._421d     && this->_startMove(ACTION_421D)) ||
-		        (this->_specialInputs._623a     && this->_startMove(ACTION_623A)) ||
-		        (this->_specialInputs._421a     && this->_startMove(ACTION_421A)) ||
+		        (this->_specialInputs._623n && this->_startMove(ACTION_623N)) ||
+		        (this->_specialInputs._421n && this->_startMove(ACTION_421N)) ||
+		        (this->_specialInputs._623v && this->_startMove(ACTION_623V)) ||
+		        (this->_specialInputs._421v && this->_startMove(ACTION_421V)) ||
+		        (this->_specialInputs._623s && this->_startMove(ACTION_623S)) ||
+		        (this->_specialInputs._421s && this->_startMove(ACTION_421S)) ||
+		        (this->_specialInputs._623m && this->_startMove(ACTION_623M)) ||
+		        (this->_specialInputs._421m && this->_startMove(ACTION_421M)) ||
+		        (this->_specialInputs._623d && this->_startMove(ACTION_623D)) ||
+		        (this->_specialInputs._421d && this->_startMove(ACTION_421D)) ||
+		        (this->_specialInputs._623a && this->_startMove(ACTION_623A)) ||
+		        (this->_specialInputs._421a && this->_startMove(ACTION_421A)) ||
 
 		        (this->_specialInputs._236n && this->_startMove(ACTION_236N)) ||
 		        (this->_specialInputs._214n && this->_startMove(ACTION_214N)) ||
