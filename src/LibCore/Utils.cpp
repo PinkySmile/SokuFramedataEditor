@@ -126,9 +126,6 @@ namespace SpiralOfFate::Utils
 			return "Unknown error " + std::to_string(ret);
 		}
 	}
-#ifdef USE_TGUI
-	static tgui::Theme *theme = nullptr;
-#endif
 	static const std::map<std::string, std::string> _icons{
 		{"folder", "assets/icons/folder.png"     },
 		{".rar",   "assets/icons/archive.png"    },
@@ -184,23 +181,6 @@ namespace SpiralOfFate::Utils
 		{".bat",   "assets/icons/shellScript.png"},
 		{"",       "assets/icons/unknownFile.png"},
 	};
-
-#ifdef USE_TGUI
-	tgui::Theme &getTheme()
-	{
-		if (!theme)
-			theme = new tgui::Theme("assets/gui/themes/Black.txt");
-		return *theme;
-	}
-
-	void setRenderer(const tgui::Widget::Ptr &widget)
-	{
-		auto renderer = getTheme().getRendererNoThrow(widget->getWidgetType());
-
-		if (renderer)
-			widget->setRenderer(renderer);
-	}
-#endif
 
 	std::string wstringToUtf8(const std::wstring& str)
 	{
@@ -280,7 +260,6 @@ namespace SpiralOfFate::Utils
 			gui.setTabKeyUsageEnabled(tabUsageEnabled);
 		};
 
-		setRenderer(window);
 		panel->onClick.connect(closeWindow);
 		window->onClose.connect(closeWindow);
 		window->onEscapeKeyPress(closeWindow);
@@ -300,6 +279,50 @@ namespace SpiralOfFate::Utils
 #endif
 
 #ifdef USE_TGUI
+	void setRenderer(tgui::Container *widget)
+	{
+		setRenderer(*widget);
+	}
+
+	void setRenderer(tgui::Container &widget)
+	{
+		auto renderer = tgui::Theme::getDefault()->getRendererNoThrow(widget.getWidgetType());
+
+		if (renderer)
+			widget.setRenderer(renderer);
+		for (auto &w : widget.getWidgets()) {
+			if (auto c = w->cast<tgui::Container>())
+				Utils::setRenderer(c);
+			else
+				Utils::setRenderer(w);
+		}
+	}
+
+	void setRenderer(const tgui::Gui &widget)
+	{
+		for (auto &w : widget.getWidgets()) {
+			if (auto c = w->cast<tgui::Container>())
+				Utils::setRenderer(c);
+			else
+				Utils::setRenderer(w);
+		}
+	}
+
+	template<>
+	void setRenderer(const tgui::Container::Ptr &widget)
+	{
+		auto renderer = tgui::Theme::getDefault()->getRendererNoThrow(widget->getWidgetType());
+
+		if (renderer)
+			widget->setRenderer(renderer);
+		for (auto &w : widget->getWidgets()) {
+			if (auto c = w->cast<tgui::Container>())
+				Utils::setRenderer(c);
+			else
+				Utils::setRenderer(w);
+		}
+	}
+
 	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(sf::Color color)> &onFinish, sf::Color startColor)
 	{
 		auto dialog = tgui::ColorPicker::create("Pick color", startColor);
@@ -319,7 +342,6 @@ namespace SpiralOfFate::Utils
 			gui.setTabKeyUsageEnabled(tabUsageEnabled);
 		};
 
-		setRenderer(dialog);
 		panel->onClick.connect(closeWindow);
 		dialog->onClose.connect(closeWindow);
 		dialog->onEscapeKeyPress.connect(closeWindow);

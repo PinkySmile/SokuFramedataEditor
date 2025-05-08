@@ -1,11 +1,25 @@
 Renderer.1 {
-    textcolor = rgb(190, 190, 190);
-    textcolorhover = rgb(250, 250, 250);
-    texture = "themes/Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturedisabled = None;
-    texturedown = "themes/Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturefocused = "themes/Black.png" Part(135, 64, 45, 50) Middle(10, 0, 25, 50);
-    texturehover = "themes/Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorDown = #EBEBEB;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorDown = black;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorDown = black;
+    TextColorHover = black;
+    Texture = None;
+    TextureDisabled = None;
+    TextureDown = None;
+    TextureDownFocused = None;
+    TextureDownHover = None;
+    TextureFocused = None;
+    TextureHover = None;
 }
 
 Slider.Slider {
@@ -19,48 +33,64 @@ Slider.Slider {
     Value = 0;
 
     Renderer {
-        texturethumb = "themes/Black.png" Part(243, 150, 30, 30);
-        texturethumbhover = None;
-        texturetrack = "themes/Black.png" Part(203, 150, 20, 45) Middle(0, 15, 20, 15);
-        texturetrackhover = "themes/Black.png" Part(223, 150, 20, 45) Middle(0, 15, 20, 15);
+        BorderColor = #3C3C3C;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        TextureThumb = None;
+        TextureThumbHover = None;
+        TextureTrack = None;
+        TextureTrackHover = None;
+        ThumbColor = #F5F5F5;
+        ThumbColorHover = white;
+        TrackColor = #F5F5F5;
+        TrackColorHover = white;
     }
 }
 
 Label.Nb {
     AutoSize = true;
     Position = (230, 20);
-    ScrollbarPolicy = Never;
-    Size = (11.2, 18);
+    Size = (12, 17);
     Text = 1;
     TextSize = 13;
 
     Renderer {
-        textcolor = rgb(190, 190, 190);
-        texturebackground = None;
+        BackgroundColor = transparent;
+        BorderColor = #3C3C3C;
+        Borders = (0, 0, 0, 0);
+        TextColor = #3C3C3C;
+        TextureBackground = None;
 
-        scrollbar {
-            texturearrowdown = "themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-            texturearrowdownhover = "themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-            texturearrowup = "themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-            texturearrowuphover = "themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-            texturethumb = "themes/Black.png" Part(143, 154, 20, 20);
-            texturethumbhover = "themes/Black.png" Part(143, 174, 20, 20);
-            texturetrack = "themes/Black.png" Part(123, 154, 20, 20);
-            texturetrackhover = "themes/Black.png" Part(123, 174, 20, 20);
+        Scrollbar {
+            ArrowBackgroundColor = #F5F5F5;
+            ArrowBackgroundColorHover = white;
+            ArrowColor = #3C3C3C;
+            ArrowColorHover = black;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = #DCDCDC;
+            ThumbColorHover = #E6E6E6;
+            TrackColor = #F5F5F5;
         }
     }
 }
 
 Button.Ok {
     Position = (210, 50);
+    Renderer = &1;
     Text = Ok;
     TextSize = 13;
-    renderer = &1;
 }
 
 Button.Cancel {
     Position = (140, 50);
+    Renderer = &1;
     Text = Cancel;
     TextSize = 13;
-    renderer = &1;
 }

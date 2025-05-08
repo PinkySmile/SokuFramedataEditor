@@ -8,6 +8,53 @@
 
 namespace SpiralOfFate
 {
+
+	ControllerInput::ControllerInput() :
+		ControllerInput({
+			{ INPUT_LEFT,    new ControllerAxis(0, sf::Joystick::Axis::X, -30) },
+			{ INPUT_RIGHT,   new ControllerAxis(0, sf::Joystick::Axis::X, 30) },
+			{ INPUT_UP,      new ControllerAxis(0, sf::Joystick::Axis::Y, -30) },
+			{ INPUT_DOWN,    new ControllerAxis(0, sf::Joystick::Axis::Y, 30) },
+			{ INPUT_NEUTRAL, new ControllerButton(0, 0) },
+			{ INPUT_MATTER,  new ControllerButton(0, 2) },
+			{ INPUT_SPIRIT,  new ControllerButton(0, 1) },
+			{ INPUT_VOID,    new ControllerButton(0, 3) },
+			{ INPUT_ASCEND,  new ControllerAxis(0, sf::Joystick::Axis::Z, 30) },
+			{ INPUT_DASH,    new ControllerAxis(0, sf::Joystick::Axis::Z, -30) },
+			{ INPUT_PAUSE,   new ControllerButton(0, 7) }
+		})
+	{
+	}
+
+	ControllerInput::ControllerInput(std::ifstream &stream)
+	{
+		std::map<InputEnum, std::pair<bool, int>> controllerMap{
+			{ INPUT_LEFT,    {true,  (int)sf::Joystick::Axis::X | (256 - 30) << 3} },
+			{ INPUT_RIGHT,   {true,  (int)sf::Joystick::Axis::X | 30 << 3} },
+			{ INPUT_UP,      {true,  (int)sf::Joystick::Axis::Y | (256 - 30) << 3} },
+			{ INPUT_DOWN,    {true,  (int)sf::Joystick::Axis::Y | 30 << 3} },
+			{ INPUT_NEUTRAL, {false, 0} },
+			{ INPUT_MATTER,  {false, 2} },
+			{ INPUT_SPIRIT,  {false, 1} },
+			{ INPUT_VOID,    {false, 3} },
+			{ INPUT_ASCEND,  {true,  (int)sf::Joystick::Axis::Z | (30 << 3)} },
+			{ INPUT_DASH,    {true,  (int)sf::Joystick::Axis::Z | ((256 - 30) << 3)} },
+			{ INPUT_PAUSE,   {false, 7} }
+		};
+		std::map<InputEnum, ControllerKey *> realControllerMap;
+
+		for (auto &pair : controllerMap)
+			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
+		for (auto &pair : controllerMap)
+			if (pair.second.first)
+				realControllerMap[pair.first] = new ControllerAxis(0, (sf::Joystick::Axis)(pair.second.second & 7), pair.second.second >> 3);
+			else
+				realControllerMap[pair.first] = new ControllerButton(0, pair.second.second);
+		for (auto [key, value] : realControllerMap)
+			this->_keyMap.emplace(key, value);
+		this->_keyDuration.fill(0);
+	}
+
 	ControllerInput::ControllerInput(const std::map<InputEnum, ControllerKey *> &keyMap)
 	{
 		for (auto [key, value] : keyMap)

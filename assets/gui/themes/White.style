@@ -1,0 +1,357 @@
+BitmapButton {
+    Borders                 = (1, 1, 1, 1);
+    BorderColor             = rgb(60, 60, 60);
+    BorderColorHover        = Black;
+    BorderColorDown         = Black;
+    BorderColorFocused      = rgb(30, 30, 180);
+    BorderColorDisabled     = rgb(125, 125, 125);
+    TextColor               = rgb(60, 60, 60);
+    TextColorHover          = Black;
+    TextColorDown           = Black;
+    TextColorDisabled       = rgb(125, 125, 125);
+    BackgroundColor         = rgb(245, 245, 245);
+    BackgroundColorHover    = White;
+    BackgroundColorDown     = rgb(235, 235, 235);
+    BackgroundColorDisabled = rgb(230, 230, 230);
+}
+Button{
+    Borders                 = (1, 1, 1, 1);
+    BorderColor             = rgb(60, 60, 60);
+    BorderColorHover        = Black;
+    BorderColorDown         = Black;
+    BorderColorFocused      = rgb(30, 30, 180);
+    BorderColorDisabled     = rgb(125, 125, 125);
+    TextColor               = rgb(60, 60, 60);
+    TextColorHover          = Black;
+    TextColorDown           = Black;
+    TextColorDisabled       = rgb(125, 125, 125);
+    BackgroundColor         = rgb(245, 245, 245);
+    BackgroundColorHover    = White;
+    BackgroundColorDown     = rgb(235, 235, 235);
+    BackgroundColorDisabled = rgb(230, 230, 230);
+}
+ChatBox{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    BorderColor = Black;
+    BackgroundColor = rgb(245, 245, 245);
+}
+CheckBox{
+    Borders = (1, 1, 1, 1);
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    BorderColorFocused = rgb(30, 30, 180);
+    BorderColorDisabled = rgb(125, 125, 125);
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    TextColorDisabled = rgb(125, 125, 125);
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    BackgroundColorDisabled = rgb(230, 230, 230);
+    CheckColor = rgb(60, 60, 60);
+    CheckColorHover = Black;
+    CheckColorDisabled = rgb(125, 125, 125);
+    TextDistanceRatio = 0.2;
+}
+ChildWindow{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TitleColor = rgb(60, 60, 60);
+    TitleBarColor = White;
+    BackgroundColor = rgb(230, 230, 230);
+    DistanceToSide = 3;
+    BorderBelowTitleBar = 1;
+    PaddingBetweenButtons = 1;
+    ShowTextOnTitleButtons = true;
+}
+ChildWindowButton{
+    Borders = (1, 1, 1, 1);
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    BorderColorDown = Black;
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    TextColorDown = Black;
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    BackgroundColorDown = rgb(235, 235, 235);
+}
+ColorPicker{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TitleColor = rgb(60, 60, 60);
+    TitleBarColor = White;
+    BackgroundColor = rgb(230, 230, 230);
+    DistanceToSide = 3;
+    BorderBelowTitleBar = 1;
+    PaddingBetweenButtons = 1;
+    ShowTextOnTitleButtons = true;
+}
+ComboBox{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    BorderColor = Black;
+    TextColor = rgb(60, 60, 60);
+    TextColorDisabled = rgb(125, 125, 125);
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorDisabled = rgb(230, 230, 230);
+    ArrowColor = rgb(60, 60, 60);
+    ArrowColorHover = Black;
+    ArrowBackgroundColor = rgb(245, 245, 245);
+    ArrowBackgroundColorHover = White;
+}
+ContextMenu{
+    TextColor = rgb(60, 60, 60);
+    SelectedTextColor = White;
+    BackgroundColor = White;
+    SelectedBackgroundColor = rgb(0, 110, 255);
+    TextColorDisabled = rgb(125, 125, 125);
+    SeparatorColor = Black;
+    SeparatorThickness = 1;
+    SeparatorVerticalPadding = 1;
+}
+EditBox{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    CaretWidth = 1;
+    CaretColor = Black;
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    BorderColorDisabled = rgb(125, 125, 125);
+    TextColor = rgb(60, 60, 60);
+    TextColorDisabled = rgb(125, 125, 125);
+    SelectedTextColor = White;
+    SelectedTextBackgroundColor = rgb(0, 110, 255);
+    DefaultTextColor = rgb(160, 160, 160);
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    BackgroundColorDisabled = rgb(230, 230, 230);
+}
+FileDialog{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TitleColor = rgb(60, 60, 60);
+    TitleBarColor = White;
+    BackgroundColor = rgb(230, 230, 230);
+    DistanceToSide = 3;
+    BorderBelowTitleBar = 1;
+    PaddingBetweenButtons = 1;
+    ShowTextOnTitleButtons = true;
+}
+Knob{
+    Borders = (2, 2, 2, 2);
+    ImageRotation = 0;
+    BorderColor = Black;
+    ThumbColor = Black;
+    BackgroundColor = White;
+}
+Label{
+    Borders = (0, 0, 0, 0);
+    BorderColor = rgb(60, 60, 60);
+    TextColor = rgb(60, 60, 60);
+    BackgroundColor = Transparent;
+}
+ListBox{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    BorderColor = Black;
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    SelectedTextColor = White;
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    SelectedBackgroundColor = rgb(0, 110, 255);
+    SelectedBackgroundColorHover = rgb(30, 150, 255);
+}
+ListView{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    BorderColor = Black;
+    SeparatorColor = Color(200, 200, 200);
+    HeaderTextColor = Black;
+    HeaderBackgroundColor = Color(230, 230, 230);
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    SelectedTextColor = White;
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    SelectedBackgroundColor = rgb(0, 110, 255);
+    SelectedBackgroundColorHover = rgb(30, 150, 255);
+}
+MenuBar{
+    TextColor = rgb(60, 60, 60);
+    SelectedTextColor = White;
+    BackgroundColor = White;
+    SelectedBackgroundColor = rgb(0, 110, 255);
+    TextColorDisabled = rgb(125, 125, 125);
+    SeparatorColor = Black;
+    SeparatorThickness = 1;
+    SeparatorVerticalPadding = 1;
+}
+MessageBox{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TitleColor = rgb(60, 60, 60);
+    TitleBarColor = White;
+    BackgroundColor = rgb(230, 230, 230);
+    DistanceToSide = 3;
+    PaddingBetweenButtons = 1;
+    TextColor = Black;
+}
+Panel{
+    BorderColor = Black;
+    BackgroundColor = White;
+}
+PanelListBox{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    BackgroundColor = White;
+    ItemsBackgroundColor = rgb(245, 245, 245);
+    ItemsBackgroundColorHover = White;
+    SelectedItemsBackgroundColor = rgb(0, 110, 255);
+    SelectedItemsBackgroundColorHover = rgb(30, 150, 255);
+}
+ProgressBar{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TextColor = rgb(60, 60, 60);
+    TextColorFilled = White;
+    BackgroundColor = rgb(245, 245, 245);
+    FillColor = rgb(0, 110, 255);
+}
+RadioButton{
+    Borders = (1, 1, 1, 1);
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    BorderColorFocused = rgb(30, 30, 180);
+    BorderColorDisabled = rgb(125, 125, 125);
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    TextColorDisabled = rgb(125, 125, 125);
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    BackgroundColorDisabled = rgb(230, 230, 230);
+    CheckColor = rgb(60, 60, 60);
+    CheckColorHover = Black;
+    CheckColorDisabled = rgb(125, 125, 125);
+    TextDistanceRatio = 0.2;
+}
+RangeSlider{
+    Borders = (1, 1, 1, 1);
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    SelectedTrackColor = rgb(0, 110, 255);
+    TrackColor = rgb(245, 245, 245);
+    TrackColorHover = rgb(255, 255, 255);
+    ThumbColor = rgb(245, 245, 245);
+    ThumbColorHover = rgb(255, 255, 255);
+}
+ScrollablePanel{
+    BorderColor = Black;
+    BackgroundColor = White;
+}
+Scrollbar{
+    TrackColor = rgb(245, 245, 245);
+    ThumbColor = rgb(220, 220, 220);
+    ThumbColorHover = rgb(230, 230, 230);
+    ArrowBackgroundColor = rgb(245, 245, 245);
+    ArrowBackgroundColorHover = rgb(255, 255, 255);
+    ArrowColor = rgb(60, 60, 60);
+    ArrowColorHover = rgb(0, 0, 0);
+}
+SeparatorLine{
+    Color = Black;
+}
+Slider{
+    Borders = (1, 1, 1, 1);
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    TrackColor = rgb(245, 245, 245);
+    TrackColorHover = rgb(255, 255, 255);
+    ThumbColor = rgb(245, 245, 245);
+    ThumbColorHover = rgb(255, 255, 255);
+}
+SpinButton{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    ArrowColor = rgb(60, 60, 60);
+    ArrowColorHover = Black;
+    BorderBetweenArrows = 2;
+}
+SplitContainer{
+    SplitterColor = rgb(60, 60, 60);
+    SplitterColorHover = Black;
+}
+Tabs{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    TextColorDisabled = rgb(125, 125, 125);
+    SelectedTextColor = White;
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    BackgroundColorDisabled = rgb(230, 230, 230);
+    SelectedBackgroundColor = rgb(0, 110, 255);
+    SelectedBackgroundColorHover = rgb(30, 150, 255);
+}
+TextArea{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    CaretWidth = 1;
+    CaretColor = Black;
+    BorderColor = Black;
+    TextColor = rgb(60, 60, 60);
+    DefaultTextColor = rgb(160, 160, 160);
+    SelectedTextColor = White;
+    SelectedTextBackgroundColor = rgb(0, 110, 255);
+    BackgroundColor = White;
+}
+ToggleButton{
+    Borders = (1, 1, 1, 1);
+    BorderColor = rgb(60, 60, 60);
+    BorderColorHover = Black;
+    BorderColorDown = Black;
+    BorderColorFocused = rgb(30, 30, 180);
+    BorderColorDisabled = rgb(125, 125, 125);
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    TextColorDown = White;
+    TextColorDisabled = rgb(125, 125, 125);
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    BackgroundColorDown = rgb(0, 110, 255);
+    BackgroundColorDownHover = rgb(0, 140, 255);
+    BackgroundColorDisabled = rgb(230, 230, 230);
+}
+TreeView{
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    BorderColor = Black;
+    TextColor = rgb(60, 60, 60);
+    TextColorHover = Black;
+    SelectedTextColor = White;
+    BackgroundColor = rgb(245, 245, 245);
+    BackgroundColorHover = White;
+    SelectedBackgroundColor = rgb(0, 110, 255);
+    SelectedBackgroundColorHover = rgb(30, 150, 255);
+}
+
+
+
+
+FDEMainWindow{
+    Borders = (1, 1, 1, 1);
+    BorderColor = Black;
+    TitleColor = White;
+    TitleColorFocused = rgb(60, 60, 60);
+    TitleBarColor = rgb(128, 128, 128);
+    TitleBarColorFocused = White;
+    BackgroundColor = rgb(230, 230, 230);
+    DistanceToSide = 3;
+    BorderBelowTitleBar = 1;
+    PaddingBetweenButtons = 1;
+    ShowTextOnTitleButtons = true;
+}

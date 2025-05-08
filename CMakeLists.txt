@@ -88,6 +88,7 @@ else ()
 	)
 
 	find_package(SFML 3 REQUIRED COMPONENTS Graphics Audio Network)
+	set(TGUI_SHARED_LIBS TRUE)
 	find_package(TGUI 1 REQUIRED)
 
 	if (NO_TGUI)
@@ -151,6 +152,8 @@ if (NETWORK_CLASSES)
 		src/LibCore/Resources/ObjectFactory.hpp
 		src/LibCore/Resources/Assert.hpp
 		src/LibCore/Resources/Assert.cpp
+		src/LibCore/Resources/Settings.cpp
+		src/LibCore/Resources/Settings.hpp
 	)
 	set(
 		NETWORK_EXTRA_SCENES
@@ -215,7 +218,8 @@ if (WIN32)
 	set(FDICON src/FrameDataEditor/fdeditor.rc)
 else()
 	set(GICON)
-	set(FDICON)
+	set(FDICON
+		src/FrameDataEditor/Operations/IOperation.hpp)
 endif()
 
 add_library(
@@ -360,10 +364,17 @@ if (NOT USE_SDL2)
 		add_executable(
 			FrameDataEditor
 			${FDICON}
+			src/LibCore/LibCore.hpp
 			src/FrameDataEditor/dataEditor.cpp
 			src/FrameDataEditor/EditableObject.cpp
 			src/FrameDataEditor/EditableObject.hpp
-			src/LibCore/LibCore.hpp
+			src/FrameDataEditor/FrameDataEditor.cpp
+			src/FrameDataEditor/FrameDataEditor.hpp
+			src/FrameDataEditor/UI/LocalizedContainer.hpp
+			src/FrameDataEditor/UI/MainWindow.cpp
+			src/FrameDataEditor/UI/MainWindow.hpp
+			src/FrameDataEditor/UI/PreviewWidget.cpp
+			src/FrameDataEditor/UI/PreviewWidget.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

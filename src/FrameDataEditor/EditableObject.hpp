@@ -8,10 +8,8 @@
 
 #include <LibCore.hpp>
 
-class EditableObject : public SpiralOfFate::IObject {
+class EditableObject {
 public:
-	mutable SpiralOfFate::Sprite _sprite;
-
 	std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
 	SpiralOfFate::Vector2f _position = {0, 0};
 	SpiralOfFate::Vector2f _speed = {0, 0};
@@ -24,18 +22,9 @@ public:
 
 	EditableObject() = default;
 	EditableObject(const std::string &frameData);
-	~EditableObject() override = default;
-	void render() const override;
-	void update() override;
-	bool isDead() const override;
-	void kill() override;
-	unsigned int getBufferSize() const override;
-	void copyToBuffer(void *data) const override;
-	void restoreFromBuffer(void *data) override;
-	unsigned int getClassId() const override;
-	size_t printDifference(const char *msgStart, void *, void *, unsigned) const override;
-	size_t printContent(const char *msgStart, void *data, unsigned int startOffset, size_t dataSize) const override;
-	int getLayer() const override;
+	~EditableObject() = default;
+	void render(sf::RenderTarget &target, sf::RenderStates states) const;
+	void update();
 };
 
 

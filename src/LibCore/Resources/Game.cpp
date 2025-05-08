@@ -12,7 +12,8 @@ namespace SpiralOfFate
 {
 	MYDLL_API Game *game = nullptr;
 
-	Game::Game(const std::string &fontPath, const std::string &loggerPath) :
+	Game::Game(const std::string &fontPath, const std::string &settingsPath, const std::string &loggerPath) :
+		settings(settingsPath),
 		logger(loggerPath),
 		font(fontPath)
 	{
@@ -44,7 +45,8 @@ namespace SpiralOfFate
 			assert_eq(this->soundMgr.load("assets/sfxs/se/tenshi/052.ogg"), BASICSOUND_INSTALL_START);
 			assert_eq(this->soundMgr.load("assets/sfxs/se/022.ogg"), BASICSOUND_WALL_BOUNCE);
 			assert_eq(this->soundMgr.load("assets/sfxs/se/022.ogg"), BASICSOUND_GROUND_SLAM);
-		} catch (...) {
+			tgui::Theme::setDefault(tgui::Theme::create(this->settings.theme));
+		} catch (std::exception &) {
 			game = nullptr;
 			throw;
 		}

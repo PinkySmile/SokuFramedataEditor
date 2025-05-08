@@ -90,142 +90,33 @@ std::string getLastError(int err = errno)
 
 using namespace SpiralOfFate;
 
-std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> loadPlayerInputs(std::ifstream &stream)
+void saveInputs(const std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> &input, const std::string &path)
 {
-	std::map<InputEnum, sf::Keyboard::Key> keyboardMap{
-		{ INPUT_LEFT,    sf::Keyboard::Key::Left },
-		{ INPUT_RIGHT,   sf::Keyboard::Key::Right },
-		{ INPUT_UP,      sf::Keyboard::Key::Up },
-		{ INPUT_DOWN,    sf::Keyboard::Key::Down },
-		{ INPUT_NEUTRAL, sf::Keyboard::Key::W },
-		{ INPUT_MATTER,  sf::Keyboard::Key::X },
-		{ INPUT_SPIRIT,  sf::Keyboard::Key::C },
-		{ INPUT_VOID,    sf::Keyboard::Key::Q },
-		{ INPUT_ASCEND,  sf::Keyboard::Key::S },
-		{ INPUT_DASH,    sf::Keyboard::Key::LShift },
-		{ INPUT_PAUSE,   sf::Keyboard::Key::Tab }
-	};
-	std::map<InputEnum, std::pair<bool, int>> controllerMap{
-		{ INPUT_LEFT,    {true,  (int)sf::Joystick::Axis::X | (256 - 30) << 3} },
-		{ INPUT_RIGHT,   {true,  (int)sf::Joystick::Axis::X | 30 << 3} },
-		{ INPUT_UP,      {true,  (int)sf::Joystick::Axis::Y | (256 - 30) << 3} },
-		{ INPUT_DOWN,    {true,  (int)sf::Joystick::Axis::Y | 30 << 3} },
-		{ INPUT_NEUTRAL, {false, 0} },
-		{ INPUT_MATTER,  {false, 2} },
-		{ INPUT_SPIRIT,  {false, 1} },
-		{ INPUT_VOID,    {false, 3} },
-		{ INPUT_ASCEND,  {true,  (int)sf::Joystick::Axis::Z | (30 << 3)} },
-		{ INPUT_DASH,    {true,  (int)sf::Joystick::Axis::Z | ((256 - 30) << 3)} },
-		{ INPUT_PAUSE,   {false, 7} }
-	};
-	std::map<InputEnum, ControllerKey *> realControllerMap;
-	std::map<sf::Keyboard::Key, InputEnum> realKeyboardMap;
+	auto parent = std::filesystem::path(path).parent_path();
 
-	if (!stream.fail()) {
-		for (auto &pair : keyboardMap)
-			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
-		for (auto &pair : controllerMap)
-			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
-	}
-	for (auto &pair : keyboardMap)
-		realKeyboardMap[pair.second] = pair.first;
-	for (auto &pair : controllerMap) {
-		realControllerMap[pair.first] = pair.second.first ?
-			static_cast<ControllerKey *>(new ControllerAxis(
-				0,
-				static_cast<sf::Joystick::Axis>(pair.second.second & 7),
-				(char)(pair.second.second >> 3)
-			)) :
-			static_cast<ControllerKey *>(new ControllerButton(
-				0,
-				pair.second.second
-			));
-	}
-	return {
-		std::make_shared<KeyboardInput>(realKeyboardMap),
-		std::make_shared<ControllerInput>(realControllerMap)
-	};
+	if (!parent.empty())
+		std::filesystem::create_directories(parent);
+
+	std::ofstream stream{path};
+
+	input.first->save(stream);
+	input.second->save(stream);
 }
 
-std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> loadMenuInputs(std::ifstream &stream)
+std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> loadInputs(const std::string &path)
 {
-	std::map<InputEnum, sf::Keyboard::Key> keyboardMap{
-		{ INPUT_LEFT,    sf::Keyboard::Key::Left },
-		{ INPUT_RIGHT,   sf::Keyboard::Key::Right },
-		{ INPUT_UP,      sf::Keyboard::Key::Up },
-		{ INPUT_DOWN,    sf::Keyboard::Key::Down },
-		{ INPUT_NEUTRAL, sf::Keyboard::Key::W },
-		{ INPUT_SPIRIT,  sf::Keyboard::Key::C },
-		{ INPUT_PAUSE,   sf::Keyboard::Key::Tab }
-	};
-	std::map<InputEnum, std::pair<bool, int>> controllerMap{
-		{ INPUT_LEFT,    {true,  (int)sf::Joystick::Axis::X | (256 - 30) << 3} },
-		{ INPUT_RIGHT,   {true,  (int)sf::Joystick::Axis::X | 30 << 3} },
-		{ INPUT_UP,      {true,  (int)sf::Joystick::Axis::Y | (256 - 30) << 3} },
-		{ INPUT_DOWN,    {true,  (int)sf::Joystick::Axis::Y | 30 << 3} },
-		{ INPUT_NEUTRAL, {false, 0} },
-		{ INPUT_SPIRIT,  {false, 1} },
-		{ INPUT_PAUSE,   {false, 7} }
-	};
-	std::map<InputEnum, ControllerKey *> realControllerMap;
-	std::map<sf::Keyboard::Key, InputEnum> realKeyboardMap;
+	std::ifstream istream{path};
+	std::pair<std::shared_ptr<KeyboardInput>, std::shared_ptr<ControllerInput>> result;
 
-	if (!stream.fail()) {
-		for (auto &pair : keyboardMap)
-			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
-		for (auto &pair : controllerMap)
-			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
+	if (istream.fail()) {
+		result.first = std::make_shared<KeyboardInput>();
+		result.second = std::make_shared<ControllerInput>();
+		saveInputs(result, path);
+	} else {
+		result.first = std::make_shared<KeyboardInput>(istream);
+		result.second = std::make_shared<ControllerInput>(istream);
 	}
-	for (auto &pair : keyboardMap)
-		realKeyboardMap[pair.second] = pair.first;
-	for (auto &pair : controllerMap) {
-		realControllerMap[pair.first] = pair.second.first ?
-			static_cast<ControllerKey *>(new ControllerAxis(
-				-1,
-				static_cast<sf::Joystick::Axis>(pair.second.second & 7),
-				(char)(pair.second.second >> 3)
-			)) :
-			static_cast<ControllerKey *>(new ControllerButton(
-				-1,
-				pair.second.second
-			));
-	}
-	return {
-		std::make_shared<KeyboardInput>(realKeyboardMap),
-		std::make_shared<ControllerInput>(realControllerMap)
-	};
-}
-
-void	saveSettings()
-{
-	std::ofstream stream{"settings.dat", std::istream::binary};
-
-	game->P1.first->save(stream);
-	game->P1.second->save(stream);
-	game->P2.first->save(stream);
-	game->P2.second->save(stream);
-	game->menu.first->save(stream);
-	game->menu.second->save(stream);
-}
-
-void	loadSettings()
-{
-	std::ifstream stream{"settings.dat", std::istream::binary};
-
-	if (stream.fail() && errno != ENOENT)
-		Utils::dispMsg(game->gui, "Cannot load settings", "Cannot open settings file: " + std::string(strerror(errno)), MB_ICONERROR);
-
-	struct stat s;
-	auto result = stat("settings.dat", &s);
-
-	if (result == -1) {
-		if (errno != ENOENT)
-			Utils::dispMsg(game->gui, "Cannot load settings", "Cannot stat file: " + std::string(strerror(errno)), MB_ICONERROR);
-	} else if (s.st_size != 348)
-		Utils::dispMsg(game->gui, "Cannot load settings", "Old settings or corrupted settings detected.\nYou might need to set your settings again in the menu.", MB_ICONWARNING);
-	game->P1 = loadPlayerInputs(stream);
-	game->P2 = loadPlayerInputs(stream);
-	game->menu = loadMenuInputs(stream);
+	return result;
 }
 
 #ifdef __ANDROID__
@@ -383,15 +274,11 @@ void	run()
 	sf::Image icon;
 	double timer = 0;
 	sf::Clock clock;
-#ifdef _WIN32
-	char *root = getenv("SYSTEMROOT");
-	std::string font = (root ? root : "C:\\Windows") + std::string("\\Fonts\\comic.ttf");
-#else
-	std::string font = "assets/fonts/Retro Gaming.ttf";
-#endif
 
 	checkCompilationEnv();
-	loadSettings();
+	game->menu = loadInputs("menuInputs.in");
+	game->P1 = loadInputs(game->settings.inputPresetP1);
+	game->P2 = loadInputs(game->settings.inputPresetP2);
 	registerScenes();
 #ifdef VIRTUAL_CONTROLLER
 	game->virtualController = std::make_shared<VirtualController>();
@@ -456,7 +343,10 @@ void	run()
 		}
 		game->sceneMutex.unlock();
 	}
-	saveSettings();
+	// TODO: Move
+	saveInputs(game->menu, "menuInputs.in");
+	saveInputs(game->P1, game->settings.inputPresetP1);
+	saveInputs(game->P2, game->settings.inputPresetP2);
 }
 
 int	main()
@@ -471,10 +361,7 @@ int	main()
 #if !defined(_DEBUG) || defined(_WIN32) || defined(__ANDROID__)
 	try {
 #endif
-		if (getenv("BATTLE_FONT"))
-			new Game(getenv("BATTLE_FONT"));
-		else
-			new Game("assets/fonts/Retro Gaming.ttf");
+		new Game("assets/fonts/Retro Gaming.ttf", "settings.json");
 		game->logger.info("Starting game->");
 		run();
 		game->logger.info("Goodbye !");
@@ -482,9 +369,15 @@ int	main()
 	} catch (std::exception &e) {
 		if (game) {
 			game->logger.fatal(e.what());
-			Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, &*game->screen);
+#ifdef _WIN32
+			MessageBoxA(game->screen->getNativeHandle(), e.what(), "Fatal error", MB_ICONERROR);
 		} else
-			Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, nullptr);
+			MessageBoxA(nullptr, e.what(), "Fatal error", MB_ICONERROR);
+#else
+		//	Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, &*game->screen);
+		}// else
+		//	Utils::dispMsg("Fatal error", e.what(), MB_ICONERROR, nullptr);
+#endif
 		ret = EXIT_FAILURE;
 	}
 #endif

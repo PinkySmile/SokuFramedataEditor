@@ -17,6 +17,7 @@
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #endif
 #endif
+#include "Settings.hpp"
 #include "Screen.hpp"
 #include "TextureManager.hpp"
 #include "Resources/Battle/BattleManager.hpp"
@@ -79,6 +80,7 @@ namespace SpiralOfFate
 
 	struct Game {
 		bool hosting = false;
+		Settings settings;
 		std::random_device random;
 		RandomWrapper battleRandom;
 		Logger logger;
@@ -114,7 +116,7 @@ namespace SpiralOfFate
 		std::mutex sceneMutex;
 		std::shared_ptr<IInput> activeNetInput;
 
-		Game(const std::string &fontPath, const std::string &loggerPath = "./latest.log");
+		Game(const std::string &fontPath, const std::string &settingsPath, const std::string &loggerPath = "./latest.log");
 		std::vector<std::string> getCharacters();
 		Color getColor(const std::string &name);
 	};

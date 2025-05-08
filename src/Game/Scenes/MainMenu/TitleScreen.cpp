@@ -86,7 +86,8 @@ enum TitleScreenButton5 {
 #define STICK_ID_VPAD 1
 #define STICK_ID_PPAD1 2
 
-extern std::pair<std::shared_ptr<SpiralOfFate::KeyboardInput>, std::shared_ptr<SpiralOfFate::ControllerInput>> loadPlayerInputs(std::ifstream &stream);
+// FIXME:
+extern std::pair<std::shared_ptr<SpiralOfFate::KeyboardInput>, std::shared_ptr<SpiralOfFate::ControllerInput>> loadInputs(const std::string &path);
 
 namespace SpiralOfFate
 {
@@ -190,6 +191,7 @@ namespace SpiralOfFate
 				{"Replays", "Select a replay to watch", [this]{
 					auto window = Utils::openFileDialog(game->gui, "Open replay", "./replays");
 
+					window->setFileTypeFilters({ {"Replay file (*.replay)", {"*.replay"}}, {"All files", {}} }, 0);
 					window->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
 						try {
 							this->_loadReplay(arr[0]);
@@ -536,6 +538,7 @@ namespace SpiralOfFate
 		if (ev.code == sf::Keyboard::Key::F2 && this->_changingInputs > 1) {
 			auto dialog = Utils::saveFileDialog(game->gui, "Save inputs", "./profiles");
 
+			dialog->setFileTypeFilters({ {"Inputs file (*.in)", {"*.in"}}, {"All files", {}} }, 0);
 			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
 				std::ofstream stream{static_cast<std::filesystem::path>(arr[0])};
 
@@ -553,15 +556,12 @@ namespace SpiralOfFate
 		if (ev.code == sf::Keyboard::Key::F3 && this->_changingInputs > 1) {
 			auto dialog = Utils::openFileDialog(game->gui, "Load inputs", "./profiles");
 
+			dialog->setFileTypeFilters({ {"Inputs file (*.in)", {"*.in"}}, {"All files", {}} }, 0);
 			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
-				std::ifstream stream{static_cast<std::filesystem::path>(arr[0])};
-
-				if (!stream)
-					Utils::dispMsg(game->gui, "Loading error", strerror(errno), MB_ICONERROR);
-
 				auto &pair = (this->_changingInputs == 2 ? game->P1 : game->P2);
 
-				pair = loadPlayerInputs(stream);
+				// FIXME: Use profile-like system
+				pair = loadInputs(static_cast<std::filesystem::path>(arr[0]).string());
 				game->soundMgr.play(BASICSOUND_MENU_CONFIRM);
 			});
 			return false;

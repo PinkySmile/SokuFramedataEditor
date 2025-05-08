@@ -159,3 +159,49 @@ ToggleButton {
     Texture     = "Black.png" Part(140, 53, 45, 50) Middle(10, 0) Smooth;
     TextureDown = "Black.png" Part(125, 105, 45, 50) Middle(10, 0) Smooth;
 }
+
+
+
+
+
+
+FDEMainWindow {
+    TextureTitleBar        = "Black.png" Part(1, 85, 75, 25) Middle(25, 0) Smooth;
+    TextureTitleBarFocused = "Black.png" Part(254, 73, 75, 25) Middle(25, 0) Smooth;
+    TitleColor             = rgb(120, 120, 120);
+    TitleColorFocused      = White;
+    Borders                = (1, 1, 1, 1);
+    DistanceToSide         = 5;
+    PaddingBetweenButtons  = 2;
+    ShowTextOnTitleButtons = false;
+    CloseButton = {
+        Texture       = "Black.png" Part(272, 40, 15, 15) Smooth;
+        TextureHover  = "Black.png" Part(255, 40, 15, 15) Smooth;
+        TextureDown   = "Black.png" Part(45, 230, 15, 15) Smooth;
+    };
+    MaximizeButton = {
+        Texture       = "Black.png" Part(272, 23, 15, 15) Smooth;
+        TextureHover  = "Black.png" Part(267, 239, 15, 15) Smooth;
+        TextureDown   = "Black.png" Part(62, 238, 15, 15) Smooth;
+    };
+    MinimizeButton = {
+        Texture       = "Black.png" Part(272, 57, 15, 15) Smooth;
+        TextureHover  = "Black.png" Part(250, 239, 15, 15) Smooth;
+        TextureDown   = "Black.png" Part(96, 238, 15, 15) Smooth;
+    };
+    CloseButtonFocused = {
+        Texture       = "Black.png" Part(79, 238, 15, 15) Smooth;
+        TextureHover  = "Black.png" Part(255, 40, 15, 15) Smooth;
+        TextureDown   = "Black.png" Part(45, 230, 15, 15) Smooth;
+    };
+    MaximizeButtonFocused = {
+        Texture       = "Black.png" Part(255, 23, 15, 15) Smooth;
+        TextureHover  = "Black.png" Part(267, 239, 15, 15) Smooth;
+        TextureDown   = "Black.png" Part(62, 238, 15, 15) Smooth;
+    };
+    MinimizeButtonFocused = {
+        Texture       = "Black.png" Part(255, 57, 15, 15) Smooth;
+        TextureHover  = "Black.png" Part(250, 239, 15, 15) Smooth;
+        TextureDown   = "Black.png" Part(96, 238, 15, 15) Smooth;
+    };
+}

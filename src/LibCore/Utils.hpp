@@ -21,6 +21,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#undef MessageBox
 #elif defined(USE_SDL)
 #include <SDL2/SDL.h>
 #define MB_ICONERROR SDL_MESSAGEBOX_ERROR
@@ -172,8 +173,27 @@ namespace SpiralOfFate::Utils
 	//! @param startColor The color to initialize the picker.
 	//! @return A pointer to the window
 	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(Color color)> &onFinish, Color startColor);
-	tgui::Theme &getTheme();
-	void setRenderer(const tgui::Widget::Ptr &widget);
+
+	void setRenderer(tgui::Container &widget);
+	void setRenderer(tgui::Container *widget);
+	void setRenderer(const tgui::Gui &widget);
+
+	template<typename T>
+	void setRenderer(const std::shared_ptr<T> &widget)
+	{
+		auto renderer = tgui::Theme::getDefault()->getRendererNoThrow(widget->getWidgetType());
+
+		if (renderer)
+			widget->setRenderer(renderer);
+	}
+	template<typename T>
+	void setRenderer(const std::shared_ptr<T> &widget, const std::string &name)
+	{
+		widget->setRenderer(tgui::Theme::getDefault()->getRenderer(name));
+	}
+
+	template<>
+	void setRenderer(const tgui::Container::Ptr &widget);
 #else
 	#define openWindowWithFocus(...) __nothing2()
 	#define makeSliderWindow(...) __nothing2()
@@ -185,7 +205,7 @@ namespace SpiralOfFate::Utils
 #else
 	#define dispMsg(...) __nothing()
 #endif
-	#define setRendered(...) __nothing()
+	#define setRenderer(...) __nothing()
 	#define getTheme() *(tgui::Theme *)nullptr
 	void __nothing();
 	void *__nothing2();

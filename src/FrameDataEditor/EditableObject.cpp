@@ -3,58 +3,62 @@
 //
 
 #include <filesystem>
+#include "Color.hpp"
 #include "EditableObject.hpp"
+
+using namespace SpiralOfFate;
 
 EditableObject::EditableObject(const std::string &frameData) :
 	_folder(frameData.substr(0, frameData.find_last_of(std::filesystem::path::preferred_separator)))
 {
-	this->_moves = SpiralOfFate::FrameData::loadFile(frameData, this->_folder);
+	this->_moves = FrameData::loadFile(frameData, this->_folder);
 }
 
-void EditableObject::render() const
+void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states) const
 {
 	sf::RectangleShape rect;
 	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
-	auto size = SpiralOfFate::Vector2f{
+	auto size = Vector2f{
 		data.scale.x * data.textureBounds.size.x,
 		data.scale.y * data.textureBounds.size.y
 	};
 	auto result = data.offset;
+	Sprite sprite;
 
 	result.y *= -1;
-	result += SpiralOfFate::Vector2f{
+	result += Vector2f{
 		size.x / -2.f,
 		-size.y
 	};
-	result += SpiralOfFate::Vector2f{
+	result += Vector2f{
 		data.textureBounds.size.x * data.scale.x / 2,
 		data.textureBounds.size.y * data.scale.y / 2
 	};
-	this->_sprite.setColor(Color::White);
-	this->_sprite.setOrigin(data.textureBounds.size / 2.f);
-	this->_sprite.setRotation(data.rotation * 180 / M_PI);
-	this->_sprite.setPosition(result);
-	this->_sprite.setScale(data.scale);
-	this->_sprite.textureHandle = data.textureHandle;
-	this->_sprite.setTextureRect(data.textureBounds);
-	SpiralOfFate::game->textureMgr.render(this->_sprite);
+	sprite.setColor(Color::White);
+	sprite.setOrigin(data.textureBounds.size / 2.f);
+	sprite.setRotation(sf::radians(data.rotation));
+	sprite.setPosition(result);
+	sprite.setScale(data.scale);
+	sprite.setTexture(data.textureHandle);
+	sprite.setTextureRect(data.textureBounds);
+	target.draw(sprite, states);
 	if (data.oFlag.spiritElement == data.oFlag.matterElement && data.oFlag.matterElement == data.oFlag.voidElement)
-		this->_sprite.setColor(SpiralOfFate::game->typeColors[data.oFlag.spiritElement ? SpiralOfFate::TYPECOLOR_NEUTRAL : SpiralOfFate::TYPECOLOR_NON_TYPED]);
+		sprite.setColor(game->typeColors[data.oFlag.spiritElement ? TYPECOLOR_NEUTRAL : TYPECOLOR_NON_TYPED]);
 	else if (data.oFlag.spiritElement)
-		this->_sprite.setColor(SpiralOfFate::game->typeColors[SpiralOfFate::TYPECOLOR_SPIRIT]);
+		sprite.setColor(game->typeColors[TYPECOLOR_SPIRIT]);
 	else if (data.oFlag.matterElement)
-		this->_sprite.setColor(SpiralOfFate::game->typeColors[SpiralOfFate::TYPECOLOR_MATTER]);
+		sprite.setColor(game->typeColors[TYPECOLOR_MATTER]);
 	else if (data.oFlag.voidElement)
-		this->_sprite.setColor(SpiralOfFate::game->typeColors[SpiralOfFate::TYPECOLOR_VOID]);
-	this->_sprite.textureHandle = data.textureHandleEffects;
-	SpiralOfFate::game->textureMgr.render(this->_sprite);
+		sprite.setColor(game->typeColors[TYPECOLOR_VOID]);
+	sprite.setTexture(data.textureHandleEffects);
+	target.draw(sprite, states);
 
 	rect.setOutlineThickness(2);
 	rect.setOutlineColor(Color::White);
 	rect.setFillColor(Color::Black);
-	rect.setPosition(SpiralOfFate::Vector2f{-4, -4});
+	rect.setPosition(Vector2f{-4, -4});
 	rect.setSize({9, 9});
-	SpiralOfFate::game->screen->draw(rect);
+	target.draw(rect, states);
 }
 
 void EditableObject::update()
@@ -66,54 +70,11 @@ void EditableObject::update()
 		this->_animationCtr = 0;
 		this->_animation++;
 		this->_animation %= this->_moves.at(this->_action)[this->_actionBlock].size();
+		if (this->_animation == 0)
+			this->_position = {0, 0};
 		data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
-		SpiralOfFate::game->soundMgr.play(data->soundHandle);
+		game->soundMgr.play(data->soundHandle);
 	}
 	this->_position += this->_speed;
 	this->_speed.y += this->_gravity;
-}
-
-bool EditableObject::isDead() const
-{
-	return false;
-}
-
-void EditableObject::kill()
-{
-
-}
-
-unsigned int EditableObject::getBufferSize() const
-{
-	return 0;
-}
-
-void EditableObject::copyToBuffer(void *) const
-{
-
-}
-
-void EditableObject::restoreFromBuffer(void *)
-{
-
-}
-
-unsigned int EditableObject::getClassId() const
-{
-	return 0;
-}
-
-size_t EditableObject::printDifference(const char *, void *, void *, unsigned) const
-{
-	return 0;
-}
-
-int EditableObject::getLayer() const
-{
-	return 0;
-}
-
-size_t EditableObject::printContent(const char *msgStart, void *data, unsigned int startOffset, size_t dataSize) const
-{
-	return 0;
 }

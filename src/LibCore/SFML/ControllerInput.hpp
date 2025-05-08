@@ -60,6 +60,8 @@ namespace SpiralOfFate
 		std::array<int, INPUT_NUMBER> _keyDuration;
 
 	public:
+		ControllerInput();
+		ControllerInput(std::ifstream &stream);
 		ControllerInput(const std::map<InputEnum, ControllerKey *> &keyMap);
 		bool isPressed(InputEnum input) const override;
 		InputStruct getInputs() const override;

@@ -37,7 +37,7 @@
       "max": 2.5
     }
   },
-  "hidden": true,
+  "hidden": false,
   "palettes":[],
   "name": "Victoria Star",
   "pos": 0

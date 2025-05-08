@@ -113,6 +113,49 @@ namespace SpiralOfFate
 		"Pause"
 	};
 
+	KeyboardInput::KeyboardInput() :
+		KeyboardInput({
+			{ sf::Keyboard::Key::Left,   INPUT_LEFT },
+			{ sf::Keyboard::Key::Right,  INPUT_RIGHT },
+			{ sf::Keyboard::Key::Up,     INPUT_UP },
+			{ sf::Keyboard::Key::Down,   INPUT_DOWN },
+			{ sf::Keyboard::Key::W,      INPUT_NEUTRAL },
+			{ sf::Keyboard::Key::X,      INPUT_MATTER },
+			{ sf::Keyboard::Key::C,      INPUT_SPIRIT },
+			{ sf::Keyboard::Key::Q,      INPUT_VOID },
+			{ sf::Keyboard::Key::S,      INPUT_ASCEND },
+			{ sf::Keyboard::Key::LShift, INPUT_DASH },
+			{ sf::Keyboard::Key::Tab,    INPUT_PAUSE }
+		})
+	{
+	}
+
+	KeyboardInput::KeyboardInput(std::ifstream &stream)
+	{
+		std::map<InputEnum, sf::Keyboard::Key> keyboardMap{
+			{ INPUT_LEFT,    sf::Keyboard::Key::Left },
+			{ INPUT_RIGHT,   sf::Keyboard::Key::Right },
+			{ INPUT_UP,      sf::Keyboard::Key::Up },
+			{ INPUT_DOWN,    sf::Keyboard::Key::Down },
+			{ INPUT_NEUTRAL, sf::Keyboard::Key::W },
+			{ INPUT_MATTER,  sf::Keyboard::Key::X },
+			{ INPUT_SPIRIT,  sf::Keyboard::Key::C },
+			{ INPUT_VOID,    sf::Keyboard::Key::Q },
+			{ INPUT_ASCEND,  sf::Keyboard::Key::S },
+			{ INPUT_DASH,    sf::Keyboard::Key::LShift },
+			{ INPUT_PAUSE,   sf::Keyboard::Key::Tab }
+		};
+		std::map<sf::Keyboard::Key, InputEnum> realKeyboardMap;
+
+		for (auto &pair : keyboardMap)
+			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
+		for (auto &pair : keyboardMap)
+			realKeyboardMap[pair.second] = pair.first;
+		this->_keyMap = realKeyboardMap;
+		this->_keyStates.fill(false);
+		this->_keyDuration.fill(0);
+	}
+
 	KeyboardInput::KeyboardInput(const std::map<sf::Keyboard::Key, InputEnum> &keyMap) :
 		_keyMap(keyMap)
 	{
