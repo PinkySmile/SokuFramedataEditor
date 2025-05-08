@@ -31,5 +31,19 @@
 	"animation.bounds":             "Bordures",
 	"animation.offset":             "Décalage",
 	"animation.duration":           "Durée",
-	"animation.scale":              "Échelle"
+	"animation.scale":              "Échelle",
+
+	"settings.save":                "Sauvegarder",
+	"settings.cancel":              "Annuler",
+	"settings.title":               "Paramètres",
+	"settings.theme":               "Thème graphique",
+	"settings.locale":              "Langue",
+	"settings.locale.":             "Langue du système",
+	"settings.locale.fr":           "Français (fr)",
+	"settings.locale.en":           "Anglais (en)",
+	"settings.locale.de":           "Allemand (de)",
+	"settings.locale.it":           "Italien (it)",
+	"settings.locale.zh":           "Chinois (zh)",
+	"settings.locale.es":           "Espagnol (es)",
+	"settings.locale.pt":           "Portugais (pt)"
 }

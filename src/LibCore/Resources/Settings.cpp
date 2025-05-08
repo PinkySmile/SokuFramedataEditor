@@ -3,10 +3,11 @@
 //
 
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include "Settings.hpp"
-#include "nlohmann/json.hpp"
+#include "Utils.hpp"
 
-Settings::Settings(const std::string &path) :
+SpiralOfFate::Settings::Settings(const std::string &path) :
 	_path(path)
 {
 	std::ifstream stream{path};
@@ -18,7 +19,7 @@ Settings::Settings(const std::string &path) :
 		this->inputPresetP2 = json["inputPresetP2"];
 		this->theme = json["theme"];
 	} else if (errno != ENOENT)
-		throw std::runtime_error("Cannot open settings file: " + std::string(strerror(errno)));
+		throw std::runtime_error("Cannot open settings file: " + this->_path + ": " + std::string(strerror(errno)));
 	else {
 		this->inputPresetP1 = "inputs/default1.in";
 		this->inputPresetP2 = "inputs/default2.in";
@@ -26,12 +27,12 @@ Settings::Settings(const std::string &path) :
 	}
 }
 
-Settings::~Settings()
+SpiralOfFate::Settings::~Settings()
 {
 	this->save();
 }
 
-void Settings::save()
+void SpiralOfFate::Settings::save()
 {
 	std::ofstream stream{this->_path};
 	nlohmann::json json = {
@@ -41,6 +42,6 @@ void Settings::save()
 	};
 
 	if (!stream)
-		throw std::runtime_error("Cannot open settings file: " + std::string(strerror(errno)));
+		throw std::runtime_error("Cannot open settings file: " + this->_path + ": " + std::string(strerror(errno)));
 	stream << json.dump(4);
 }

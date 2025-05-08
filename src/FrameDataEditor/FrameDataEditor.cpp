@@ -5,30 +5,70 @@
 #include <nlohmann/json.hpp>
 #include "FrameDataEditor.hpp"
 #include "UI/MainWindow.hpp"
+#include "UI/LocalizedContainer.hpp"
+#include "UI/SettingsWindow.hpp"
 
-SpiralOfFate::FrameDataEditor *editor = nullptr;
+template<typename T>
+void localizeGui(T &container)
+{
+	using namespace SpiralOfFate;
+
+	for (const tgui::Widget::Ptr &w : container.getWidgets()) {
+		if (auto loc1 = w->cast<LocalizedContainer<tgui::ChildWindow>>())
+			loc1->reLocalize();
+		else if (auto loc2 = w->cast<LocalizedContainer<MainWindow>>())
+			loc2->reLocalize();
+		else if (auto loc3 = w->cast<LocalizedContainer<SettingsWindow>>())
+			loc3->reLocalize();
+		else if (auto cont = w->cast<tgui::Container>())
+			localizeGui(*cont);
+	}
+}
 
 SpiralOfFate::FrameDataEditor::FrameDataEditor()
 {
-	editor = this;
 	game->gui.loadWidgetsFromFile("assets/gui/editor/layout.gui");
 	this->_clock.stop();
 	this->_loadSettings();
 
-	std::ifstream stream{ "assets/gui/editor/locale/" + this->_locale + ".json" };
 	auto menu = game->gui.get<tgui::MenuBar>("main_bar");
-	nlohmann::json json = nlohmann::json::object();
 
-	Utils::setRenderer(game->gui);
-	if (stream)
-		stream >> json;
-	this->_localization = json.get<std::map<std::string, std::string>>();
 	this->_menuHierarchy = menu->getMenus();
-	this->_buildMenu(menu);
+	this->setLocale(this->_locale);
+	Utils::setRenderer(game->gui);
+}
+
+SpiralOfFate::FrameDataEditor::~FrameDataEditor()
+{
+	this->saveSettings();
 }
 
 void SpiralOfFate::FrameDataEditor::_loadSettings()
 {
+	std::ifstream stream{"editorSettings.json"};
+	nlohmann::json json;
+
+	if (!stream.fail()) {
+		stream >> json;
+		if (json.contains("locale") && json["locale"].is_string())
+			this->_locale = json["locale"];
+	} else if (errno != ENOENT)
+		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
+	else {
+		this->_locale = "";
+	}
+}
+
+void SpiralOfFate::FrameDataEditor::saveSettings()
+{
+	std::ofstream stream{"editorSettings.json"};
+	nlohmann::json json = {
+		{ "locale", this->_locale }
+	};
+
+	if (!stream)
+		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
+	stream << json.dump(4);
 }
 
 std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
@@ -73,9 +113,14 @@ void SpiralOfFate::FrameDataEditor::_addMenu(const tgui::MenuBar::Ptr &menu, con
 		this->_addMenu(menu, d, hierarchy);
 }
 
-void SpiralOfFate::FrameDataEditor::_buildMenu(const tgui::MenuBar::Ptr &menu)
+void SpiralOfFate::FrameDataEditor::_buildMenu()
 {
-	menu->removeAllMenus();
+	auto menu = game->gui.get<tgui::MenuBar>("main_bar");
+
+	game->gui.remove(menu);
+	menu = tgui::MenuBar::create();
+	game->gui.add(menu, "main_bar");
+	game->gui.moveWidgetToBack(menu);
 	for (auto &d : this->_menuHierarchy)
 		this->_addMenu(menu, d, {});
 	this->_placeMenuCallbacks(menu);
@@ -100,6 +145,40 @@ void SpiralOfFate::FrameDataEditor::update()
 
 void SpiralOfFate::FrameDataEditor::render()
 {
+}
+
+void SpiralOfFate::FrameDataEditor::setLocale(const std::string &name)
+{
+	std::string locale = name;
+	nlohmann::json json = nlohmann::json::object();
+
+	this->_locale = name;
+	this->_localization.clear();
+	if (locale.empty())
+		locale = Utils::getLocale();
+
+	std::ifstream stream{ "assets/gui/editor/locale/" + locale + ".json" };
+
+	if (!stream && name.empty())
+		stream.open("assets/gui/editor/locale/en.json");
+	if (stream)
+		stream >> json;
+	if (json.is_object()) {
+		for (auto &[key, value] : json.items()) {
+			if (!value.is_string()) {
+				this->_localization.clear();
+				break;
+			}
+			this->_localization[key] = value;
+		}
+	}
+	this->_buildMenu();
+	localizeGui(game->gui);
+}
+
+std::string SpiralOfFate::FrameDataEditor::getLocale() const
+{
+	return this->_locale;
 }
 
 void SpiralOfFate::FrameDataEditor::_newFramedata()
@@ -151,6 +230,9 @@ void SpiralOfFate::FrameDataEditor::_saveAs()
 
 void SpiralOfFate::FrameDataEditor::_settings()
 {
+	auto window = Utils::openWindowWithFocus<SettingsWindow>(game->gui, 0, 0, nullptr, false, std::ref(*this));
+
+	window->setTitle(this->localize("settings.title"));
 }
 
 void SpiralOfFate::FrameDataEditor::_quit()

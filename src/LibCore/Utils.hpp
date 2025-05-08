@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-
+#include "Color.hpp"
 #if !defined(__ANDROID__) && defined(USE_TGUI)
 #include <TGUI/TGUI.hpp>
 #ifdef USE_SDL
@@ -36,17 +36,13 @@
 
 namespace SpiralOfFate::Utils
 {
-	struct HSLColor {
-		unsigned char h;
-		unsigned char s;
-		unsigned char l;
-	};
-
 	namespace Z {
 		int compress(unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level);
 		int decompress(unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer);
 		std::string error(int ret);
 	}
+
+	std::string getLocale();
 
 	//! @brief Get the last Exception Name
 	//! @details Return the last type of Exception name
@@ -136,7 +132,40 @@ namespace SpiralOfFate::Utils
 	//! @param width The width of the window.
 	//! @param height The height of the window.
 	//! @return A pointer to the window
-	tgui::ChildWindow::Ptr openWindowWithFocus(tgui::Gui &gui, tgui::Layout width, tgui::Layout height, tgui::ChildWindow::Ptr win = nullptr);
+	template<typename WindowType = tgui::ChildWindow, typename ...Args>
+	typename WindowType::Ptr openWindowWithFocus(tgui::Gui &gui, tgui::Layout width, tgui::Layout height, typename WindowType::Ptr window = nullptr, bool closeOut = true, Args ...args)
+	{
+		auto panel = tgui::Panel::create({"100%", "100%"});
+
+		panel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
+		panel->setUserData(false);
+		gui.add(panel);
+
+		if (!window) {
+			window = WindowType::create(args...);
+			if (!width.isConstant() || width.getValue() != 0)
+				window->setSize(width, height);
+		}
+		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+		gui.add(window);
+
+		window->setFocused(true);
+
+		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
+		auto closeWindow = [&gui, window, panel, tabUsageEnabled]{
+			gui.remove(window);
+			gui.remove(panel);
+			gui.setTabKeyUsageEnabled(tabUsageEnabled);
+		};
+
+		if (closeOut)
+			panel->onClick.connect([window]{
+				window->close();
+			});
+		window->onClose.connect(closeWindow);
+		window->onEscapeKeyPress(closeWindow);
+		return window;
+	}
 
 	//! @brief Display a Windows dialog box.
 	//! @details This functions opens a Windows dialog box and return the button clicked by the user.
@@ -166,13 +195,6 @@ namespace SpiralOfFate::Utils
 	//! @param onFinish Function to call when exiting the window.
 	//! @return A pointer to the window
 	tgui::ChildWindow::Ptr makeSliderWindow(tgui::Gui &gui, const std::function<void(float value)> &onFinish, float defaultValue = 1, float min = 0, float max = 20, float step = 1);
-
-	//! @brief Display a window with a Color picker.
-	//! @param gui The gui handling the window.
-	//! @param onFinish Function to call when exiting the window.
-	//! @param startColor The color to initialize the picker.
-	//! @return A pointer to the window
-	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(Color color)> &onFinish, Color startColor);
 
 	void setRenderer(tgui::Container &widget);
 	void setRenderer(tgui::Container *widget);
@@ -214,9 +236,6 @@ namespace SpiralOfFate::Utils
 
 	template<class... Ts>
 	struct overloads : Ts... { using Ts::operator()...; };
-
-	HSLColor RGBtoHSL(const sf::Color &color);
-	Color HSLtoRGB(const HSLColor &color);
 }
 
 

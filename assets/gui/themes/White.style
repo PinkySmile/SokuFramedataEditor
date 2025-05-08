@@ -187,6 +187,7 @@ MenuBar{
     SeparatorColor = Black;
     SeparatorThickness = 1;
     SeparatorVerticalPadding = 1;
+    DistanceToSide = 5;
 }
 MessageBox{
     Borders = (1, 1, 1, 1);

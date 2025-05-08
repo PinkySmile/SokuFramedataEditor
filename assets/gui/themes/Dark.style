@@ -155,6 +155,7 @@ MenuBar
     SeparatorColor = &SeparatorColor;
     SeparatorThickness = &SeparatorThickness;
     SeparatorVerticalPadding = &SeparatorVerticalPadding;
+    DistanceToSide = 5;
 }
 
 MessageBox

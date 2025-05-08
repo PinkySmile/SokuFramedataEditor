@@ -3,6 +3,8 @@
 
 using namespace SpiralOfFate;
 
+FrameDataEditor *editor;
+
 void run()
 {
 	while (game->screen->isOpen()) {

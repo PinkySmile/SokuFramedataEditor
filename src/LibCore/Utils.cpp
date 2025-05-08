@@ -236,35 +236,6 @@ namespace SpiralOfFate::Utils
 	{
 		return openFileDialog(gui, title, basePath, true, false);
 	}
-
-	tgui::ChildWindow::Ptr openWindowWithFocus(tgui::Gui &gui, tgui::Layout width, tgui::Layout height, tgui::ChildWindow::Ptr window)
-	{
-		auto panel = tgui::Panel::create({"100%", "100%"});
-
-		panel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
-		gui.add(panel);
-
-		if (!window) {
-			window = tgui::ChildWindow::create();
-			window->setSize(width, height);
-		}
-		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
-		gui.add(window);
-
-		window->setFocused(true);
-
-		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
-		auto closeWindow = [&gui, window, panel, tabUsageEnabled]{
-			gui.remove(window);
-			gui.remove(panel);
-			gui.setTabKeyUsageEnabled(tabUsageEnabled);
-		};
-
-		panel->onClick.connect(closeWindow);
-		window->onClose.connect(closeWindow);
-		window->onEscapeKeyPress(closeWindow);
-		return window;
-	}
 #else
 #ifdef USE_SDL
 	int dispMsg(const std::string &title, const std::string &content, int variate, Screen *win)
@@ -291,6 +262,10 @@ namespace SpiralOfFate::Utils
 		if (renderer)
 			widget.setRenderer(renderer);
 		for (auto &w : widget.getWidgets()) {
+			try {
+				if (!w->getUserData<bool>())
+					continue;
+			} catch (std::bad_any_cast &) {}
 			if (auto c = w->cast<tgui::Container>())
 				Utils::setRenderer(c);
 			else
@@ -301,6 +276,10 @@ namespace SpiralOfFate::Utils
 	void setRenderer(const tgui::Gui &widget)
 	{
 		for (auto &w : widget.getWidgets()) {
+			try {
+				if (!w->getUserData<bool>())
+					continue;
+			} catch (std::bad_any_cast &) {}
 			if (auto c = w->cast<tgui::Container>())
 				Utils::setRenderer(c);
 			else
@@ -382,6 +361,38 @@ namespace SpiralOfFate::Utils
 			window->close();
 		});
 		return window;
+	}
+
+	std::string getLocale()
+	{
+#ifdef _WIN32
+		char locale[LOCALE_NAME_MAX_LENGTH] = {0};
+		wchar_t localw[LOCALE_NAME_MAX_LENGTH] = {0};
+
+		GetUserDefaultLocaleName(localw, sizeof(localw));
+		for (int i = 0; localw[i]; i++)
+			locale[i] = localw[i];
+
+		auto end = strchr(locale, '-');
+
+		if (end)
+			*end = 0;
+		return locale;
+#else
+		char locale[1024] = {0};
+		char *lang = getenv("LANG");
+
+		if (!lang)
+			strcpy(locale, "en_EN");
+		else
+			strncpy(locale, lang, sizeof(locale) - 1);
+
+		auto end = strchr(locale, '_');
+
+		if (end)
+			*end = 0;
+		return locale;
+#endif
 	}
 #endif
 }

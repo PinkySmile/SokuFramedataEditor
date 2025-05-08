@@ -15,8 +15,9 @@ namespace SpiralOfFate
 
 	class FrameDataEditor {
 	private:
+		std::string _locale;
+
 		bool _force = false;
-		std::string _locale = "fr";
 		float _timer = 0;
 		sf::Clock _clock;
 		std::vector<tgui::MenuBar::GetMenusElement> _menuHierarchy;
@@ -26,7 +27,7 @@ namespace SpiralOfFate
 
 		void _placeMenuCallbacks(const tgui::MenuBar::Ptr &menu);
 		void _addMenu(const tgui::MenuBar::Ptr &menu, const tgui::MenuBar::GetMenusElement &element, std::vector<tgui::String> hierarchy);
-		void _buildMenu(const tgui::MenuBar::Ptr &menu);
+		void _buildMenu();
 
 		void _loadSettings();
 		void _tickAnimation();
@@ -52,14 +53,17 @@ namespace SpiralOfFate
 
 	public:
 		FrameDataEditor();
+		~FrameDataEditor();
+
+		void setLocale(const std::string &name);
+		std::string getLocale() const;
+		void saveSettings();
 
 		std::string localize(const std::string &s) const;
 		void update();
 		void render();
 	};
 }
-
-extern SpiralOfFate::FrameDataEditor *editor;
 
 
 #endif //SOFGV_FRAMEDATAEDITOR_HPP

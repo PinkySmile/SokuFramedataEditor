@@ -375,6 +375,8 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/UI/MainWindow.hpp
 			src/FrameDataEditor/UI/PreviewWidget.cpp
 			src/FrameDataEditor/UI/PreviewWidget.hpp
+			src/FrameDataEditor/UI/SettingsWindow.cpp
+			src/FrameDataEditor/UI/SettingsWindow.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

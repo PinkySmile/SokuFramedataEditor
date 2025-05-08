@@ -77,6 +77,10 @@ ToggleButton : Button {
     BackgroundColorDownHover = rgba(160, 160, 160, 215);
 }
 
+MenuBar {
+    DistanceToSide = 5;
+}
+
 
 
 

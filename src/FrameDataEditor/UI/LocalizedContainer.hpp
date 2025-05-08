@@ -25,6 +25,11 @@ namespace SpiralOfFate
 					if (first)
 						button->setUserData(std::string(button->getText()));
 					button->setText(this->_editor.localize(std::string(button->getUserData<std::string>())));
+				} else if (auto combo = w->cast<tgui::ComboBox>()) {
+					auto items = combo->getItemIds();
+
+					for (size_t i = 0; i < items.size(); i++)
+						combo->changeItemById(items[i], this->_editor.localize(items[i].toStdString()));
 				} else if (auto cont = w->cast<tgui::Container>())
 					this->_localizeWidgets(*cont, first);
 			}
@@ -37,7 +42,7 @@ namespace SpiralOfFate
 		using Ptr = std::shared_ptr<LocalizedContainer>; //!< Shared widget pointer
 		using ConstPtr = std::shared_ptr<const LocalizedContainer>; //!< Shared constant widget pointer
 
-		LocalizedContainer(const FrameDataEditor &editor, const char *name, bool initRenderer = true) :
+		LocalizedContainer(const FrameDataEditor &editor, const char *name = BaseContainer::StaticWidgetType, bool initRenderer = true) :
 			BaseContainer(name, initRenderer),
 			_editor(editor)
 		{
@@ -49,7 +54,7 @@ namespace SpiralOfFate
 			this->_localizeWidgets(*this, true);
 		}
 
-		void reLocalize(bool first = false)
+		void reLocalize()
 		{
 			this->_localizeWidgets(*this, false);
 		}
