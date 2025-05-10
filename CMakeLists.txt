@@ -380,6 +380,7 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/UI/SettingsWindow.cpp
 			src/FrameDataEditor/UI/SettingsWindow.hpp
 			src/FrameDataEditor/Operations/BasicDataOperation.hpp
+			src/FrameDataEditor/Operations/FlagOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

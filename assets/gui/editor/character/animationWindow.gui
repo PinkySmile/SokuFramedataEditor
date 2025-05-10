@@ -129,6 +129,7 @@ Panel.ControlPanel {
     }
 
     EditBox.ActionID {
+        Alignment = Center;
         Position = (110, 10);
         Renderer = &1;
         Size = (42, 21);
@@ -144,7 +145,7 @@ Panel.ControlPanel {
 
     Label.BlockLabel {
         HorizontalAlignment = Right;
-        Position = (0, 40);
+        Position = (0, 38);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
@@ -164,7 +165,7 @@ Panel.ControlPanel {
 
     Label.FrameLabel {
         HorizontalAlignment = Right;
-        Position = (0, 60);
+        Position = (0, 58);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
@@ -282,7 +283,7 @@ Panel.ControlPanel {
 
     Label.Label1 {
         HorizontalAlignment = Right;
-        Position = (5, 12);
+        Position = (5, 14);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
         Size = (100, 17);

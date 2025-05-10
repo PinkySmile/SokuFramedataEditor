@@ -14,17 +14,12 @@ MenuBar.MainBar {
     }
 
     Menu {
-        Items = ["menu_item.new.frame", "menu_item.new.frame_end", "menu_item.new.block", "menu_item.new.hurt_box", "menu_item.new.hit_box"];
+        Items = ["menu_item.new.action", "menu_item.new.block", "menu_item.new.frame", "menu_item.new.frame_end", "-", "menu_item.new.hurt_box", "menu_item.new.hit_box"];
         Text = "menu_item.new";
     }
 
     Menu {
-        Items = ["menu_item.new.frame", "menu_item.new.frame_end", "menu_item.new.block", "menu_item.new.hurt_box", "menu_item.new.hit_box"];
-        Text = "menu_item.new";
-    }
-
-    Menu {
-        Items = ["menu_item.remove.frame", "menu_item.remove.block", "menu_item.remove.action"];
+        Items = ["menu_item.remove.action", "menu_item.remove.block", "menu_item.remove.frame"];
         Text = "menu_item.remove";
     }
 

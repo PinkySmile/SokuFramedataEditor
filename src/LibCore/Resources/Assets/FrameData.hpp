@@ -25,7 +25,7 @@ namespace SpiralOfFate
 	};
 
 	union DefensiveFlags {
-		unsigned flags;
+		unsigned long long flags;
 		struct {
 			bool invulnerable : 1;
 			bool invulnerableArmor : 1;
@@ -57,6 +57,40 @@ namespace SpiralOfFate
 			bool matterArmor : 1;
 			bool spiritArmor : 1;
 			bool voidArmor : 1;
+			bool unusedFlag31 : 1;
+			bool unusedFlag32 : 1;
+			bool unusedFlag33 : 1;
+			bool unusedFlag34 : 1;
+			bool unusedFlag35 : 1;
+			bool unusedFlag36 : 1;
+			bool unusedFlag37 : 1;
+			bool unusedFlag38 : 1;
+			bool unusedFlag39 : 1;
+			bool unusedFlag40 : 1;
+			bool unusedFlag41 : 1;
+			bool unusedFlag42 : 1;
+			bool unusedFlag43 : 1;
+			bool unusedFlag44 : 1;
+			bool unusedFlag45 : 1;
+			bool unusedFlag46 : 1;
+			bool unusedFlag47 : 1;
+			bool unusedFlag48 : 1;
+			bool unusedFlag49 : 1;
+			bool unusedFlag50 : 1;
+			bool unusedFlag51 : 1;
+			bool unusedFlag52 : 1;
+			bool unusedFlag53 : 1;
+			bool unusedFlag54 : 1;
+			bool unusedFlag55 : 1;
+			bool unusedFlag56 : 1;
+			bool unusedFlag57 : 1;
+			bool unusedFlag58 : 1;
+			bool unusedFlag59 : 1;
+			bool unusedFlag60 : 1;
+			bool unusedFlag61 : 1;
+			bool unusedFlag62 : 1;
+			bool unusedFlag63 : 1;
+			bool unusedFlag64 : 1;
 		};
 	};
 
@@ -86,9 +120,9 @@ namespace SpiralOfFate
 			bool unTransformCancelable : 1;
 			bool dashCancelable : 1;
 			bool backDashCancelable : 1;
-			bool unusedFlag1 : 1;
-			bool unusedFlag2 : 1;
-			bool unusedFlag3 : 1;
+			bool unusedFlag24 : 1;
+			bool unusedFlag25 : 1;
+			bool unusedFlag26 : 1;
 			bool turnAround : 1;
 			bool forceTurnAround : 1;
 			bool nextBlockOnHit : 1;
@@ -99,9 +133,37 @@ namespace SpiralOfFate
 			bool wallSplat : 1;
 			bool wallSplatCH : 1;
 			bool phantomHit : 1;
+			bool unusedFlag37 : 1;
+			bool unusedFlag38 : 1;
+			bool unusedFlag39 : 1;
+			bool unusedFlag40 : 1;
+			bool unusedFlag41 : 1;
+			bool unusedFlag42 : 1;
+			bool unusedFlag43 : 1;
+			bool unusedFlag44 : 1;
+			bool unusedFlag45 : 1;
+			bool unusedFlag46 : 1;
+			bool unusedFlag47 : 1;
+			bool unusedFlag48 : 1;
+			bool unusedFlag49 : 1;
+			bool unusedFlag50 : 1;
+			bool unusedFlag51 : 1;
+			bool unusedFlag52 : 1;
+			bool unusedFlag53 : 1;
+			bool unusedFlag54 : 1;
+			bool unusedFlag55 : 1;
+			bool unusedFlag56 : 1;
+			bool unusedFlag57 : 1;
+			bool unusedFlag58 : 1;
+			bool unusedFlag59 : 1;
+			bool unusedFlag60 : 1;
+			bool unusedFlag61 : 1;
+			bool unusedFlag62 : 1;
+			bool unusedFlag63 : 1;
+			bool unusedFlag64 : 1;
 		};
 	};
-	static_assert(sizeof(DefensiveFlags) == sizeof(unsigned), "Too many defensive flags");
+	static_assert(sizeof(DefensiveFlags) == sizeof(unsigned long long), "Too many defensive flags");
 	static_assert(sizeof(OffensiveFlags) == sizeof(unsigned long long), "Too many offensive flags");
 
 	enum LimitType {
@@ -166,7 +228,7 @@ namespace SpiralOfFate
 			Box boxes[0];
 		};
 		static_assert(sizeof(Box) == 16, "Box has wrong size");
-		static_assert(sizeof(Data) == 740, "Data has wrong size");
+		static_assert(sizeof(Data) == 744, "Data has wrong size");
 #pragma pack(pop)
 
 	public:

@@ -20,6 +20,8 @@ void localizeGui(T &container)
 			loc2->reLocalize();
 		else if (auto loc3 = w->cast<LocalizedContainer<SettingsWindow>>())
 			loc3->reLocalize();
+		else if (auto loc4 = w->cast<LocalizedContainer<tgui::ScrollablePanel>>())
+			loc4->reLocalize();
 		else if (auto cont = w->cast<tgui::Container>())
 			localizeGui(*cont);
 	}

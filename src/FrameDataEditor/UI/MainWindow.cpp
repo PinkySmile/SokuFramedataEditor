@@ -5,6 +5,7 @@
 #include <TGUI/RendererDefines.hpp>
 #include "MainWindow.hpp"
 #include "PreviewWidget.hpp"
+#include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
 #include "../Operations/SpriteChangeOperation.hpp"
 
@@ -36,21 +37,21 @@ do {                                                                            
         auto __elem = container.get<tgui::EditBox>(guiId);                                                       \
                                                                                                                  \
         if (!__elem)                                                                                             \
-        	break;                                                                                           \
-	__elem->onTextChange.connect([this](const tgui::String &s){                                              \
-        	if (s.empty()) return;                                                                           \
+                break;                                                                                           \
+        __elem->onTextChange.connect([this](const tgui::String &s){                                              \
+                if (s.empty()) return;                                                                           \
                 fromStringPre(s)                                                                                 \
                 this->applyOperation(new operation(                                                              \
-			*this->_object,                                                                          \
-			name,                                                                                    \
-			&FrameData::field,                                                                       \
-			fromString(s, FrameData::field)                                                          \
-		));                                                                                              \
+                        *this->_object,                                                                          \
+                        name,                                                                                    \
+                        &FrameData::field,                                                                       \
+                        fromString(s, FrameData::field)                                                          \
+                ));                                                                                              \
         });                                                                                                      \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{                                      \
                 auto &data = this->_object->getFrameData();                                                      \
                 __elem->onTextChange.setEnabled(false);                                                          \
-        	__elem->setText(toString(data.field, arg));                                                      \
+                __elem->setText(toString(data.field, arg));                                                      \
                 __elem->onTextChange.setEnabled(true);                                                           \
         });                                                                                                      \
 } while (false)
@@ -67,11 +68,11 @@ do {                                                                            
 #define NUMFLAGS_TO_STRING(s, _) to_hex(s.flags)
 
 #define VECTOR_FROM_STRING_PRE(s) auto pos = s.find(',');               \
-	auto __x = s.substr(1, pos - 1).toStdString();                  \
-	auto __y = s.substr(pos + 1, s.size() - pos - 1).toStdString();
+        auto __x = s.substr(1, pos - 1).toStdString();                  \
+        auto __y = s.substr(pos + 1, s.size() - pos - 1).toStdString();
 #define VECTOR_FROM_STRING(s, data) { \
-	(decltype(data.x))std::stof(__x), \
-	(decltype(data.y))std::stof(__y)  \
+        (decltype(data.x))std::stof(__x), \
+        (decltype(data.y))std::stof(__y)  \
 }
 #define VECTOR_TO_STRING(s, p) "(" + \
 	to_string(s.x, p) + "," +    \
@@ -79,26 +80,26 @@ do {                                                                            
 ")"
 
 #define RECT_FROM_STRING_PRE(s)                                     \
-	auto __pos = s.find(',');                                   \
-	auto __x = s.substr(1, __pos - 1).toStdString();            \
+        auto __pos = s.find(',');                                   \
+        auto __x = s.substr(1, __pos - 1).toStdString();            \
 	                                                            \
-	auto __remainder = s.substr(__pos + 1);                     \
-	auto __pos2 = __remainder.find(',');                        \
-	auto __y = __remainder.substr(0, __pos2 + 1).toStdString(); \
+        auto __remainder = s.substr(__pos + 1);                     \
+        auto __pos2 = __remainder.find(',');                        \
+        auto __y = __remainder.substr(0, __pos2 + 1).toStdString(); \
 	                                                            \
-	auto __remainder2 = __remainder.substr(__pos2 + 1);         \
-	auto __pos3 = __remainder2.find(',');                       \
-	auto __w = __remainder2.substr(0, __pos3 + 1).toStdString();\
-	auto __h = __remainder2.substr(__pos3 + 1, __remainder2.size() - __pos3 - 1).toStdString();
+        auto __remainder2 = __remainder.substr(__pos2 + 1);         \
+        auto __pos3 = __remainder2.find(',');                       \
+        auto __w = __remainder2.substr(0, __pos3 + 1).toStdString();\
+        auto __h = __remainder2.substr(__pos3 + 1, __remainder2.size() - __pos3 - 1).toStdString();
 #define RECT_FROM_STRING(s, data) { \
-	{(decltype(data.pos.x))std::stof(__x),  (decltype(data.pos.y))std::stof(__y) }, \
-	{(decltype(data.size.x))std::stof(__w), (decltype(data.size.y))std::stof(__h) } \
+        {(decltype(data.pos.x))std::stof(__x),  (decltype(data.pos.y))std::stof(__y) }, \
+        {(decltype(data.size.x))std::stof(__w), (decltype(data.size.y))std::stof(__h) } \
 }
 #define RECT_TO_STRING(s, p) "(" +     \
-	to_string(s.pos.x, p) + "," +  \
-	to_string(s.pos.y, p) + "," +  \
-	to_string(s.size.x, p) + "," + \
-	to_string(s.size.y, p) +       \
+        to_string(s.pos.x, p) + "," +  \
+        to_string(s.pos.y, p) + "," +  \
+        to_string(s.size.x, p) + "," + \
+        to_string(s.size.y, p) +       \
 ")"
 
 #define PLACE_HOOK_STRING(container, guiId, field, name, operation) \
@@ -111,7 +112,29 @@ do {                                                                            
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision)
 #define PLACE_HOOK_RECT(container, guiId, field, name, operation) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0)
-
+#define PLACE_HOOK_FLAG(container, guiId, field, index, name)                      \
+do {                                                                               \
+        auto __elem = container.get<tgui::CheckBox>(guiId);                        \
+                                                                                   \
+        if (!__elem)                                                               \
+                break;                                                             \
+        __elem->onChange.connect([this, index](bool b){                            \
+                this->applyOperation(new FlagOperation(                            \
+                        *this->_object,                                            \
+                        name,                                                      \
+                        &FrameData::field,                                         \
+                        index, b                                                   \
+                ));                                                                \
+                for (auto &[key, _] : this->_updateFrameElements)                  \
+                        this->_populateFrameData(*key);                            \
+        });                                                                        \
+        this->_updateFrameElements[&container].emplace_back([__elem, this, index]{ \
+                auto &data = this->_object->getFrameData();                        \
+                __elem->onChange.setEnabled(false);                                \
+                __elem->setChecked(data.field.flags & (1ULL << index));            \
+                __elem->onChange.setEnabled(true);                                 \
+        });                                                                        \
+} while (false)
 
 
 TGUI_RENDERER_PROPERTY_COLOR(SpiralOfFate::MainWindow::Renderer, TitleColorFocused, tgui::Color::Black)
@@ -240,6 +263,39 @@ std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
 	return Character::actionToString(id);
 }
 
+void SpiralOfFate::MainWindow::_createFlagsListPopup(const std::string &path)
+{
+	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
+	auto contentPanel = std::make_shared<LocalizedContainer<tgui::ScrollablePanel>>(this->_editor);
+	tgui::Vector2f size = {0, 0};
+
+	outsidePanel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
+	this->add(outsidePanel);
+
+	contentPanel->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+	this->add(contentPanel);
+
+	auto closePopup = [this](std::weak_ptr<tgui::Panel> outsidePanel, std::weak_ptr<tgui::ScrollablePanel> contentPanel){
+		auto content = contentPanel.lock();
+
+		this->remove(outsidePanel.lock());
+		this->remove(content);
+		this->_updateFrameElements.erase(&*content);
+	};
+	auto data = this->_object->getFrameData();
+
+	contentPanel->loadLocalizedWidgetsFromFile(path);
+	for (auto &w : contentPanel->getWidgets()) {
+		size.x = std::max(size.x, w->getFullSize().x + w->getPosition().x + 20);
+		size.y = std::max(size.y, w->getFullSize().y + w->getPosition().y + 20);
+	}
+	contentPanel->setSize(size);
+	Utils::setRenderer(contentPanel->cast<tgui::Container>());
+	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	this->_placeUIHooks(*contentPanel);
+	this->_populateData(*contentPanel);
+}
+
 void SpiralOfFate::MainWindow::_createMoveListPopup()
 {
 	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
@@ -314,6 +370,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	auto frame = container.get<tgui::Slider>("Frame");
 	auto blockSpin = container.get<tgui::SpinButton>("BlockSpin");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
+	auto aFlags = container.get<tgui::Button>("AFlagsButton");
+	auto dFlags = container.get<tgui::Button>("DFlagsButton");
 
 	if (action)
 		action->onReturnOrUnfocus.connect([this](std::weak_ptr<tgui::EditBox> This, const tgui::String &s){
@@ -337,6 +395,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		}, std::weak_ptr(action));
+	if (aFlags)
+		// TODO: character/subobject
+		aFlags->onClick.connect(&MainWindow::_createFlagsListPopup, this, "assets/gui/editor/character/attackFlags.gui");
+	if (dFlags)
+		// TODO: character/subobject
+		dFlags->onClick.connect(&MainWindow::_createFlagsListPopup, this, "assets/gui/editor/character/defenseFlags.gui");
 	if (actionSelect)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this);
 	if (play)
@@ -365,13 +429,17 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 				this->_populateData(*key);
 		});
 
-	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation);
-	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, 2);
-	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation);
+	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("editoraction.sprite"),   SpriteChangeOperation);
+	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("editoraction.duration"), BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("editoraction.offset"),   BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("editoraction.scale"),    BasicDataOperation, 2);
+	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("editoraction.bounds"),   BasicDataOperation);
+	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("editoraction.aflags"),   BasicDataOperation);
+	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("editoraction.dflags"),   BasicDataOperation);
+	for (size_t i = 0; i < 64; i++)
+		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)));
+	for (size_t i = 0; i < 64; i++)
+		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)));
 }
 
 void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
