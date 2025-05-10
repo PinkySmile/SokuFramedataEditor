@@ -51,6 +51,8 @@ namespace SpiralOfFate
 		void tick();
 
 	protected:
+		std::map<const tgui::Container *, std::vector<std::function<void()>>> _updateFrameElements;
+
 		tgui::Color _titleColorFocusedCached;
 		tgui::Color _titleColorUnfocusedCached;
 		tgui::Color _titleBarColorFocusedCached;
@@ -67,12 +69,15 @@ namespace SpiralOfFate
 		void rendererChanged(const tgui::String &property) override;
 
 	private:
+		bool _paused = true;
 		std::string _path;
 		std::unique_ptr<EditableObject> _object;
 		std::vector<std::unique_ptr<IOperation>> _operationQueue;
 		size_t _operationIndex = 0;
 
-		void _placeUIHooks();
+		void _placeUIHooks(const tgui::Container &container);
+		void _populateData(const tgui::Container &container);
+		void _populateFrameData(const tgui::Container &container);
 	};
 }
 

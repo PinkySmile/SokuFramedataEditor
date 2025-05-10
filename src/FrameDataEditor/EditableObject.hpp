@@ -23,6 +23,7 @@ public:
 	EditableObject() = default;
 	EditableObject(const std::string &frameData);
 	~EditableObject() = default;
+	SpiralOfFate::FrameData &getFrameData();
 	void render(sf::RenderTarget &target, sf::RenderStates states) const;
 	void update();
 };

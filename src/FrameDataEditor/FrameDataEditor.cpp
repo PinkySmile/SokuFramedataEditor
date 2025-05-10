@@ -31,7 +31,7 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 	this->_clock.stop();
 	this->_loadSettings();
 
-	auto menu = game->gui.get<tgui::MenuBar>("main_bar");
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
 	this->_menuHierarchy = menu->getMenus();
 	this->setLocale(this->_locale);
@@ -89,6 +89,9 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.settings") }, &FrameDataEditor::_settings, this);
 	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.quit")     }, &FrameDataEditor::_quit, this);
 
+	menu->connectMenuItem({ this->localize("menu_item.edit"), this->localize("menu_item.edit.undo")  }, &FrameDataEditor::_undo, this);
+	menu->connectMenuItem({ this->localize("menu_item.edit"), this->localize("menu_item.edit.redo")  }, &FrameDataEditor::_redo, this);
+
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.frame")     }, &FrameDataEditor::_newFrame, this);
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.frame_end") }, &FrameDataEditor::_newEndFrame, this);
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.block")     }, &FrameDataEditor::_newAnimationBlock, this);
@@ -115,11 +118,11 @@ void SpiralOfFate::FrameDataEditor::_addMenu(const tgui::MenuBar::Ptr &menu, con
 
 void SpiralOfFate::FrameDataEditor::_buildMenu()
 {
-	auto menu = game->gui.get<tgui::MenuBar>("main_bar");
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
 	game->gui.remove(menu);
 	menu = tgui::MenuBar::create();
-	game->gui.add(menu, "main_bar");
+	game->gui.add(menu, "MainBar");
 	game->gui.moveWidgetToBack(menu);
 	for (auto &d : this->_menuHierarchy)
 		this->_addMenu(menu, d, {});
@@ -238,6 +241,16 @@ void SpiralOfFate::FrameDataEditor::_settings()
 void SpiralOfFate::FrameDataEditor::_quit()
 {
 	game->screen->close();
+}
+
+void SpiralOfFate::FrameDataEditor::_undo()
+{
+	this->_focusedWindow->undo();
+}
+
+void SpiralOfFate::FrameDataEditor::_redo()
+{
+	this->_focusedWindow->redo();
 }
 
 void SpiralOfFate::FrameDataEditor::_newFrame()

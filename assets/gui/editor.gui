@@ -6,17 +6,6 @@ Renderer.1 {
 Renderer.2 {
     textcolor = rgb(190, 190, 190);
     texturebackground = None;
-
-    scrollbar {
-        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-    }
 }
 
 Renderer.3 {
@@ -45,17 +34,6 @@ Renderer.4 {
 Renderer.5 {
     textcolor = rgb(190, 190, 190);
     texturebackground = None;
-
-    scrollbar {
-        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-    }
 }
 
 Renderer.6 {
@@ -270,17 +248,6 @@ ScrollablePanel.Panel1 {
                     padding = (10, 10, 10, 10);
                     textcolor = rgb(190, 190, 190);
                     texturebackground = None;
-
-                    scrollbar {
-                        texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                        texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                        texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                        texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                        texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                        texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                        texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                        texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                    }
                 }
             }
 
@@ -1533,17 +1500,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
 
@@ -1558,17 +1514,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
 
@@ -1622,17 +1567,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
 
@@ -1704,17 +1638,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
 
@@ -1749,17 +1672,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
 
@@ -1795,17 +1707,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
 
@@ -1862,17 +1763,6 @@ ScrollablePanel.Panel1 {
             Renderer {
                 textcolor = rgb(190, 190, 190);
                 texturebackground = None;
-
-                scrollbar {
-                    texturearrowdown = "assets/gui/themes/Black.png" Part(163, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowdownhover = "assets/gui/themes/Black.png" Part(183, 174, 20, 20) Middle(0, 1, 20, 19);
-                    texturearrowup = "assets/gui/themes/Black.png" Part(163, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturearrowuphover = "assets/gui/themes/Black.png" Part(183, 154, 20, 20) Middle(0, 0, 20, 19);
-                    texturethumb = "assets/gui/themes/Black.png" Part(143, 154, 20, 20);
-                    texturethumbhover = "assets/gui/themes/Black.png" Part(143, 174, 20, 20);
-                    texturetrack = "assets/gui/themes/Black.png" Part(123, 154, 20, 20);
-                    texturetrackhover = "assets/gui/themes/Black.png" Part(123, 174, 20, 20);
-                }
             }
         }
     }
@@ -1931,8 +1821,6 @@ MenuBar.main_bar {
         selectedtextcolor = White;
         textcolor = rgb(190, 190, 190);
         texturebackground = "assets/gui/themes/Black.png" Part(115, 179, 8, 6) Middle(2, 2, 4, 2);
-        textureitembackground = "assets/gui/themes/Black.png" Part(115, 181, 8, 4) Middle(2, 0, 4, 2);
-        textureselecteditembackground = "assets/gui/themes/Black.png" Part(115, 185, 8, 6) Middle(2, 2, 4, 2);
     }
 
     Menu {

@@ -78,3 +78,8 @@ void EditableObject::update()
 	this->_position += this->_speed;
 	this->_speed.y += this->_gravity;
 }
+
+SpiralOfFate::FrameData &EditableObject::getFrameData()
+{
+	return this->_moves.at(this->_action).at(this->_actionBlock).at(this->_animation);
+}

@@ -6,6 +6,8 @@
 #define SOFGV_IOPERATION_HPP
 
 
+#include <string>
+
 namespace SpiralOfFate
 {
 	class IOperation {

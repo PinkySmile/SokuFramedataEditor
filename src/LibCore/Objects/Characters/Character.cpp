@@ -163,171 +163,171 @@ namespace SpiralOfFate
 		{ ACTION_GROUND_LOW_NEUTRAL_WRONG_BLOCK, "Ground low neutral wrong block" },
 		{ ACTION_AIR_NEUTRAL_WRONG_BLOCK,        "Air neutral wrong block" },
 		{ ACTION_PLATFORM_DROP,                  "Platform drop" },
-		{ ACTION_5N,                             "5n" },
-		{ ACTION_6N,                             "6n" },
-		{ ACTION_8N,                             "8n" },
-		{ ACTION_3N,                             "3n" },
-		{ ACTION_2N,                             "2n" },
-		{ ACTION_214N,                           "214n" },
-		{ ACTION_236N,                           "236n" },
-		{ ACTION_623N,                           "623n" },
-		{ ACTION_41236N,                         "41236n" },
-		{ ACTION_63214N,                         "63214n" },
-		{ ACTION_6321469874N,                    "6321469874n" },
-		{ ACTION_j5N,                            "j5n" },
-		{ ACTION_j6N,                            "j6n" },
-		{ ACTION_j8N,                            "j8n" },
-		{ ACTION_j3N,                            "j3n" },
-		{ ACTION_j2N,                            "j2n" },
-		{ ACTION_j214N,                          "j214n" },
-		{ ACTION_j236N,                          "j236n" },
-		{ ACTION_j623N,                          "j623n" },
-		{ ACTION_j41236N,                        "j41236n" },
-		{ ACTION_j63214N,                        "j63214n" },
-		{ ACTION_j6321469874N,                   "j6321469874n" },
-		{ ACTION_t5N,                            "t5n" },
-		{ ACTION_t6N,                            "t6n" },
-		{ ACTION_t8N,                            "t8n" },
-		{ ACTION_t2N,                            "t2n" },
-		{ ACTION_c28N,                           "[2]8n" },
-		{ ACTION_c46N,                           "[4]6n" },
-		{ ACTION_c64N,                           "[6]4n" },
-		{ ACTION_5M,                             "5m" },
-		{ ACTION_6M,                             "6m" },
-		{ ACTION_8M,                             "8m" },
-		{ ACTION_3M,                             "3m" },
-		{ ACTION_2M,                             "2m" },
-		{ ACTION_214M,                           "214m" },
-		{ ACTION_236M,                           "236m" },
-		{ ACTION_623M,                           "623m" },
-		{ ACTION_41236M,                         "41236m" },
-		{ ACTION_63214M,                         "63214m" },
-		{ ACTION_6321469874M,                    "6321469874m" },
-		{ ACTION_j5M,                            "j5m" },
-		{ ACTION_j6M,                            "j6m" },
-		{ ACTION_j8M,                            "j8m" },
-		{ ACTION_j3M,                            "j3m" },
-		{ ACTION_j2M,                            "j2m" },
-		{ ACTION_j214M,                          "j214m" },
-		{ ACTION_j236M,                          "j236m" },
-		{ ACTION_j623M,                          "j623m" },
-		{ ACTION_j41236M,                        "j41236m" },
-		{ ACTION_j63214M,                        "j63214m" },
-		{ ACTION_j6321469874M,                   "j6321469874m" },
-		{ ACTION_t5M,                            "t5m" },
-		{ ACTION_t6M,                            "t6m" },
-		{ ACTION_t8M,                            "t8m" },
-		{ ACTION_t2M,                            "t2m" },
-		{ ACTION_c28M,                           "[2]8m" },
-		{ ACTION_c46M,                           "[4]6m" },
-		{ ACTION_c64M,                           "[6]4m" },
-		{ ACTION_5S,                             "5s" },
-		{ ACTION_6S,                             "6s" },
-		{ ACTION_8S,                             "8s" },
-		{ ACTION_3S,                             "3s" },
-		{ ACTION_2S,                             "2s" },
-		{ ACTION_214S,                           "214s" },
-		{ ACTION_236S,                           "236s" },
-		{ ACTION_623S,                           "623s" },
-		{ ACTION_41236S,                         "41236s" },
-		{ ACTION_63214S,                         "63214s" },
-		{ ACTION_6321469874S,                    "6321469874s" },
-		{ ACTION_j5S,                            "j5s" },
-		{ ACTION_j6S,                            "j6s" },
-		{ ACTION_j8S,                            "j8s" },
-		{ ACTION_j3S,                            "j3s" },
-		{ ACTION_j2S,                            "j2s" },
-		{ ACTION_j214S,                          "j214s" },
-		{ ACTION_j236S,                          "j236s" },
-		{ ACTION_j623S,                          "j623s" },
-		{ ACTION_j41236S,                        "j41236s" },
-		{ ACTION_j63214S,                        "j63214s" },
-		{ ACTION_j6321469874S,                   "j6321469874s" },
-		{ ACTION_t5S,                            "t5s" },
-		{ ACTION_t6S,                            "t6s" },
-		{ ACTION_t8S,                            "t8s" },
-		{ ACTION_t2S,                            "t2s" },
-		{ ACTION_c28S,                           "[2]8s" },
-		{ ACTION_c46S,                           "[4]6s" },
-		{ ACTION_c64S,                           "[6]4s" },
-		{ ACTION_5V,                             "5v" },
-		{ ACTION_6V,                             "6v" },
-		{ ACTION_8V,                             "8v" },
-		{ ACTION_3V,                             "3v" },
-		{ ACTION_2V,                             "2v" },
-		{ ACTION_214V,                           "214v" },
-		{ ACTION_236V,                           "236v" },
-		{ ACTION_623V,                           "623v" },
-		{ ACTION_41236V,                         "41236v" },
-		{ ACTION_63214V,                         "63214v" },
-		{ ACTION_6321469874V,                    "6321469874v" },
-		{ ACTION_j5V,                            "j5v" },
-		{ ACTION_j6V,                            "j6v" },
-		{ ACTION_j8V,                            "j8v" },
-		{ ACTION_j3V,                            "j3v" },
-		{ ACTION_j2V,                            "j2v" },
-		{ ACTION_j214V,                          "j214v" },
-		{ ACTION_j236V,                          "j236v" },
-		{ ACTION_j623V,                          "j623v" },
-		{ ACTION_j41236V,                        "j41236v" },
-		{ ACTION_j63214V,                        "j63214v" },
-		{ ACTION_j6321469874V,                   "j6321469874v" },
-		{ ACTION_t5V,                            "t5v" },
-		{ ACTION_t6V,                            "t6v" },
-		{ ACTION_t8V,                            "t8v" },
-		{ ACTION_t2V,                            "t2v" },
-		{ ACTION_c28V,                           "[2]8v" },
-		{ ACTION_c46V,                           "[4]6v" },
-		{ ACTION_c64V,                           "[6]4v" },
-		{ ACTION_5A,                             "5a" },
-		{ ACTION_6A,                             "6a" },
-		{ ACTION_8A,                             "8a" },
-		{ ACTION_3A,                             "3a" },
-		{ ACTION_2A,                             "2a" },
-		{ ACTION_214A,                           "214a" },
-		{ ACTION_236A,                           "236a" },
-		{ ACTION_421A,                           "421a" },
-		{ ACTION_623A,                           "623a" },
-		{ ACTION_41236A,                         "41236a" },
-		{ ACTION_63214A,                         "63214a" },
-		{ ACTION_6321469874A,                    "6321469874a" },
-		{ ACTION_j5A,                            "j5a" },
-		{ ACTION_j6A,                            "j6a" },
-		{ ACTION_j8A,                            "j8a" },
-		{ ACTION_j3A,                            "j3a" },
-		{ ACTION_j2A,                            "j2a" },
-		{ ACTION_j214A,                          "j214a" },
-		{ ACTION_j236A,                          "j236a" },
-		{ ACTION_j421A,                          "j421a" },
-		{ ACTION_j623A,                          "j623a" },
-		{ ACTION_j41236A,                        "j41236a" },
-		{ ACTION_j63214A,                        "j63214a" },
-		{ ACTION_j6321469874A,                   "j6321469874a" },
-		{ ACTION_t5A,                            "t5a" },
-		{ ACTION_t6A,                            "t6a" },
-		{ ACTION_t8A,                            "t8a" },
-		{ ACTION_t2A,                            "t2a" },
-		{ ACTION_c28A,                           "[2]8a" },
-		{ ACTION_c46A,                           "[4]6a" },
-		{ ACTION_c64A,                           "[6]4a" },
-		{ ACTION_214D,                           "214d"},
-		{ ACTION_236D,                           "236d" },
-		{ ACTION_421D,                           "421d" },
-		{ ACTION_623D,                           "623d" },
-		{ ACTION_41236D,                         "41236d" },
-		{ ACTION_63214D,                         "63214d" },
-		{ ACTION_6321469874D,                    "6321469874d" },
-		{ ACTION_j214D,                          "j214d" },
-		{ ACTION_j236D,                          "j236d" },
-		{ ACTION_j421D,                          "j421d" },
-		{ ACTION_j623D,                          "j623d" },
-		{ ACTION_j41236D,                        "j41236d" },
-		{ ACTION_j63214D,                        "j63214d" },
-		{ ACTION_j6321469874D,                   "j6321469874d" },
-		{ ACTION_t5D,                            "t5d" },
-		{ ACTION_t6D,                            "t6d" },
-		{ ACTION_t8D,                            "t8d" },
-		{ ACTION_t2D,                            "t2d" },
+		{ ACTION_5N,                             "5N" },
+		{ ACTION_6N,                             "6N" },
+		{ ACTION_8N,                             "8N" },
+		{ ACTION_3N,                             "3N" },
+		{ ACTION_2N,                             "2N" },
+		{ ACTION_214N,                           "214N" },
+		{ ACTION_236N,                           "236N" },
+		{ ACTION_623N,                           "623N" },
+		{ ACTION_426N,                           "426N" },
+		{ ACTION_624N,                           "624N" },
+		{ ACTION_624684N,                        "624684N" },
+		{ ACTION_j5N,                            "j.5N" },
+		{ ACTION_j6N,                            "j.6N" },
+		{ ACTION_j8N,                            "j.8N" },
+		{ ACTION_j3N,                            "j.3N" },
+		{ ACTION_j2N,                            "j.2N" },
+		{ ACTION_j214N,                          "j.214N" },
+		{ ACTION_j236N,                          "j.236N" },
+		{ ACTION_j623N,                          "j.623N" },
+		{ ACTION_j426N,                          "j.426N" },
+		{ ACTION_j624N,                          "j.624N" },
+		{ ACTION_j624684N,                       "j.624684N" },
+		{ ACTION_t5N,                            "t.5N" },
+		{ ACTION_t6N,                            "t.6N" },
+		{ ACTION_t8N,                            "t.8N" },
+		{ ACTION_t2N,                            "t.2N" },
+		{ ACTION_c28N,                           "[2]8N" },
+		{ ACTION_c46N,                           "[4]6N" },
+		{ ACTION_c64N,                           "[6]4N" },
+		{ ACTION_5M,                             "5M" },
+		{ ACTION_6M,                             "6M" },
+		{ ACTION_8M,                             "8M" },
+		{ ACTION_3M,                             "3M" },
+		{ ACTION_2M,                             "2M" },
+		{ ACTION_214M,                           "214M" },
+		{ ACTION_236M,                           "236M" },
+		{ ACTION_623M,                           "623M" },
+		{ ACTION_426M,                           "426M" },
+		{ ACTION_624M,                           "624M" },
+		{ ACTION_624684M,                        "624684M" },
+		{ ACTION_j5M,                            "j.5M" },
+		{ ACTION_j6M,                            "j.6M" },
+		{ ACTION_j8M,                            "j.8M" },
+		{ ACTION_j3M,                            "j.3M" },
+		{ ACTION_j2M,                            "j.2M" },
+		{ ACTION_j214M,                          "j.214M" },
+		{ ACTION_j236M,                          "j.236M" },
+		{ ACTION_j623M,                          "j.623M" },
+		{ ACTION_j426M,                          "j.426M" },
+		{ ACTION_j624M,                          "j.624M" },
+		{ ACTION_j624684M,                       "j.624684M" },
+		{ ACTION_t5M,                            "t.5M" },
+		{ ACTION_t6M,                            "t.6M" },
+		{ ACTION_t8M,                            "t.8M" },
+		{ ACTION_t2M,                            "t.2M" },
+		{ ACTION_c28M,                           "[2]8M" },
+		{ ACTION_c46M,                           "[4]6M" },
+		{ ACTION_c64M,                           "[6]4M" },
+		{ ACTION_5S,                             "5S" },
+		{ ACTION_6S,                             "6S" },
+		{ ACTION_8S,                             "8S" },
+		{ ACTION_3S,                             "3S" },
+		{ ACTION_2S,                             "2S" },
+		{ ACTION_214S,                           "214S" },
+		{ ACTION_236S,                           "236S" },
+		{ ACTION_623S,                           "623S" },
+		{ ACTION_426S,                           "426S" },
+		{ ACTION_624S,                           "624S" },
+		{ ACTION_624684S,                        "624684S" },
+		{ ACTION_j5S,                            "j.5S" },
+		{ ACTION_j6S,                            "j.6S" },
+		{ ACTION_j8S,                            "j.8S" },
+		{ ACTION_j3S,                            "j.3S" },
+		{ ACTION_j2S,                            "j.2S" },
+		{ ACTION_j214S,                          "j.214S" },
+		{ ACTION_j236S,                          "j.236S" },
+		{ ACTION_j623S,                          "j.623S" },
+		{ ACTION_j426S,                          "j.426S" },
+		{ ACTION_j624S,                          "j.624S" },
+		{ ACTION_j624684S,                       "j.624684S" },
+		{ ACTION_t5S,                            "t.5S" },
+		{ ACTION_t6S,                            "t.6S" },
+		{ ACTION_t8S,                            "t.8S" },
+		{ ACTION_t2S,                            "t.2S" },
+		{ ACTION_c28S,                           "[2]8S" },
+		{ ACTION_c46S,                           "[4]6S" },
+		{ ACTION_c64S,                           "[6]4S" },
+		{ ACTION_5V,                             "5V" },
+		{ ACTION_6V,                             "6V" },
+		{ ACTION_8V,                             "8V" },
+		{ ACTION_3V,                             "3V" },
+		{ ACTION_2V,                             "2V" },
+		{ ACTION_214V,                           "214V" },
+		{ ACTION_236V,                           "236V" },
+		{ ACTION_623V,                           "623V" },
+		{ ACTION_426V,                           "426V" },
+		{ ACTION_624V,                           "624V" },
+		{ ACTION_624684V,                        "624684V" },
+		{ ACTION_j5V,                            "j.5V" },
+		{ ACTION_j6V,                            "j.6V" },
+		{ ACTION_j8V,                            "j.8V" },
+		{ ACTION_j3V,                            "j.3V" },
+		{ ACTION_j2V,                            "j.2V" },
+		{ ACTION_j214V,                          "j.214V" },
+		{ ACTION_j236V,                          "j.236V" },
+		{ ACTION_j623V,                          "j.623V" },
+		{ ACTION_j426V,                          "j.426V" },
+		{ ACTION_j624V,                          "j.624V" },
+		{ ACTION_j624684V,                       "j.624684V" },
+		{ ACTION_t5V,                            "t.5V" },
+		{ ACTION_t6V,                            "t.6V" },
+		{ ACTION_t8V,                            "t.8V" },
+		{ ACTION_t2V,                            "t.2V" },
+		{ ACTION_c28V,                           "[2]8V" },
+		{ ACTION_c46V,                           "[4]6V" },
+		{ ACTION_c64V,                           "[6]4V" },
+		{ ACTION_5A,                             "5A" },
+		{ ACTION_6A,                             "6A" },
+		{ ACTION_8A,                             "8A" },
+		{ ACTION_3A,                             "3A" },
+		{ ACTION_2A,                             "2A" },
+		{ ACTION_214A,                           "214A" },
+		{ ACTION_236A,                           "236A" },
+		{ ACTION_421A,                           "421A" },
+		{ ACTION_623A,                           "623A" },
+		{ ACTION_426A,                           "426A" },
+		{ ACTION_624A,                           "624A" },
+		{ ACTION_624684A,                        "624684A" },
+		{ ACTION_j5A,                            "j.5A" },
+		{ ACTION_j6A,                            "j.6A" },
+		{ ACTION_j8A,                            "j.8A" },
+		{ ACTION_j3A,                            "j.3A" },
+		{ ACTION_j2A,                            "j.2A" },
+		{ ACTION_j214A,                          "j.214A" },
+		{ ACTION_j236A,                          "j.236A" },
+		{ ACTION_j421A,                          "j.421A" },
+		{ ACTION_j623A,                          "j.623A" },
+		{ ACTION_j426A,                          "j.426A" },
+		{ ACTION_j624A,                          "j.624A" },
+		{ ACTION_j624684A,                       "j.624684A" },
+		{ ACTION_t5A,                            "t.5A" },
+		{ ACTION_t6A,                            "t.6A" },
+		{ ACTION_t8A,                            "t.8A" },
+		{ ACTION_t2A,                            "t.2A" },
+		{ ACTION_c28A,                           "[2]8A" },
+		{ ACTION_c46A,                           "[4]6A" },
+		{ ACTION_c64A,                           "[6]4A" },
+		{ ACTION_214D,                           "214D"},
+		{ ACTION_236D,                           "236D" },
+		{ ACTION_421D,                           "421D" },
+		{ ACTION_623D,                           "623D" },
+		{ ACTION_426D,                           "426D" },
+		{ ACTION_624D,                           "624D" },
+		{ ACTION_624684D,                        "624684D" },
+		{ ACTION_j214D,                          "j.214D" },
+		{ ACTION_j236D,                          "j.236D" },
+		{ ACTION_j421D,                          "j.421D" },
+		{ ACTION_j623D,                          "j.623D" },
+		{ ACTION_j426D,                          "j.426D" },
+		{ ACTION_j624D,                          "j.624D" },
+		{ ACTION_j624684D,                       "j.624684D" },
+		{ ACTION_t5D,                            "t.5D" },
+		{ ACTION_t6D,                            "t.6D" },
+		{ ACTION_t8D,                            "t.8D" },
+		{ ACTION_t2D,                            "t.2D" },
 
 		{ ACTION_NEUTRAL_OVERDRIVE,     "Neutral overdrive" },
 		{ ACTION_MATTER_OVERDRIVE,      "Matter overdrive" },
@@ -950,25 +950,25 @@ namespace SpiralOfFate
 		return  //(input.n && input.n <= 4 && this->_startMove(ACTION_j5N));
 		        this->_executeAirTech(this->_getInputs()) ||
 
-		        (this->_specialInputs._624684n && this->_startMove(ACTION_j6321469874N)) ||
-		        (this->_specialInputs._624684v && this->_startMove(ACTION_j6321469874V)) ||
-		        (this->_specialInputs._624684s && this->_startMove(ACTION_j6321469874S)) ||
-		        (this->_specialInputs._624684m && this->_startMove(ACTION_j6321469874M)) ||
-		        (this->_specialInputs._624684d && this->_startMove(ACTION_j6321469874D)) ||
-		        (this->_specialInputs._624684a && this->_startMove(ACTION_j6321469874A)) ||
+		        (this->_specialInputs._624684n && this->_startMove(ACTION_j624684N)) ||
+		        (this->_specialInputs._624684v && this->_startMove(ACTION_j624684V)) ||
+		        (this->_specialInputs._624684s && this->_startMove(ACTION_j624684S)) ||
+		        (this->_specialInputs._624684m && this->_startMove(ACTION_j624684M)) ||
+		        (this->_specialInputs._624684d && this->_startMove(ACTION_j624684D)) ||
+		        (this->_specialInputs._624684a && this->_startMove(ACTION_j624684A)) ||
 
-		        (this->_specialInputs._624n && this->_startMove(ACTION_j63214N)) ||
-		        (this->_specialInputs._426n && this->_startMove(ACTION_j41236N)) ||
-		        (this->_specialInputs._624v && this->_startMove(ACTION_j63214V)) ||
-		        (this->_specialInputs._426v && this->_startMove(ACTION_j41236V)) ||
-		        (this->_specialInputs._624s && this->_startMove(ACTION_j63214S)) ||
-		        (this->_specialInputs._426s && this->_startMove(ACTION_j41236S)) ||
-		        (this->_specialInputs._624m && this->_startMove(ACTION_j63214M)) ||
-		        (this->_specialInputs._426m && this->_startMove(ACTION_j41236M)) ||
-		        (this->_specialInputs._624d && this->_startMove(ACTION_j63214D)) ||
-		        (this->_specialInputs._426d && this->_startMove(ACTION_j41236D)) ||
-		        (this->_specialInputs._624a && this->_startMove(ACTION_j63214A)) ||
-		        (this->_specialInputs._426a && this->_startMove(ACTION_j41236A)) ||
+		        (this->_specialInputs._624n && this->_startMove(ACTION_j624N)) ||
+		        (this->_specialInputs._426n && this->_startMove(ACTION_j426N)) ||
+		        (this->_specialInputs._624v && this->_startMove(ACTION_j624V)) ||
+		        (this->_specialInputs._426v && this->_startMove(ACTION_j426V)) ||
+		        (this->_specialInputs._624s && this->_startMove(ACTION_j624S)) ||
+		        (this->_specialInputs._426s && this->_startMove(ACTION_j426S)) ||
+		        (this->_specialInputs._624m && this->_startMove(ACTION_j624M)) ||
+		        (this->_specialInputs._426m && this->_startMove(ACTION_j426M)) ||
+		        (this->_specialInputs._624d && this->_startMove(ACTION_j624D)) ||
+		        (this->_specialInputs._426d && this->_startMove(ACTION_j426D)) ||
+		        (this->_specialInputs._624a && this->_startMove(ACTION_j624A)) ||
+		        (this->_specialInputs._426a && this->_startMove(ACTION_j426A)) ||
 
 		        (this->_specialInputs._623n && this->_startMove(ACTION_j623N)) ||
 		        (this->_specialInputs._421n && this->_startMove(ACTION_j421N)) ||
@@ -1033,25 +1033,25 @@ namespace SpiralOfFate
 	{
 		return  //(input.n && input.n <= 4 && this->_startMove(ACTION_5N)) ||
 
-		        (this->_specialInputs._624684n && this->_startMove(ACTION_6321469874N)) ||
-		        (this->_specialInputs._624684v && this->_startMove(ACTION_6321469874V)) ||
-		        (this->_specialInputs._624684s && this->_startMove(ACTION_6321469874S)) ||
-		        (this->_specialInputs._624684m && this->_startMove(ACTION_6321469874M)) ||
-		        (this->_specialInputs._624684d && this->_startMove(ACTION_6321469874D)) ||
-		        (this->_specialInputs._624684a && this->_startMove(ACTION_6321469874A)) ||
+		        (this->_specialInputs._624684n && this->_startMove(ACTION_624684N)) ||
+		        (this->_specialInputs._624684v && this->_startMove(ACTION_624684V)) ||
+		        (this->_specialInputs._624684s && this->_startMove(ACTION_624684S)) ||
+		        (this->_specialInputs._624684m && this->_startMove(ACTION_624684M)) ||
+		        (this->_specialInputs._624684d && this->_startMove(ACTION_624684D)) ||
+		        (this->_specialInputs._624684a && this->_startMove(ACTION_624684A)) ||
 
-		        (this->_specialInputs._624n && this->_startMove(ACTION_63214N)) ||
-		        (this->_specialInputs._426n && this->_startMove(ACTION_41236N)) ||
-		        (this->_specialInputs._624v && this->_startMove(ACTION_63214V)) ||
-		        (this->_specialInputs._426v && this->_startMove(ACTION_41236V)) ||
-		        (this->_specialInputs._624s && this->_startMove(ACTION_63214S)) ||
-		        (this->_specialInputs._426s && this->_startMove(ACTION_41236S)) ||
-		        (this->_specialInputs._624m && this->_startMove(ACTION_63214M)) ||
-		        (this->_specialInputs._426m && this->_startMove(ACTION_41236M)) ||
-		        (this->_specialInputs._624d && this->_startMove(ACTION_63214D)) ||
-		        (this->_specialInputs._426d && this->_startMove(ACTION_41236D)) ||
-		        (this->_specialInputs._624a && this->_startMove(ACTION_63214A)) ||
-		        (this->_specialInputs._426a && this->_startMove(ACTION_41236A)) ||
+		        (this->_specialInputs._624n && this->_startMove(ACTION_624N)) ||
+		        (this->_specialInputs._426n && this->_startMove(ACTION_426N)) ||
+		        (this->_specialInputs._624v && this->_startMove(ACTION_624V)) ||
+		        (this->_specialInputs._426v && this->_startMove(ACTION_426V)) ||
+		        (this->_specialInputs._624s && this->_startMove(ACTION_624S)) ||
+		        (this->_specialInputs._426s && this->_startMove(ACTION_426S)) ||
+		        (this->_specialInputs._624m && this->_startMove(ACTION_624M)) ||
+		        (this->_specialInputs._426m && this->_startMove(ACTION_426M)) ||
+		        (this->_specialInputs._624d && this->_startMove(ACTION_624D)) ||
+		        (this->_specialInputs._426d && this->_startMove(ACTION_426D)) ||
+		        (this->_specialInputs._624a && this->_startMove(ACTION_624A)) ||
+		        (this->_specialInputs._426a && this->_startMove(ACTION_426A)) ||
 
 		        (this->_specialInputs._c28n && this->_startMove(ACTION_c28N)) ||
 		        (this->_specialInputs._c46n && this->_startMove(ACTION_c46N)) ||
@@ -1789,16 +1789,16 @@ namespace SpiralOfFate
 		case ACTION_236N:
 		case ACTION_421N:
 		case ACTION_623N:
-		case ACTION_41236N:
-		case ACTION_63214N:
-		case ACTION_6321469874N:
+		case ACTION_426N:
+		case ACTION_624N:
+		case ACTION_624684N:
 		case ACTION_j214N:
 		case ACTION_j236N:
 		case ACTION_j421N:
 		case ACTION_j623N:
-		case ACTION_j41236N:
-		case ACTION_j63214N:
-		case ACTION_j6321469874N:
+		case ACTION_j426N:
+		case ACTION_j624N:
+		case ACTION_j624684N:
 		case ACTION_c28V:
 		case ACTION_c46V:
 		case ACTION_c64V:
@@ -1806,16 +1806,16 @@ namespace SpiralOfFate
 		case ACTION_236V:
 		case ACTION_421V:
 		case ACTION_623V:
-		case ACTION_41236V:
-		case ACTION_63214V:
-		case ACTION_6321469874V:
+		case ACTION_426V:
+		case ACTION_624V:
+		case ACTION_624684V:
 		case ACTION_j214V:
 		case ACTION_j236V:
 		case ACTION_j421V:
 		case ACTION_j623V:
-		case ACTION_j41236V:
-		case ACTION_j63214V:
-		case ACTION_j6321469874V:
+		case ACTION_j426V:
+		case ACTION_j624V:
+		case ACTION_j624684V:
 		case ACTION_c28S:
 		case ACTION_c46S:
 		case ACTION_c64S:
@@ -1823,16 +1823,16 @@ namespace SpiralOfFate
 		case ACTION_236S:
 		case ACTION_421S:
 		case ACTION_623S:
-		case ACTION_41236S:
-		case ACTION_63214S:
-		case ACTION_6321469874S:
+		case ACTION_426S:
+		case ACTION_624S:
+		case ACTION_624684S:
 		case ACTION_j214S:
 		case ACTION_j236S:
 		case ACTION_j421S:
 		case ACTION_j623S:
-		case ACTION_j41236S:
-		case ACTION_j63214S:
-		case ACTION_j6321469874S:
+		case ACTION_j426S:
+		case ACTION_j624S:
+		case ACTION_j624684S:
 		case ACTION_c28M:
 		case ACTION_c46M:
 		case ACTION_c64M:
@@ -1840,16 +1840,16 @@ namespace SpiralOfFate
 		case ACTION_236M:
 		case ACTION_421M:
 		case ACTION_623M:
-		case ACTION_41236M:
-		case ACTION_63214M:
-		case ACTION_6321469874M:
+		case ACTION_426M:
+		case ACTION_624M:
+		case ACTION_624684M:
 		case ACTION_j214M:
 		case ACTION_j236M:
 		case ACTION_j421M:
 		case ACTION_j623M:
-		case ACTION_j41236M:
-		case ACTION_j63214M:
-		case ACTION_j6321469874M:
+		case ACTION_j426M:
+		case ACTION_j624M:
+		case ACTION_j624684M:
 			return 600;
 		default:
 			return -1;

@@ -38,14 +38,20 @@ namespace SpiralOfFate
 		void _saveAs();
 		void _settings();
 		void _quit();
+
+		void _undo();
+		void _redo();
+
 		void _newFrame();
 		void _newEndFrame();
 		void _newAnimationBlock();
 		void _newHurtBox();
 		void _newHitBox();
+
 		void _removeFrame();
 		void _removeAnimationBlock();
 		void _removeAction();
+
 		void _copyBoxesFromLastFrame();
 		void _copyBoxesFromNextFrame();
 		void _flattenThisMoveCollisionBoxes();
@@ -60,6 +66,24 @@ namespace SpiralOfFate
 		void saveSettings();
 
 		std::string localize(const std::string &s) const;
+		template<typename ...Args>
+		std::string localize(const std::string &s, const Args... args) const
+		{
+			std::vector<std::string> vec{args...};
+			std::string localize = this->localize(s);
+
+			for (size_t i = 0; i < vec.size(); i++) {
+				std::string v = "%" + std::to_string(i + 1);
+				size_t pos = localize.find(v);
+
+				if (pos != std::string::npos)
+					localize.replace(pos, v.size(), vec[i]);
+				else
+					localize += " " + v;
+			}
+			return localize;
+		}
+
 		void update();
 		void render();
 	};

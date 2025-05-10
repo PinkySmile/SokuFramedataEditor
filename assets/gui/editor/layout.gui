@@ -1,4 +1,4 @@
-MenuBar.main_bar {
+MenuBar.MainBar {
     MinimumSubMenuWidth = 125;
     Size = (&.size, 20);
     TextSize = 13;
@@ -6,6 +6,16 @@ MenuBar.main_bar {
     Menu {
         Items = ["menu_item.file.new", "menu_item.file.load", "menu_item.file.save", "menu_item.file.save_as", "menu_item.file.settings", "menu_item.file.quit"];
         Text = "menu_item.file";
+    }
+
+    Menu {
+        Items = ["menu_item.edit.undo", "menu_item.edit.redo"];
+        Text = "menu_item.edit";
+    }
+
+    Menu {
+        Items = ["menu_item.new.frame", "menu_item.new.frame_end", "menu_item.new.block", "menu_item.new.hurt_box", "menu_item.new.hit_box"];
+        Text = "menu_item.new";
     }
 
     Menu {
