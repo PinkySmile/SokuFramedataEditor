@@ -13,7 +13,7 @@ namespace SpiralOfFate
 {
 	template<typename T>
 	class BasicDataOperation : public IOperation {
-	private:
+	protected:
 		EditableObject &_obj;
 		unsigned _action;
 		unsigned _actionBlock;

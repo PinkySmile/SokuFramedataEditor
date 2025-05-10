@@ -56,7 +56,7 @@ SeparatorVerticalPadding = 1; // *
 // Title Bar
 TitleBarColor = rgb(15,15,15); // *
 TitleColor = White; // *
-TitleBarColorUnfocus = rgb(65,65,65); // *
+TitleBarColorUnfocus = rgb(125,125,125); // *
 TitleColorUnfocus = White; // *
 
 // Miscellaneous

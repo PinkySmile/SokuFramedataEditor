@@ -46,6 +46,8 @@ namespace SpiralOfFate
 
 		void undo();
 		void redo();
+		void save();
+		void save(const std::string &path);
 		void applyOperation(IOperation *operation);
 		bool isModified() const noexcept;
 		void tick();
@@ -71,9 +73,11 @@ namespace SpiralOfFate
 	private:
 		bool _paused = true;
 		std::string _path;
+		std::string _character;
 		std::unique_ptr<EditableObject> _object;
 		std::vector<std::unique_ptr<IOperation>> _operationQueue;
 		size_t _operationIndex = 0;
+		size_t _operationSaved = 0;
 
 		void _placeUIHooks(const tgui::Container &container);
 		void _populateData(const tgui::Container &container);

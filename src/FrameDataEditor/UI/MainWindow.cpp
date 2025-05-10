@@ -3,9 +3,10 @@
 //
 
 #include <TGUI/RendererDefines.hpp>
-#include "../Operations/BasicDataOperation.hpp"
 #include "MainWindow.hpp"
 #include "PreviewWidget.hpp"
+#include "../Operations/BasicDataOperation.hpp"
+#include "../Operations/SpriteChangeOperation.hpp"
 
 template<typename T>
 std::string to_string(T value, int)
@@ -24,7 +25,7 @@ std::string to_string(float value, int pres)
 
 std::string to_hex(unsigned long long value)
 {
-	char buffer[64];
+	char buffer[17];
 
 	sprintf(buffer, "%016llX", value);
 	return buffer;
@@ -106,8 +107,6 @@ do {                                                                            
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision)
 #define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _)
-#define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _)
 #define PLACE_HOOK_VECTOR(container, guiId, field, name, operation, precision) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision)
 #define PLACE_HOOK_RECT(container, guiId, field, name, operation) \
@@ -125,6 +124,7 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButt
 SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const FrameDataEditor &editor) :
 	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
 	_path(frameDataPath),
+	_character(std::filesystem::path(frameDataPath).parent_path().filename().string()),
 	_object(new EditableObject(frameDataPath))
 {
 	auto preview = std::make_shared<PreviewWidget>(*this->_object);
@@ -161,7 +161,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const Fra
 
 bool SpiralOfFate::MainWindow::isModified() const noexcept
 {
-	return this->_operationIndex == 0;
+	return this->_operationIndex != this->_operationSaved;
 }
 
 void SpiralOfFate::MainWindow::redo()
@@ -172,7 +172,10 @@ void SpiralOfFate::MainWindow::redo()
 	this->_operationIndex++;
 	for (auto &[key, _] : this->_updateFrameElements)
 		this->_populateData(*key);
-	this->setTitle(this->_path + "*");
+	if (this->isModified())
+		this->setTitle(this->_path + "*");
+	else
+		this->setTitle(this->_path);
 }
 
 void SpiralOfFate::MainWindow::undo()
@@ -183,7 +186,7 @@ void SpiralOfFate::MainWindow::undo()
 	this->_operationQueue[this->_operationIndex]->undo();
 	for (auto &[key, _] : this->_updateFrameElements)
 		this->_populateData(*key);
-	if (this->_operationIndex)
+	if (this->isModified())
 		this->setTitle(this->_path + "*");
 	else
 		this->setTitle(this->_path);
@@ -194,18 +197,71 @@ void SpiralOfFate::MainWindow::applyOperation(IOperation *operation)
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
 	this->_operationQueue.back()->apply();
+	if (this->_operationIndex < this->_operationSaved)
+		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
 	this->setTitle(this->_path + "*");
 }
 
+void SpiralOfFate::MainWindow::save(const std::string &path)
+{
+	this->_path = path;
+	this->save();
+}
+
+void SpiralOfFate::MainWindow::save()
+{
+	nlohmann::json j = nlohmann::json::array();
+
+	for (auto &[key, value] : this->_object->_moves) {
+		j.push_back({
+			{"action", key},
+			{"framedata", value}
+		});
+	}
+
+	std::ofstream stream{this->_path};
+
+	if (stream.fail()) {
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_path + ": " + strerror(errno), MB_ICONERROR);
+		return;
+	}
+	stream << j.dump(2);
+	this->_operationSaved = this->_operationIndex;
+	this->setTitle(this->_path);
+}
+
 void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 {
+	auto action = container.get<tgui::EditBox>("ActionID");
 	auto play = container.get<tgui::Button>("Play");
 	auto pause = container.get<tgui::Button>("Pause");
 	auto frame = container.get<tgui::Slider>("Frame");
 	auto blockSpin = container.get<tgui::SpinButton>("BlockSpin");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
 
+	if (action)
+		action->onReturnOrUnfocus.connect([this](std::weak_ptr<tgui::EditBox> This, const tgui::String &s){
+			if (This.lock()->getText() == s)
+				return;
+			if (s.empty()) {
+				This.lock()->setText(std::to_string(this->_object->_action));
+				return;
+			}
+
+			unsigned action = std::stoul(s.toStdString());
+
+			if (this->_object->_moves.count(action) == 0) {
+				This.lock()->setText(std::to_string(this->_object->_action));
+				return;
+			}
+			this->_object->_action = action;
+			this->_object->_actionBlock = 0;
+			this->_object->_animation = 0;
+			this->_object->_animationCtr = 0;
+			for (auto &[key, _] : this->_updateFrameElements)
+				this->_populateData(*key);
+		}, std::weak_ptr(action));
 	if (play)
 		play->onPress.connect([this]{ this->_paused = false; });
 	if (pause)
@@ -226,29 +282,40 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		});
 	if (blockSpin)
 		blockSpin->onValueChange.connect([this](float value){
-			this->_paused = true;
 			this->_object->_actionBlock = value;
 			this->_object->_animation = 0;
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		});
 
-	PLACE_HOOK_STRING(container, "Sprite",        spritePath,    this->_editor.localize("animation.sprite"),   BasicDataOperation);
-	PLACE_HOOK_NUMBER(container, "Duration",      duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container, "Offset",        offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container, "Scale",         scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, 2);
-	PLACE_HOOK_RECT(container,   "Bounds",        textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "Attack Flag", oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "Defense Flag",dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation);
+	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation);
+	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, 2);
+	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation);
+	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation);
+	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation);
 }
 
 void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 {
+	auto action = container.get<tgui::EditBox>("ActionID");
+	auto actionSelect = container.get<tgui::Button>("ActionSelect");
 	auto block = container.get<tgui::Label>("BlockLabel");
 	auto blockSpin = container.get<tgui::SpinButton>("BlockSpin");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
 	auto frame = container.get<tgui::Slider>("Frame");
 
+	if (action)
+		action->setText(std::to_string(this->_object->_action));
+	if (actionSelect) {
+		if (this->_editor.hasLocalization("action." + this->_character + "." + std::to_string(this->_object->_action)))
+			actionSelect->setText(this->_editor.localize("action." + this->_character + "." + std::to_string(this->_object->_action)));
+		else if (this->_editor.hasLocalization("action.generic." + std::to_string(this->_object->_action)))
+			actionSelect->setText(this->_editor.localize("action.generic." + std::to_string(this->_object->_action)));
+		else
+			actionSelect->setText(Character::actionToString(this->_object->_action));
+	}
 	if (block)
 		block->setText(this->_editor.localize(
 			block->getUserData<std::string>(),

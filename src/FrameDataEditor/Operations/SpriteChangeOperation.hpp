@@ -1,0 +1,23 @@
+//
+// Created by PinkySmile on 10/05/25.
+//
+
+#ifndef SOFGV_SPRITECHANGEOPERATION_HPP
+#define SOFGV_SPRITECHANGEOPERATION_HPP
+
+
+#include "BasicDataOperation.hpp"
+
+namespace SpiralOfFate
+{
+	class SpriteChangeOperation : public BasicDataOperation<std::string> {
+	public:
+		SpriteChangeOperation(EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue);
+
+		void apply() override;
+		void undo() override;
+	};
+}
+
+
+#endif //SOFGV_SPRITECHANGEOPERATION_HPP

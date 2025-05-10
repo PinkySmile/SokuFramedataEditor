@@ -219,7 +219,9 @@ if (WIN32)
 else()
 	set(GICON)
 	set(FDICON
-		src/FrameDataEditor/Operations/IOperation.hpp)
+		src/FrameDataEditor/Operations/IOperation.hpp
+		src/FrameDataEditor/Operations/SpriteChangeOperation.cpp
+		src/FrameDataEditor/Operations/SpriteChangeOperation.hpp)
 endif()
 
 add_library(

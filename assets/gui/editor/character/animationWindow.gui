@@ -225,18 +225,18 @@ Panel.ControlPanel {
 
     EditBox.Sprite {
         DefaultText = "assets/...";
-        Position = (130, 120);
+        Position = (120, 120);
         Renderer = &1;
-        Size = (160, 21);
+        Size = (170, 21);
         TextSize = 13;
     }
 
     EditBox.Bounds {
         Alignment = Center;
         InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4},[0-9]{1,4},[0-9]{1,4}\\)";
-        Position = (130, 150);
+        Position = (120, 150);
         Renderer = &1;
-        Size = (135, 21);
+        Size = (145, 21);
         Text = "(0,0,0,0)";
         TextSize = 13;
     }
@@ -244,9 +244,9 @@ Panel.ControlPanel {
     EditBox.Duration {
         Alignment = Center;
         InputValidator = UInt;
-        Position = (130, 210);
+        Position = (120, 210);
         Renderer = &1;
-        Size = (160, 21);
+        Size = (170, 21);
         Text = 0;
         TextSize = 13;
     }
@@ -254,9 +254,9 @@ Panel.ControlPanel {
     EditBox.Offset {
         Alignment = Center;
         InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4}\\)";
-        Position = (130, 180);
+        Position = (120, 180);
         Renderer = &1;
-        Size = (160, 21);
+        Size = (170, 21);
         Text = "(0,0)";
         TextSize = 13;
     }
@@ -264,15 +264,15 @@ Panel.ControlPanel {
     EditBox.Scale {
         Alignment = Center;
         InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
-        Position = (130, 240);
+        Position = (120, 240);
         Renderer = &1;
-        Size = (160, 21);
+        Size = (170, 21);
         Text = "(1.0,1.0)";
         TextSize = 13;
     }
 
     BitmapButton.BoundsButton {
-        Image = "arrow_down.png" Smooth;
+        Image = "crayon.png" Smooth;
         ImageScaling = 0;
         Position = (270, 150);
         Renderer = &5;
@@ -295,7 +295,7 @@ Panel.ControlPanel {
         Position = (5, 122);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.sprite";
         TextSize = 13;
     }
@@ -305,7 +305,7 @@ Panel.ControlPanel {
         Position = (5, 152);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.bounds";
         TextSize = 13;
     }
@@ -315,7 +315,7 @@ Panel.ControlPanel {
         Position = (5, 182);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.offset";
         TextSize = 13;
     }
@@ -325,7 +325,7 @@ Panel.ControlPanel {
         Position = (5, 242);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.scale";
         TextSize = 13;
     }
@@ -335,7 +335,7 @@ Panel.ControlPanel {
         Position = (5, 212);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.duration";
         TextSize = 13;
     }
@@ -345,7 +345,7 @@ Panel.ControlPanel {
         Position = (5, 272);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.aflags";
         TextSize = 13;
     }
@@ -355,13 +355,13 @@ Panel.ControlPanel {
         Position = (5, 302);
         Renderer = &3;
         ScrollbarPolicy = Automatic;
-        Size = (120, 17);
+        Size = (110, 17);
         Text = "animation.dflags";
         TextSize = 13;
     }
 
     BitmapButton.AFlagsButton {
-        Image = "arrow_down.png" Smooth;
+        Image = "crayon.png" Smooth;
         ImageScaling = 0;
         Position = (270, 270);
         Renderer = &5;
@@ -370,7 +370,7 @@ Panel.ControlPanel {
     }
 
     BitmapButton.DFlagsButton {
-        Image = "arrow_down.png" Smooth;
+        Image = "crayon.png" Smooth;
         ImageScaling = 0;
         Position = (270, 300);
         Renderer = &5;
@@ -381,9 +381,9 @@ Panel.ControlPanel {
     EditBox.AFlags {
         Alignment = Center;
         InputValidator = "[0-9A-Fa-f]*";
-        Position = (130, 270);
+        Position = (120, 270);
         Renderer = &1;
-        Size = (135, 21);
+        Size = (145, 21);
         Text = 0000000000000000;
         TextSize = 13;
     }
@@ -391,9 +391,9 @@ Panel.ControlPanel {
     EditBox.DFlags {
         Alignment = Center;
         InputValidator = "[0-9A-Fa-f]*";
-        Position = (130, 300);
+        Position = (120, 300);
         Renderer = &1;
-        Size = (135, 21);
+        Size = (145, 21);
         Text = 0000000000000000;
         TextSize = 13;
     }

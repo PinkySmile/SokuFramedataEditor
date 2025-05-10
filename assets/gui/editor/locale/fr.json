@@ -141,5 +141,7 @@
 	"action.generic.404":           "Game start 1",
 	"action.generic.405":           "Game start 2",
 	"action.generic.406":           "Game start 3",
-	"action.generic.407":           "Game start 4"
+	"action.generic.407":           "Game start 4",
+
+	"action.victoria_star.368":     "Screen teleport"
 }

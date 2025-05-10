@@ -71,6 +71,11 @@ void SpiralOfFate::FrameDataEditor::saveSettings()
 	stream << json.dump(4);
 }
 
+bool SpiralOfFate::FrameDataEditor::hasLocalization(const std::string &s) const
+{
+	return this->_localization.count(s) != 0;
+}
+
 std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
 {
 	auto it = this->_localization.find(s);
@@ -224,11 +229,17 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 
 void SpiralOfFate::FrameDataEditor::_save()
 {
+	this->_focusedWindow->save();
 }
 
 void SpiralOfFate::FrameDataEditor::_saveAs()
 {
+	auto file = Utils::saveFileDialog(game->gui, "Save Framedata", "assets/characters");
 
+	file->setFileTypeFilters({ {"Framedata file", {"*.json"}}, {"All files", {}} }, 0);
+	file->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+		this->_focusedWindow->save(arr[0].asNativeString());
+	});
 }
 
 void SpiralOfFate::FrameDataEditor::_settings()
