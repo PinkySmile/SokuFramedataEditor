@@ -377,7 +377,6 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/UI/PreviewWidget.hpp
 			src/FrameDataEditor/UI/SettingsWindow.cpp
 			src/FrameDataEditor/UI/SettingsWindow.hpp
-			src/FrameDataEditor/Operations/NumberDataOperation.cpp
 			src/FrameDataEditor/Operations/BasicDataOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
