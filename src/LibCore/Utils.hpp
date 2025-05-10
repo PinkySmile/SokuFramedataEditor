@@ -159,9 +159,7 @@ namespace SpiralOfFate::Utils
 		};
 
 		if (closeOut)
-			panel->onClick.connect([window]{
-				window->close();
-			});
+			panel->onClick.connect(closeWindow);
 		window->onClose.connect(closeWindow);
 		window->onEscapeKeyPress(closeWindow);
 		return window;

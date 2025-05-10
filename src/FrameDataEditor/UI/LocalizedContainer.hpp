@@ -16,22 +16,27 @@ namespace SpiralOfFate
 	private:
 		void _localizeWidgets(tgui::Container &container, bool first)
 		{
+			// TODO: Create struct LocalizationData and use that instead
 			for (auto &w : container.getWidgets()) {
-				if (auto label = w->cast<tgui::Label>()) {
-					if (first)
-						label->setUserData(std::string(label->getText()));
-					label->setText(this->_editor.localize(std::string(label->getUserData<std::string>())));
-				} else if (auto button = w->cast<tgui::ButtonBase>()) {
-					if (first)
-						button->setUserData(std::string(button->getText()));
-					button->setText(this->_editor.localize(std::string(button->getUserData<std::string>())));
-				} else if (auto combo = w->cast<tgui::ComboBox>()) {
-					auto items = combo->getItemIds();
-
-					for (size_t i = 0; i < items.size(); i++)
-						combo->changeItemById(items[i], this->_editor.localize(items[i].toStdString()));
-				} else if (auto cont = w->cast<tgui::Container>())
-					this->_localizeWidgets(*cont, first);
+				try {
+					if (!w->getUserData<bool>())
+						continue;
+				} catch (std::bad_any_cast &) {}
+				try {
+					if (auto label = w->cast<tgui::Label>()) {
+						if (first)
+							label->setUserData(std::string(label->getText()));
+						label->setText(this->_editor.localize(std::string(label->getUserData<std::string>())));
+					} else if (auto button = w->cast<tgui::ButtonBase>()) {
+						if (first)
+							button->setUserData(std::string(button->getText()));
+						button->setText(this->_editor.localize(std::string(button->getUserData<std::string>())));
+					} else if (auto combo = w->cast<tgui::ComboBox>()) {
+						for (const auto &item : combo->getItemIds())
+							combo->changeItemById(item, this->_editor.localize(item.toStdString()));
+					} else if (auto cont = w->cast<tgui::Container>())
+						this->_localizeWidgets(*cont, first);
+				} catch (std::bad_any_cast &) {}
 			}
 		}
 

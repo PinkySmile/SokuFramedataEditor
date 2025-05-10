@@ -66,6 +66,7 @@ namespace SpiralOfFate
 		std::shared_ptr<tgui::RendererData> _maximizeButtonRendererFocusedCached;
 		std::shared_ptr<tgui::RendererData> _maximizeButtonRendererUnFocusedCached;
 
+		std::string _localizeActionName(unsigned id);
 		void _updateTitleButtons();
 		void _updateTextureTitleBar();
 		void rendererChanged(const tgui::String &property) override;
@@ -79,6 +80,7 @@ namespace SpiralOfFate
 		size_t _operationIndex = 0;
 		size_t _operationSaved = 0;
 
+		void _createMoveListPopup();
 		void _placeUIHooks(const tgui::Container &container);
 		void _populateData(const tgui::Container &container);
 		void _populateFrameData(const tgui::Container &container);

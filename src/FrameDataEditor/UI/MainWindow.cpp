@@ -231,9 +231,84 @@ void SpiralOfFate::MainWindow::save()
 	this->setTitle(this->_path);
 }
 
+std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
+{
+	if (this->_editor.hasLocalization("action." + this->_character + "." + std::to_string(id)))
+		return this->_editor.localize("action." + this->_character + "." + std::to_string(id));
+	else if (this->_editor.hasLocalization("action.generic." + std::to_string(id)))
+		return this->_editor.localize("action.generic." + std::to_string(id));
+	return Character::actionToString(id);
+}
+
+void SpiralOfFate::MainWindow::_createMoveListPopup()
+{
+	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
+	auto contentPanel = tgui::ScrollablePanel::create({500, "&.h - 100"});
+	unsigned i = 0;
+	auto scroll = 0;
+
+	outsidePanel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
+	outsidePanel->setUserData(false);
+	this->add(outsidePanel);
+
+	contentPanel->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+	this->add(contentPanel);
+
+	auto closePopup = [this](std::weak_ptr<tgui::Panel> outsidePanel, std::weak_ptr<tgui::ScrollablePanel> contentPanel){
+		this->remove(outsidePanel.lock());
+		this->remove(contentPanel.lock());
+	};
+
+	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+
+	for (auto &[moveId, _] : this->_object->_moves) {
+		auto label = tgui::Label::create(std::to_string(moveId));
+		auto button = tgui::Button::create(this->_localizeActionName(moveId));
+
+		label->setPosition(10, i * 25 + 12);
+		button->setPosition(50, i * 25 + 10);
+		button->setSize(410, 20);
+		Utils::setRenderer(button);
+		Utils::setRenderer(label);
+		if (moveId == this->_object->_action) {
+			scroll = i * 25 + 20;
+			button->getRenderer()->setTextColor(tgui::Color::Green);
+			button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
+			button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
+			button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
+			button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
+		}
+
+		button->onClick.connect([this](unsigned move){
+			this->_object->_action = move;
+			this->_object->_actionBlock = 0;
+			this->_object->_animation = 0;
+			this->_object->_animationCtr = 0;
+			for (auto &[key, _] : this->_updateFrameElements)
+				this->_populateData(*key);
+		}, moveId);
+		button->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+
+		contentPanel->add(label);
+		contentPanel->add(button);
+		i++;
+	}
+	scroll -= contentPanel->getSize().y / 2;
+
+	auto label = tgui::Label::create("");
+
+	label->setPosition(10, i * 25 + 10);
+	label->setSize(100, 10);
+	label->setTextSize(1);
+	contentPanel->add(label);
+	if (scroll > 0)
+		contentPanel->getVerticalScrollbar()->setValue(scroll);
+}
+
 void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 {
 	auto action = container.get<tgui::EditBox>("ActionID");
+	auto actionSelect = container.get<tgui::Button>("ActionSelect");
 	auto play = container.get<tgui::Button>("Play");
 	auto pause = container.get<tgui::Button>("Pause");
 	auto frame = container.get<tgui::Slider>("Frame");
@@ -262,6 +337,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		}, std::weak_ptr(action));
+	if (actionSelect)
+		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this);
 	if (play)
 		play->onPress.connect([this]{ this->_paused = false; });
 	if (pause)
@@ -308,14 +385,8 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 
 	if (action)
 		action->setText(std::to_string(this->_object->_action));
-	if (actionSelect) {
-		if (this->_editor.hasLocalization("action." + this->_character + "." + std::to_string(this->_object->_action)))
-			actionSelect->setText(this->_editor.localize("action." + this->_character + "." + std::to_string(this->_object->_action)));
-		else if (this->_editor.hasLocalization("action.generic." + std::to_string(this->_object->_action)))
-			actionSelect->setText(this->_editor.localize("action.generic." + std::to_string(this->_object->_action)));
-		else
-			actionSelect->setText(Character::actionToString(this->_object->_action));
-	}
+	if (actionSelect)
+		actionSelect->setText(this->_localizeActionName(this->_object->_action));
 	if (block)
 		block->setText(this->_editor.localize(
 			block->getUserData<std::string>(),

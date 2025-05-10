@@ -25,7 +25,7 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 		{(int)this->getSize().x, (int)this->getSize().y}
 	});
 
-	states.transform.translate({50, this->getSize().y - 50});
+	states.transform.translate({100, this->getSize().y - 50});
 	statesSFML.transform = sf::Transform(
 		transformMatrix[0], transformMatrix[4], transformMatrix[12],
 		transformMatrix[1], transformMatrix[5], transformMatrix[13],
