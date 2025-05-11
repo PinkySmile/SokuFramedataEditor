@@ -383,6 +383,10 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/SoundChangeOperation.cpp
 			src/FrameDataEditor/Operations/SoundChangeOperation.hpp
 			${FDICON}
+			src/FrameDataEditor/Operations/ClearHitOperation.cpp
+			src/FrameDataEditor/Operations/ClearHitOperation.hpp
+			src/FrameDataEditor/Operations/ClearBlockOperation.cpp
+			src/FrameDataEditor/Operations/ClearBlockOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

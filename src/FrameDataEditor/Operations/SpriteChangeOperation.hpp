@@ -12,7 +12,7 @@ namespace SpiralOfFate
 {
 	class SpriteChangeOperation : public BasicDataOperation<std::string> {
 	public:
-		SpriteChangeOperation(EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue);
+		SpriteChangeOperation(EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue, bool reset);
 
 		void apply() override;
 		void undo() override;

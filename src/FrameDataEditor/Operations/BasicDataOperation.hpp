@@ -22,9 +22,10 @@ namespace SpiralOfFate
 		T _oldValue;
 		T _newValue;
 		std::string _fieldName;
+		bool _reset;
 
 	public:
-		BasicDataOperation(EditableObject &obj, const std::string &&name, T FrameData::*field, T newValue) :
+		BasicDataOperation(EditableObject &obj, const std::string &&name, T FrameData::*field, T newValue, bool reset) :
 			_obj(obj),
 			_action(obj._action),
 			_actionBlock(obj._actionBlock),
@@ -32,24 +33,45 @@ namespace SpiralOfFate
 			_field(field),
 			_oldValue(obj.getFrameData().*field),
 			_newValue(newValue),
-			_fieldName(name)
+			_fieldName(name),
+			_reset(reset)
 		{
 		}
 
 		void apply() override
 		{
+			bool shouldReset =
+				this->_obj._action != this->_action ||
+				this->_obj._actionBlock != this->_actionBlock ||
+				this->_obj._animation != this->_animation;
+
 			this->_obj._action = this->_action;
 			this->_obj._actionBlock = this->_actionBlock;
 			this->_obj._animation = this->_animation;
 			this->_obj.getFrameData().*_field = this->_newValue;
+			if (shouldReset || this->_reset) {
+				if (shouldReset)
+					this->_obj._animationCtr = 0;
+				this->_obj.resetState();
+			}
 		}
 
 		void undo() override
 		{
+			bool shouldReset =
+				this->_obj._action != this->_action ||
+				this->_obj._actionBlock != this->_actionBlock ||
+				this->_obj._animation != this->_animation;
+
 			this->_obj._action = this->_action;
 			this->_obj._actionBlock = this->_actionBlock;
 			this->_obj._animation = this->_animation;
 			this->_obj.getFrameData().*_field = this->_oldValue;
+			if (shouldReset || this->_reset) {
+				if (shouldReset)
+					this->_obj._animationCtr = 0;
+				this->_obj.resetState();
+			}
 		}
 
 		std::string getName() const noexcept override

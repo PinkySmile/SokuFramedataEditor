@@ -12,6 +12,25 @@ SpiralOfFate::PreviewWidget::PreviewWidget(const EditableObject &object) :
 	assert_exp(this->_stageTexture.loadFromFile("assets/stages/editor.png"));
 }
 
+void SpiralOfFate::PreviewWidget::_drawBox(const SpiralOfFate::Rectangle &box, const SpiralOfFate::Color &color, sf::RenderStates &states) const
+{
+	sf::VertexArray arr{ sf::PrimitiveType::TriangleFan, 4 };
+	sf::VertexArray arr2{ sf::PrimitiveType::LineStrip, 5 };
+
+	for (int i = 0; i < 4; i++) {
+		arr[i].color = color;
+		arr[i].color.a *= 0x60 / 255.f;
+		arr[i].position = (&box.pt1)[i];
+	}
+	game->screen->draw(arr, states);
+
+	for (unsigned i = 0; i < 5; i++) {
+		arr2[i].color = color;
+		arr2[i].position = (&box.pt1)[i % 4];
+	}
+	game->screen->draw(arr2, states);
+}
+
 void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const
 {
 	auto &sfmlTarget = dynamic_cast<tgui::BackendRenderTargetSFML &>(target);
@@ -34,4 +53,33 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	statesSFML.coordinateType = sf::CoordinateType::Normalized;
 	realTarget->draw(this->_stageSprite, statesSFML);
 	this->_object.render(*realTarget, statesSFML);
-}
+
+	for (auto &hurtBox : this->_object._getModifiedHurtBoxes())
+		this->_drawBox(hurtBox, Color::Green, statesSFML);
+	for (auto &hitBox : this->_object._getModifiedHitBoxes())
+		this->_drawBox(hitBox, Color::Red, statesSFML);
+
+	auto &data = this->_object.getFrameData();
+
+	if (data.collisionBox) {
+		auto &box = *data.collisionBox;
+		Vector2f realPos = {
+			this->_object._position.x,
+			-this->_object._position.y
+		};
+
+		this->_drawBox({
+			realPos + box.pos,
+			realPos + Vector2f{
+				static_cast<float>(box.pos.x),
+				static_cast<float>(box.pos.y) + box.size.y
+			},
+			realPos + box.pos + box.size,
+			realPos + Vector2f{
+				static_cast<float>(box.pos.x) + box.size.x,
+				static_cast<float>(box.pos.y)
+			}
+		}, Color::Yellow, statesSFML);
+	}
+
+;}

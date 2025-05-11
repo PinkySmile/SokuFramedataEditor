@@ -52,11 +52,11 @@ Label.Label1 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.partgenerator";
+    Text = "animation.block.pstop";
     TextSize = 13;
 }
 
-EditBox.PGen {
+EditBox.PBlockStop {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 10);
@@ -71,13 +71,13 @@ Label.Label3 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.subobj";
+    Text = "animation.block.ppush";
     TextSize = 13;
 }
 
-EditBox.SubObj {
+EditBox.PPush {
     Alignment = Center;
-    InputValidator = UInt;
+    InputValidator = Int;
     Position = (180, 40);
     Renderer = &2;
     Size = (60, 21);
@@ -90,16 +90,16 @@ Label.Label2 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.speed";
+    Text = "animation.block.ostop";
     TextSize = 13;
 }
 
-EditBox.MoveSpeed {
+EditBox.OBlockStop {
     Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
+    InputValidator = UInt;
     Position = (420, 10);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
@@ -109,34 +109,35 @@ Label.Label4 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.gravity";
+    Text = "animation.block.opush";
     TextSize = 13;
 }
 
-EditBox.Gravity {
+EditBox.OPush {
     Alignment = Center;
-    InputValidator = "\\(?[+-]?[0-9]*\\.?[0-9]*,?[+-]?[0-9]*\\.?[0-9]*\\)?";
+    InputValidator = Int;
     Position = (420, 40);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
 Label.Label5 {
     HorizontalAlignment = Right;
-    Position = (240, 73);
+    Position = (0, 103);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.sound";
+    Text = "animation.block.stun";
     TextSize = 13;
 }
 
-EditBox.Sound {
+EditBox.BlockStun {
     Alignment = Center;
-    Position = (420, 70);
+    InputValidator = UInt;
+    Position = (180, 100);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
@@ -146,39 +147,39 @@ Label.Label6 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.marker";
+    Text = "animation.block.wstun";
     TextSize = 13;
 }
 
-EditBox.Marker {
+EditBox.WBlockStun {
     Alignment = Center;
     InputValidator = UInt;
     Position = (420, 100);
-    Renderer = &2;
-    Size = (100, 21);
-    TextSize = 13;
-}
-
-Label.Label7 {
-    HorizontalAlignment = Right;
-    Position = (0, 103);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.general.tier";
-    TextSize = 13;
-}
-
-EditBox.Tier {
-    Alignment = Center;
-    InputValidator = UInt;
-    Position = (180, 100);
     Renderer = &2;
     Size = (60, 21);
     TextSize = 13;
 }
 
-EditBox.FadeTime {
+Label.Label7 {
+    HorizontalAlignment = Right;
+    Position = (240, 73);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.block.chip";
+    TextSize = 13;
+}
+
+EditBox.Chip {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (420, 70);
+    Renderer = &2;
+    Size = (60, 21);
+    TextSize = 13;
+}
+
+EditBox.GuardDmg {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 70);
@@ -193,44 +194,6 @@ Label.Label8 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.fadetime";
-    TextSize = 13;
-}
-
-Label.Label9 {
-    HorizontalAlignment = Right;
-    Position = (240, 133);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.general.rotation";
-    TextSize = 13;
-}
-
-EditBox.Rotation {
-    Alignment = Center;
-    InputValidator = Float;
-    Position = (420, 130);
-    Renderer = &2;
-    Size = (100, 21);
-    TextSize = 13;
-}
-
-Label.Label10 {
-    HorizontalAlignment = Right;
-    Position = (0, 133);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.general.manacost";
-    TextSize = 13;
-}
-
-EditBox.ManaCost {
-    Alignment = Center;
-    InputValidator = UInt;
-    Position = (180, 130);
-    Renderer = &2;
-    Size = (60, 21);
+    Text = "animation.block.guarddmg";
     TextSize = 13;
 }

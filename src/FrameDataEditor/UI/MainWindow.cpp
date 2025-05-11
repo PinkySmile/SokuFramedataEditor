@@ -9,6 +9,8 @@
 #include "../Operations/BasicDataOperation.hpp"
 #include "../Operations/SpriteChangeOperation.hpp"
 #include "../Operations/SoundChangeOperation.hpp"
+#include "../Operations/ClearBlockOperation.hpp"
+#include "../Operations/ClearHitOperation.hpp"
 
 template<typename T>
 std::string to_string(T value, int)
@@ -33,7 +35,7 @@ std::string to_hex(unsigned long long value)
 	return buffer;
 }
 
-#define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg) \
+#define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset) \
 do {                                                                                                             \
         auto __elem = container.get<tgui::EditBox>(guiId);                                                       \
                                                                                                                  \
@@ -47,7 +49,8 @@ do {                                                                            
                                 *this->_object,                                                                  \
                                 name,                                                                            \
                                 &FrameData::field,                                                               \
-                                fromString(s, decltype(FrameData::field))                                        \
+                                fromString(s, decltype(FrameData::field)),                                       \
+                                reset                                                                            \
                         ));                                                                                      \
                 } catch (...) { return; }                                                                        \
         });                                                                                                      \
@@ -58,43 +61,45 @@ do {                                                                            
                 __elem->onTextChange.setEnabled(true);                                                           \
         });                                                                                                      \
 } while (false)
-#define PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg) \
-do {                                                                                                                      \
-        auto __elem = container.get<tgui::EditBox>(guiId);                                                                \
-                                                                                                                          \
-        if (!__elem)                                                                                                      \
-                break;                                                                                                    \
-        __elem->onTextChange.connect([this](const tgui::String &s){                                                       \
-                if (s.empty()) {                                                                                          \
-                        this->applyOperation(new operation(                                                               \
-                                *this->_object,                                                                           \
-                                name,                                                                                     \
-                                &FrameData::field,                                                                        \
-                                std::make_optional<decltype(FrameData::field)::value_type>()                              \
-                        ));                                                                                               \
-                        return;                                                                                           \
-                }                                                                                                         \
-                try {                                                                                                     \
-                        fromStringPre(s)                                                                                  \
-                        this->applyOperation(new operation(                                                               \
-                                *this->_object,                                                                           \
-                                name,                                                                                     \
-                                &FrameData::field,                                                                        \
-                                std::make_optional<decltype(FrameData::field)::value_type>(                               \
-                                        fromString(s, decltype(FrameData::field)::value_type)                             \
-                                )                                                                                         \
-                        ));                                                                                               \
-                } catch (...) { return; }                                                                                 \
-        });                                                                                                               \
-        this->_updateFrameElements[&container].emplace_back([__elem, this]{                                               \
-                auto &data = this->_object->getFrameData();                                                               \
-                __elem->onTextChange.setEnabled(false);                                                                   \
-                if (data.field)                                                                                           \
-                        __elem->setText(toString(*data.field, arg));                                                      \
-                else                                                                                                      \
-                        __elem->setText("");                                                                              \
-                __elem->onTextChange.setEnabled(true);                                                                    \
-        });                                                                                                               \
+#define PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset) \
+do {                                                                                                                             \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                                                       \
+                                                                                                                                 \
+        if (!__elem)                                                                                                             \
+                break;                                                                                                           \
+        __elem->onTextChange.connect([this](const tgui::String &s){                                                              \
+                if (s.empty()) {                                                                                                 \
+                        this->applyOperation(new operation(                                                                      \
+                                *this->_object,                                                                                  \
+                                name,                                                                                            \
+                                &FrameData::field,                                                                               \
+                                std::make_optional<decltype(FrameData::field)::value_type>(),                                    \
+                                (reset)                                                                                          \
+                        ));                                                                                                      \
+                        return;                                                                                                  \
+                }                                                                                                                \
+                try {                                                                                                            \
+                        fromStringPre(s)                                                                                         \
+                        this->applyOperation(new operation(                                                                      \
+                                *this->_object,                                                                                  \
+                                name,                                                                                            \
+                                &FrameData::field,                                                                               \
+                                std::make_optional<decltype(FrameData::field)::value_type>(                                      \
+                                        fromString(s, decltype(FrameData::field)::value_type)                                    \
+                                ),                                                                                               \
+                                (reset)                                                                                          \
+                        ));                                                                                                      \
+                } catch (...) { return; }                                                                                        \
+        });                                                                                                                      \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                                                      \
+                auto &data = this->_object->getFrameData();                                                                      \
+                __elem->onTextChange.setEnabled(false);                                                                          \
+                if (data.field)                                                                                                  \
+                        __elem->setText(toString(*data.field, arg));                                                             \
+                else                                                                                                             \
+                        __elem->setText("");                                                                                     \
+                __elem->onTextChange.setEnabled(true);                                                                           \
+        });                                                                                                                      \
 } while (false)
 
 #define NO_FROMSTRING_PRE(s)
@@ -104,6 +109,9 @@ do {                                                                            
 
 #define NUMBER_FROM_STRING(s, type) static_cast<type>(std::stof(s.toStdString()))
 #define NUMBER_TO_STRING(s, p) to_string(s, p)
+
+#define NUMBER_RAD_FROM_STRING(s, type) static_cast<type>(std::stof(s.toStdString()) * M_PI / 180)
+#define NUMBER_RAD_TO_STRING(s, p) to_string(s * 180 / M_PI, p)
 
 #define NUMFLAGS_FROM_STRING(s, _) { (unsigned int)std::stoul(s.toStdString(), nullptr, 16) }
 #define NUMFLAGS_TO_STRING(s, _) to_hex(s.flags)
@@ -119,6 +127,23 @@ do {                                                                            
 #define VECTOR_TO_STRING(s, p) "(" + \
 	to_string((s).x, p) + "," +  \
 	to_string((s).y, p) +        \
+")"
+
+#define SNAP_FROM_STRING_PRE(s)                          \
+        auto pos = s.find(',');                          \
+        auto s2 = s.substr(pos + 1, s.size() - pos - 2); \
+        auto pos2 = s2.find(',');                        \
+        auto __x = s.substr(1, pos - 1).toStdString();   \
+        auto __y = s2.substr(0, pos2 - 1).toStdString(); \
+        auto __r = s2.substr(pos2 + 1).toStdString();
+#define SNAP_FROM_STRING(s, type) {                                                           \
+        { (decltype(type::first.x))std::stod(__x), (decltype(type::first.y))std::stod(__y) }, \
+        (decltype(type::second))std::stof(__r) * (float)M_PI / 180.f                          \
+}
+#define SNAP_TO_STRING(s, _) "(" +                     \
+	to_string((s).first.x, 2) + "," +              \
+	to_string((s).first.y, 2) + "," +              \
+	to_string((int)((s).second * 180 / M_PI), 0) + \
 ")"
 
 #define RECT_FROM_STRING_PRE(s)                                     \
@@ -144,21 +169,25 @@ do {                                                                            
         to_string(s.size.y, p) +       \
 ")"
 
-#define PLACE_HOOK_STRING(container, guiId, field, name, operation) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, STRING_TO_STRING, NO_FROMSTRING_PRE, STRING_FROM_STRING, _)
-#define PLACE_HOOK_NUMBER(container, guiId, field, name, operation, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision)
-#define PLACE_HOOK_OPTIONAL_NUMBER(container, guiId, field, name, operation, precision) \
-	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision)
-#define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _)
-#define PLACE_HOOK_VECTOR(container, guiId, field, name, operation, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision)
-#define PLACE_HOOK_OPTIONAL_VECTOR(container, guiId, field, name, operation, precision) \
-	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision)
-#define PLACE_HOOK_RECT(container, guiId, field, name, operation) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0)
-#define PLACE_HOOK_FLAG(container, guiId, field, index, name)                      \
+#define PLACE_HOOK_STRING(container, guiId, field, name, operation, reset) \
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, STRING_TO_STRING, NO_FROMSTRING_PRE, STRING_FROM_STRING, _, reset)
+#define PLACE_HOOK_NUMBER(container, guiId, field, name, operation, reset, precision) \
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset)
+#define PLACE_HOOK_NUMBER_DEG(container, guiId, field, name, operation, reset, precision) \
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_RAD_TO_STRING, NO_FROMSTRING_PRE, NUMBER_RAD_FROM_STRING, precision, reset)
+#define PLACE_HOOK_OPTIONAL_NUMBER(container, guiId, field, name, operation, reset, precision) \
+	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset)
+#define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation, reset) \
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _, reset)
+#define PLACE_HOOK_VECTOR(container, guiId, field, name, operation, reset, precision) \
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset)
+#define PLACE_HOOK_OPTIONAL_VECTOR(container, guiId, field, name, operation, reset, precision) \
+	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset)
+#define PLACE_HOOK_OPTIONAL_SNAP(container, guiId, field, name, operation, reset) \
+	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, SNAP_TO_STRING, SNAP_FROM_STRING_PRE, SNAP_FROM_STRING, _, reset)
+#define PLACE_HOOK_RECT(container, guiId, field, name, operation, reset) \
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0, reset)
+#define PLACE_HOOK_FLAG(container, guiId, field, index, name, reset)               \
 do {                                                                               \
         auto __elem = container.get<tgui::CheckBox>(guiId);                        \
                                                                                    \
@@ -169,7 +198,7 @@ do {                                                                            
                         *this->_object,                                            \
                         name,                                                      \
                         &FrameData::field,                                         \
-                        index, b                                                   \
+                        index, b, (reset)                                          \
                 ));                                                                \
                 for (auto &[key, _] : this->_updateFrameElements)                  \
                         this->_populateFrameData(*key);                            \
@@ -393,6 +422,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup()
 			this->_object->_actionBlock = 0;
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
+			this->_object->resetState();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		}, moveId);
@@ -416,10 +446,12 @@ void SpiralOfFate::MainWindow::_createMoveListPopup()
 
 void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 {
+	auto clearHit = container.get<tgui::Button>("ClearHit");
+	auto clearBlock = container.get<tgui::Button>("ClearBlock");
 	auto action = container.get<tgui::EditBox>("ActionID");
 	auto actionSelect = container.get<tgui::Button>("ActionSelect");
 	auto play = container.get<tgui::Button>("Play");
-	auto pause = container.get<tgui::Button>("Pause");
+	auto step = container.get<tgui::Button>("Step");
 	auto frame = container.get<tgui::Slider>("Frame");
 	auto blockSpin = container.get<tgui::SpinButton>("BlockSpin");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
@@ -448,9 +480,18 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_actionBlock = 0;
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
+			this->_object->resetState();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		}, std::weak_ptr(action));
+	if (clearHit)
+		clearHit->onClick.connect([this]{
+			this->applyOperation(new ClearHitOperation(*this->_object, this->_editor));
+		});
+	if (clearBlock)
+		clearBlock->onClick.connect([this]{
+			this->applyOperation(new ClearBlockOperation(*this->_object, this->_editor));
+		});
 	if (aFlags)
 		// TODO: character/subobject
 		aFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/attackFlags.gui");
@@ -470,12 +511,17 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this);
 	if (play)
 		play->onPress.connect([this]{ this->_paused = false; });
-	if (pause)
-		pause->onPress.connect([this]{ this->_paused = true; });
+	if (step)
+		step->onPress.connect([this]{
+			this->_paused = false;
+			this->tick();
+			this->_paused = true;
+		});
 	if (frame)
 		frame->onValueChange.connect([this](float value){
 			this->_paused = true;
 			this->_object->_animation = value;
+			this->_object->resetState();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateFrameData(*key);
 		});
@@ -483,6 +529,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		frameSpin->onValueChange.connect([this](float value){
 			this->_paused = true;
 			this->_object->_animation = value;
+			this->_object->resetState();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateFrameData(*key);
 		});
@@ -490,32 +537,60 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		blockSpin->onValueChange.connect([this](float value){
 			this->_object->_actionBlock = value;
 			this->_object->_animation = 0;
+			this->_object->resetState();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		});
 
-	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation);
-	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, 2);
-	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation);
-	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
+	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation, false);
+	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
+	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, false, 2);
+	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation, false);
+	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation, false);
+	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation, false);
+	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
 
-	PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, 0);
-	PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, 0);
-	PLACE_HOOK_NUMBER(container,          "Marker",    specialMarker,     this->_editor.localize("animation.general.marker"),        BasicDataOperation, 0);
-	PLACE_HOOK_OPTIONAL_NUMBER(container, "Tier",      priority,          this->_editor.localize("animation.general.tier"),          BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, 2);
-	PLACE_HOOK_OPTIONAL_VECTOR(container, "Gravity",   gravity,           this->_editor.localize("animation.general.gravity"),       BasicDataOperation, 2);
-	PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         SoundChangeOperation);
-	PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, 0);
+	PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,          "Marker",    specialMarker,     this->_editor.localize("animation.general.marker"),        BasicDataOperation, false, 0);
+	PLACE_HOOK_OPTIONAL_NUMBER(container, "Tier",      priority,          this->_editor.localize("animation.general.tier"),          BasicDataOperation, false, 0);
+	PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, true,  2);
+	PLACE_HOOK_OPTIONAL_VECTOR(container, "Gravity",   gravity,           this->_editor.localize("animation.general.gravity"),       BasicDataOperation, true,  2);
+	PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         SoundChangeOperation, false);
+	PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,          "ManaCost",  manaCost,          this->_editor.localize("animation.general.manacost"),      BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER_DEG(container,      "Rotation",  rotation,          this->_editor.localize("animation.general.rotation"),      BasicDataOperation, true, 2);
+
+	PLACE_HOOK_NUMBER(container,        "PHitStop",  hitPlayerHitStop,  this->_editor.localize("animation.hit.pstop"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "OHitStop",  hitOpponentHitStop,this->_editor.localize("animation.hit.ostop"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_VECTOR(container,        "HitSpeed",  hitSpeed,          this->_editor.localize("animation.hit.speed"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_VECTOR(container,        "CHitSpeed", counterHitSpeed,   this->_editor.localize("animation.hit.chspeed"), BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "NLimit",    neutralLimit,      this->_editor.localize("animation.hit.nlimit"),  BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "SLimit",    spiritLimit,       this->_editor.localize("animation.hit.slimit"),  BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "MLimit",    matterLimit,       this->_editor.localize("animation.hit.mlimit"),  BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "VLimit",    voidLimit,         this->_editor.localize("animation.hit.vlimit"),  BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "Rate",      prorate,           this->_editor.localize("animation.hit.rate"),    BasicDataOperation, false, 2);
+	PLACE_HOOK_NUMBER(container,        "MinRate",   minProrate,        this->_editor.localize("animation.hit.minrate"), BasicDataOperation, false, 2);
+	PLACE_HOOK_NUMBER(container,        "Untech",    untech,            this->_editor.localize("animation.hit.untech"),  BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "Damage",    damage,            this->_editor.localize("animation.hit.damage"),  BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container,        "HitStun",   hitStun,           this->_editor.localize("animation.hit.stun"),    BasicDataOperation, false, 0);
+	PLACE_HOOK_STRING(container,        "HitSound",  hitSoundPath,      this->_editor.localize("animation.hit.sound"),   SoundChangeOperation, false);
+	PLACE_HOOK_OPTIONAL_SNAP(container, "HitSnap",   snap,              this->_editor.localize("animation.hit.snap"),    BasicDataOperation, false);
+
+	PLACE_HOOK_NUMBER(container, "PBlockStop", blockPlayerHitStop,  this->_editor.localize("animation.block.pstop"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "OBlockStop", blockOpponentHitStop,this->_editor.localize("animation.block.ostop"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "PPush",      pushBack,            this->_editor.localize("animation.block.ppush"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "OPush",      pushBlock,           this->_editor.localize("animation.block.opush"),   BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "GuardDmg",   guardDmg,            this->_editor.localize("animation.block.guarddmg"),BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "Chip",       chipDamage,          this->_editor.localize("animation.block.chip"),    BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "BlockStun",  blockStun,           this->_editor.localize("animation.block.stun"),    BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "WBlockStun", wrongBlockStun,      this->_editor.localize("animation.block.wstun"),   BasicDataOperation, false, 0);
 
 	for (size_t i = 0; i < 64; i++)
-		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)));
+		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)), false);
 	for (size_t i = 0; i < 64; i++)
-		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)));
+		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)), i == 8 || i == 13 || i == 21);
 }
 
 void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)

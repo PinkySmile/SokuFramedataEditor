@@ -52,11 +52,11 @@ Label.Label1 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.partgenerator";
+    Text = "animation.hit.pstop";
     TextSize = 13;
 }
 
-EditBox.PGen {
+EditBox.PHitStop {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 10);
@@ -71,11 +71,11 @@ Label.Label3 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.subobj";
+    Text = "animation.hit.nlimit";
     TextSize = 13;
 }
 
-EditBox.SubObj {
+EditBox.NLimit {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 40);
@@ -90,16 +90,16 @@ Label.Label2 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.speed";
+    Text = "animation.hit.ostop";
     TextSize = 13;
 }
 
-EditBox.MoveSpeed {
+EditBox.OHitStop {
     Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
+    InputValidator = UInt;
     Position = (420, 10);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
@@ -109,16 +109,16 @@ Label.Label4 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.gravity";
+    Text = "animation.hit.slimit";
     TextSize = 13;
 }
 
-EditBox.Gravity {
+EditBox.SLimit {
     Alignment = Center;
-    InputValidator = "\\(?[+-]?[0-9]*\\.?[0-9]*,?[+-]?[0-9]*\\.?[0-9]*\\)?";
+    InputValidator = UInt;
     Position = (420, 40);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
@@ -128,15 +128,16 @@ Label.Label5 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.sound";
+    Text = "animation.hit.vlimit";
     TextSize = 13;
 }
 
-EditBox.Sound {
+EditBox.VLimit {
     Alignment = Center;
+    InputValidator = UInt;
     Position = (420, 70);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
@@ -146,16 +147,16 @@ Label.Label6 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.marker";
+    Text = "animation.hit.untech";
     TextSize = 13;
 }
 
-EditBox.Marker {
+EditBox.Untech {
     Alignment = Center;
     InputValidator = UInt;
     Position = (420, 100);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (60, 21);
     TextSize = 13;
 }
 
@@ -165,20 +166,20 @@ Label.Label7 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.tier";
+    Text = "animation.hit.rate";
     TextSize = 13;
 }
 
-EditBox.Tier {
+EditBox.Rate {
     Alignment = Center;
-    InputValidator = UInt;
+    InputValidator = Float;
     Position = (180, 100);
     Renderer = &2;
     Size = (60, 21);
     TextSize = 13;
 }
 
-EditBox.FadeTime {
+EditBox.MLimit {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 70);
@@ -193,44 +194,137 @@ Label.Label8 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.fadetime";
+    Text = "animation.hit.mlimit";
+    TextSize = 13;
+}
+
+EditBox.HitSpeed {
+    Alignment = Center;
+    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
+    Position = (670, 10);
+    Renderer = &2;
+    Size = (130, 21);
     TextSize = 13;
 }
 
 Label.Label9 {
     HorizontalAlignment = Right;
-    Position = (240, 133);
+    Position = (490, 13);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.rotation";
+    Text = "animation.hit.speed";
     TextSize = 13;
 }
 
-EditBox.Rotation {
+EditBox.CHitSpeed {
     Alignment = Center;
-    InputValidator = Float;
-    Position = (420, 130);
+    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
+    Position = (670, 40);
     Renderer = &2;
-    Size = (100, 21);
+    Size = (130, 21);
     TextSize = 13;
 }
 
 Label.Label10 {
     HorizontalAlignment = Right;
+    Position = (490, 43);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.chspeed";
+    TextSize = 13;
+}
+
+EditBox.HitSnap {
+    Alignment = Center;
+    InputValidator = "\\(?[+-]?[0-9]*\\.?[0-9]*,?[+-]?[0-9]*\\.?[0-9]*,?[+-]?[0-9]*\\)?";
+    Position = (670, 70);
+    Renderer = &2;
+    Size = (130, 21);
+    TextSize = 13;
+}
+
+Label.Label11 {
+    HorizontalAlignment = Right;
+    Position = (490, 73);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.snap";
+    TextSize = 13;
+}
+
+Label.Label12 {
+    HorizontalAlignment = Right;
+    Position = (490, 103);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.sound";
+    TextSize = 13;
+}
+
+EditBox.HitSound {
+    Alignment = Center;
+    Position = (670, 100);
+    Renderer = &2;
+    Size = (130, 21);
+    TextSize = 13;
+}
+
+EditBox.Damage {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (420, 130);
+    Renderer = &2;
+    Size = (60, 21);
+    TextSize = 13;
+}
+
+Label.Label13 {
+    HorizontalAlignment = Right;
+    Position = (240, 133);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.damage";
+    TextSize = 13;
+}
+
+EditBox.MinRate {
+    Alignment = Center;
+    InputValidator = Float;
+    Position = (180, 130);
+    Renderer = &2;
+    Size = (60, 21);
+    TextSize = 13;
+}
+
+Label.Label14 {
+    HorizontalAlignment = Right;
     Position = (0, 133);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.general.manacost";
+    Text = "animation.hit.minrate";
     TextSize = 13;
 }
 
-EditBox.ManaCost {
+Label.Label15 {
+    HorizontalAlignment = Right;
+    Position = (490, 133);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.stun";
+    TextSize = 13;
+}
+
+EditBox.HitStun {
     Alignment = Center;
-    InputValidator = UInt;
-    Position = (180, 130);
+    Position = (670, 130);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (130, 21);
     TextSize = 13;
 }

@@ -5,9 +5,13 @@
 #include "SpriteChangeOperation.hpp"
 
 SpiralOfFate::SpriteChangeOperation::SpriteChangeOperation(
-	EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue
+	EditableObject &obj,
+	const std::string &&name,
+	std::string FrameData::*field,
+	const std::string &newValue,
+	bool reset
 ) :
-	BasicDataOperation<std::string>(obj, std::move(name), field, newValue)
+	BasicDataOperation<std::string>(obj, std::move(name), field, newValue, reset)
 {
 }
 

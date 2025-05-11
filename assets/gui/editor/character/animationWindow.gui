@@ -191,11 +191,11 @@ Panel.ControlPanel {
         TextSize = 13;
     }
 
-    Button.Pause {
+    Button.Step {
         Position = (160, 56);
         Renderer = &2;
         Size = (130, 21);
-        Text = "animation.pause";
+        Text = "animation.step";
         TextSize = 13;
     }
 
@@ -225,6 +225,7 @@ Panel.ControlPanel {
     }
 
     EditBox.Sprite {
+        Alignment = Center;
         DefaultText = "assets/...";
         Position = (120, 120);
         Renderer = &1;

@@ -23,9 +23,10 @@ namespace SpiralOfFate
 		bool _newValue;
 		std::string _fieldName;
 		size_t _index;
+		bool _reset;
 
 	public:
-		FlagOperation(EditableObject &obj, const std::string &&name, T FrameData::*field, size_t index, bool newValue) :
+		FlagOperation(EditableObject &obj, const std::string &&name, T FrameData::*field, size_t index, bool newValue, bool reset) :
 			_obj(obj),
 			_action(obj._action),
 			_actionBlock(obj._actionBlock),
@@ -34,12 +35,18 @@ namespace SpiralOfFate
 			_oldValue((obj.getFrameData().*field).flags & (1ULL << index)),
 			_newValue(newValue),
 			_fieldName(name),
-			_index(index)
+			_index(index),
+			_reset(reset)
 		{
 		}
 
 		void apply() override
 		{
+			bool shouldReset = this->_reset ||
+				this->_obj._action != this->_action ||
+				this->_obj._actionBlock != this->_actionBlock ||
+				this->_obj._animation != this->_animation;
+
 			this->_obj._action = this->_action;
 			this->_obj._actionBlock = this->_actionBlock;
 			this->_obj._animation = this->_animation;
@@ -50,10 +57,19 @@ namespace SpiralOfFate
 				flags |= 1ULL << this->_index;
 			else
 				flags &= ~(1ULL << this->_index);
+			if (shouldReset) {
+				this->_obj._animationCtr = 0;
+				this->_obj.resetState();
+			}
 		}
 
 		void undo() override
 		{
+			bool shouldReset = this->_reset ||
+				this->_obj._action != this->_action ||
+				this->_obj._actionBlock != this->_actionBlock ||
+				this->_obj._animation != this->_animation;
+
 			this->_obj._action = this->_action;
 			this->_obj._actionBlock = this->_actionBlock;
 			this->_obj._animation = this->_animation;
@@ -64,6 +80,10 @@ namespace SpiralOfFate
 				flags |= 1ULL << this->_index;
 			else
 				flags &= ~(1ULL << this->_index);
+			if (shouldReset) {
+				this->_obj._animationCtr = 0;
+				this->_obj.resetState();
+			}
 		}
 
 		std::string getName() const noexcept override

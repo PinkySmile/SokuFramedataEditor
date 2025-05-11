@@ -21,6 +21,7 @@ namespace SpiralOfFate
 		bool intersect(const Rectangle &other);
 		std::vector<std::vector<Vector2f>> getIntersectionPoints(const Rectangle &other);
 		static bool intersect(const Vector2f &A, const Vector2f &B, const Vector2f &C, const Vector2f &D);
+		bool isIn(const Vector2f &point);
 		bool isIn(const Rectangle &other);
 	};
 

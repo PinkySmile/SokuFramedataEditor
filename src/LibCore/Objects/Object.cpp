@@ -78,24 +78,38 @@ namespace SpiralOfFate
 
 	bool Rectangle::isIn(const Rectangle &other)
 	{
-		Vector2f maxPt1{
-			std::max(this->pt1.x, std::max(this->pt2.x, std::max(this->pt3.x, this->pt4.x))),
-			std::max(this->pt1.y, std::max(this->pt2.y, std::max(this->pt3.y, this->pt4.y)))
-		};
-		Vector2f maxPt2{
-			std::max(other.pt1.x, std::max(other.pt2.x, std::max(other.pt3.x, other.pt4.x))),
-			std::max(other.pt1.y, std::max(other.pt2.y, std::max(other.pt3.y, other.pt4.y)))
-		};
-		Vector2f minPt1{
-			std::min(this->pt1.x, std::min(this->pt2.x, std::min(this->pt3.x, this->pt4.x))),
-			std::min(this->pt1.y, std::min(this->pt2.y, std::min(this->pt3.y, this->pt4.y)))
-		};
-		Vector2f minPt2{
-			std::min(other.pt1.x, std::min(other.pt2.x, std::min(other.pt3.x, other.pt4.x))),
-			std::min(other.pt1.y, std::min(other.pt2.y, std::min(other.pt3.y, other.pt4.y)))
-		};
+		return this->isIn(other.pt1) && this->isIn(other.pt2) && this->isIn(other.pt3) && this->isIn(other.pt4);
+	}
 
-		return maxPt1.x < maxPt2.x && maxPt1.y < maxPt2.y && minPt1.x > minPt2.x && minPt1.y > minPt2.y;
+	bool Rectangle::isIn(const Vector2f &point)
+	{
+		// 0 <= dot(AB,AM) <= dot(AB,AB) &&
+		// 0 <= dot(BC,BM) <= dot(BC,BC)
+		auto AB = this->pt2 - this->pt1;
+		auto BC = this->pt3 - this->pt2;
+		auto AM = point - this->pt1;
+		auto BM = point - this->pt2;
+		auto dotAB_AM = AB * AM;
+
+		if (0 > dotAB_AM)
+			return false;
+
+		auto dotAB_AB = AB * AB;
+
+		if (dotAB_AM > dotAB_AB)
+			return false;
+
+		auto dotBC_BM = BC * BM;
+
+		if (0 > dotBC_BM)
+			return false;
+
+		auto dotBC_BC = BC * BM;
+
+		if (dotBC_BM > dotBC_BC)
+			return false;
+
+		return true;
 	}
 
 	Object::Object()
@@ -468,7 +482,7 @@ namespace SpiralOfFate
 			this->_rotation = this->_baseRotation * this->_dir;
 		this->_rotation += data->rotation * this->_dir;
 		this->_rotation = std::fmod(this->_rotation, 2 * M_PI);
-		this->_speed += Vector2f{this->_dir * data->speed.x, static_cast<float>(data->speed.y)};
+		this->_speed += Vector2f{this->_dir * data->speed.x, data->speed.y};
 		this->_position += this->_speed;
 		this->_checkPlatforms(oldPos);
 		if (data->dFlag.airborne) {
@@ -550,7 +564,6 @@ namespace SpiralOfFate
 
 	void Object::_drawBox(const Rectangle &box, const Color &color) const
 	{
-		// TODO: Check if still working
 		sf::VertexArray arr{ sf::PrimitiveType::TriangleFan, 4 };
 		sf::VertexArray arr2{ sf::PrimitiveType::LineStrip, 5 };
 
