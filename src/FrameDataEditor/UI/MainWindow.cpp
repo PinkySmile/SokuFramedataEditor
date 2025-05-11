@@ -8,6 +8,7 @@
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
 #include "../Operations/SpriteChangeOperation.hpp"
+#include "../Operations/SoundChangeOperation.hpp"
 
 template<typename T>
 std::string to_string(T value, int)
@@ -40,13 +41,15 @@ do {                                                                            
                 break;                                                                                           \
         __elem->onTextChange.connect([this](const tgui::String &s){                                              \
                 if (s.empty()) return;                                                                           \
-                fromStringPre(s)                                                                                 \
-                this->applyOperation(new operation(                                                              \
-                        *this->_object,                                                                          \
-                        name,                                                                                    \
-                        &FrameData::field,                                                                       \
-                        fromString(s, FrameData::field)                                                          \
-                ));                                                                                              \
+                try {                                                                                            \
+                        fromStringPre(s)                                                                         \
+                        this->applyOperation(new operation(                                                      \
+                                *this->_object,                                                                  \
+                                name,                                                                            \
+                                &FrameData::field,                                                               \
+                                fromString(s, decltype(FrameData::field))                                        \
+                        ));                                                                                      \
+                } catch (...) { return; }                                                                        \
         });                                                                                                      \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{                                      \
                 auto &data = this->_object->getFrameData();                                                      \
@@ -55,28 +58,67 @@ do {                                                                            
                 __elem->onTextChange.setEnabled(true);                                                           \
         });                                                                                                      \
 } while (false)
+#define PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg) \
+do {                                                                                                                      \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                                                \
+                                                                                                                          \
+        if (!__elem)                                                                                                      \
+                break;                                                                                                    \
+        __elem->onTextChange.connect([this](const tgui::String &s){                                                       \
+                if (s.empty()) {                                                                                          \
+                        this->applyOperation(new operation(                                                               \
+                                *this->_object,                                                                           \
+                                name,                                                                                     \
+                                &FrameData::field,                                                                        \
+                                std::make_optional<decltype(FrameData::field)::value_type>()                              \
+                        ));                                                                                               \
+                        return;                                                                                           \
+                }                                                                                                         \
+                try {                                                                                                     \
+                        fromStringPre(s)                                                                                  \
+                        this->applyOperation(new operation(                                                               \
+                                *this->_object,                                                                           \
+                                name,                                                                                     \
+                                &FrameData::field,                                                                        \
+                                std::make_optional<decltype(FrameData::field)::value_type>(                               \
+                                        fromString(s, decltype(FrameData::field)::value_type)                             \
+                                )                                                                                         \
+                        ));                                                                                               \
+                } catch (...) { return; }                                                                                 \
+        });                                                                                                               \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                                               \
+                auto &data = this->_object->getFrameData();                                                               \
+                __elem->onTextChange.setEnabled(false);                                                                   \
+                if (data.field)                                                                                           \
+                        __elem->setText(toString(*data.field, arg));                                                      \
+                else                                                                                                      \
+                        __elem->setText("");                                                                              \
+                __elem->onTextChange.setEnabled(true);                                                                    \
+        });                                                                                                               \
+} while (false)
 
 #define NO_FROMSTRING_PRE(s)
 
 #define STRING_FROM_STRING(s, _) s.toStdString()
 #define STRING_TO_STRING(s, _) s
 
-#define NUMBER_FROM_STRING(s, data) static_cast<decltype(data)>(std::stof(s.toStdString()))
+#define NUMBER_FROM_STRING(s, type) static_cast<type>(std::stof(s.toStdString()))
 #define NUMBER_TO_STRING(s, p) to_string(s, p)
 
 #define NUMFLAGS_FROM_STRING(s, _) { (unsigned int)std::stoul(s.toStdString(), nullptr, 16) }
 #define NUMFLAGS_TO_STRING(s, _) to_hex(s.flags)
 
-#define VECTOR_FROM_STRING_PRE(s) auto pos = s.find(',');               \
+#define VECTOR_FROM_STRING_PRE(s)                                       \
+        auto pos = s.find(',');                                         \
         auto __x = s.substr(1, pos - 1).toStdString();                  \
         auto __y = s.substr(pos + 1, s.size() - pos - 1).toStdString();
-#define VECTOR_FROM_STRING(s, data) { \
-        (decltype(data.x))std::stof(__x), \
-        (decltype(data.y))std::stof(__y)  \
+#define VECTOR_FROM_STRING(s, type) {       \
+        (decltype(type::x))std::stof(__x), \
+        (decltype(type::y))std::stof(__y)  \
 }
 #define VECTOR_TO_STRING(s, p) "(" + \
-	to_string(s.x, p) + "," +    \
-	to_string(s.y, p) +          \
+	to_string((s).x, p) + "," +  \
+	to_string((s).y, p) +        \
 ")"
 
 #define RECT_FROM_STRING_PRE(s)                                     \
@@ -91,9 +133,9 @@ do {                                                                            
         auto __pos3 = __remainder2.find(',');                       \
         auto __w = __remainder2.substr(0, __pos3 + 1).toStdString();\
         auto __h = __remainder2.substr(__pos3 + 1, __remainder2.size() - __pos3 - 1).toStdString();
-#define RECT_FROM_STRING(s, data) { \
-        {(decltype(data.pos.x))std::stof(__x),  (decltype(data.pos.y))std::stof(__y) }, \
-        {(decltype(data.size.x))std::stof(__w), (decltype(data.size.y))std::stof(__h) } \
+#define RECT_FROM_STRING(s, type) {                                                       \
+        {(decltype(type::pos.x))std::stof(__x),  (decltype(type::pos.y))std::stof(__y) }, \
+        {(decltype(type::size.x))std::stof(__w), (decltype(type::size.y))std::stof(__h) } \
 }
 #define RECT_TO_STRING(s, p) "(" +     \
         to_string(s.pos.x, p) + "," +  \
@@ -106,10 +148,14 @@ do {                                                                            
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, STRING_TO_STRING, NO_FROMSTRING_PRE, STRING_FROM_STRING, _)
 #define PLACE_HOOK_NUMBER(container, guiId, field, name, operation, precision) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision)
+#define PLACE_HOOK_OPTIONAL_NUMBER(container, guiId, field, name, operation, precision) \
+	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision)
 #define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _)
 #define PLACE_HOOK_VECTOR(container, guiId, field, name, operation, precision) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision)
+#define PLACE_HOOK_OPTIONAL_VECTOR(container, guiId, field, name, operation, precision) \
+	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision)
 #define PLACE_HOOK_RECT(container, guiId, field, name, operation) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0)
 #define PLACE_HOOK_FLAG(container, guiId, field, index, name)                      \
@@ -263,7 +309,7 @@ std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
 	return Character::actionToString(id);
 }
 
-void SpiralOfFate::MainWindow::_createFlagsListPopup(const std::string &path)
+void SpiralOfFate::MainWindow::_createGenericPopup(const std::string &path)
 {
 	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
 	auto contentPanel = std::make_shared<LocalizedContainer<tgui::ScrollablePanel>>(this->_editor);
@@ -318,8 +364,9 @@ void SpiralOfFate::MainWindow::_createMoveListPopup()
 	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 
 	for (auto &[moveId, _] : this->_object->_moves) {
+		auto name = this->_localizeActionName(moveId);
 		auto label = tgui::Label::create(std::to_string(moveId));
-		auto button = tgui::Button::create(this->_localizeActionName(moveId));
+		auto button = tgui::Button::create(name);
 
 		label->setPosition(10, i * 25 + 12);
 		button->setPosition(50, i * 25 + 10);
@@ -333,6 +380,12 @@ void SpiralOfFate::MainWindow::_createMoveListPopup()
 			button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
 			button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
 			button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
+		} else if (name.rfind("Action #", 0) == 0) {
+			button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00});
+			button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0xA0, 0x40});
+			button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x50, 0});
+			button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x40, 0x00});
+			button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x60, 0x20});
 		}
 
 		button->onClick.connect([this](unsigned move){
@@ -372,10 +425,13 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
 	auto aFlags = container.get<tgui::Button>("AFlagsButton");
 	auto dFlags = container.get<tgui::Button>("DFlagsButton");
+	auto hitEdit = container.get<tgui::Button>("HitEdit");
+	auto blockEdit = container.get<tgui::Button>("BlockEdit");
+	auto generalEdit = container.get<tgui::Button>("GeneralEdit");
 
 	if (action)
 		action->onReturnOrUnfocus.connect([this](std::weak_ptr<tgui::EditBox> This, const tgui::String &s){
-			if (This.lock()->getText() == s)
+			if (std::to_string(this->_object->_action) == s)
 				return;
 			if (s.empty()) {
 				This.lock()->setText(std::to_string(this->_object->_action));
@@ -397,10 +453,19 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		}, std::weak_ptr(action));
 	if (aFlags)
 		// TODO: character/subobject
-		aFlags->onClick.connect(&MainWindow::_createFlagsListPopup, this, "assets/gui/editor/character/attackFlags.gui");
+		aFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/attackFlags.gui");
 	if (dFlags)
 		// TODO: character/subobject
-		dFlags->onClick.connect(&MainWindow::_createFlagsListPopup, this, "assets/gui/editor/character/defenseFlags.gui");
+		dFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/defenseFlags.gui");
+	if (hitEdit)
+		// TODO: character/subobject
+		hitEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/hitProperties.gui");
+	if (blockEdit)
+		// TODO: character/subobject
+		blockEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/blockProperties.gui");
+	if (generalEdit)
+		// TODO: character/subobject
+		generalEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
 	if (actionSelect)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this);
 	if (play)
@@ -429,13 +494,24 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 				this->_populateData(*key);
 		});
 
-	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("editoraction.sprite"),   SpriteChangeOperation);
-	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("editoraction.duration"), BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("editoraction.offset"),   BasicDataOperation, 0);
-	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("editoraction.scale"),    BasicDataOperation, 2);
-	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("editoraction.bounds"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("editoraction.aflags"),   BasicDataOperation);
-	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("editoraction.dflags"),   BasicDataOperation);
+	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation);
+	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, 2);
+	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation);
+	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation);
+	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation);
+	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, 0);
+
+	PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, 0);
+	PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, 0);
+	PLACE_HOOK_NUMBER(container,          "Marker",    specialMarker,     this->_editor.localize("animation.general.marker"),        BasicDataOperation, 0);
+	PLACE_HOOK_OPTIONAL_NUMBER(container, "Tier",      priority,          this->_editor.localize("animation.general.tier"),          BasicDataOperation, 0);
+	PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, 2);
+	PLACE_HOOK_OPTIONAL_VECTOR(container, "Gravity",   gravity,           this->_editor.localize("animation.general.gravity"),       BasicDataOperation, 2);
+	PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         SoundChangeOperation);
+	PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, 0);
+
 	for (size_t i = 0; i < 64; i++)
 		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)));
 	for (size_t i = 0; i < 64; i++)

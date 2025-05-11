@@ -342,18 +342,18 @@ namespace SpiralOfFate
 			this->counterHitSpeed.y = data["counter_hit_speed"]["y"];
 		}
 		if (!this->soundPath.empty()) {
-			if (this->soundPath[0] != 'a') {
+			if (this->soundPath.find('.') == std::string::npos) {
 				this->soundHandle = std::stoul(this->soundPath);
 				game->soundMgr.addRef(this->soundHandle);
 			} else
-				this->soundHandle = game->soundMgr.load(this->soundPath);
+				this->soundHandle = game->soundMgr.load("assets/sfxs/se/" + this->soundPath);
 		}
 		if (!this->hitSoundPath.empty()){
-			if (this->hitSoundPath[0] >= '0' && this->hitSoundPath[0] <= '9') {
+			if (this->hitSoundPath.find('.') == std::string::npos) {
 				this->hitSoundHandle = std::stoul(this->hitSoundPath);
 				game->soundMgr.addRef(this->hitSoundHandle);
 			} else
-				this->hitSoundHandle = game->soundMgr.load(this->hitSoundPath);
+				this->hitSoundHandle = game->soundMgr.load("assets/sfxs/se/" + this->hitSoundPath);
 		}
 	}
 
@@ -522,18 +522,18 @@ namespace SpiralOfFate
 		this->soundHandle = 0;
 		this->hitSoundHandle = 0;
 		if (!this->soundPath.empty()) {
-			if (this->soundPath[0] != 'a') {
+			if (this->soundPath.find('.') == std::string::npos) {
 				this->soundHandle = std::stoul(this->soundPath);
 				game->soundMgr.addRef(this->soundHandle);
 			} else
-				this->soundHandle = game->soundMgr.load(this->soundPath);
+				this->soundHandle = game->soundMgr.load("assets/sfxs/se/" + this->soundPath);
 		}
 		if (!this->hitSoundPath.empty()){
-			if (this->hitSoundPath[0] != 'a') {
+			if (this->hitSoundPath.find('.') == std::string::npos) {
 				this->hitSoundHandle = std::stoul(this->hitSoundPath);
 				game->soundMgr.addRef(this->hitSoundHandle);
 			} else
-				this->hitSoundHandle = game->soundMgr.load(this->hitSoundPath);
+				this->hitSoundHandle = game->soundMgr.load("assets/sfxs/se/" + this->hitSoundPath);
 		}
 	}
 

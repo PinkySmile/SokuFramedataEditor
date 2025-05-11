@@ -19,13 +19,13 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	sf::RenderStates statesSFML;
 	auto realTarget = sfmlTarget.getTarget();
 
-	this->_stageSprite.setPosition({-50, 50 - this->getSize().y});
+	this->_stageSprite.setPosition({-150, 50 - this->getSize().y});
 	this->_stageSprite.setTextureRect(sf::IntRect{
-		{0, (int)this->_stageTexture.getSize().y - (int)this->getSize().y - 50},
-		{(int)this->getSize().x, (int)this->getSize().y}
+		{-100, (int)this->_stageTexture.getSize().y - (int)this->getSize().y - 50},
+		{(int)this->getSize().x + 100, (int)this->getSize().y + 100}
 	});
 
-	states.transform.translate({100, this->getSize().y - 50});
+	states.transform.translate({100, this->getSize().y - 150});
 	statesSFML.transform = sf::Transform(
 		transformMatrix[0], transformMatrix[4], transformMatrix[12],
 		transformMatrix[1], transformMatrix[5], transformMatrix[13],

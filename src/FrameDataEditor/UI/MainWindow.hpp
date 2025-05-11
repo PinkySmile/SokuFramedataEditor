@@ -82,7 +82,7 @@ namespace SpiralOfFate
 
 		void _createMoveListPopup();
 		void _placeUIHooks(const tgui::Container &container);
-		void _createFlagsListPopup(const std::string &path);
+		void _createGenericPopup(const std::string &path);
 		void _populateData(const tgui::Container &container);
 		void _populateFrameData(const tgui::Container &container);
 	};
