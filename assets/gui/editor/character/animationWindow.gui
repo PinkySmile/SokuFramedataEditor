@@ -1,6 +1,30 @@
 Renderer.1 {
     BackgroundColor = #F5F5F5;
     BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorDown = #EBEBEB;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorDown = black;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorDown = black;
+    TextColorHover = black;
+    Texture = None;
+    TextureDisabled = None;
+    TextureDown = None;
+    TextureDownFocused = None;
+    TextureDownHover = None;
+    TextureFocused = None;
+    TextureHover = None;
+}
+
+Renderer.2 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
     BackgroundColorHover = white;
     BorderColor = #3C3C3C;
     BorderColorDisabled = #7D7D7D;
@@ -20,7 +44,7 @@ Renderer.1 {
     TextureHover = None;
 }
 
-Renderer.2 {
+Renderer.3 {
     BackgroundColor = #F5F5F5;
     BackgroundColorDisabled = #E6E6E6;
     BackgroundColorDown = #EBEBEB;
@@ -44,7 +68,7 @@ Renderer.2 {
     TextureHover = None;
 }
 
-Renderer.3 {
+Renderer.4 {
     BackgroundColor = transparent;
     BorderColor = #3C3C3C;
     Borders = (0, 0, 0, 0);
@@ -70,7 +94,7 @@ Renderer.3 {
     }
 }
 
-Renderer.4 {
+Renderer.5 {
     ArrowColor = #3C3C3C;
     ArrowColorHover = black;
     BackgroundColor = #F5F5F5;
@@ -84,30 +108,6 @@ Renderer.4 {
     TextureArrowUpHover = None;
 }
 
-Renderer.5 {
-    BackgroundColor = #F5F5F5;
-    BackgroundColorDisabled = #E6E6E6;
-    BackgroundColorDown = #EBEBEB;
-    BackgroundColorHover = white;
-    BorderColor = #3C3C3C;
-    BorderColorDisabled = #7D7D7D;
-    BorderColorDown = black;
-    BorderColorFocused = #1E1EB4;
-    BorderColorHover = black;
-    Borders = (1, 1, 1, 1);
-    TextColor = #3C3C3C;
-    TextColorDisabled = #7D7D7D;
-    TextColorDown = black;
-    TextColorHover = black;
-    Texture = None;
-    TextureDisabled = None;
-    TextureDown = None;
-    TextureDownFocused = None;
-    TextureDownHover = None;
-    TextureFocused = None;
-    TextureHover = None;
-}
-
 Panel.AnimationPanel {
     Size = (ControlPanel.x, &.h);
 
@@ -115,6 +115,58 @@ Panel.AnimationPanel {
         BackgroundColor = #ABABAB;
         BorderColor = black;
         TextureBackground = None;
+    }
+
+    Panel.Boxes {
+        Size = (&.w, &.h);
+        UserData = "";
+
+        Renderer {
+            BackgroundColor = transparent;
+            BorderColor = black;
+            TextureBackground = None;
+        }
+    }
+
+    BitmapButton.ShowBoxes {
+        Image = "../boxes.png" Middle(0, 0, 16, 16) NoSmooth;
+        ImageScaling = 0;
+        Position = (5, 5);
+        Renderer = &1;
+        Size = (40, 40);
+        TextSize = 13;
+    }
+
+    BitmapButton.Displace {
+        Image = "../dispose.png" NoSmooth;
+        ImageScaling = 0;
+        Position = (5, 50);
+        Size = (40, 40);
+        TextSize = 13;
+
+        Renderer {
+            BackgroundColor = #F5F5F5;
+            BackgroundColorDisabled = #E6E6E6;
+            BackgroundColorDown = #EBEBEB;
+            BackgroundColorHover = white;
+            BorderColor = #3C3C3C;
+            BorderColorDisabled = #7D7D7D;
+            BorderColorDown = black;
+            BorderColorFocused = #1E1EB4;
+            BorderColorHover = black;
+            Borders = (1, 1, 1, 1);
+            TextColor = #3C3C3C;
+            TextColorDisabled = #7D7D7D;
+            TextColorDown = black;
+            TextColorHover = black;
+            Texture = None;
+            TextureDisabled = None;
+            TextureDown = None;
+            TextureDownFocused = None;
+            TextureDownHover = None;
+            TextureFocused = None;
+            TextureHover = None;
+        }
     }
 }
 
@@ -131,14 +183,14 @@ Panel.ControlPanel {
     EditBox.ActionID {
         Alignment = Center;
         Position = (110, 10);
-        Renderer = &1;
+        Renderer = &2;
         Size = (42, 21);
         TextSize = 13;
     }
 
     Button.ActionSelect {
         Position = (160, 10);
-        Renderer = &2;
+        Renderer = &3;
         Size = (130, 21);
         TextSize = 13;
     }
@@ -146,7 +198,7 @@ Panel.ControlPanel {
     Label.BlockLabel {
         HorizontalAlignment = Right;
         Position = (0, 38);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.block";
@@ -157,7 +209,7 @@ Panel.ControlPanel {
         Maximum = 10;
         Minimum = 0;
         Position = (110, 36);
-        Renderer = &4;
+        Renderer = &5;
         Size = (42, 21);
         Step = 1;
         Value = 0;
@@ -166,7 +218,7 @@ Panel.ControlPanel {
     Label.FrameLabel {
         HorizontalAlignment = Right;
         Position = (0, 58);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.frame";
@@ -177,7 +229,7 @@ Panel.ControlPanel {
         Maximum = 10;
         Minimum = 0;
         Position = (110, 56);
-        Renderer = &4;
+        Renderer = &5;
         Size = (42, 21);
         Step = 1;
         Value = 0;
@@ -185,7 +237,7 @@ Panel.ControlPanel {
 
     Button.Play {
         Position = (160, 36);
-        Renderer = &2;
+        Renderer = &3;
         Size = (130, 21);
         Text = "animation.play";
         TextSize = 13;
@@ -193,7 +245,7 @@ Panel.ControlPanel {
 
     Button.Step {
         Position = (160, 56);
-        Renderer = &2;
+        Renderer = &3;
         Size = (130, 21);
         Text = "animation.step";
         TextSize = 13;
@@ -228,7 +280,7 @@ Panel.ControlPanel {
         Alignment = Center;
         DefaultText = "assets/...";
         Position = (120, 120);
-        Renderer = &1;
+        Renderer = &2;
         Size = (170, 21);
         TextSize = 13;
     }
@@ -237,7 +289,7 @@ Panel.ControlPanel {
         Alignment = Center;
         InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4},[0-9]{1,4},[0-9]{1,4}\\)";
         Position = (120, 150);
-        Renderer = &1;
+        Renderer = &2;
         Size = (145, 21);
         Text = "(0,0,0,0)";
         TextSize = 13;
@@ -247,7 +299,7 @@ Panel.ControlPanel {
         Alignment = Center;
         InputValidator = UInt;
         Position = (120, 210);
-        Renderer = &1;
+        Renderer = &2;
         Size = (170, 21);
         Text = 0;
         TextSize = 13;
@@ -257,7 +309,7 @@ Panel.ControlPanel {
         Alignment = Center;
         InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4}\\)";
         Position = (120, 180);
-        Renderer = &1;
+        Renderer = &2;
         Size = (170, 21);
         Text = "(0,0)";
         TextSize = 13;
@@ -267,7 +319,7 @@ Panel.ControlPanel {
         Alignment = Center;
         InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
         Position = (120, 240);
-        Renderer = &1;
+        Renderer = &2;
         Size = (170, 21);
         Text = "(1.0,1.0)";
         TextSize = 13;
@@ -277,7 +329,7 @@ Panel.ControlPanel {
         Image = "crayon.png" Smooth;
         ImageScaling = 0;
         Position = (270, 150);
-        Renderer = &5;
+        Renderer = &1;
         Size = (21, 21);
         TextSize = 13;
     }
@@ -285,7 +337,7 @@ Panel.ControlPanel {
     Label.Label1 {
         HorizontalAlignment = Right;
         Position = (5, 14);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (100, 17);
         Text = "animation.action";
@@ -295,7 +347,7 @@ Panel.ControlPanel {
     Label.Label2 {
         HorizontalAlignment = Right;
         Position = (5, 122);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.sprite";
@@ -305,7 +357,7 @@ Panel.ControlPanel {
     Label.Label3 {
         HorizontalAlignment = Right;
         Position = (5, 152);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.bounds";
@@ -315,7 +367,7 @@ Panel.ControlPanel {
     Label.Label4 {
         HorizontalAlignment = Right;
         Position = (5, 182);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.offset";
@@ -325,7 +377,7 @@ Panel.ControlPanel {
     Label.Label5 {
         HorizontalAlignment = Right;
         Position = (5, 242);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.scale";
@@ -335,7 +387,7 @@ Panel.ControlPanel {
     Label.Label6 {
         HorizontalAlignment = Right;
         Position = (5, 212);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.duration";
@@ -345,7 +397,7 @@ Panel.ControlPanel {
     Label.Label7 {
         HorizontalAlignment = Right;
         Position = (5, 272);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.aflags";
@@ -355,7 +407,7 @@ Panel.ControlPanel {
     Label.Label8 {
         HorizontalAlignment = Right;
         Position = (5, 302);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
         Text = "animation.dflags";
@@ -366,7 +418,7 @@ Panel.ControlPanel {
         Image = "crayon.png" Smooth;
         ImageScaling = 0;
         Position = (270, 270);
-        Renderer = &5;
+        Renderer = &1;
         Size = (21, 21);
         TextSize = 13;
     }
@@ -375,7 +427,7 @@ Panel.ControlPanel {
         Image = "crayon.png" Smooth;
         ImageScaling = 0;
         Position = (270, 300);
-        Renderer = &5;
+        Renderer = &1;
         Size = (21, 21);
         TextSize = 13;
     }
@@ -384,7 +436,7 @@ Panel.ControlPanel {
         Alignment = Center;
         InputValidator = "[0-9A-Fa-f]*";
         Position = (120, 270);
-        Renderer = &1;
+        Renderer = &2;
         Size = (145, 21);
         Text = 0000000000000000;
         TextSize = 13;
@@ -394,7 +446,7 @@ Panel.ControlPanel {
         Alignment = Center;
         InputValidator = "[0-9A-Fa-f]*";
         Position = (120, 300);
-        Renderer = &1;
+        Renderer = &2;
         Size = (145, 21);
         Text = 0000000000000000;
         TextSize = 13;
@@ -403,7 +455,7 @@ Panel.ControlPanel {
     Label.Label9 {
         HorizontalAlignment = Right;
         Position = (5, 332);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (170, 17);
         Text = "animation.hitproperties";
@@ -412,7 +464,7 @@ Panel.ControlPanel {
 
     Button.ClearHit {
         Position = (270, 330);
-        Renderer = &2;
+        Renderer = &3;
         Size = (20, 21);
         Text = X;
         TextSize = 13;
@@ -420,7 +472,7 @@ Panel.ControlPanel {
 
     Button.HitEdit {
         Position = (180, 330);
-        Renderer = &2;
+        Renderer = &3;
         Size = (85, 21);
         Text = "animation.edit";
         TextSize = 13;
@@ -429,7 +481,7 @@ Panel.ControlPanel {
     Label.Label10 {
         HorizontalAlignment = Right;
         Position = (5, 392);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (170, 17);
         Text = "animation.generalproperties";
@@ -438,7 +490,7 @@ Panel.ControlPanel {
 
     Button.GeneralEdit {
         Position = (180, 390);
-        Renderer = &2;
+        Renderer = &3;
         Size = (110, 21);
         Text = "animation.edit";
         TextSize = 13;
@@ -446,7 +498,7 @@ Panel.ControlPanel {
 
     Button.BlockEdit {
         Position = (180, 360);
-        Renderer = &2;
+        Renderer = &3;
         Size = (85, 21);
         Text = "animation.edit";
         TextSize = 13;
@@ -454,7 +506,7 @@ Panel.ControlPanel {
 
     Button.ClearBlock {
         Position = (270, 360);
-        Renderer = &2;
+        Renderer = &3;
         Size = (20, 21);
         Text = X;
         TextSize = 13;
@@ -463,7 +515,7 @@ Panel.ControlPanel {
     Label.Label11 {
         HorizontalAlignment = Right;
         Position = (5, 362);
-        Renderer = &3;
+        Renderer = &4;
         ScrollbarPolicy = Automatic;
         Size = (170, 17);
         Text = "animation.blockproperties";

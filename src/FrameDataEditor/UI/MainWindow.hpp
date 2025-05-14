@@ -8,6 +8,7 @@
 
 #include <TGUI/Widgets/ChildWindow.hpp>
 #include "LocalizedContainer.hpp"
+#include "PreviewWidget.hpp"
 #include "../Operations/IOperation.hpp"
 
 namespace SpiralOfFate
@@ -72,6 +73,7 @@ namespace SpiralOfFate
 		void rendererChanged(const tgui::String &property) override;
 
 	private:
+		PreviewWidget::Ptr _preview;
 		bool _paused = true;
 		std::string _path;
 		std::string _character;

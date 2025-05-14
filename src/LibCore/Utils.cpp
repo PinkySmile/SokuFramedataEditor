@@ -290,16 +290,7 @@ namespace SpiralOfFate::Utils
 	template<>
 	void setRenderer(const tgui::Container::Ptr &widget)
 	{
-		auto renderer = tgui::Theme::getDefault()->getRendererNoThrow(widget->getWidgetType());
-
-		if (renderer)
-			widget->setRenderer(renderer);
-		for (auto &w : widget->getWidgets()) {
-			if (auto c = w->cast<tgui::Container>())
-				Utils::setRenderer(c);
-			else
-				Utils::setRenderer(w);
-		}
+		Utils::setRenderer(*widget);
 	}
 
 	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(sf::Color color)> &onFinish, sf::Color startColor)

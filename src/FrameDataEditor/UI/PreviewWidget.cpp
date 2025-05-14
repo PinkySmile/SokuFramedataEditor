@@ -34,7 +34,7 @@ void SpiralOfFate::PreviewWidget::_drawBox(const SpiralOfFate::Rectangle &box, c
 void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const
 {
 	auto &sfmlTarget = dynamic_cast<tgui::BackendRenderTargetSFML &>(target);
-	const std::array<float, 16>& transformMatrix = states.transform.getMatrix();
+	const std::array<float, 16> &transformMatrix = states.transform.getMatrix();
 	sf::RenderStates statesSFML;
 	auto realTarget = sfmlTarget.getTarget();
 
@@ -52,34 +52,35 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	);
 	statesSFML.coordinateType = sf::CoordinateType::Normalized;
 	realTarget->draw(this->_stageSprite, statesSFML);
-	this->_object.render(*realTarget, statesSFML);
+	this->_object.render(*realTarget, statesSFML, this->displaceObject);
 
-	for (auto &hurtBox : this->_object._getModifiedHurtBoxes())
-		this->_drawBox(hurtBox, Color::Green, statesSFML);
-	for (auto &hitBox : this->_object._getModifiedHitBoxes())
-		this->_drawBox(hitBox, Color::Red, statesSFML);
+	if (this->displayBoxes) {
+		for (auto &hurtBox : this->_object._getModifiedHurtBoxes(this->displaceObject))
+			this->_drawBox(hurtBox, Color::Green, statesSFML);
+		for (auto &hitBox : this->_object._getModifiedHitBoxes(this->displaceObject))
+			this->_drawBox(hitBox, Color::Red, statesSFML);
 
-	auto &data = this->_object.getFrameData();
+		auto &data = this->_object.getFrameData();
 
-	if (data.collisionBox) {
-		auto &box = *data.collisionBox;
-		Vector2f realPos = {
-			this->_object._position.x,
-			-this->_object._position.y
-		};
+		if (data.collisionBox) {
+			auto &box = *data.collisionBox;
+			Vector2f realPos = this->displaceObject ? Vector2f{
+				this->_object._position.x,
+				-this->_object._position.y
+			} : Vector2f{0, 0};
 
-		this->_drawBox({
-			realPos + box.pos,
-			realPos + Vector2f{
-				static_cast<float>(box.pos.x),
-				static_cast<float>(box.pos.y) + box.size.y
-			},
-			realPos + box.pos + box.size,
-			realPos + Vector2f{
-				static_cast<float>(box.pos.x) + box.size.x,
-				static_cast<float>(box.pos.y)
-			}
-		}, Color::Yellow, statesSFML);
+			this->_drawBox({
+				realPos + box.pos,
+				realPos + Vector2f{
+					static_cast<float>(box.pos.x),
+					static_cast<float>(box.pos.y) + box.size.y
+				},
+				realPos + box.pos + box.size,
+				realPos + Vector2f{
+					static_cast<float>(box.pos.x) + box.size.x,
+					static_cast<float>(box.pos.y)
+				}
+			}, Color::Yellow, statesSFML);
+		}
 	}
-
-;}
+}

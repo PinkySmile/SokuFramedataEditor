@@ -14,7 +14,7 @@ EditableObject::EditableObject(const std::string &frameData) :
 	this->_moves = FrameData::loadFile(frameData, this->_folder);
 }
 
-void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states) const
+void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes) const
 {
 	sf::RectangleShape rect;
 	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
@@ -22,9 +22,11 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states) c
 		data.scale.x * data.textureBounds.size.x,
 		data.scale.y * data.textureBounds.size.y
 	};
-	auto result = data.offset + this->_position;
+	auto result = data.offset;
 	Sprite sprite;
 
+	if (displaceBoxes)
+		result += this->_position;
 	result.y *= -1;
 	result += Vector2f{
 		size.x / -2.f,
@@ -36,7 +38,10 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states) c
 	};
 	sprite.setColor(Color::White);
 	sprite.setOrigin(data.textureBounds.size / 2.f);
-	sprite.setRotation(sf::radians(this->_rotation));
+	if (displaceBoxes)
+		sprite.setRotation(sf::radians(this->_rotation));
+	else
+		sprite.setRotation(sf::radians(0));
 	sprite.setPosition(result);
 	sprite.setScale(data.scale);
 	sprite.setTexture(data.textureHandle);
@@ -56,7 +61,10 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states) c
 	rect.setOutlineThickness(2);
 	rect.setOutlineColor(Color::White);
 	rect.setFillColor(Color::Black);
-	rect.setPosition(Vector2f{-4 + this->_position.x, -4 - this->_position.y});
+	if (displaceBoxes)
+		rect.setPosition(Vector2f{-4 + this->_position.x, -4 - this->_position.y});
+	else
+		rect.setPosition(Vector2f{-4, -4});
 	rect.setSize({9, 9});
 	target.draw(rect, states);
 }
@@ -89,35 +97,35 @@ const SpiralOfFate::FrameData &EditableObject::getFrameData() const
 	return this->_moves.at(this->_action).at(this->_actionBlock).at(this->_animation);
 }
 
-std::vector<SpiralOfFate::Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, const std::vector<SpiralOfFate::Box> &boxes) const
+std::vector<SpiralOfFate::Rectangle> EditableObject::_getModifiedBoxes(bool displaceObject, const FrameData &data, const std::vector<SpiralOfFate::Box> &boxes) const
 {
 	std::vector<SpiralOfFate::Rectangle> result;
 	Vector2f center{
 		static_cast<float>(data.offset.x),
 		data.textureBounds.size.y * data.scale.y / -2.f - data.offset.y
 	};
+	auto rotation = displaceObject ? this->_rotation : 0;
+	auto real = displaceObject ? Vector2f{this->_position.x, -this->_position.y} : Vector2f{0, 0};
 
-	for (auto &_box : boxes) {
-		Rectangle __box;
-		auto real = Vector2f{this->_position.x, -this->_position.y};
-
-		__box.pt1 = real + _box.pos.rotation(this->_rotation, center);
-		__box.pt2 = real + (_box.pos + Vector2f{0, static_cast<float>(_box.size.y)}).rotation(this->_rotation, center);
-		__box.pt3 = real + (_box.pos + _box.size.to<int>()).rotation(this->_rotation, center);
-		__box.pt4 = real + (_box.pos + Vector2f{static_cast<float>(_box.size.x), 0}).rotation(this->_rotation, center);
-		result.push_back(__box);
-	}
+	result.reserve(boxes.size());
+	for (auto &_box : boxes)
+		result.push_back({
+			.pt1 = real + _box.pos.rotation(rotation, center),
+			.pt2 = real + (_box.pos + Vector2f{0, static_cast<float>(_box.size.y)}).rotation(rotation, center),
+			.pt3 = real + (_box.pos + _box.size.to<int>()).rotation(rotation, center),
+			.pt4 = real + (_box.pos + Vector2f{static_cast<float>(_box.size.x), 0}).rotation(rotation, center)
+		});
 	return result;
 }
 
-std::vector<SpiralOfFate::Rectangle> EditableObject::_getModifiedHurtBoxes() const
+std::vector<SpiralOfFate::Rectangle> EditableObject::_getModifiedHurtBoxes(bool displaceObject) const
 {
-	return this->_getModifiedBoxes(this->getFrameData(), this->getFrameData().hurtBoxes);
+	return this->_getModifiedBoxes(displaceObject, this->getFrameData(), this->getFrameData().hurtBoxes);
 }
 
-std::vector<SpiralOfFate::Rectangle> EditableObject::_getModifiedHitBoxes() const
+std::vector<SpiralOfFate::Rectangle> EditableObject::_getModifiedHitBoxes(bool displaceObject) const
 {
-	return this->_getModifiedBoxes(this->getFrameData(), this->getFrameData().hitBoxes);
+	return this->_getModifiedBoxes(displaceObject, this->getFrameData(), this->getFrameData().hitBoxes);
 }
 
 void EditableObject::resetState()

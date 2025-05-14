@@ -4,7 +4,6 @@
 
 #include <TGUI/RendererDefines.hpp>
 #include "MainWindow.hpp"
-#include "PreviewWidget.hpp"
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
 #include "../Operations/SpriteChangeOperation.hpp"
@@ -225,20 +224,37 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const Fra
 	_character(std::filesystem::path(frameDataPath).parent_path().filename().string()),
 	_object(new EditableObject(frameDataPath))
 {
-	auto preview = std::make_shared<PreviewWidget>(*this->_object);
-
-	preview->setPosition(0, 0);
-	preview->setSize("&.w", "&.h");
+	this->_preview = std::make_shared<PreviewWidget>(*this->_object);
+	this->_preview->setPosition(0, 0);
+	this->_preview->setSize("&.w", "&.h");
 
 	this->m_renderer = aurora::makeCopied<Renderer>();
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/character/animationWindow.gui");
+
+	auto panel = this->get<tgui::Panel>("AnimationPanel");
+	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
+	auto displace = panel->get<tgui::BitmapButton>("Displace");
+	auto boxes = panel->get<tgui::Panel>("Boxes");
+
+	boxes->setUserData(false);
 	Utils::setRenderer(this);
 	this->setSize(1200, 600);
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
 	this->setTitle(frameDataPath);
 	this->setResizable();
-	this->get<tgui::Panel>("AnimationPanel")->add(preview);
+
+	panel->add(this->_preview);
+	this->_preview->moveToBack();
+
+	showBoxes->onClick.connect([this](std::weak_ptr<tgui::BitmapButton> This){
+		this->_preview->displayBoxes = !this->_preview->displayBoxes;
+		This.lock()->setImage(tgui::Texture("assets/gui/editor/" + std::string(this->_preview->displayBoxes ? "" : "no") + "boxes.png"));
+	}, std::weak_ptr(showBoxes));
+	displace->onClick.connect([this](std::weak_ptr<tgui::BitmapButton> This){
+		this->_preview->displaceObject = !this->_preview->displaceObject;
+		This.lock()->setImage(tgui::Texture("assets/gui/editor/" + std::string(this->_preview->displaceObject ? "" : "no") + "dispose.png"));
+	}, std::weak_ptr(displace));
 
 	this->onFocus.connect([this]{
 		this->m_titleText.setColor(this->_titleColorFocusedCached);
@@ -510,7 +526,9 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	if (actionSelect)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this);
 	if (play)
-		play->onPress.connect([this]{ this->_paused = false; });
+		play->onPress.connect([this]{
+			this->_paused = false;
+		});
 	if (step)
 		step->onPress.connect([this]{
 			this->_paused = false;

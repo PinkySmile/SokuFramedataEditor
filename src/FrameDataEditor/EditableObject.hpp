@@ -20,9 +20,9 @@ public:
 	float _rotation = 0;
 	std::string _folder;
 
-	std::vector<SpiralOfFate::Rectangle> _getModifiedBoxes(const SpiralOfFate::FrameData &data, const std::vector<SpiralOfFate::Box> &boxes) const;
-	std::vector<SpiralOfFate::Rectangle> _getModifiedHurtBoxes() const;
-	std::vector<SpiralOfFate::Rectangle> _getModifiedHitBoxes() const;
+	std::vector<SpiralOfFate::Rectangle> _getModifiedBoxes(bool displaceObject, const SpiralOfFate::FrameData &data, const std::vector<SpiralOfFate::Box> &boxes) const;
+	std::vector<SpiralOfFate::Rectangle> _getModifiedHurtBoxes(bool displaceObject) const;
+	std::vector<SpiralOfFate::Rectangle> _getModifiedHitBoxes(bool displaceObject) const;
 	void _simulate(const SpiralOfFate::FrameData &data);
 
 	EditableObject() = default;
@@ -30,7 +30,7 @@ public:
 	~EditableObject() = default;
 	SpiralOfFate::FrameData &getFrameData();
 	const SpiralOfFate::FrameData &getFrameData() const;
-	void render(sf::RenderTarget &target, sf::RenderStates states) const;
+	void render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes) const;
 	void update();
 	void resetState();
 };

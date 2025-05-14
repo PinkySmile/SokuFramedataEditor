@@ -22,7 +22,8 @@ namespace SpiralOfFate
 		typedef std::shared_ptr<PreviewWidget> Ptr; //!< Shared widget pointer
 		typedef std::shared_ptr<const PreviewWidget> ConstPtr; //!< Shared constant widget pointer
 
-		bool displayBoxes;
+		bool displayBoxes = true;
+		bool displaceObject = true;
 
 		PreviewWidget(const EditableObject &object);
 		~PreviewWidget() override = default;
