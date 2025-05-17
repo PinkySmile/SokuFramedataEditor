@@ -78,10 +78,10 @@ namespace SpiralOfFate
 
 	bool Rectangle::isIn(const Rectangle &other)
 	{
-		return this->isIn(other.pt1) && this->isIn(other.pt2) && this->isIn(other.pt3) && this->isIn(other.pt4);
+		return this->contains(other.pt1) && this->contains(other.pt2) && this->contains(other.pt3) && this->contains(other.pt4);
 	}
 
-	bool Rectangle::isIn(const Vector2f &point)
+	bool Rectangle::contains(const Vector2f &point)
 	{
 		// 0 <= dot(AB,AM) <= dot(AB,AB) &&
 		// 0 <= dot(BC,BM) <= dot(BC,BC)
@@ -104,7 +104,7 @@ namespace SpiralOfFate
 		if (0 > dotBC_BM)
 			return false;
 
-		auto dotBC_BC = BC * BM;
+		auto dotBC_BC = BC * BC;
 
 		if (dotBC_BM > dotBC_BC)
 			return false;
