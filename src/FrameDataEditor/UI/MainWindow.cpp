@@ -234,9 +234,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const Fra
 	auto panel = this->get<tgui::Panel>("AnimationPanel");
 	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
 	auto displace = panel->get<tgui::BitmapButton>("Displace");
-	auto boxes = panel->get<tgui::Panel>("Boxes");
 
-	boxes->setUserData(false);
 	Utils::setRenderer(this);
 	this->setSize(1200, 600);
 	this->setPosition(10, 30);
@@ -540,6 +538,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_paused = true;
 			this->_object->_animation = value;
 			this->_object->resetState();
+			this->_preview->frameChanged();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateFrameData(*key);
 		});
@@ -548,6 +547,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_paused = true;
 			this->_object->_animation = value;
 			this->_object->resetState();
+			this->_preview->frameChanged();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateFrameData(*key);
 		});
@@ -556,6 +556,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_actionBlock = value;
 			this->_object->_animation = 0;
 			this->_object->resetState();
+			this->_preview->frameChanged();
 			for (auto &[key, _] : this->_updateFrameElements)
 				this->_populateData(*key);
 		});
@@ -686,9 +687,11 @@ void SpiralOfFate::MainWindow::tick()
 
 	if (!this->_paused)
 		this->_object->update();
-	if (animation != this->_object->_animation)
-		for (auto &[key, _] : this->_updateFrameElements)
+	if (animation != this->_object->_animation) {
+		this->_preview->frameChanged();
+		for (auto &[key, _]: this->_updateFrameElements)
 			this->_populateFrameData(*key);
+	}
 }
 
 void SpiralOfFate::MainWindow::rendererChanged(const tgui::String &property)

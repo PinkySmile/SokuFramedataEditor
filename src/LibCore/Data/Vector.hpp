@@ -5,8 +5,12 @@
 #ifndef SOFGV_VECTOR_HPP
 #define SOFGV_VECTOR_HPP
 
+
 #include <ostream>
 #include <cmath>
+#ifndef NO_TGUI
+#include <TGUI/Vector2.hpp>
+#endif
 #include <SFML/System/Vector2.hpp>
 
 namespace SpiralOfFate
@@ -30,6 +34,23 @@ namespace SpiralOfFate
 		Vector2(sf::Vector2<T> v) noexcept
 			: x(v.x), y(v.y) {}
 
+		template <typename T2>
+		operator sf::Vector2<T2>() const noexcept
+		{
+			return sf::Vector2<T2>(this->x, this->y);
+		}
+
+#ifndef NO_TGUI
+		Vector2(tgui::Vector2<T> v) noexcept
+			: x(v.x), y(v.y) {}
+
+		template <typename T2>
+		operator tgui::Vector2<T2>() const noexcept
+		{
+			return tgui::Vector2<T2>(this->x, this->y);
+		}
+#endif
+
 		template<typename T2>
 		Vector2<T2> to() const noexcept
 		{
@@ -37,12 +58,6 @@ namespace SpiralOfFate
 				static_cast<T2>(this->x),
 				static_cast<T2>(this->y)
 			};
-		}
-
-		template <typename T2>
-		operator sf::Vector2<T2>() const noexcept
-		{
-			return sf::Vector2<T2>(this->x, this->y);
 		}
 
 		template <typename T2>
