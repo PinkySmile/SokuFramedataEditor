@@ -49,9 +49,16 @@ namespace SpiralOfFate
 		void redo();
 		void save();
 		void save(const std::string &path);
+		void autoSave();
 		void applyOperation(IOperation *operation);
+		void startTransaction(IOperation *operation = nullptr);
+		void updateTransaction(const std::function<IOperation *()> &operation);
+		void commitTransaction();
+		void cancelTransaction();
 		bool isModified() const noexcept;
 		void tick();
+		void keyPressed(const tgui::Event::KeyEvent &event) override;
+		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
 
 	protected:
 		std::map<const tgui::Container *, std::vector<std::function<void()>>> _updateFrameElements;
@@ -77,6 +84,7 @@ namespace SpiralOfFate
 		bool _paused = true;
 		std::string _path;
 		std::string _character;
+		std::unique_ptr<IOperation> _pendingTransaction;
 		std::unique_ptr<EditableObject> _object;
 		std::vector<std::unique_ptr<IOperation>> _operationQueue;
 		size_t _operationIndex = 0;
@@ -87,6 +95,8 @@ namespace SpiralOfFate
 		void _createGenericPopup(const std::string &path);
 		void _populateData(const tgui::Container &container);
 		void _populateFrameData(const tgui::Container &container);
+		void _rePopulateData();
+		void _rePopulateFrameData();
 	};
 }
 

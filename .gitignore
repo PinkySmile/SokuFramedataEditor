@@ -40,6 +40,9 @@ cmake-build-*
 # Placeholder files
 assets/sfxs/se
 
+# FDE recovery files
+*.bak
+
 src/WikiGenerator/generated
 __pycache__
 Android.mk

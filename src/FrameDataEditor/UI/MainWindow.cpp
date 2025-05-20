@@ -4,6 +4,7 @@
 
 #include <TGUI/RendererDefines.hpp>
 #include "MainWindow.hpp"
+#include "../Operations/DummyOperation.hpp"
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
 #include "../Operations/SpriteChangeOperation.hpp"
@@ -40,17 +41,20 @@ do {                                                                            
                                                                                                                  \
         if (!__elem)                                                                                             \
                 break;                                                                                           \
+        __elem->onFocus.connect([this]{ this->startTransaction(); });                                            \
+        __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                         \
+        __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); });        \
         __elem->onTextChange.connect([this](const tgui::String &s){                                              \
                 if (s.empty()) return;                                                                           \
                 try {                                                                                            \
                         fromStringPre(s)                                                                         \
-                        this->applyOperation(new operation(                                                      \
+                        this->updateTransaction([&]{ return new operation(                                       \
                                 *this->_object,                                                                  \
                                 name,                                                                            \
                                 &FrameData::field,                                                               \
                                 fromString(s, decltype(FrameData::field)),                                       \
                                 reset                                                                            \
-                        ));                                                                                      \
+                        ); });                                                                                   \
                 } catch (...) { return; }                                                                        \
         });                                                                                                      \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{                                      \
@@ -66,20 +70,23 @@ do {                                                                            
                                                                                                                                  \
         if (!__elem)                                                                                                             \
                 break;                                                                                                           \
+        __elem->onFocus.connect([this]{ this->startTransaction(); });                                                            \
+        __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                                         \
+        __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); });                        \
         __elem->onTextChange.connect([this](const tgui::String &s){                                                              \
                 if (s.empty()) {                                                                                                 \
-                        this->applyOperation(new operation(                                                                      \
+                        this->updateTransaction([&]{ return new operation(                                                       \
                                 *this->_object,                                                                                  \
                                 name,                                                                                            \
                                 &FrameData::field,                                                                               \
                                 std::make_optional<decltype(FrameData::field)::value_type>(),                                    \
                                 (reset)                                                                                          \
-                        ));                                                                                                      \
+                        ); });                                                                                                   \
                         return;                                                                                                  \
                 }                                                                                                                \
                 try {                                                                                                            \
                         fromStringPre(s)                                                                                         \
-                        this->applyOperation(new operation(                                                                      \
+                        this->updateTransaction([&]{ return new operation(                                                       \
                                 *this->_object,                                                                                  \
                                 name,                                                                                            \
                                 &FrameData::field,                                                                               \
@@ -87,7 +94,7 @@ do {                                                                            
                                         fromString(s, decltype(FrameData::field)::value_type)                                    \
                                 ),                                                                                               \
                                 (reset)                                                                                          \
-                        ));                                                                                                      \
+                        ); });                                                                                                   \
                 } catch (...) { return; }                                                                                        \
         });                                                                                                                      \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{                                                      \
@@ -199,8 +206,7 @@ do {                                                                            
                         &FrameData::field,                                         \
                         index, b, (reset)                                          \
                 ));                                                                \
-                for (auto &[key, _] : this->_updateFrameElements)                  \
-                        this->_populateFrameData(*key);                            \
+                this->_rePopulateFrameData();                                      \
         });                                                                        \
         this->_updateFrameElements[&container].emplace_back([__elem, this, index]{ \
                 auto &data = this->_object->getFrameData();                        \
@@ -273,17 +279,20 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const Fra
 
 bool SpiralOfFate::MainWindow::isModified() const noexcept
 {
-	return this->_operationIndex != this->_operationSaved;
+	return
+		this->_operationIndex != this->_operationSaved ||
+		(this->_pendingTransaction && this->_pendingTransaction->hasModification());
 }
 
 void SpiralOfFate::MainWindow::redo()
 {
+	if (this->_pendingTransaction)
+		this->commitTransaction();
 	if (this->_operationIndex == this->_operationQueue.size())
 		return;
 	this->_operationQueue[this->_operationIndex]->apply();
 	this->_operationIndex++;
-	for (auto &[key, _] : this->_updateFrameElements)
-		this->_populateData(*key);
+	this->_rePopulateData();
 	if (this->isModified())
 		this->setTitle(this->_path + "*");
 	else
@@ -292,20 +301,74 @@ void SpiralOfFate::MainWindow::redo()
 
 void SpiralOfFate::MainWindow::undo()
 {
+	if (this->_pendingTransaction) {
+		this->cancelTransaction();
+		return;
+	}
 	if (this->_operationIndex == 0)
 		return;
 	this->_operationIndex--;
 	this->_operationQueue[this->_operationIndex]->undo();
-	for (auto &[key, _] : this->_updateFrameElements)
-		this->_populateData(*key);
+	this->_rePopulateData();
 	if (this->isModified())
 		this->setTitle(this->_path + "*");
 	else
 		this->setTitle(this->_path);
 }
 
+void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::IOperation *operation)
+{
+	assert_exp(!this->_pendingTransaction);
+	if (!operation)
+		operation = new DummyOperation();
+	this->_pendingTransaction.reset(operation);
+	this->_pendingTransaction->apply();
+	if (this->_pendingTransaction->hasModification())
+		this->setTitle(this->_path + "*");
+}
+
+void SpiralOfFate::MainWindow::updateTransaction(const std::function<IOperation *()> &operation)
+{
+	assert_exp(this->_pendingTransaction);
+	this->_pendingTransaction->undo();
+	this->_pendingTransaction.reset(operation());
+	this->_pendingTransaction->apply();
+	if (this->_pendingTransaction->hasModification())
+		this->setTitle(this->_path + "*");
+}
+
+void SpiralOfFate::MainWindow::cancelTransaction()
+{
+	assert_exp(this->_pendingTransaction);
+	this->_pendingTransaction->undo();
+	this->_pendingTransaction.reset();
+	if (this->isModified())
+		this->setTitle(this->_path + "*");
+	else
+		this->setTitle(this->_path);
+}
+
+void SpiralOfFate::MainWindow::commitTransaction()
+{
+	assert_exp(this->_pendingTransaction);
+	if (!this->_pendingTransaction->hasModification())
+		return this->_pendingTransaction.reset();
+	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
+	this->_operationQueue.emplace_back(nullptr);
+	this->_operationQueue.back().swap(this->_pendingTransaction);
+	if (this->_operationIndex < this->_operationSaved)
+		this->_operationSaved = -1;
+	this->_operationIndex = this->_operationQueue.size();
+	this->setTitle(this->_path + "*");
+	this->autoSave();
+}
+
 void SpiralOfFate::MainWindow::applyOperation(IOperation *operation)
 {
+	if (!operation->hasModification()) {
+		delete operation;
+		return;
+	}
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
 	this->_operationQueue.back()->apply();
@@ -313,6 +376,7 @@ void SpiralOfFate::MainWindow::applyOperation(IOperation *operation)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
 	this->setTitle(this->_path + "*");
+	this->autoSave();
 }
 
 void SpiralOfFate::MainWindow::save(const std::string &path)
@@ -325,6 +389,8 @@ void SpiralOfFate::MainWindow::save()
 {
 	nlohmann::json j = nlohmann::json::array();
 
+	if (this->_pendingTransaction)
+		this->commitTransaction();
 	for (auto &[key, value] : this->_object->_moves) {
 		j.push_back({
 			{"action", key},
@@ -341,6 +407,26 @@ void SpiralOfFate::MainWindow::save()
 	stream << j.dump(2);
 	this->_operationSaved = this->_operationIndex;
 	this->setTitle(this->_path);
+}
+
+void SpiralOfFate::MainWindow::autoSave()
+{
+	nlohmann::json j = nlohmann::json::array();
+
+	for (auto &[key, value] : this->_object->_moves) {
+		j.push_back({
+			{"action", key},
+			{"framedata", value}
+		});
+	}
+
+	std::ofstream stream{this->_path + ".bak"};
+
+	if (stream.fail()) {
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_path + ".bak: " + strerror(errno), MB_ICONERROR);
+		return;
+	}
+	stream << j.dump(2);
 }
 
 std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
@@ -437,8 +523,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup()
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
 			this->_object->resetState();
-			for (auto &[key, _] : this->_updateFrameElements)
-				this->_populateData(*key);
+			this->_rePopulateData();
 		}, moveId);
 		button->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 
@@ -495,8 +580,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
 			this->_object->resetState();
-			for (auto &[key, _] : this->_updateFrameElements)
-				this->_populateData(*key);
+			this->_rePopulateData();
 		}, std::weak_ptr(action));
 	if (clearHit)
 		clearHit->onClick.connect([this]{
@@ -539,8 +623,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_animation = value;
 			this->_object->resetState();
 			this->_preview->frameChanged();
-			for (auto &[key, _] : this->_updateFrameElements)
-				this->_populateFrameData(*key);
+			this->_rePopulateFrameData();
 		});
 	if (frameSpin)
 		frameSpin->onValueChange.connect([this](float value){
@@ -548,8 +631,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_animation = value;
 			this->_object->resetState();
 			this->_preview->frameChanged();
-			for (auto &[key, _] : this->_updateFrameElements)
-				this->_populateFrameData(*key);
+			this->_rePopulateFrameData();
 		});
 	if (blockSpin)
 		blockSpin->onValueChange.connect([this](float value){
@@ -557,8 +639,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_animation = 0;
 			this->_object->resetState();
 			this->_preview->frameChanged();
-			for (auto &[key, _] : this->_updateFrameElements)
-				this->_populateData(*key);
+			this->_rePopulateData();
 		});
 
 	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation, false);
@@ -568,7 +649,6 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation, false);
 	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation, false);
 	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation, false);
-	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
 
 	PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, false, 0);
 	PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, false, 0);
@@ -610,6 +690,18 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)), false);
 	for (size_t i = 0; i < 64; i++)
 		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)), i == 8 || i == 13 || i == 21);
+}
+
+void SpiralOfFate::MainWindow::_rePopulateData()
+{
+	for (auto &[key, _] : this->_updateFrameElements)
+		this->_populateData(*key);
+}
+
+void SpiralOfFate::MainWindow::_rePopulateFrameData()
+{
+	for (auto &[key, _] : this->_updateFrameElements)
+		this->_populateFrameData(*key);
 }
 
 void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
@@ -806,4 +898,23 @@ const SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getSharedRen
 SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getRenderer()
 {
 	return aurora::downcast<SpiralOfFate::MainWindow::Renderer*>(Widget::getRenderer());
+}
+
+void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
+{
+	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Escape) {
+		if (this->_pendingTransaction) {
+			this->cancelTransaction();
+			this->_rePopulateData();
+			this->startTransaction();
+		}
+	} else
+		ChildWindow::keyPressed(event);
+}
+
+bool SpiralOfFate::MainWindow::canHandleKeyPress(const tgui::Event::KeyEvent &event)
+{
+	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Escape)
+		return true;
+	return ChildWindow::canHandleKeyPress(event);
 }

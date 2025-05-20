@@ -387,6 +387,8 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/ClearHitOperation.hpp
 			src/FrameDataEditor/Operations/ClearBlockOperation.cpp
 			src/FrameDataEditor/Operations/ClearBlockOperation.hpp
+			src/FrameDataEditor/Operations/DummyOperation.cpp
+			src/FrameDataEditor/Operations/DummyOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

@@ -39,7 +39,6 @@ void SpiralOfFate::ClearBlockOperation::apply()
 	data.chipDamage = 0;
 	data.blockStun = 0;
 	data.wrongBlockStun = 0;
-
 }
 
 void SpiralOfFate::ClearBlockOperation::undo()
@@ -63,4 +62,17 @@ void SpiralOfFate::ClearBlockOperation::undo()
 std::string SpiralOfFate::ClearBlockOperation::getName() const noexcept
 {
 	return this->_name;
+}
+
+bool SpiralOfFate::ClearBlockOperation::hasModification() const
+{
+	return
+		this->_oldBlockPlayerHitStop != 0 ||
+		this->_oldBlockOpponentHitStop != 0 ||
+		this->_oldPushBack != 0 ||
+		this->_oldPushBlock != 0 ||
+		this->_oldGuardDmg != 0 ||
+		this->_oldChipDamage != 0 ||
+		this->_oldBlockStun != 0 ||
+		this->_oldWrongBlockStun != 0;
 }

@@ -25,8 +25,6 @@ namespace SpiralOfFate
 		unsigned _oldChipDamage;
 		unsigned _oldBlockStun;
 		unsigned _oldWrongBlockStun;
-		std::string _oldHitSoundPath;
-		std::optional<std::pair<Vector2f, float>> _oldSnap;
 		std::string _name;
 
 	public:
@@ -35,6 +33,7 @@ namespace SpiralOfFate
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;
+		bool hasModification() const override;
 	};
 }
 

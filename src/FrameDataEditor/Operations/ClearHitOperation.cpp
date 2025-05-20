@@ -86,3 +86,23 @@ std::string SpiralOfFate::ClearHitOperation::getName() const noexcept
 {
 	return this->_name;
 }
+
+bool SpiralOfFate::ClearHitOperation::hasModification() const
+{
+	return
+		this->_oldHitPlayerHitStop != 0 ||
+		this->_oldHitOpponentHitStop != 0 ||
+		this->_oldHitSpeed != Vector2f{0, 0} ||
+		this->_oldCounterHitSpeed != Vector2f{0, 0} ||
+		this->_oldNeutralLimit != 0 ||
+		this->_oldSpiritLimit != 0 ||
+		this->_oldMatterLimit != 0 ||
+		this->_oldVoidLimit != 0 ||
+		this->_oldProrate != 0 ||
+		this->_oldMinProrate != 0 ||
+		this->_oldUntech != 0 ||
+		this->_oldDamage != 0 ||
+		this->_oldHitStun != 0 ||
+		!this->_oldHitSoundPath.empty() ||
+		this->_oldSnap;
+}

@@ -21,7 +21,9 @@ namespace SpiralOfFate
 	struct Box {
 		Vector2i pos;
 		Vector2u size;
+
 		operator IntRect() const noexcept;
+		bool operator!=(const Box &other) const;
 	};
 
 	union DefensiveFlags {
@@ -92,6 +94,8 @@ namespace SpiralOfFate
 			/* 62 */ bool unusedFlag63 : 1;
 			/* 63 */ bool unusedFlag64 : 1;
 		};
+
+		bool operator!=(const DefensiveFlags &other) const;
 	};
 
 	union OffensiveFlags {
@@ -162,6 +166,8 @@ namespace SpiralOfFate
 			/* 62 */ bool unusedFlag63 : 1;
 			/* 63 */ bool unusedFlag64 : 1;
 		};
+
+		bool operator!=(const OffensiveFlags &other) const;
 	};
 	static_assert(sizeof(DefensiveFlags) == sizeof(unsigned long long), "Too many defensive flags");
 	static_assert(sizeof(OffensiveFlags) == sizeof(unsigned long long), "Too many offensive flags");

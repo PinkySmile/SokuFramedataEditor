@@ -90,6 +90,11 @@ namespace SpiralOfFate
 		{
 			return this->_fieldName;
 		}
+
+		bool hasModification() const override
+		{
+			return this->_newValue != this->_oldValue;
+		}
 	};
 }
 

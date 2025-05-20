@@ -15,6 +15,7 @@ namespace SpiralOfFate
 		virtual ~IOperation() = default;
 		virtual void apply() = 0;
 		virtual void undo() = 0;
+		[[nodiscard]] virtual bool hasModification() const = 0;
 		[[nodiscard]] virtual std::string getName() const noexcept = 0;
 	};
 }

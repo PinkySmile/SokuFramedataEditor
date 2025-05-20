@@ -1033,4 +1033,20 @@ namespace SpiralOfFate
 			this->size.to<int>()
 		};
 	}
+
+	bool Box::operator!=(const Box &other) const
+	{
+		return this->pos != other.pos || this->size != other.size;
+	}
+
+	bool DefensiveFlags::operator!=(const DefensiveFlags &other) const
+	{
+		return this->flags != other.flags;
+	}
+
+	bool OffensiveFlags::operator!=(const OffensiveFlags &other) const
+	{
+		return this->flags != other.flags;
+	}
+
 }
