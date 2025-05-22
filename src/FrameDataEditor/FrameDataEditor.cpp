@@ -45,6 +45,16 @@ SpiralOfFate::FrameDataEditor::~FrameDataEditor()
 	this->saveSettings();
 }
 
+bool SpiralOfFate::FrameDataEditor::closeAll()
+{
+	auto vec = this->_openWindows;
+
+	// TODO: Actually end the program if all popups are answered with no
+	for (auto &widget : vec)
+		widget->close();
+	return this->_openWindows.empty();
+}
+
 void SpiralOfFate::FrameDataEditor::_loadSettings()
 {
 	std::ifstream stream{"editorSettings.json"};
@@ -197,12 +207,11 @@ void SpiralOfFate::FrameDataEditor::_newFramedata()
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
 {
+	// TODO: Hardcoded string
 	auto file = Utils::openFileDialog(game->gui, "Open Framedata", "assets/characters");
-
-	file->setFileTypeFilters({ {"Framedata file", {"*.json"}}, {"All files", {}} }, 0);
-	file->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+	auto load = [this](const std::string &path){
 		try {
-			this->_openWindows.emplace_back(new MainWindow(arr[0].asNativeString(), *this));
+			this->_openWindows.emplace_back(new MainWindow(path, *this));
 			this->_focusedWindow = this->_openWindows.back();
 			this->_focusedWindow->onMousePress.connect([this]{
 				this->_focusedWindow->setFocused(true);
@@ -216,15 +225,59 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 					this->_focusedWindow = lock;
 				}
 			}, std::weak_ptr(this->_focusedWindow));
-			this->_focusedWindow->onClose.connect([this](const std::weak_ptr<MainWindow> &This){
+			this->_focusedWindow->onRealClose.connect([this](const std::weak_ptr<MainWindow> &This){
 				this->_openWindows.erase(std::remove(this->_openWindows.begin(), this->_openWindows.end(), This.lock()), this->_openWindows.end());
 			}, std::weak_ptr(this->_focusedWindow));
 			game->gui.add(this->_focusedWindow);
 			this->_focusedWindow->setFocused(true);
+			return true;
 		} catch (_AssertionFailedException &e) {
-			Utils::dispMsg(game->gui, "Framedata loading failed", "Invalid framedata file: " + std::string(e.what()), MB_ICONERROR);
+			Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.load_failed"),
+				this->localize("message_box.invalid_file", e.what()),
+				MB_ICONERROR
+			);
 		} catch (std::exception &e) {
-			Utils::dispMsg(game->gui, "Framedata loading failed", "Internal error: " + Utils::getLastExceptionName() + ": " + std::string(e.what()), MB_ICONERROR);
+			Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.load_failed"),
+				this->localize("message_box.internal_error", Utils::getLastExceptionName(), e.what()),
+				MB_ICONERROR
+			);
+		}
+		return false;
+	};
+
+	// TODO: Hardcoded string
+	file->setFileTypeFilters({ {"Framedata file", {"*.json"}}, {"All files", {}} }, 0);
+	file->setMultiSelect(true);
+	file->onFileSelect.connect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
+		for (auto &p : arr) {
+			auto path = p.asString().toStdString();
+
+			if (!std::filesystem::exists(path + ".bak")) {
+				load(path);
+				return;
+			}
+
+			auto dialog = Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.backup_exists"),
+				this->localize("message_box.backup_exists", path),
+				MB_ICONINFORMATION
+			);
+
+			dialog->changeButtons({
+				this->localize("message_box.button.yes"),
+				this->localize("message_box.button.no")
+			});
+			dialog->onButtonPress.connect([this, load, path](const tgui::String &d){
+				if (d == this->localize("message_box.button.no"))
+					load(path);
+				else if (load(path + ".bak"))
+					this->_focusedWindow->setPath(path);
+			});
 		}
 	});
 }
@@ -236,11 +289,13 @@ void SpiralOfFate::FrameDataEditor::_save()
 
 void SpiralOfFate::FrameDataEditor::_saveAs()
 {
+	// TODO: Hardcoded string
 	auto file = Utils::saveFileDialog(game->gui, "Save Framedata", "assets/characters");
 
+	// TODO: Hardcoded string
 	file->setFileTypeFilters({ {"Framedata file", {"*.json"}}, {"All files", {}} }, 0);
 	file->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
-		this->_focusedWindow->save(arr[0].asNativeString());
+		this->_focusedWindow->save(arr[0].asString().toStdString());
 	});
 }
 

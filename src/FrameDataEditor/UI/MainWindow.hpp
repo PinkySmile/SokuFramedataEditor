@@ -49,6 +49,7 @@ namespace SpiralOfFate
 		void redo();
 		void save();
 		void save(const std::string &path);
+		void setPath(const std::string &path);
 		void autoSave();
 		void applyOperation(IOperation *operation);
 		void startTransaction(IOperation *operation = nullptr);
@@ -59,6 +60,8 @@ namespace SpiralOfFate
 		void tick();
 		void keyPressed(const tgui::Event::KeyEvent &event) override;
 		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
+
+		tgui::SignalChildWindow onRealClose = {"RealClosed"}; //!< The window was closed. Optional parameter: pointer to the window
 
 	protected:
 		std::map<const tgui::Container *, std::vector<std::function<void()>>> _updateFrameElements;

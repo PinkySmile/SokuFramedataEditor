@@ -11,17 +11,17 @@ namespace SpiralOfFate
 
 	ControllerInput::ControllerInput() :
 		ControllerInput({
-			{ INPUT_LEFT,    new ControllerAxis(0, sf::Joystick::Axis::X, -30) },
-			{ INPUT_RIGHT,   new ControllerAxis(0, sf::Joystick::Axis::X, 30) },
-			{ INPUT_UP,      new ControllerAxis(0, sf::Joystick::Axis::Y, -30) },
-			{ INPUT_DOWN,    new ControllerAxis(0, sf::Joystick::Axis::Y, 30) },
-			{ INPUT_NEUTRAL, new ControllerButton(0, 0) },
-			{ INPUT_MATTER,  new ControllerButton(0, 2) },
-			{ INPUT_SPIRIT,  new ControllerButton(0, 1) },
-			{ INPUT_VOID,    new ControllerButton(0, 3) },
-			{ INPUT_ASCEND,  new ControllerAxis(0, sf::Joystick::Axis::Z, 30) },
-			{ INPUT_DASH,    new ControllerAxis(0, sf::Joystick::Axis::Z, -30) },
-			{ INPUT_PAUSE,   new ControllerButton(0, 7) }
+			{ INPUT_LEFT,    new ControllerAxis(-1, sf::Joystick::Axis::X, -30) },
+			{ INPUT_RIGHT,   new ControllerAxis(-1, sf::Joystick::Axis::X, 30) },
+			{ INPUT_UP,      new ControllerAxis(-1, sf::Joystick::Axis::Y, -30) },
+			{ INPUT_DOWN,    new ControllerAxis(-1, sf::Joystick::Axis::Y, 30) },
+			{ INPUT_NEUTRAL, new ControllerButton(-1, 0) },
+			{ INPUT_MATTER,  new ControllerButton(-1, 2) },
+			{ INPUT_SPIRIT,  new ControllerButton(-1, 1) },
+			{ INPUT_VOID,    new ControllerButton(-1, 3) },
+			{ INPUT_ASCEND,  new ControllerAxis(-1, sf::Joystick::Axis::Z, 30) },
+			{ INPUT_DASH,    new ControllerAxis(-1, sf::Joystick::Axis::Z, -30) },
+			{ INPUT_PAUSE,   new ControllerButton(-1, 7) }
 		})
 	{
 	}
@@ -47,9 +47,9 @@ namespace SpiralOfFate
 			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
 		for (auto &pair : controllerMap)
 			if (pair.second.first)
-				realControllerMap[pair.first] = new ControllerAxis(0, (sf::Joystick::Axis)(pair.second.second & 7), pair.second.second >> 3);
+				realControllerMap[pair.first] = new ControllerAxis(-1, (sf::Joystick::Axis)(pair.second.second & 7), pair.second.second >> 3);
 			else
-				realControllerMap[pair.first] = new ControllerButton(0, pair.second.second);
+				realControllerMap[pair.first] = new ControllerButton(-1, pair.second.second);
 		for (auto [key, value] : realControllerMap)
 			this->_keyMap.emplace(key, value);
 		this->_keyDuration.fill(0);
@@ -152,20 +152,20 @@ namespace SpiralOfFate
 	{
 		auto pDisconnected = event.getIf<sf::Event::JoystickDisconnected>();
 
-		if (pDisconnected && (pDisconnected->joystickId == this->_joystickId || this->_joystickId == (unsigned)-1)) {
+		if (pDisconnected && (pDisconnected->joystickId == this->_joystickId || this->_joystickId == -1U)) {
 			this->_state = false;
 			return;
 		}
 
 		if (auto e = event.getIf<sf::Event::JoystickButtonPressed>()) {
-			if (e->joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
+			if (e->joystickId != this->_joystickId && this->_joystickId != -1U)
 				return;
 			if (e->button != this->_buttonId)
 				return;
 			this->_state = true;
 		}
 		if (auto e = event.getIf<sf::Event::JoystickButtonReleased>()) {
-			if (e->joystickId != this->_joystickId && this->_joystickId != (unsigned)-1)
+			if (e->joystickId != this->_joystickId && this->_joystickId != -1U)
 				return;
 			if (e->button != this->_buttonId)
 				return;

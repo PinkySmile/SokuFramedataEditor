@@ -5,6 +5,7 @@
 #include "Logger.hpp"
 #include "Screen.hpp"
 #include "Resources/Game.hpp"
+#include <X11/Xlib.h>
 
 namespace SpiralOfFate
 {
@@ -222,4 +223,11 @@ namespace SpiralOfFate
 		sf::IntRect({x, y}, {w, h})
 	{
 	}
+}
+
+void libraryInit()
+{
+#ifndef _WIN32
+	XInitThreads();
+#endif
 }

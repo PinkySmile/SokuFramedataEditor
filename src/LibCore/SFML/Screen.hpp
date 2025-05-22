@@ -68,7 +68,7 @@ namespace SpiralOfFate
 	};
 }
 
-#define libraryInit()
+void libraryInit();
 #define libraryUnInit()
 
 #endif //THFGAME_RESSOURCES_HPP

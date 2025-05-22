@@ -81,6 +81,7 @@ LONG WINAPI UnhandledExFilter(PEXCEPTION_POINTERS ExPtr)
 }
 #else
 #define MessageBox(...) ((void)0)
+#define MessageBox(...) ((void)0)
 
 std::string getLastError(int err = errno)
 {

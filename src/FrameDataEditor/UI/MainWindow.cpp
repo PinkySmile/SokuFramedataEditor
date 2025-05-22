@@ -247,6 +247,15 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const Fra
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
 	this->setTitle(frameDataPath);
 	this->setResizable();
+	this->setCloseBehavior(CloseBehavior::None);
+	this->onClose.connect([this]{
+		// TODO: Check if needs to be saved
+		std::error_code err;
+
+		std::filesystem::remove(this->_path + ".bak");
+		this->m_parent->remove(this->shared_from_this());
+		this->onRealClose.emit(this);
+	});
 
 	panel->add(this->_preview);
 	this->_preview->moveToBack();
@@ -381,8 +390,22 @@ void SpiralOfFate::MainWindow::applyOperation(IOperation *operation)
 
 void SpiralOfFate::MainWindow::save(const std::string &path)
 {
-	this->_path = path;
+	std::error_code err;
+
+	std::filesystem::rename(this->_path + ".bak", path + ".bak", err);
+	if (err) {
+		// TODO: Hardcoded string
+		// FIXME: strerror only works on Linux (err.message()?)
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot rename " + this->_path + ".bak to " + path + ".bak: " + strerror(errno), MB_ICONERROR);
+		return;
+	}
+	this->setPath(path);
 	this->save();
+}
+
+void SpiralOfFate::MainWindow::setPath(const std::string &path)
+{
+	this->_path = path;
 }
 
 void SpiralOfFate::MainWindow::save()
@@ -401,7 +424,9 @@ void SpiralOfFate::MainWindow::save()
 	std::ofstream stream{this->_path};
 
 	if (stream.fail()) {
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_path + ": " + strerror(errno), MB_ICONERROR);
+		// TODO: Hardcoded string
+		// FIXME: strerror only works on Linux (err.message()?)
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + this->_path + ": " + strerror(errno), MB_ICONERROR);
 		return;
 	}
 	stream << j.dump(2);

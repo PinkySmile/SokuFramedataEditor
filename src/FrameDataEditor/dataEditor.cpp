@@ -14,7 +14,7 @@ void run()
 		game->gui.draw();
 		game->screen->display();
 		while (auto event = game->screen->pollEvent()) {
-			if (event->is<EVENT_WINDOW_CLOSED>())
+			if (event->is<EVENT_WINDOW_CLOSED>() && editor->closeAll())
 				game->screen->close();
 			game->gui.handleEvent(*event);
 		}

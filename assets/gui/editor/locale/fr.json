@@ -1,4 +1,14 @@
 {
+	"message_box.title.load_failed":   "Erreur de charger du fichier",
+	"message_box.title.backup_exists": "Données de restauration existantes",
+	"message_box.backup_exists":       "Des données de restauration sont présentes pour le fichier %1.\nVoulez-vous les charger ? Si non, elles seront supprimées.",
+	"message_box.internal_error":      "Erreur interne: %1: %2",
+	"message_box.invalid_file":        "Fichier invalide: %1",
+	"message_box.button.yes":          "Oui",
+	"message_box.button.no":           "Non",
+	"message_box.button.cancel":       "Annuler",
+	"message_box.button.ok":           "OK",
+
 	"menu_item.file":                  "Fichier",
 	"menu_item.file.new":              "Nouveau",
 	"menu_item.file.load":             "Ouvrir",

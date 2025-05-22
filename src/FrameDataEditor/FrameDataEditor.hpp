@@ -87,6 +87,7 @@ namespace SpiralOfFate
 
 		void update();
 		void render();
+		bool closeAll();
 	};
 }
 
