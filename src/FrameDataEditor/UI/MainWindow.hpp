@@ -9,7 +9,7 @@
 #include <TGUI/Widgets/ChildWindow.hpp>
 #include "LocalizedContainer.hpp"
 #include "PreviewWidget.hpp"
-#include "../Operations/IOperation.hpp"
+#include "../Operations/Operation.hpp"
 
 namespace SpiralOfFate
 {
@@ -33,13 +33,12 @@ namespace SpiralOfFate
 			TGUI_NODISCARD std::shared_ptr<tgui::RendererData> getMinimizeButtonFocused() const;
 		};
 
-	public:
 		using Ptr = std::shared_ptr<MainWindow>; //!< Shared widget pointer
 		using ConstPtr = std::shared_ptr<const MainWindow>; //!< Shared constant widget pointer
 
 		static constexpr const char StaticWidgetType[] = "FDEMainWindow"; //!< Type name of the widget
 
-		MainWindow(const std::string &frameDataPath, const FrameDataEditor &editor);
+		MainWindow(const std::string &frameDataPath, FrameDataEditor &editor);
 
 		Renderer *getSharedRenderer() override;
 		const Renderer *getSharedRenderer() const override;
@@ -51,15 +50,33 @@ namespace SpiralOfFate
 		void save(const std::string &path);
 		void setPath(const std::string &path);
 		void autoSave();
-		void applyOperation(IOperation *operation);
-		void startTransaction(IOperation *operation = nullptr);
-		void updateTransaction(const std::function<IOperation *()> &operation);
+		void applyOperation(Operation *operation);
+		void startTransaction(Operation *operation = nullptr);
+		void updateTransaction(const std::function<Operation *()> &operation);
 		void commitTransaction();
 		void cancelTransaction();
 		bool isModified() const noexcept;
+		bool hasUndoData() const noexcept;
+		bool hasRedoData() const noexcept;
 		void tick();
 		void keyPressed(const tgui::Event::KeyEvent &event) override;
 		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
+
+		void newFrame();
+		void newEndFrame();
+		void newAnimationBlock();
+		void newAction();
+		void newHurtBox();
+		void newHitBox();
+
+		void removeFrame();
+		void removeAnimationBlock();
+		void removeAction();
+
+		void copyBoxesFromLastFrame();
+		void copyBoxesFromNextFrame();
+		void flattenThisMoveCollisionBoxes();
+		void reloadTextures();
 
 		tgui::SignalChildWindow onRealClose = {"RealClosed"}; //!< The window was closed. Optional parameter: pointer to the window
 
@@ -83,19 +100,21 @@ namespace SpiralOfFate
 		void rendererChanged(const tgui::String &property) override;
 
 	private:
+		FrameDataEditor &_editor;
 		PreviewWidget::Ptr _preview;
 		bool _paused = true;
 		std::string _path;
 		std::string _character;
-		std::unique_ptr<IOperation> _pendingTransaction;
+		std::unique_ptr<Operation> _pendingTransaction;
 		std::unique_ptr<EditableObject> _object;
-		std::vector<std::unique_ptr<IOperation>> _operationQueue;
+		std::vector<std::unique_ptr<Operation>> _operationQueue;
 		size_t _operationIndex = 0;
 		size_t _operationSaved = 0;
 
-		void _createMoveListPopup();
+		void _createMoveListPopup(const std::function<void(unsigned)> &onConfirm, bool showNotAdded);
 		void _placeUIHooks(const tgui::Container &container);
 		void _createGenericPopup(const std::string &path);
+		LocalizedContainer<tgui::ChildWindow>::Ptr _createPopup(const std::string &path);
 		void _populateData(const tgui::Container &container);
 		void _populateFrameData(const tgui::Container &container);
 		void _rePopulateData();

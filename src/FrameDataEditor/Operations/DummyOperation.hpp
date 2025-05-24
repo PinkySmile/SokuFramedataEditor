@@ -6,11 +6,11 @@
 #define SOFGV_DUMMYOPERATION_HPP
 
 
-#include "IOperation.hpp"
+#include "Operation.hpp"
 
 namespace SpiralOfFate
 {
-	class DummyOperation : public IOperation {
+	class DummyOperation : public Operation {
 	public:
 		void apply() override;
 		void undo() override;

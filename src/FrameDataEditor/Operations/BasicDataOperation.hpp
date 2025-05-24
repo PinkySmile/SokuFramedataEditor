@@ -6,13 +6,13 @@
 #define SOFGV_BASICDATAOPERATION_HPP
 
 
-#include "IOperation.hpp"
+#include "Operation.hpp"
 #include "../EditableObject.hpp"
 
 namespace SpiralOfFate
 {
 	template<typename T>
-	class BasicDataOperation : public IOperation {
+	class BasicDataOperation : public Operation {
 	protected:
 		EditableObject &_obj;
 		unsigned _action;

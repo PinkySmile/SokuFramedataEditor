@@ -28,6 +28,7 @@ namespace SpiralOfFate
 		void _placeMenuCallbacks(const tgui::MenuBar::Ptr &menu);
 		void _addMenu(const tgui::MenuBar::Ptr &menu, const tgui::MenuBar::GetMenusElement &element, std::vector<tgui::String> hierarchy);
 		void _buildMenu();
+		void _updateMenuBar();
 
 		void _loadSettings();
 		void _tickAnimation();
@@ -45,6 +46,7 @@ namespace SpiralOfFate
 		void _newFrame();
 		void _newEndFrame();
 		void _newAnimationBlock();
+		void _newAction();
 		void _newHurtBox();
 		void _newHitBox();
 
@@ -65,6 +67,7 @@ namespace SpiralOfFate
 		std::string getLocale() const;
 		void saveSettings();
 
+		const std::map<std::string, std::string> &getLocalizationData() const;
 		bool hasLocalization(const std::string &s) const;
 		std::string localize(const std::string &s) const;
 		template<typename ...Args>
@@ -88,6 +91,9 @@ namespace SpiralOfFate
 		void update();
 		void render();
 		bool closeAll();
+
+		void setHasRedo(bool hasRedo);
+		void setHasUndo(bool hasRedo);
 	};
 }
 

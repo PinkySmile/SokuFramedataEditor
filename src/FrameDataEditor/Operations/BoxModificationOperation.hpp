@@ -6,12 +6,12 @@
 #define SOFGV_BOXMODIFICATIONOPERATION_HPP
 
 
-#include "IOperation.hpp"
+#include "Operation.hpp"
 #include "../EditableObject.hpp"
 
 namespace SpiralOfFate
 {
-	class BoxModificationOperation : public IOperation {
+	class BoxModificationOperation : public Operation {
 	protected:
 		EditableObject &_obj;
 		unsigned _action;

@@ -6,13 +6,13 @@
 #define SOFGV_FLAGOPERATION_HPP
 
 
-#include "IOperation.hpp"
+#include "Operation.hpp"
 #include "../EditableObject.hpp"
 
 namespace SpiralOfFate
 {
 	template<typename T>
-	class FlagOperation : public IOperation {
+	class FlagOperation : public Operation {
 	protected:
 		EditableObject &_obj;
 		unsigned _action;

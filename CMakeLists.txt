@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(SoFGV CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 add_compile_definitions(_USE_MATH_DEFINES)
 
@@ -379,7 +379,7 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/UI/SettingsWindow.hpp
 			src/FrameDataEditor/Operations/BasicDataOperation.hpp
 			src/FrameDataEditor/Operations/FlagOperation.hpp
-			src/FrameDataEditor/Operations/IOperation.hpp
+			src/FrameDataEditor/Operations/Operation.hpp
 			src/FrameDataEditor/Operations/SpriteChangeOperation.cpp
 			src/FrameDataEditor/Operations/SpriteChangeOperation.hpp
 			src/FrameDataEditor/Operations/SoundChangeOperation.cpp
@@ -391,6 +391,8 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/ClearBlockOperation.hpp
 			src/FrameDataEditor/Operations/DummyOperation.cpp
 			src/FrameDataEditor/Operations/DummyOperation.hpp
+			src/FrameDataEditor/Operations/CreateMoveOperation.cpp
+			src/FrameDataEditor/Operations/CreateMoveOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

@@ -113,6 +113,7 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.frame")     }, &FrameDataEditor::_newFrame, this);
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.frame_end") }, &FrameDataEditor::_newEndFrame, this);
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.block")     }, &FrameDataEditor::_newAnimationBlock, this);
+	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.action")    }, &FrameDataEditor::_newAction, this);
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.hurt_box")  }, &FrameDataEditor::_newHurtBox, this);
 	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.hit_box")   }, &FrameDataEditor::_newHitBox, this);
 
@@ -145,6 +146,26 @@ void SpiralOfFate::FrameDataEditor::_buildMenu()
 	for (auto &d : this->_menuHierarchy)
 		this->_addMenu(menu, d, {});
 	this->_placeMenuCallbacks(menu);
+	this->_updateMenuBar();
+}
+
+void SpiralOfFate::FrameDataEditor::_updateMenuBar()
+{
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
+
+	if (this->_focusedWindow) {
+		menu->setMenuEnabled(this->localize("menu_item.new"), true);
+		menu->setMenuEnabled(this->localize("menu_item.edit"), true);
+		menu->setMenuEnabled(this->localize("menu_item.misc"), true);
+		menu->setMenuEnabled(this->localize("menu_item.remove"), true);
+		menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.undo") }, this->_focusedWindow->hasUndoData());
+		menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.redo") }, this->_focusedWindow->hasRedoData());
+	} else {
+		menu->setMenuEnabled(this->localize("menu_item.new"), false);
+		menu->setMenuEnabled(this->localize("menu_item.edit"), false);
+		menu->setMenuEnabled(this->localize("menu_item.misc"), false);
+		menu->setMenuEnabled(this->localize("menu_item.remove"), false);
+	}
 }
 
 void SpiralOfFate::FrameDataEditor::_tickAnimation()
@@ -224,6 +245,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 					if (this->_focusedWindow)
 						this->_focusedWindow->setFocused(false);
 					this->_focusedWindow = lock;
+					this->_updateMenuBar();
 				}
 			}, std::weak_ptr(this->_focusedWindow));
 			this->_focusedWindow->onRealClose.connect([this](const std::weak_ptr<MainWindow> &This){
@@ -231,6 +253,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 			}, std::weak_ptr(this->_focusedWindow));
 			game->gui.add(this->_focusedWindow);
 			this->_focusedWindow->setFocused(true);
+			this->_updateMenuBar();
 			return true;
 		} catch (_AssertionFailedException &e) { // TODO: Very dirty
 			Utils::dispMsg(
@@ -324,48 +347,84 @@ void SpiralOfFate::FrameDataEditor::_redo()
 
 void SpiralOfFate::FrameDataEditor::_newFrame()
 {
+	this->_focusedWindow->newFrame();
 }
 
 void SpiralOfFate::FrameDataEditor::_newEndFrame()
 {
+	this->_focusedWindow->newEndFrame();
 }
 
 void SpiralOfFate::FrameDataEditor::_newAnimationBlock()
 {
+	this->_focusedWindow->newAnimationBlock();
+}
+
+void SpiralOfFate::FrameDataEditor::_newAction()
+{
+	this->_focusedWindow->newAction();
 }
 
 void SpiralOfFate::FrameDataEditor::_newHurtBox()
 {
+	this->_focusedWindow->newHurtBox();
 }
 
 void SpiralOfFate::FrameDataEditor::_newHitBox()
 {
+	this->_focusedWindow->newHitBox();
 }
 
 void SpiralOfFate::FrameDataEditor::_removeFrame()
 {
+	this->_focusedWindow->removeFrame();
 }
 
 void SpiralOfFate::FrameDataEditor::_removeAnimationBlock()
 {
+	this->_focusedWindow->removeAnimationBlock();
 }
 
 void SpiralOfFate::FrameDataEditor::_removeAction()
 {
+	this->_focusedWindow->removeAction();
 }
 
 void SpiralOfFate::FrameDataEditor::_copyBoxesFromLastFrame()
 {
+	this->_focusedWindow->copyBoxesFromLastFrame();
 }
 
 void SpiralOfFate::FrameDataEditor::_copyBoxesFromNextFrame()
 {
+	this->_focusedWindow->copyBoxesFromNextFrame();
 }
 
 void SpiralOfFate::FrameDataEditor::_flattenThisMoveCollisionBoxes()
 {
+	this->_focusedWindow->flattenThisMoveCollisionBoxes();
 }
 
 void SpiralOfFate::FrameDataEditor::_reloadTextures()
 {
+	this->_focusedWindow->reloadTextures();
+}
+
+void SpiralOfFate::FrameDataEditor::setHasRedo(bool hasRedo)
+{
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
+
+	menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.redo") }, hasRedo);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasUndo(bool hasUndo)
+{
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
+
+	menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.undo") }, hasUndo);
+}
+
+const std::map<std::string, std::string> &SpiralOfFate::FrameDataEditor::getLocalizationData() const
+{
+	return this->_localization;
 }

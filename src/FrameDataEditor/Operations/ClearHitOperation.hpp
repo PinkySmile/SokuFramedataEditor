@@ -7,11 +7,11 @@
 
 
 #include "../FrameDataEditor.hpp"
-#include "IOperation.hpp"
+#include "Operation.hpp"
 
 namespace SpiralOfFate
 {
-	class ClearHitOperation : public IOperation {
+	class ClearHitOperation : public Operation {
 	private:
 		EditableObject &_obj;
 		unsigned _action;

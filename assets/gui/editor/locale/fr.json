@@ -82,6 +82,9 @@
 	"animation.hit.minrate":           "Proration minimale",
 	"animation.hit.stun":              "Hitstun",
 
+	"create_action.title":             "Créer une action",
+	"create_action.create":            "Confirmer",
+
 	"operation.move_box":              "Déplacer une boîte",
 	"operation.resize_box":            "Redimentionner une boîte",
 
