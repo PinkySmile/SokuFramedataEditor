@@ -230,7 +230,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, const Fra
 	_character(std::filesystem::path(frameDataPath).parent_path().filename().string()),
 	_object(new EditableObject(frameDataPath))
 {
-	this->_preview = std::make_shared<PreviewWidget>(*this->_object);
+	this->_preview = std::make_shared<PreviewWidget>(std::ref(editor), std::ref(*this), *this->_object);
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
 

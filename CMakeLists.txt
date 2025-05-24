@@ -218,7 +218,9 @@ if (WIN32)
 	set(FDICON src/FrameDataEditor/fdeditor.rc)
 else()
 	set(GICON)
-	set(FDICON)
+	set(FDICON
+		src/FrameDataEditor/Operations/BoxModificationOperation.cpp
+		src/FrameDataEditor/Operations/BoxModificationOperation.hpp)
 endif()
 
 add_library(

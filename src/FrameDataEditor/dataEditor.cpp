@@ -14,8 +14,12 @@ void run()
 		game->gui.draw();
 		game->screen->display();
 		while (auto event = game->screen->pollEvent()) {
-			if (event->is<EVENT_WINDOW_CLOSED>() && editor->closeAll())
-				game->screen->close();
+			if (event->is<EVENT_WINDOW_CLOSED>()) {
+				if (editor->closeAll())
+					game->screen->close();
+				else
+					Utils::dispMsg(game->gui, editor->localize("message_box.title.not_saved"), editor->localize("message_box.not_saved"), MB_ICONINFORMATION);
+			}
 			game->gui.handleEvent(*event);
 		}
 	}

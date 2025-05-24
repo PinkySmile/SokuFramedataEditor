@@ -51,7 +51,8 @@ bool SpiralOfFate::FrameDataEditor::closeAll()
 
 	// TODO: Actually end the program if all popups are answered with no
 	for (auto &widget : vec)
-		widget->close();
+		if (!widget->isModified())
+			widget->close();
 	return this->_openWindows.empty();
 }
 
@@ -231,7 +232,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 			game->gui.add(this->_focusedWindow);
 			this->_focusedWindow->setFocused(true);
 			return true;
-		} catch (_AssertionFailedException &e) {
+		} catch (_AssertionFailedException &e) { // TODO: Very dirty
 			Utils::dispMsg(
 				game->gui,
 				this->localize("message_box.title.load_failed"),

@@ -1,6 +1,8 @@
 {
 	"message_box.title.load_failed":   "Erreur de charger du fichier",
 	"message_box.title.backup_exists": "Données de restauration existantes",
+	"message_box.title.not_saved":     "Fichiers non-sauvegardés",
+	"message_box.not_saved":           "Un ou plusieurs fichier(s) ont des changements non sauvegardés.",
 	"message_box.backup_exists":       "Des données de restauration sont présentes pour le fichier %1.\nVoulez-vous les charger ? Si non, elles seront supprimées.",
 	"message_box.internal_error":      "Erreur interne: %1: %2",
 	"message_box.invalid_file":        "Fichier invalide: %1",
@@ -79,6 +81,9 @@
 	"animation.hit.damage":            "Dégâts",
 	"animation.hit.minrate":           "Proration minimale",
 	"animation.hit.stun":              "Hitstun",
+
+	"operation.move_box":              "Déplacer une boîte",
+	"operation.resize_box":            "Redimentionner une boîte",
 
 	"animation.block.pstop":           "Hitstop du joueur",
 	"animation.block.ostop":           "Hitstop de l'adversaire",
