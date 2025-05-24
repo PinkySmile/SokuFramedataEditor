@@ -1140,6 +1140,8 @@ void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
 		if (this->_pendingTransaction) {
 			this->cancelTransaction();
 			this->_rePopulateData();
+			// FIXME: Special case for when you were dragging a box
+			//        Right now will start a transation that will never be removed
 			this->startTransaction();
 		}
 	} else

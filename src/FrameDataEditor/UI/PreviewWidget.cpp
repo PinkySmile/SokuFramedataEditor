@@ -459,6 +459,10 @@ void SpiralOfFate::PreviewWidget::frameChanged()
 	this->_boxCounter = 0;
 	this->_boxHovered = 0;
 	this->_boxSelected = 0;
+	this->_cornerHovered = 0;
+	this->_cornerSelected = 0;
+	this->_dragStarted = false;
+	this->_commited = false;
 }
 
 bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
