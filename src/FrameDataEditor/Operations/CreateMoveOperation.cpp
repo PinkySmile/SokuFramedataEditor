@@ -8,7 +8,7 @@ SpiralOfFate::CreateMoveOperation::CreateMoveOperation(
 	EditableObject &obj,
 	const std::string &&name,
 	unsigned int id,
-	const std::vector<std::vector<SpiralOfFate::FrameData>> &newData
+	const std::vector<std::vector<FrameData>> &newData
 ) :
 	_obj(obj),
 	_name(name),
@@ -37,7 +37,7 @@ void SpiralOfFate::CreateMoveOperation::undo()
 
 bool SpiralOfFate::CreateMoveOperation::hasModification() const
 {
-	return !this->_obj._moves.contains(this->_id);
+	return true;
 }
 
 std::string SpiralOfFate::CreateMoveOperation::getName() const noexcept

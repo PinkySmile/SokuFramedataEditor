@@ -218,9 +218,7 @@ if (WIN32)
 	set(FDICON src/FrameDataEditor/fdeditor.rc)
 else()
 	set(GICON)
-	set(FDICON
-		src/FrameDataEditor/Operations/BoxModificationOperation.cpp
-		src/FrameDataEditor/Operations/BoxModificationOperation.hpp)
+	set(FDICON)
 endif()
 
 add_library(
@@ -364,6 +362,7 @@ if (NOT USE_SDL2)
 		message("${FDICON}")
 		add_executable(
 			FrameDataEditor
+			${FDICON}
 			src/LibCore/LibCore.hpp
 			src/FrameDataEditor/dataEditor.cpp
 			src/FrameDataEditor/EditableObject.cpp
@@ -384,7 +383,6 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/SpriteChangeOperation.hpp
 			src/FrameDataEditor/Operations/SoundChangeOperation.cpp
 			src/FrameDataEditor/Operations/SoundChangeOperation.hpp
-			${FDICON}
 			src/FrameDataEditor/Operations/ClearHitOperation.cpp
 			src/FrameDataEditor/Operations/ClearHitOperation.hpp
 			src/FrameDataEditor/Operations/ClearBlockOperation.cpp
@@ -393,6 +391,12 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/DummyOperation.hpp
 			src/FrameDataEditor/Operations/CreateMoveOperation.cpp
 			src/FrameDataEditor/Operations/CreateMoveOperation.hpp
+			src/FrameDataEditor/Operations/CreateFrameOperation.cpp
+			src/FrameDataEditor/Operations/CreateFrameOperation.hpp
+			src/FrameDataEditor/Operations/BoxModificationOperation.cpp
+			src/FrameDataEditor/Operations/BoxModificationOperation.hpp
+			src/FrameDataEditor/Operations/CreateBlockOperation.cpp
+			src/FrameDataEditor/Operations/CreateBlockOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()

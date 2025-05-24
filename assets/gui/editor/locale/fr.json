@@ -87,6 +87,10 @@
 
 	"operation.move_box":              "Déplacer une boîte",
 	"operation.resize_box":            "Redimentionner une boîte",
+	"operation.create_frame":          "Créer une frame",
+	"operation.create_frame_end":      "Créer une frame",
+	"operation.create_block":          "Créer un block d'animation",
+	"operation.create_move":           "Créer une action",
 
 	"animation.block.pstop":           "Hitstop du joueur",
 	"animation.block.ostop":           "Hitstop de l'adversaire",

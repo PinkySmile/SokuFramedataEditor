@@ -12,6 +12,8 @@
 #include "../Operations/ClearBlockOperation.hpp"
 #include "../Operations/ClearHitOperation.hpp"
 #include "../Operations/CreateMoveOperation.hpp"
+#include "../Operations/CreateFrameOperation.hpp"
+#include "../Operations/CreateBlockOperation.hpp"
 
 template<typename T>
 std::string to_string(T value, int)
@@ -799,17 +801,37 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 
 void SpiralOfFate::MainWindow::newFrame()
 {
-
+	this->applyOperation(new CreateFrameOperation(
+		*this->_object,
+		this->_editor.localize("operation.create_frame"),
+		this->_object->_action,
+		this->_object->_actionBlock,
+		this->_object->_animation,
+		this->_object->getFrameData()
+	));
 }
 
 void SpiralOfFate::MainWindow::newEndFrame()
 {
-
+	this->applyOperation(new CreateFrameOperation(
+		*this->_object,
+		this->_editor.localize("operation.create_frame_end"),
+		this->_object->_action,
+		this->_object->_actionBlock,
+		this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size(),
+		this->_object->getFrameData()
+	));
 }
 
 void SpiralOfFate::MainWindow::newAnimationBlock()
 {
-
+	this->applyOperation(new CreateBlockOperation(
+		*this->_object,
+		this->_editor.localize("operation.create_block"),
+		this->_object->_action,
+		this->_object->_actionBlock + 1,
+		{ this->_object->getFrameData() }
+	));
 }
 
 void SpiralOfFate::MainWindow::newAction()

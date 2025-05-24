@@ -482,7 +482,7 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 			data.hitBoxes[this->_boxSelected - 1 - data.hurtBoxes.size()];
 		this->_dragStarted = true;
 		this->_commited = false;
-		this->_main.startTransaction(new DummyOperation());
+		this->_main.startTransaction();
 		this->_lastMousePos = translatedPos;
 		this->_startMousePos = translatedPos;
 		return true;
