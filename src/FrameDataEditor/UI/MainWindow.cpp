@@ -15,6 +15,7 @@
 #include "../Operations/CreateFrameOperation.hpp"
 #include "../Operations/CreateBlockOperation.hpp"
 #include "../Operations/CreateBoxOperation.hpp"
+#include "../Operations/RemoveFrameOperation.hpp"
 
 template<typename T>
 std::string to_string(T value, int)
@@ -323,6 +324,7 @@ void SpiralOfFate::MainWindow::redo()
 		this->setTitle(this->_path);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(this->hasRedoData());
+	this->autoSave();
 }
 
 void SpiralOfFate::MainWindow::undo()
@@ -342,6 +344,7 @@ void SpiralOfFate::MainWindow::undo()
 		this->setTitle(this->_path);
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setHasRedo(true);
+	this->autoSave();
 }
 
 void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operation)
@@ -894,7 +897,12 @@ void SpiralOfFate::MainWindow::newHitBox()
 
 void SpiralOfFate::MainWindow::removeFrame()
 {
-
+	if (this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() == 1)
+		return;
+	this->applyOperation(new RemoveFrameOperation(
+		*this->_object,
+		this->_editor.localize("operation.remove_frame")
+	));
 }
 
 void SpiralOfFate::MainWindow::removeAnimationBlock()

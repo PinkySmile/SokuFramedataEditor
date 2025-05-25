@@ -399,6 +399,8 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/CreateBlockOperation.hpp
 			src/FrameDataEditor/Operations/CreateBoxOperation.cpp
 			src/FrameDataEditor/Operations/CreateBoxOperation.hpp
+			src/FrameDataEditor/Operations/RemoveFrameOperation.cpp
+			src/FrameDataEditor/Operations/RemoveFrameOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()
