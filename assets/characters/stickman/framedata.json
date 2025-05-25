@@ -18900,12 +18900,13 @@
             "top": -138,
             "width": 38
           },
-          "defense_flag": 27680,
+          "defense_flag": 402677760,
+          "duration": 65,
           "hurt_boxes": [
             {
-              "height": 188,
+              "height": 167,
               "left": -28,
-              "top": -189,
+              "top": -168,
               "width": 60
             }
           ],
@@ -18915,43 +18916,12 @@
             "y": 2.0
           },
           "sound": "suika/018.ogg",
-          "sprite": "sheet.png",
+          "sprite": "sheet_old.png",
           "texture_bounds": {
-            "height": 94,
-            "left": 975,
-            "top": 707,
-            "width": 24
-          }
-        },
-        {
-          "collision_box": {
-            "height": 137,
-            "left": -20,
-            "top": -138,
-            "width": 38
-          },
-          "defense_flag": 27680,
-          "duration": 16,
-          "hurt_boxes": [
-            {
-              "height": 188,
-              "left": -28,
-              "top": -189,
-              "width": 60
-            }
-          ],
-          "matter_limit": 40,
-          "offense_flag": 32,
-          "scale": {
-            "x": 2.0,
-            "y": 2.0
-          },
-          "sprite": "sheet.png",
-          "texture_bounds": {
-            "height": 94,
-            "left": 975,
-            "top": 707,
-            "width": 24
+            "height": 83,
+            "left": 86,
+            "top": 930,
+            "width": 53
           }
         },
         {
@@ -18960,14 +18930,14 @@
           "block_stun": 20,
           "chip_damage": 400,
           "collision_box": {
-            "height": 130,
+            "height": 145,
             "left": -20,
-            "top": -131,
+            "top": -146,
             "width": 38
           },
           "counter_hit_speed": {
-            "x": 7.0,
-            "y": 28.0
+            "x": 35.0,
+            "y": 15.0
           },
           "damage": 1400,
           "defense_flag": 19488,
@@ -18976,32 +18946,44 @@
           "hit_boxes": [
             {
               "height": 86,
-              "left": 16,
-              "top": -134,
-              "width": 28
+              "left": 108,
+              "top": -142,
+              "width": 67
+            },
+            {
+              "height": 56,
+              "left": 27,
+              "top": -127,
+              "width": 87
             }
           ],
           "hit_opponent_hit_stop": 16,
           "hit_player_hit_stop": 16,
           "hit_sound": "tenshi/002.ogg",
           "hit_speed": {
-            "x": 8.0,
-            "y": 24.0
+            "x": 25.0,
+            "y": 10.0
           },
           "hit_stun": 35,
           "hurt_boxes": [
             {
-              "height": 188,
+              "height": 167,
               "left": -28,
-              "top": -189,
+              "top": -168,
               "width": 61
+            },
+            {
+              "height": 40,
+              "left": 1,
+              "top": -111,
+              "width": 88
             }
           ],
           "matter_limit": 40,
-          "offense_flag": 2592,
+          "offense_flag": 25769806500,
           "offset": {
-            "x": 9,
-            "y": 0
+            "x": 72,
+            "y": -18
           },
           "prorate": 84.0,
           "push_back": 8,
@@ -19011,77 +18993,12 @@
             "y": 2.0
           },
           "sound": "suika/001.ogg",
-          "sprite": "sheet.png",
+          "sprite": "sheet_old.png",
           "texture_bounds": {
-            "height": 94,
-            "left": 0,
-            "top": 801,
-            "width": 31
-          },
-          "untech": 35
-        },
-        {
-          "block_opponent_hit_stop": 16,
-          "block_player_hit_stop": 16,
-          "block_stun": 20,
-          "chip_damage": 600,
-          "collision_box": {
-            "height": 130,
-            "left": -20,
-            "top": -131,
-            "width": 38
-          },
-          "counter_hit_speed": {
-            "x": 7.0,
-            "y": 28.0
-          },
-          "damage": 1400,
-          "defense_flag": 19488,
-          "duration": 4,
-          "guard_damage": 120,
-          "hit_boxes": [
-            {
-              "height": 93,
-              "left": 17,
-              "top": -166,
-              "width": 31
-            }
-          ],
-          "hit_opponent_hit_stop": 16,
-          "hit_player_hit_stop": 16,
-          "hit_sound": "tenshi/002.ogg",
-          "hit_speed": {
-            "x": 8.0,
-            "y": 24.0
-          },
-          "hit_stun": 35,
-          "hurt_boxes": [
-            {
-              "height": 188,
-              "left": -28,
-              "top": -189,
-              "width": 61
-            }
-          ],
-          "matter_limit": 40,
-          "offense_flag": 2592,
-          "offset": {
-            "x": 9,
-            "y": 0
-          },
-          "prorate": 84.0,
-          "push_back": 8,
-          "push_block": 2,
-          "scale": {
-            "x": 2.0,
-            "y": 2.0
-          },
-          "sprite": "sheet.png",
-          "texture_bounds": {
-            "height": 94,
-            "left": 231,
-            "top": 801,
-            "width": 34
+            "height": 92,
+            "left": 147,
+            "top": 930,
+            "width": 103
           },
           "untech": 35
         },
@@ -19095,27 +19012,33 @@
           "duration": 42,
           "hurt_boxes": [
             {
-              "height": 188,
+              "height": 173,
               "left": -28,
-              "top": -189,
+              "top": -174,
               "width": 61
+            },
+            {
+              "height": 62,
+              "left": 21,
+              "top": -120,
+              "width": 74
             }
           ],
           "offense_flag": 2080,
           "offset": {
-            "x": 4,
-            "y": 0
+            "x": 22,
+            "y": -4
           },
           "scale": {
             "x": 2.0,
             "y": 2.0
           },
-          "sprite": "sheet.png",
+          "sprite": "sheet_old.png",
           "texture_bounds": {
-            "height": 94,
-            "left": 1186,
-            "top": 707,
-            "width": 29
+            "height": 85,
+            "left": 251,
+            "top": 930,
+            "width": 51
           }
         }
       ]

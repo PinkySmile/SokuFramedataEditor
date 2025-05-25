@@ -21,7 +21,7 @@
           ],
           "hit_opponent_hit_stop": 4,
           "hit_player_hit_stop": 4,
-          "hit_sound": "assets/sfxs/se/011.ogg",
+          "hit_sound": "011.ogg",
           "hit_speed": {
             "x": 4.0,
             "y": 0.0
@@ -78,7 +78,7 @@
           ],
           "hit_opponent_hit_stop": 4,
           "hit_player_hit_stop": 4,
-          "hit_sound": "assets/sfxs/se/011.ogg",
+          "hit_sound": "011.ogg",
           "hit_speed": {
             "x": 4.0,
             "y": 0.0
@@ -135,7 +135,7 @@
           ],
           "hit_opponent_hit_stop": 4,
           "hit_player_hit_stop": 4,
-          "hit_sound": "assets/sfxs/se/011.ogg",
+          "hit_sound": "011.ogg",
           "hit_speed": {
             "x": 4.0,
             "y": 0.0
@@ -192,7 +192,7 @@
           ],
           "hit_opponent_hit_stop": 4,
           "hit_player_hit_stop": 4,
-          "hit_sound": "assets/sfxs/se/011.ogg",
+          "hit_sound": "011.ogg",
           "hit_speed": {
             "x": 4.0,
             "y": 0.0
@@ -249,7 +249,7 @@
           ],
           "hit_opponent_hit_stop": 4,
           "hit_player_hit_stop": 4,
-          "hit_sound": "assets/sfxs/se/011.ogg",
+          "hit_sound": "011.ogg",
           "hit_speed": {
             "x": 4.0,
             "y": 0.0
@@ -306,7 +306,7 @@
           ],
           "hit_opponent_hit_stop": 4,
           "hit_player_hit_stop": 4,
-          "hit_sound": "assets/sfxs/se/011.ogg",
+          "hit_sound": "011.ogg",
           "hit_speed": {
             "x": 4.0,
             "y": 0.0
@@ -433,7 +433,7 @@
           ],
           "hit_opponent_hit_stop": 10,
           "hit_player_hit_stop": 10,
-          "hit_sound": "assets/sfxs/se/youmu/000.ogg",
+          "hit_sound": "youmu/000.ogg",
           "hit_speed": {
             "x": 1.0,
             "y": 0.0
@@ -484,7 +484,7 @@
           ],
           "hit_opponent_hit_stop": 10,
           "hit_player_hit_stop": 10,
-          "hit_sound": "assets/sfxs/se/youmu/000.ogg",
+          "hit_sound": "youmu/000.ogg",
           "hit_speed": {
             "x": 1.0,
             "y": 0.0
@@ -535,7 +535,7 @@
           ],
           "hit_opponent_hit_stop": 10,
           "hit_player_hit_stop": 10,
-          "hit_sound": "assets/sfxs/se/youmu/000.ogg",
+          "hit_sound": "youmu/000.ogg",
           "hit_speed": {
             "x": 1.0,
             "y": 0.0
@@ -586,7 +586,7 @@
           ],
           "hit_opponent_hit_stop": 10,
           "hit_player_hit_stop": 10,
-          "hit_sound": "assets/sfxs/se/youmu/000.ogg",
+          "hit_sound": "youmu/000.ogg",
           "hit_speed": {
             "x": 1.0,
             "y": 0.0
