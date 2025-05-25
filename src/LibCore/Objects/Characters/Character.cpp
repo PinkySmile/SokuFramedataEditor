@@ -418,9 +418,17 @@ namespace SpiralOfFate
 			data.textureBounds.size.y * scale.y / 2
 		};
 
+		auto realPos = result;
+
+		if (isHitAction(this->_action)) {
+			if (this->_hitStop % 2 == 0)
+				result.x += this->_hitStop / 2;
+			else
+				result.x -= this->_hitStop / 2;
+		}
 		Object::_render(result, scale);
 		this->_effectTimer++;
-		this->_renderExtraEffects(result);
+		this->_renderExtraEffects(realPos);
 
 		if (this->showBoxes) {
 			if (isBlockingAction(this->_action))
