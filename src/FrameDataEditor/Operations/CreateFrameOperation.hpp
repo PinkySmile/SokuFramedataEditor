@@ -21,7 +21,7 @@ namespace SpiralOfFate
 		FrameData _newData;
 
 	public:
-		CreateFrameOperation(EditableObject &obj, const std::string &&name, unsigned action, unsigned block, unsigned id, const FrameData &newData);
+		CreateFrameOperation(EditableObject &obj, const std::string &&name, unsigned id, const FrameData &newData);
 		void apply() override;
 		void undo() override;
 		bool hasModification() const override;

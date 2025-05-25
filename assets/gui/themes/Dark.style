@@ -152,6 +152,7 @@ ListView
 
 MenuBar
 {
+    TextColorDisabled = &TextColorDisabled;
     SeparatorColor = &SeparatorColor;
     SeparatorThickness = &SeparatorThickness;
     SeparatorVerticalPadding = &SeparatorVerticalPadding;

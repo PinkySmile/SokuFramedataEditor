@@ -79,6 +79,7 @@ ToggleButton : Button {
 
 MenuBar {
     DistanceToSide = 5;
+    TextColorDisabled = rgba(255, 255, 255, 55);
 }
 
 

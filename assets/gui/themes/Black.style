@@ -94,6 +94,7 @@ MenuBar {
     TextureBackground             = "Black.png" Part(45, 247, 8, 6) Middle(2, 2) NoSmooth;
     TextureItemBackground         = "Black.png" Part(78, 105, 8, 4) Middle(2, 0, 4, 2) NoSmooth;
     TextureSelectedItemBackground = "Black.png" Part(113, 238, 8, 6) Middle(2, 2) NoSmooth;
+    TextColorDisabled             = &TextColorDisabled;
     DistanceToSide                = 5;
 }
 

@@ -7,13 +7,12 @@
 SpiralOfFate::CreateBlockOperation::CreateBlockOperation(
 	EditableObject &obj,
 	const std::string &&name,
-	unsigned action,
 	unsigned id,
 	const std::vector<FrameData> &newData
 ) :
 	_obj(obj),
 	_name(name),
-	_action(action),
+	_action(obj._action),
 	_id(id),
 	_newData(newData)
 {

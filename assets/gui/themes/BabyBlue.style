@@ -73,6 +73,7 @@ ListBox {
 
 MenuBar {
     DistanceToSide = 5;
+    TextColorDisabled = white
 }
 
 Panel {

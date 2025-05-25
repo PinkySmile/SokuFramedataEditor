@@ -87,6 +87,8 @@
 
 	"operation.move_box":              "Déplacer une boîte",
 	"operation.resize_box":            "Redimentionner une boîte",
+	"operation.create_hitbox":         "Créer une hitbox",
+	"operation.create_hurtbox":        "Créer une hurtbox",
 	"operation.create_frame":          "Créer une frame",
 	"operation.create_frame_end":      "Créer une frame",
 	"operation.create_block":          "Créer un block d'animation",

@@ -7,15 +7,13 @@
 SpiralOfFate::CreateFrameOperation::CreateFrameOperation(
 	EditableObject &obj,
 	const std::string &&name,
-	unsigned action,
-	unsigned block,
 	unsigned id,
 	const FrameData &newData
 ) :
 	_obj(obj),
 	_name(name),
-	_action(action),
-	_block(block),
+	_action(obj._action),
+	_block(obj._actionBlock),
 	_id(id),
 	_newData(newData)
 {

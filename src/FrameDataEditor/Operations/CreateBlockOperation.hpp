@@ -20,7 +20,7 @@ namespace SpiralOfFate
 		std::vector<FrameData> _newData;
 
 	public:
-		CreateBlockOperation(EditableObject &obj, const std::string &&name, unsigned action, unsigned id, const std::vector<FrameData> &newData);
+		CreateBlockOperation(EditableObject &obj, const std::string &&name, unsigned id, const std::vector<FrameData> &newData);
 		void apply() override;
 		void undo() override;
 		bool hasModification() const override;
