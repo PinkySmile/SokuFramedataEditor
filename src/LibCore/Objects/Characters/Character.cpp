@@ -3448,12 +3448,12 @@ namespace SpiralOfFate
 		counter &= this->_action != ACTION_GROUND_LOW_HIT;
 		counter &= this->_action != ACTION_GROUND_HIGH_HIT;
 
-		bool noArmor = data.oFlag.grab || (
-			(!myData->dFlag.superarmor || this->_armorUsed) &&
-			(!myData->dFlag.neutralArmor || data.oFlag.spiritElement != data.oFlag.matterElement || data.oFlag.spiritElement != data.oFlag.voidElement) &&
-			(!myData->dFlag.matterArmor || data.oFlag.matterElement) &&
-			(!myData->dFlag.spiritArmor || data.oFlag.spiritElement) &&
-			(!myData->dFlag.voidArmor || data.oFlag.voidElement)
+		bool hasArmor = !data.oFlag.grab && (
+			(myData->dFlag.superarmor && this->_armorUsed) ||
+			(myData->dFlag.neutralArmor && data.oFlag.spiritElement == data.oFlag.matterElement && data.oFlag.spiritElement == data.oFlag.voidElement) ||
+			(myData->dFlag.matterArmor && data.oFlag.matterElement) ||
+			(myData->dFlag.spiritArmor && data.oFlag.spiritElement) ||
+			(myData->dFlag.voidArmor && data.oFlag.voidElement)
 		);
 
 		this->_hasBeenHitDuringFrame = true;
@@ -3468,7 +3468,7 @@ namespace SpiralOfFate
 			(myData->dFlag.counterHit || counter) &&
 			(data.oFlag.canCounterHit || forcedCounter) &&
 			this->_counterHit != 2 &&
-			(forcedCounter || noArmor)
+			(forcedCounter || !hasArmor)
 		) {
 			game->soundMgr.play(BASICSOUND_COUNTER_HIT);
 			this->_willGroundSlam = data.oFlag.groundSlamCH;
@@ -3494,10 +3494,10 @@ namespace SpiralOfFate
 			stun *= forcedCounter ? 2 : 1.5;
 			obj->_hitStop = std::max<unsigned char>(obj->_hitStop, data.hitPlayerHitStop * 1.5);
 			this->_hitStop = std::max<unsigned char>(this->_hitStop, data.hitOpponentHitStop * (forcedCounter ? 2 : 1.5));
-			game->logger.debug("Counter hit !: " + std::to_string(this->_blockStun) + " hitstun frames");
+			game->logger.debug("Counter hit !: " + std::to_string(stun) + " hitstun frames");
 		} else {
 			game->soundMgr.play(data.hitSoundHandle);
-			if (noArmor) {
+			if (!hasArmor) {
 				this->_willGroundSlam = data.oFlag.groundSlam;
 				this->_willWallSplat = data.oFlag.wallSplat;
 				this->_speed.x = -data.hitSpeed.x * this->_dir;
@@ -3520,7 +3520,7 @@ namespace SpiralOfFate
 				stun = 0;
 			obj->_hitStop = std::max<unsigned char>(obj->_hitStop, data.hitPlayerHitStop);
 			this->_hitStop = std::max<unsigned char>(this->_hitStop, data.hitOpponentHitStop);
-			game->logger.debug(std::to_string(this->_blockStun) + " hitstun frames");
+			game->logger.debug(std::to_string(stun) + " hitstun frames");
 		}
 
 		unsigned nb = 0;
