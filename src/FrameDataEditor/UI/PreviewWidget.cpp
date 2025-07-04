@@ -7,6 +7,7 @@
 #include "PreviewWidget.hpp"
 #include "../Operations/DummyOperation.hpp"
 #include "../Operations/BoxModificationOperation.hpp"
+#include "../Operations/RemoveBoxOperation.hpp"
 
 #define HOVER_ALPHA 0x80
 #define NORMAL_ALPHA 0x40
@@ -510,4 +511,22 @@ void SpiralOfFate::PreviewWidget::mouseNoLongerOnWidget()
 		this->_main.cancelTransaction();
 	this->_dragStarted = false;
 	Widget::mouseNoLongerOnWidget();
+}
+
+void SpiralOfFate::PreviewWidget::keyPressed(const tgui::Event::KeyEvent &event)
+{
+	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Delete && this->_boxSelected)
+		this->_main.applyOperation(new RemoveBoxOperation(
+			this->_object,
+			this->_editor.localize("operation.resize_box"),
+			this->_boxSelected, this->_boxSelected
+		));
+	Widget::keyPressed(event);
+}
+
+bool SpiralOfFate::PreviewWidget::canHandleKeyPress(const tgui::Event::KeyEvent &event)
+{
+	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Delete && this->_boxSelected)
+		return true;
+	return Widget::canHandleKeyPress(event);
 }

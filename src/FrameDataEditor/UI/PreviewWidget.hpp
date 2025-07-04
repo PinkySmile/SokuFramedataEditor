@@ -57,6 +57,8 @@ namespace SpiralOfFate
 		void draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const override;
 		void leftMouseReleased(tgui::Vector2f pos) override;
 		void mouseNoLongerOnWidget() override;
+		void keyPressed(const tgui::Event::KeyEvent &event) override;
+		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
 	};
 }
 

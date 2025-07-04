@@ -93,7 +93,7 @@ else ()
 
 	if (NO_TGUI)
 		set(
-			EXTRA_LINK_LIBRARIES
+			<EXTRA_LINK_LIBRARIES
 			SFML::Graphics
 			SFML::Audio
 			SFML::Network
@@ -401,6 +401,8 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/CreateBoxOperation.hpp
 			src/FrameDataEditor/Operations/RemoveFrameOperation.cpp
 			src/FrameDataEditor/Operations/RemoveFrameOperation.hpp
+			src/FrameDataEditor/Operations/RemoveBoxOperation.cpp
+			src/FrameDataEditor/Operations/RemoveBoxOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore)
 	endif ()
