@@ -4,8 +4,8 @@ import os
 import sys
 import json
 
-if len(sys.argv) != 3:
-	print(f'Usage: {sys.argv[0]} <character folder> <framedata>')
+if len(sys.argv) < 4:
+	print(f'Usage: {sys.argv[0]} <character folder> <framedata> <resulting_sheet_name> [--indent-json]')
 	exit(1)
 
 print("Loading data")
@@ -21,12 +21,20 @@ for move in framedata:
 	for i, block in enumerate(move["framedata"]):
 		for j, frame in enumerate(block):
 			if not frame['sprite'] in sprites:
-				path = os.path.join(sys.argv[1], frame['sprite'])
-				print("Loading " + path)
-				sprites[frame['sprite']] = Image.open(path).convert("RGBA")
-				path = os.path.join(sys.argv[1], 'effects', frame['sprite'])
-				print("Loading " + path)
-				sprites_effect[frame['sprite']] = Image.open(path).convert("RGBA")
+				try:
+					path = os.path.join(sys.argv[1], frame['sprite'])
+					print("Loading " + path)
+					sprites[frame['sprite']] = Image.open(path).convert("RGBA")
+				except FileNotFoundError:
+					pass
+				try:
+					path = os.path.join(sys.argv[1], 'effects', frame['sprite'])
+					print("Loading " + path)
+					sprites_effect[frame['sprite']] = Image.open(path).convert("RGBA")
+					if not frame['sprite'] in sprites:
+						sprites[frame['sprite']] = Image.new("RGBA", sprites_effect[frame['sprite']].size)
+				except FileNotFoundError:
+					sprites_effect[frame['sprite']] = Image.new("RGBA", sprites[frame['sprite']].size)
 				sprites_merged[frame['sprite']] = sprites[frame['sprite']].copy()
 				if sprites_effect[frame['sprite']]:
 					sprites_merged[frame['sprite']].paste(sprites_effect[frame['sprite']], (0, 0), sprites_effect[frame['sprite']])
@@ -107,6 +115,8 @@ for area in areas:
 	area['frames'][0]["offset"]["y"] -= (area['rect']['top'] - base['top']) * scale['y']
 	area['frames'][0]["offset"]["x"] -= (base['width'] - area['rect']['width']) * scale['x'] / 2
 	area['frames'][0]["offset"]["y"] += (base['height'] - area['rect']['height']) * scale['y']
+	area['frames'][0]["offset"]["x"] = int(area['frames'][0]["offset"]["x"])
+	area['frames'][0]["offset"]["y"] = int(area['frames'][0]["offset"]["y"])
 # with open(sys.argv[1] + "/framedata_step1.json", "w") as fd:
 # 	json.dump(framedata, fd)
 
@@ -190,13 +200,16 @@ for a in areas:
 		result_effect.paste(a['effect_image'], (x - a['rect']['left'], y - a['rect']['top']), mask)
 
 	for f in a['frames']:
-		f['sprite'] = "sheet.png"
+		f['sprite'] = sys.argv[3]
 		f['texture_bounds']['left'] = x
 		f['texture_bounds']['top'] = y
 	x += a['rect']['width']
 	totalX += a['rect']['width']
 
-result.save(sys.argv[1] + "/sheet.png")
-result_effect.save(sys.argv[1] + "/effects/sheet.png")
+result.save(sys.argv[1] + "/" + sys.argv[3])
+result_effect.save(sys.argv[1] + "/effects/" + sys.argv[3])
 with open(sys.argv[2], "w") as fd:
-	json.dump(framedata, fd, separators=(',', ':'))
+	if len(sys.argv) == 4:
+		json.dump(framedata, fd, separators=(',', ':'))
+	else:
+		json.dump(framedata, fd, indent=2)
