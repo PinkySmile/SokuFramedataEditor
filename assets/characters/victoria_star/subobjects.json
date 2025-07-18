@@ -411,5 +411,19 @@
 		"shadow": "matter",
 		"tint": true,
 		"hp": 1600
+	},
+		{
+		"index": 138,
+		"action": 11,
+		"spawn_offset": {
+			"anchorX": "owner",
+			"anchorY": "owner",
+			"x": -590,
+			"y": -135
+		},
+		"dir": "back",
+		"shadow": "neutral",
+		"tint": true,
+		"hp": 1600
 	}
 ]
