@@ -10505,7 +10505,7 @@
             "width": 41
           },
           "untech": 17,
-          "wrong_block_stun": 0
+          "wrong_block_stun": 25
         },
         {
           "collision_box": {
