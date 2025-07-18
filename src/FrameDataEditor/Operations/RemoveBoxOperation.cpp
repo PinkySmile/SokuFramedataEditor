@@ -44,7 +44,7 @@ void SpiralOfFate::RemoveBoxOperation::apply()
 		delete data.collisionBox;
 		data.collisionBox = nullptr;
 	} else if (this->_isHurtBox)
-		data.hurtBoxes.erase(data.hurtBoxes.begin() + this->_boxIndex );
+		data.hurtBoxes.erase(data.hurtBoxes.begin() + this->_boxIndex);
 	else
 		data.hitBoxes.erase(data.hitBoxes.begin() + this->_boxIndex);
 	this->_boxIndexPtr = 0;

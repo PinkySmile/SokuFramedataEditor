@@ -225,7 +225,7 @@ namespace SpiralOfFate
 			assert_msg(data["wrong_block_stun"].is_number(), "Invalid json");
 			this->wrongBlockStun = data["wrong_block_stun"];
 		} else
-			this->wrongBlockStun = this->blockStun * 5 / 3;
+			this->wrongBlockStun = this->blockStun + 8;
 		if (data.contains("chip_damage")) {
 			assert_msg(data["chip_damage"].is_number(), "Invalid json");
 			this->chipDamage = data["chip_damage"];
@@ -605,7 +605,7 @@ namespace SpiralOfFate
 			result["collision_box"] = *this->collisionBox;
 		if (this->blockStun)
 			result["block_stun"] = this->blockStun;
-		if (this->wrongBlockStun != this->blockStun * 5 / 3)
+		if (this->wrongBlockStun != this->blockStun + 8)
 			result["wrong_block_stun"] = this->wrongBlockStun;
 		if (this->hitStun)
 			result["hit_stun"] = this->hitStun;
