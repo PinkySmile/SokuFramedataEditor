@@ -7,9 +7,7 @@
 #include "CharacterSelect.hpp"
 #include "InGame.hpp"
 #include "Resources/Game.hpp"
-#include "Objects/Characters/Stickman/Stickman.hpp"
 #include "Utils.hpp"
-#include "Objects/Characters/VictoriaStar/VictoriaStar.hpp"
 
 namespace SpiralOfFate
 {
@@ -116,63 +114,27 @@ namespace SpiralOfFate
 		}
 	}
 
-	Character *CharacterSelect::_createCharacter(int pos, int posOp, int palette, std::shared_ptr<IInput> input)
-	{
-		return createCharacter(this->_entries[pos], this->_entries[posOp], pos, palette, std::move(input));
-	}
-
-	Character *CharacterSelect::createCharacter(const CharacterEntry &entry, const CharacterEntry &entryOp, int pos, int palette, std::shared_ptr<IInput> input)
-	{
-		Character *chr;
-		std::pair<std::vector<Color>, std::vector<Color>> palettes;
-
-		if (!entry.palettes.empty() && palette) {
-			palettes.first = entry.palettes.front();
-			palettes.second = entry.palettes[palette];
-		}
-		switch (entry._class) {
-		case 2:
-			chr = new VictoriaStar{
-				static_cast<unsigned>(palette << 16 | pos),
-				entry.folder,
-				palettes,
-				std::move(input),
-				std::filesystem::path(entryOp.folder).filename().string()
-			};
-			break;
-		case 1:
-			chr = new Stickman{
-				static_cast<unsigned>(palette << 16 | pos),
-				entry.folder,
-				palettes,
-				std::move(input)
-			};
-			break;
-		default:
-			chr = new Character{
-				static_cast<unsigned>(palette << 16 | pos),
-				entry.folder,
-				palettes,
-				std::move(input)
-			};
-			break;
-		}
-
-		chr->name = entry.name;
-		return chr;
-	}
-
 	void CharacterSelect::_launchGame()
 	{
 		game->soundMgr.play(BASICSOUND_GAME_LAUNCH);
 		if (this->_inGameName.empty())
 			return;
 
-		auto args = new InGame::Arguments();
+		auto args = new InGame::Arguments{};
 
+		args->params.seed = game->random();
+		args->params.p1chr = this->_leftPos;
+		args->params.p1pal = this->_leftPalette;
+		args->params.p2chr = this->_rightPos;
+		args->params.p2pal = this->_rightPalette;
+		args->params.stage = this->_stage;
+		args->params.platformConfig = this->_platform;
+		args->stages = this->_stages;
+		args->entries = this->_entries;
+		args->leftInput = this->_leftInput;
+		args->rightInput = this->_rightInput;
 		args->saveReplay = true;
 		args->endScene = game->scene.getCurrentScene().first;
-		args->characterSelectScene = this;
 		game->scene.switchScene(this->_inGameName, args);
 	}
 
@@ -415,157 +377,6 @@ namespace SpiralOfFate
 		return new CharacterSelect(*realArgs);
 	}
 
-	InGame::InitParams CharacterSelect::createParams(SceneArguments *args)
-	{
-		if (args->reportProgressA)
-			args->reportProgressA("Generating data...");
-
-		std::uniform_int_distribution<size_t> dist{0, this->_entries.size() - 1};
-		std::uniform_int_distribution<size_t> dist2{0, this->_stages.size() - 1};
-
-		if (this->_stage == -1) {
-			this->_platform = -1;
-			this->_stage = dist2(game->random);
-		}
-
-		std::uniform_int_distribution<size_t> dist3{0, this->_stages[this->_stage].platforms.size() - 1};
-		auto &stage = this->_stages[this->_stage];
-
-		if (this->_platform == -1)
-			this->_platform = dist3(game->random);
-		if (this->_leftPos < 0)
-			this->_leftPalette = 0;
-		if (this->_rightPos < 0)
-			this->_rightPalette = 0;
-		if (this->_leftPos < 0)
-			this->_leftPos = dist(game->random);
-		if (this->_rightPos < 0)
-			this->_rightPos = dist(game->random);
-		if (this->_leftPos == this->_rightPos && this->_entries[this->_leftPos].palettes.size() <= 1) {
-			this->_leftPalette = 0;
-			this->_rightPalette = 0;
-		} else if (
-			this->_leftPos == this->_rightPos &&
-			this->_entries[this->_leftPos].palettes.size() == 2 &&
-			this->_leftPalette == this->_rightPalette
-		) {
-			this->_leftPalette = 0;
-			this->_rightPalette = 1;
-		}
-		if (
-			this->_leftPos == this->_rightPos &&
-			this->_leftPalette == this->_rightPalette &&
-			this->_entries[this->_leftPos].palettes.size() > 1
-		) {
-			this->_rightPalette++;
-			this->_rightPalette %= this->_entries[this->_leftPos].palettes.size();
-		}
-
-		auto &lentry = this->_entries[this->_leftPos];
-		auto &rentry = this->_entries[this->_rightPos];
-		auto &licon = lentry.icon[this->_leftPalette];
-		auto &ricon = rentry.icon[this->_rightPalette];
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P1's character (" + this->_entries[this->_leftPos].name + L")");
-
-		auto lchr = this->_createCharacter(this->_leftPos, this->_rightPos, this->_leftPalette, this->_leftInput);
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P2's character (" + this->_entries[this->_rightPos].name + L")");
-
-		auto rchr = this->_createCharacter(this->_rightPos, this->_leftPos, this->_rightPalette, this->_rightInput);
-
-		return {
-			{static_cast<unsigned>(this->_stage), 0, static_cast<unsigned>(this->_platform)},
-			stage.platforms[this->_platform],
-			stage,
-			lchr,
-			rchr,
-			licon.getHandle(),
-			ricon.getHandle(),
-			lentry.entry,
-			rentry.entry
-		};
-	}
-
-	InGame::InitParams CharacterSelect::staticCreateParams(std::vector<StageEntry> &stages, std::vector<CharacterEntry> &entries, InGameArguments *args, std::shared_ptr<IInput> leftInput, std::shared_ptr<IInput> rightInput)
-	{
-		std::uniform_int_distribution<size_t> dist{0, entries.size() - 1};
-		std::uniform_int_distribution<size_t> dist2{0, stages.size() - 1};
-		int leftPos = args->startParams.p1chr;
-		int rightPos = args->startParams.p2chr;
-		int leftPalette = args->startParams.p1pal;
-		int rightPalette = args->startParams.p2pal;
-		int _stage = args->startParams.stage;
-		int platform = args->startParams.platformConfig;
-
-		if (_stage == -1) {
-			platform = -1;
-			_stage = dist2(game->random);
-		}
-
-		std::uniform_int_distribution<size_t> dist3{0, stages[_stage].platforms.size() - 1};
-		auto &stage = stages[_stage];
-
-		if (platform == -1)
-			platform = dist3(game->random);
-		if (leftPos < 0)
-			leftPalette = 0;
-		if (rightPos < 0)
-			rightPalette = 0;
-		if (leftPos < 0)
-			leftPos = dist(game->random);
-		if (rightPos < 0)
-			rightPos = dist(game->random);
-		if (leftPos == rightPos && entries[leftPos].palettes.size() <= 1) {
-			leftPalette = 0;
-			rightPalette = 0;
-		} else if (
-			leftPos == rightPos &&
-			entries[leftPos].palettes.size() == 2 &&
-			leftPalette == rightPalette
-		) {
-			leftPalette = 0;
-			rightPalette = 1;
-		}
-		if (
-			leftPos == rightPos &&
-			leftPalette == rightPalette &&
-			entries[leftPos].palettes.size() > 1
-		) {
-			rightPalette++;
-			rightPalette %= entries[leftPos].palettes.size();
-		}
-
-		auto &lentry = entries[leftPos];
-		auto &rentry = entries[rightPos];
-		auto &licon = lentry.icon[leftPalette];
-		auto &ricon = rentry.icon[rightPalette];
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P1's character (" + entries[leftPos].name + L")");
-
-		auto lchr = createCharacter(entries[leftPos], entries[rightPos], leftPos, leftPalette, std::move(leftInput));
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P2's character (" + entries[rightPos].name + L")");
-
-		auto rchr = createCharacter(entries[rightPos], entries[leftPos], rightPos, rightPalette, std::move(rightInput));
-
-		return {
-			{static_cast<unsigned>(_stage), 0, static_cast<unsigned>(platform)},
-			stage.platforms[platform],
-			stage,
-			lchr,
-			rchr,
-			licon.getHandle(),
-			ricon.getHandle(),
-			lentry.entry,
-			rentry.entry
-		};
-	}
-
 	std::pair<std::vector<StageEntry>, std::vector<CharacterEntry>> CharacterSelect::loadData()
 	{
 		auto chrList = game->getCharacters();
@@ -599,6 +410,16 @@ namespace SpiralOfFate
 		for (auto &elem: json)
 			stages.emplace_back(elem);
 		return { stages, entries };
+	}
+
+	std::pair<std::vector<StageEntry>, std::vector<CharacterEntry>> CharacterSelect::getData() const
+	{
+		return {this->_stages, this->_entries};
+	}
+
+	std::pair<std::shared_ptr<IInput>, std::shared_ptr<IInput>> CharacterSelect::getInputs() const
+	{
+		return {this->_leftInput, this->_rightInput};
 	}
 
 	CharacterEntry::CharacterEntry(const nlohmann::json &json, const std::string &folder) :
@@ -705,6 +526,7 @@ namespace SpiralOfFate
 				this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png", {this->palettes[0], palette}));
 		}
 	}
+
 
 	CharacterEntry::CharacterEntry(const CharacterEntry &entry) :
 		entry(entry.entry),

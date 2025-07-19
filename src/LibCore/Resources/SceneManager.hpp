@@ -8,6 +8,7 @@
 
 #include <thread>
 #include <functional>
+#include <shared_mutex>
 #include "IScene.hpp"
 #include "SceneArgument.hpp"
 
@@ -39,6 +40,7 @@ namespace SpiralOfFate
 		bool _loading = false;
 		std::string _currentScene;
 		SceneInitializer _nextScene;
+		mutable std::recursive_mutex _sceneMutex;
 		std::shared_ptr<IScene> _oldScene;
 		std::shared_ptr<IScene> _scene;
 		std::map<std::string, SceneConstructor> _factory;

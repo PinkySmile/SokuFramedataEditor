@@ -36,7 +36,6 @@ namespace SpiralOfFate
 		void flushInputs(unsigned delay);
 		std::shared_ptr<RemoteInput> getRemoteRealInput();
 		void update() override;
-		InGame::InitParams createParams(SceneArguments *args, GameStartParams params);
 		void render() const override;
 	};
 }

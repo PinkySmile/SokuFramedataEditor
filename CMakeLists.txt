@@ -353,6 +353,7 @@ add_executable(
 	${NETWORK_EXTRA_SCENES}
 	src/LibCore/LibCore.hpp
 	src/Game/Scenes/Scenes.hpp
+	src/Game/Scenes/SkeletonData.hpp
 )
 target_link_libraries(SoFGV SoFGVCore ${EXTRA_LINK_LIBRARIES})
 target_include_directories(SoFGV PRIVATE src/LibCore src/Game)

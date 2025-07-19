@@ -66,37 +66,6 @@ namespace SpiralOfFate
 		game->screen->displayElement("Delay " + std::to_string(game->connection->getCurrentDelay()), {0, 920});
 	}
 
-	InGame::InitParams NetworkCharacterSelect::createParams(SceneArguments *args, GameStartParams params)
-	{
-		auto &lentry = this->_entries[params.p1chr];
-		auto &rentry = this->_entries[params.p2chr];
-		auto &licon = lentry.icon[params.p1pal];
-		auto &ricon = rentry.icon[params.p2pal];
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P1's character (" + this->_entries[params.p1chr].name + L")");
-
-		auto lchr = this->_createCharacter(params.p1chr, params.p2chr, params.p1pal, this->_leftInput);
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P2's character (" + this->_entries[params.p2chr].name + L")");
-
-		auto rchr = this->_createCharacter(params.p2chr, params.p1chr, params.p2pal, this->_rightInput);
-		auto &stage = this->_stages[params.stage];
-
-		return {
-			{static_cast<unsigned>(params.stage), 0, static_cast<unsigned>(params.platformConfig)},
-			stage.platforms[params.platformConfig],
-			stage,
-			lchr,
-			rchr,
-			licon.getHandle(),
-			ricon.getHandle(),
-			lentry.entry,
-			rentry.entry
-		};
-	}
-
 	std::shared_ptr<RemoteInput> NetworkCharacterSelect::getRemoteRealInput()
 	{
 		return this->_remoteRealInput;

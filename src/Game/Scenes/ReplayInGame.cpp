@@ -286,36 +286,29 @@ namespace SpiralOfFate
 	{
 		checked_cast(realArgs, ReplayInGame::Arguments, args);
 
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P1's character (" + realArgs->lentry.name + L")");
+		auto params = InGame::createParams(
+			realArgs->stages,
+			realArgs->entries,
+			realArgs->reportProgressW,
+			realArgs->params,
+			realArgs->leftInput,
+			realArgs->rightInput
+		);
 
-		auto lChr = CharacterSelect::createCharacter(realArgs->lentry, realArgs->rentry, realArgs->lpos, realArgs->lpalette, realArgs->linput);
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P2's character (" + realArgs->rentry.name + L")");
-
-		auto rChr = CharacterSelect::createCharacter(realArgs->rentry, realArgs->lentry, realArgs->rpos, realArgs->rpalette, realArgs->rinput);
-
+		game->battleRandom.seed(realArgs->params.seed);
 		if (args->reportProgressA)
 			args->reportProgressA("Creating scene...");
 		return new ReplayInGame(
-			realArgs->params,
+			params.params,
 			realArgs->frameCount,
-			realArgs->platforms,
-			realArgs->stage,
-			lChr,
-			rChr,
-			realArgs->licon,
-			realArgs->ricon,
-			realArgs->lJson,
-			realArgs->rJson
+			params.platforms,
+			params.stage,
+			params.leftChr,
+			params.rightChr,
+			params.licon,
+			params.ricon,
+			params.lJson,
+			params.rJson
 		);
-	}
-
-	ReplayInGame::Arguments::Arguments(CharacterEntry lentry, CharacterEntry rentry, StageEntry stage) :
-		lentry(lentry),
-		rentry(rentry),
-		stage(stage)
-	{
 	}
 }

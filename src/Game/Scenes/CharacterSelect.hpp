@@ -15,51 +15,10 @@
 #include "InGame.hpp"
 #include "LoadingScene.hpp"
 #include "Resources/SceneArgument.hpp"
-#include "InGame.hpp"
+#include "SkeletonData.hpp"
 
 namespace SpiralOfFate
 {
-	struct CharacterEntry {
-		nlohmann::json entry;
-		int pos;
-		unsigned _class;
-		std::wstring name;
-		std::string folder;
-		std::vector<std::vector<Color>> palettes;
-		std::vector<Sprite> icon;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> data;
-
-		CharacterEntry(const nlohmann::json &json, const std::string &folder);
-		CharacterEntry(const CharacterEntry &entry);
-	};
-
-	struct PlatformSkeleton {
-		nlohmann::json entry;
-		std::string framedata;
-		FrameData data;
-		unsigned _class;
-		float width;
-		unsigned hp;
-		unsigned cd;
-		Vector2f pos;
-
-		PlatformSkeleton(const nlohmann::json &json);
-	};
-
-	struct StageEntry {
-		nlohmann::json entry;
-		std::string name;
-		std::string credits;
-		std::string objectPath;
-		std::string imagePath;
-		unsigned imageHandle;
-		std::vector<std::vector<PlatformSkeleton>> platforms;
-
-		StageEntry(const StageEntry &other);
-		StageEntry(const nlohmann::json &json);
-		~StageEntry();
-	};
-
 	class CharacterSelect : public IScene {
 	protected:
 		mutable Sprite _stageSprite;
@@ -80,7 +39,6 @@ namespace SpiralOfFate
 		int _platform = 0;
 		bool _selectingStage = false;
 
-		Character *_createCharacter(int pos, int posOp, int palette, std::shared_ptr<IInput> input);
 		virtual void _launchGame();
 		void _selectCharacterRender() const;
 		void _selectStageRender() const;
@@ -103,8 +61,6 @@ namespace SpiralOfFate
 			~Arguments() override = default;
 		};
 
-		static Character *createCharacter(const CharacterEntry &entry, const CharacterEntry &entryOp, int pos, int palette, std::shared_ptr<IInput> input);
-
 		CharacterSelect(const Arguments &);
 		CharacterSelect(
 			std::shared_ptr<IInput> leftInput,
@@ -122,10 +78,10 @@ namespace SpiralOfFate
 		void render() const override;
 		void update() override;
 		void consumeEvent(const sf::Event &event) override;
-		InGame::InitParams createParams(SceneArguments *args);
+		std::pair<std::shared_ptr<IInput>, std::shared_ptr<IInput>> getInputs() const;
+		std::pair<std::vector<StageEntry>, std::vector<CharacterEntry>> getData() const;
 
 		static std::pair<std::vector<StageEntry>, std::vector<CharacterEntry>> loadData();
-		static InGame::InitParams staticCreateParams(std::vector<StageEntry> &stages, std::vector<CharacterEntry> &entries, InGameArguments *args, std::shared_ptr<IInput> leftInput, std::shared_ptr<IInput> rightInput);
 		static CharacterSelect *create(SceneArguments *args);
 	};
 }

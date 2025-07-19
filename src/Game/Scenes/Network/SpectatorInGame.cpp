@@ -292,7 +292,14 @@ namespace SpiralOfFate
 		auto data = CharacterSelect::loadData();
 		auto manager = std::make_shared<SpectatorInputManager>();
 		auto inputs = manager->getInputs();
-		auto params = CharacterSelect::staticCreateParams(data.first, data.second, realArgs, inputs.first, inputs.second);
+		auto params = InGame::createParams(
+			data.first,
+			data.second,
+			realArgs->reportProgressW,
+			realArgs->startParams,
+			inputs.first,
+			inputs.second
+		);
 
 		con->onReplayData = [manager](PacketReplay &r){
 			manager->parseReplayPacket(r);

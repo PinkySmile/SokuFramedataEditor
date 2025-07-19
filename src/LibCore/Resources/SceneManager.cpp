@@ -10,25 +10,37 @@ namespace SpiralOfFate
 	void SceneManager::update()
 	{
 		if (this->_loading) {
+			std::unique_lock<std::recursive_mutex> guard{this->_sceneMutex};
+
+			if (!this->_loading)
+				this->_oldScene.reset();
 			if (this->_scene)
 				this->_scene->update();
 			return;
 		}
-		this->_oldScene.reset();
 		if (!this->_nextScene.name.empty() && this->_currentScene != this->_nextScene.name)
 			this->_applySwitchScene();
-		else if (this->_scene)
+
+		std::unique_lock<std::recursive_mutex> guard{this->_sceneMutex};
+
+		if (!this->_loading)
+			this->_oldScene.reset();
+		if (this->_scene)
 			this->_scene->update();
 	}
 
 	void SceneManager::render() const
 	{
+		std::unique_lock<std::recursive_mutex> guard{this->_sceneMutex};
+
 		assert_exp(this->_scene || this->_oldScene);
 		(this->_scene ? this->_scene : this->_oldScene)->render();
 	}
 
 	void SceneManager::consumeEvent(const sf::Event &event)
 	{
+		std::unique_lock<std::recursive_mutex> guard{this->_sceneMutex};
+
 		assert_exp(this->_scene || this->_oldScene);
 		(this->_scene ? this->_scene : this->_oldScene)->consumeEvent(event);
 	}
@@ -78,18 +90,25 @@ namespace SpiralOfFate
 	{
 		auto &factory = this->_factory[this->_nextScene.name];
 		auto cb = [this](IScene *result){
-			this->_oldScene = this->_scene;
 			assert_exp(result);
+
+			std::unique_lock<std::recursive_mutex> guard{this->_sceneMutex};
+
+			this->_oldScene = this->_scene;
 			this->_scene.reset(result);
 			this->_loading = false;
 		};
 
+		this->_oldScene = this->_scene;
 		if (factory.needLoading) {
 			LoadingArguments arg{factory.callback};
 
 			this->_loading = true;
 			arg.onLoadingFinished = cb;
 			arg.args = this->_nextScene.args;
+
+			std::unique_lock<std::recursive_mutex> guard{this->_sceneMutex};
+
 			this->_scene.reset(this->_factory["loading"].callback(&arg));
 		} else
 			cb(factory.callback(this->_nextScene.args));

@@ -293,7 +293,6 @@ void	run()
 	game->screen->setFramerateLimit(60);
 	game->gui.setWindow(*game->screen);
 	while (game->screen->isOpen()) {
-		game->sceneMutex.lock();
 	#ifdef HAS_NETWORK
 		if (game->connection)
 			game->connection->update();
@@ -342,7 +341,6 @@ void	run()
 			game->gui.handleEvent(*event);
 		#endif
 		}
-		game->sceneMutex.unlock();
 	}
 	// TODO: Move
 	saveInputs(game->menu, "menuInputs.in");

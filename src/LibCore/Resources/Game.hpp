@@ -113,7 +113,6 @@ namespace SpiralOfFate
 	#ifndef NO_TGUI
 		tgui::Gui gui;
 	#endif
-		std::mutex sceneMutex;
 		std::shared_ptr<IInput> activeNetInput;
 
 		Game(const std::string &fontPath, const std::string &settingsPath, const std::string &loggerPath = "./latest.log");

@@ -1011,10 +1011,7 @@ namespace SpiralOfFate
 
 	void TitleScreen::_loadReplay(const std::filesystem::path &path)
 	{
-		std::vector<StageEntry> stages;
-		std::vector<CharacterEntry> entries;
 		std::ifstream stream{path, std::ifstream::binary};
-		auto data = game->fileMgr.readFull("assets/stages/list.json");
 		nlohmann::json json;
 		unsigned nb;
 		unsigned short P1pos;
@@ -1026,7 +1023,7 @@ namespace SpiralOfFate
 		char *buffer;
 		ReplayData *buffer2;
 		InGame::GameParams params;
-		unsigned magic;
+		unsigned magic = 0;
 		unsigned frameCount;
 		unsigned expectedMagic = getMagic();
 		RandomWrapper::SerializedWrapper random;
@@ -1039,26 +1036,10 @@ namespace SpiralOfFate
 		if (magic != expectedMagic)
 			throw std::invalid_argument("INVALID_MAGIC");
 
-		auto chrList = game->getCharacters();
+		auto characterSelectData = CharacterSelect::loadData();
+		auto &stages = characterSelectData.first;
+		auto &entries = characterSelectData.second;
 
-		entries.reserve(chrList.size());
-		for (auto &entry : chrList) {
-			auto file = entry + "/chr.json";
-
-			game->logger.debug("Loading character from " + file);
-
-			auto data2 = game->fileMgr.readFull(file);
-
-			json = nlohmann::json::parse(data2);
-			entries.emplace_back(json, entry);
-		}
-		std::sort(entries.begin(), entries.end(), [](CharacterEntry &a, CharacterEntry &b){
-			return a.pos < b.pos;
-		});
-
-		json = nlohmann::json::parse(data);
-		for (auto &elem : json)
-			stages.emplace_back(elem);
 		stream.read(reinterpret_cast<char *>(&frameCount), sizeof(frameCount));
 		stream.read(reinterpret_cast<char *>(&random), sizeof(random));
 		stream.read(reinterpret_cast<char *>(&params), sizeof(params));
@@ -1067,8 +1048,6 @@ namespace SpiralOfFate
 			throw std::invalid_argument("INVALID_STAGE");
 		if (params.platforms >= stages[params.stage].platforms.size())
 			throw std::invalid_argument("INVALID_PLAT_CONF");
-		game->battleRandom.seed(random.seed);
-		game->battleRandom.discard(random.invoke_count);
 
 
 		stream.read(reinterpret_cast<char *>(&P1pos), sizeof(P1pos));
@@ -1104,21 +1083,22 @@ namespace SpiralOfFate
 		P2inputs.insert(P2inputs.begin(), buffer2, buffer2 + nb);
 		delete[] buffer;
 
-		auto args = new ReplayInGame::Arguments(entries[P1pos], entries[P2pos], stages[params.stage]);
+		auto args = new ReplayInGame::Arguments{};
 
-		args->lpos = P1pos;
-		args->lpalette = P1palette;
-		args->linput = std::make_shared<ReplayInput>(P1inputs);
-		args->rpos = P2pos;
-		args->rpalette = P2palette;
-		args->rinput = std::make_shared<ReplayInput>(P2inputs);
-		args->params = params;
 		args->frameCount = frameCount;
-		args->platforms = stages[params.stage].platforms[params.platforms];
-		args->licon = entries[P1pos].icon[P1palette].getHandle();
-		args->ricon = entries[P2pos].icon[P2palette].getHandle();
-		args->lJson = entries[P1pos].entry;
-		args->rJson = entries[P2pos].entry;
+		args->params.seed = random.seed;
+		args->params.p1chr = P1pos;
+		args->params.p1pal = P1palette;
+		args->params.p2chr = P2pos;
+		args->params.p2pal = P2palette;
+		args->params.stage = params.stage;
+		args->params.platformConfig = params.platforms;
+		args->stages.swap(stages);
+		args->entries.swap(entries);
+		args->leftInput = std::make_shared<ReplayInput>(P1inputs);
+		args->rightInput = std::make_shared<ReplayInput>(P2inputs);
+		args->saveReplay = false;
+		args->endScene = game->scene.getCurrentScene().first;
 		game->scene.switchScene("replay_in_game", args);
 	}
 

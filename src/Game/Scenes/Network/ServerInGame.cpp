@@ -48,7 +48,16 @@ namespace SpiralOfFate
 		checked_cast(realArgs, InGameArguments, args);
 		checked_cast(scene, NetworkCharacterSelect, realArgs->currentScene);
 
-		auto params = scene->createParams(args, realArgs->startParams);
+		auto data = scene->getData();
+		auto inputs = scene->getInputs();
+		auto params = InGame::createParams(
+			data.first,
+			data.second,
+			realArgs->reportProgressW,
+			realArgs->startParams,
+			inputs.first,
+			inputs.second
+		);
 
 		game->battleRandom.seed(realArgs->startParams.seed);
 		scene->flushInputs(realArgs->connection->getCurrentDelay());

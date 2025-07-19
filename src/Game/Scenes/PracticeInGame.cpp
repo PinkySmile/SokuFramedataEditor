@@ -498,8 +498,16 @@ namespace SpiralOfFate
 	{
 		checked_cast(realArgs, InGame::Arguments, args);
 
-		auto params = realArgs->characterSelectScene->createParams(args);
+		auto params = InGame::createParams(
+			realArgs->stages,
+			realArgs->entries,
+			realArgs->reportProgressW,
+			realArgs->params,
+			realArgs->leftInput,
+			realArgs->rightInput
+		);
 
+		game->battleRandom.seed(realArgs->params.seed);
 		if (args->reportProgressA)
 			args->reportProgressA("Creating scene...");
 		return new PracticeInGame(

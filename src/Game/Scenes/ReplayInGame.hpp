@@ -37,25 +37,8 @@ namespace SpiralOfFate
 		bool _practiceConfirm() override;
 
 	public:
-		struct Arguments : public SceneArguments {
-			CharacterEntry lentry;
-			int lpos;
-			int lpalette;
-			std::shared_ptr<IInput> linput;
-			CharacterEntry rentry;
-			int rpos;
-			int rpalette;
-			std::shared_ptr<IInput> rinput;
-			GameParams params;
+		struct Arguments : public InGame::Arguments {
 			unsigned frameCount;
-			std::vector<struct PlatformSkeleton> platforms;
-			StageEntry stage;
-			unsigned licon;
-			unsigned ricon;
-			nlohmann::json lJson;
-			nlohmann::json rJson;
-
-			Arguments(CharacterEntry lentry, CharacterEntry rentry, StageEntry stage);
 		};
 
 		ReplayInGame(const GameParams &params, unsigned frameCount, const std::vector<struct PlatformSkeleton> &platforms, const struct StageEntry &stage, Character *leftChr, Character *rightChr, unsigned licon, unsigned ricon, const nlohmann::json &lJson, const nlohmann::json &rJson);
