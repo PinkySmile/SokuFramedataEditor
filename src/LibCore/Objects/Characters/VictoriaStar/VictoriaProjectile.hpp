@@ -21,7 +21,7 @@ namespace SpiralOfFate
 			class Character *ownerObj,
 			unsigned id,
 			const nlohmann::json &json,
-			unsigned char typeSwitchFlags,
+			TypeSwitch typeSwitchFlags,
 			unsigned debuffDuration
 		);
 		bool hits(const Object &other) const override;

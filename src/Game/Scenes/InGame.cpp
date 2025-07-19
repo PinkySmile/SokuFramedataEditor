@@ -23,6 +23,10 @@
 #include "Objects/StageObjects/StageObject.hpp"
 #include "Objects/StageObjects/Cloud.hpp"
 
+
+#include "Objects/Characters/Stickman/Stickman.hpp"
+#include "Objects/Characters/VictoriaStar/VictoriaStar.hpp"
+
 unsigned getMagic()
 {
 	unsigned magic = REPLAY_MAGIC;
@@ -44,9 +48,10 @@ namespace SpiralOfFate
 	};
 
 	InGame::InGame(const GameParams &params) :
-		_random(game->battleRandom.ser),
+		_random(game->battleRandom.ser.seed),
 		_params(params)
 	{
+		assert_exp(game->battleRandom.ser.invoke_count == 0);
 		for (unsigned i = 0; i < spritesPaths.size(); i++)
 			this->_moveSprites[i] = game->textureMgr.load(spritesPaths[i]);
 		game->logger.info("InGame scene created");
@@ -668,12 +673,145 @@ namespace SpiralOfFate
 		return {};
 	}
 
+	InGame::InitParams InGame::createParams(
+		std::vector<StageEntry> &stages,
+		std::vector<CharacterEntry> &entries,
+		std::function<void (const std::wstring &)> reportProgressW,
+		const GameStartParams &params,
+		std::shared_ptr<IInput> leftInput,
+		std::shared_ptr<IInput> rightInput
+	)
+	{
+		std::uniform_int_distribution<size_t> dist{0, entries.size() - 1};
+		std::uniform_int_distribution<size_t> dist2{0, stages.size() - 1};
+		int leftPos = params.p1chr;
+		int rightPos = params.p2chr;
+		int leftPalette = params.p1pal;
+		int rightPalette = params.p2pal;
+		int _stage = params.stage;
+		int platform = params.platformConfig;
+
+		if (_stage == -1) {
+			platform = -1;
+			_stage = dist2(game->random);
+		}
+
+		std::uniform_int_distribution<size_t> dist3{0, stages[_stage].platforms.size() - 1};
+		auto &stage = stages[_stage];
+
+		if (platform == -1)
+			platform = dist3(game->random);
+		if (leftPos < 0)
+			leftPalette = 0;
+		if (rightPos < 0)
+			rightPalette = 0;
+		if (leftPos < 0)
+			leftPos = dist(game->random);
+		if (rightPos < 0)
+			rightPos = dist(game->random);
+		if (leftPos == rightPos && entries[leftPos].palettes.size() <= 1) {
+			leftPalette = 0;
+			rightPalette = 0;
+		} else if (
+			leftPos == rightPos &&
+			entries[leftPos].palettes.size() == 2 &&
+			leftPalette == rightPalette
+			) {
+			leftPalette = 0;
+			rightPalette = 1;
+		}
+		if (
+			leftPos == rightPos &&
+			leftPalette == rightPalette &&
+			entries[leftPos].palettes.size() > 1
+			) {
+			rightPalette++;
+			rightPalette %= entries[leftPos].palettes.size();
+		}
+
+		auto &lentry = entries[leftPos];
+		auto &rentry = entries[rightPos];
+		auto &licon = lentry.icon[leftPalette];
+		auto &ricon = rentry.icon[rightPalette];
+
+		if (reportProgressW)
+			reportProgressW(L"Loading P1's character (" + entries[leftPos].name + L")");
+
+		auto lchr = createCharacter(entries[leftPos], entries[rightPos], leftPos, leftPalette, std::move(leftInput));
+
+		if (reportProgressW)
+			reportProgressW(L"Loading P2's character (" + entries[rightPos].name + L")");
+
+		auto rchr = createCharacter(entries[rightPos], entries[leftPos], rightPos, rightPalette, std::move(rightInput));
+
+		return InGame::InitParams{
+			{static_cast<unsigned>(_stage), 0, static_cast<unsigned>(platform)},
+			stage.platforms[platform],
+			stage,
+			lchr,
+			rchr,
+			licon.getHandle(),
+			ricon.getHandle(),
+			lentry.entry,
+			rentry.entry
+		};
+	}
+
+	Character *InGame::createCharacter(const CharacterEntry &entry, const CharacterEntry &entryOp, int pos, int palette, std::shared_ptr<IInput> input)
+	{
+		Character *chr;
+		std::pair<std::vector<Color>, std::vector<Color>> palettes;
+
+		if (!entry.palettes.empty() && palette) {
+			palettes.first = entry.palettes.front();
+			palettes.second = entry.palettes[palette];
+		}
+		switch (entry._class) {
+		case 2:
+			chr = new VictoriaStar{
+				static_cast<unsigned>(palette << 16 | pos),
+				entry.folder,
+				palettes,
+				std::move(input),
+				std::filesystem::path(entryOp.folder).filename().string()
+			};
+			break;
+		case 1:
+			chr = new Stickman{
+				static_cast<unsigned>(palette << 16 | pos),
+				entry.folder,
+				palettes,
+				std::move(input)
+			};
+			break;
+		default:
+			chr = new Character{
+				static_cast<unsigned>(palette << 16 | pos),
+				entry.folder,
+				palettes,
+				std::move(input)
+			};
+			break;
+		}
+
+		chr->name = entry.name;
+		return chr;
+	}
+
 	InGame *InGame::create(SceneArguments *args)
 	{
 		checked_cast(realArgs, InGame::Arguments, args);
 
-		auto params = realArgs->characterSelectScene->createParams(args);
+		auto params = InGame::createParams(
+			realArgs->stages,
+			realArgs->entries,
+			realArgs->reportProgressW,
+			realArgs->params,
+			realArgs->leftInput,
+			realArgs->rightInput
+		);
 
+		game->battleRandom.seed(realArgs->params.seed);
 		if (args->reportProgressA)
 			args->reportProgressA("Creating scene...");
 		return new InGame(params, realArgs->endScene, realArgs->saveReplay);

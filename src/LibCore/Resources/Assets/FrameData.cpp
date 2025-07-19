@@ -546,24 +546,24 @@ namespace SpiralOfFate
 			result["sound"] = this->soundPath;
 		if (!this->hitSoundPath.empty())
 			result["hit_sound"] = this->hitSoundPath;
-		if (this->particleGenerator)
+		if (this->particleGenerator != 0)
 			result["particle_generator"] = this->particleGenerator;
-		if (this->offset.x || this->offset.y)
+		if (this->offset.x != 0 || this->offset.y != 0)
 			result["offset"] = {
 				{"x", this->offset.x},
 				{"y", this->offset.y}
 			};
-		if (this->speed.x || this->speed.y)
+		if (this->speed.x != 0 || this->speed.y != 0)
 			result["speed"] = {
 				{"x", this->speed.x},
 				{"y", this->speed.y}
 			};
-		if (this->gravity)
+		if (this->gravity.has_value())
 			result["gravity"] = {
 				{"x", this->gravity->x},
 				{"y", this->gravity->y}
 			};
-		if (this->snap)
+		if (this->snap.has_value())
 			result["snap"] = {
 				{"x", this->snap->first.x},
 				{"y", this->snap->first.y},
@@ -587,70 +587,70 @@ namespace SpiralOfFate
 			result["hurt_boxes"] = this->hurtBoxes;
 		if (!this->hitBoxes.empty())
 			result["hit_boxes"] = this->hitBoxes;
-		if (this->specialMarker)
+		if (this->specialMarker != 0)
 			result["marker"] = this->specialMarker;
-		if (this->damage)
+		if (this->damage != 0)
 			result["damage"] = this->damage;
-		if (this->fadeTime)
+		if (this->fadeTime != 0)
 			result["fade_time"] = this->fadeTime;
-		if (this->chipDamage)
+		if (this->chipDamage != 0)
 			result["chip_damage"] = this->chipDamage;
-		if (this->priority)
+		if (this->priority.has_value())
 			result["priority"] = *this->priority;
-		if (this->dFlag.flags)
+		if (this->dFlag.flags != 0)
 			result["defense_flag"] = this->dFlag.flags;
-		if (this->oFlag.flags)
+		if (this->oFlag.flags != 0)
 			result["offense_flag"] = this->oFlag.flags;
-		if (this->collisionBox)
+		if (this->collisionBox != nullptr)
 			result["collision_box"] = *this->collisionBox;
-		if (this->blockStun)
+		if (this->blockStun != 0)
 			result["block_stun"] = this->blockStun;
 		if (this->wrongBlockStun != this->blockStun + 8)
 			result["wrong_block_stun"] = this->wrongBlockStun;
-		if (this->hitStun)
+		if (this->hitStun != 0)
 			result["hit_stun"] = this->hitStun;
-		if (this->untech)
+		if (this->untech != 0)
 			result["untech"] = this->untech;
-		if (this->guardDmg)
+		if (this->guardDmg != 0)
 			result["guard_damage"] = this->guardDmg;
 		if (this->prorate != 0)
 			result["prorate"] = this->prorate;
 		if (this->minProrate != 0)
 			result["min_prorate"] = this->minProrate;
-		if (this->neutralLimit)
+		if (this->neutralLimit != 0)
 			result["neutral_limit"] = this->neutralLimit;
-		if (this->voidLimit)
+		if (this->voidLimit != 0)
 			result["void_limit"] = this->voidLimit;
-		if (this->spiritLimit)
+		if (this->spiritLimit != 0)
 			result["spirit_limit"] = this->spiritLimit;
-		if (this->matterLimit)
+		if (this->matterLimit != 0)
 			result["matter_limit"] = this->matterLimit;
-		if (this->pushBack)
+		if (this->pushBack != 0)
 			result["push_back"] = this->pushBack;
-		if (this->pushBlock)
+		if (this->pushBlock != 0)
 			result["push_block"] = this->pushBlock;
 		if (this->duration > 1)
 			result["duration"] = this->duration;
-		if (this->subObjectSpawn)
+		if (this->subObjectSpawn != 0)
 			result["subobject"] = this->subObjectSpawn;
-		if (this->manaGain)
+		if (this->manaGain != 0)
 			result["mana_gain"] = this->manaGain;
-		if (this->manaCost)
+		if (this->manaCost != 0)
 			result["mana_cost"] = this->manaCost;
-		if (this->hitPlayerHitStop)
+		if (this->hitPlayerHitStop != 0)
 			result["hit_player_hit_stop"] = this->hitPlayerHitStop;
-		if (this->hitOpponentHitStop)
+		if (this->hitOpponentHitStop != 0)
 			result["hit_opponent_hit_stop"] = this->hitOpponentHitStop;
-		if (this->blockPlayerHitStop)
+		if (this->blockPlayerHitStop != 0)
 			result["block_player_hit_stop"] = this->blockPlayerHitStop;
-		if (this->blockOpponentHitStop)
+		if (this->blockOpponentHitStop != 0)
 			result["block_opponent_hit_stop"] = this->blockOpponentHitStop;
-		if (this->hitSpeed.x || this->hitSpeed.y)
+		if (this->hitSpeed.x != 0 || this->hitSpeed.y != 0)
 			result["hit_speed"] = {
 				{"x", this->hitSpeed.x},
 				{"y", this->hitSpeed.y}
 			};
-		if (this->counterHitSpeed.x || this->counterHitSpeed.y)
+		if (this->counterHitSpeed.x != 0 || this->counterHitSpeed.y != 0)
 			result["counter_hit_speed"] = {
 				{"x", this->counterHitSpeed.x},
 				{"y", this->counterHitSpeed.y}

@@ -64,12 +64,17 @@ class OffensiveFlag:
 	unTransformCancelable = 1 << 20
 	dashCancelable        = 1 << 21
 	backDashCancelable    = 1 << 22
-	voidMana              = 1 << 23
-	spiritMana            = 1 << 24
-	matterMana            = 1 << 25
+	# 23 - 25
 	turnAround            = 1 << 26
 	forceTurnAround       = 1 << 27
 	nextBlockOnHit        = 1 << 28
+	nextBlockOnBlock      = 1 << 29
+	hardKnockDown         = 1 << 30
+	groundSlam            = 1 << 31
+	groundSlamCH          = 1 << 32
+	wallSplat             = 1 << 33
+	wallSplatCH           = 1 << 34
+	phantomHit            = 1 << 35
 
 
 def rmdir(directory):
@@ -320,7 +325,7 @@ def calc_frame_advantage(block, data):
 	stun = frame.get("block_stun", 0)
 	stop = frame.get("block_opponent_hit_stop", 0) - frame.get("block_player_hit_stop", 0)
 	dat[0][0] = stun + stop - total
-	dat[0][1] = anim.get("wrong_block_stun", stun + 8) + stop - total
+	dat[0][1] = frame.get("wrong_block_stun", stun + 8) + stop - total
 	if not any(i for k, i in data['guard'][0].items() if k in l):
 		dat[0][0] = None
 	if not any(i for k, i in data['guard'][-1].items() if k in l):
@@ -501,11 +506,7 @@ def get_data_for_move(mid, move, objs_datas):
 					frame.get("neutral_limit", 0)
 				],
 				# Mana gain
-				'gain': [
-					frame.get("mana_gain", 0) * bool(oflags & OffensiveFlag.voidMana),
-					frame.get("mana_gain", 0) * bool(oflags & OffensiveFlag.spiritMana),
-					frame.get("mana_gain", 0) * bool(oflags & OffensiveFlag.matterMana)
-				],
+				'gain': frame.get("mana_gain", 0),
 				# Move type (Void, Spirit, Matter, Neutral)
 				'type': oflags & (OffensiveFlag.voidElement | OffensiveFlag.matterElement | OffensiveFlag.spiritElement),
 				# Guard damage
@@ -534,6 +535,14 @@ def get_data_for_move(mid, move, objs_datas):
 					"Grab": False,
 					"Auto": False
 				}
+				if oflags & OffensiveFlag.lowHit:
+					current['guard']['H'] = False
+				if oflags & OffensiveFlag.highHit:
+					current['guard']['L'] = False
+				if oflags & OffensiveFlag.autoHitPos:
+					current['guard']["Auto"] = True
+				if oflags & OffensiveFlag.airUnblockable:
+					current['guard']['A'] = False
 			elif oflags & OffensiveFlag.grab:
 				current['guard'] = {
 					"A": False,
@@ -597,12 +606,7 @@ def get_data_for_move(mid, move, objs_datas):
 	# TODO: Land Cancel recovery
 	# TODO: Follow up info
 	# Mana cost
-	cost = move[0][0].get("mana_cost", 0)
-	data["cost"] = [
-		cost * bool(flags & OffensiveFlag.voidMana),
-		cost * bool(flags & OffensiveFlag.spiritMana),
-		cost * bool(flags & OffensiveFlag.matterMana)
-	]
+	data["cost"] = move[0][0].get("mana_cost", 0)
 	# Frame advantage
 	data['advantage'] = calc_frame_advantage(move[0], data)
 	# Total duration

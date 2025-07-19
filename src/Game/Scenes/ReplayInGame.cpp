@@ -94,12 +94,12 @@ namespace SpiralOfFate
 			return;
 		}
 		if (relevent.verticalAxis == 1 || (relevent.verticalAxis >= 36 && relevent.verticalAxis % 6 == 0)) {
-			this->_practiceCursor += sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings);
+			this->_practiceCursor += std::size(ReplayInGame::_practiceMenuStrings);
 			this->_practiceCursor--;
-			this->_practiceCursor %= sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings);
+			this->_practiceCursor %= std::size(ReplayInGame::_practiceMenuStrings);
 		} else if (relevent.verticalAxis == -1 || (relevent.verticalAxis <= -36 && relevent.verticalAxis % 6 == 0)) {
 			this->_practiceCursor++;
-			this->_practiceCursor %= sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings);
+			this->_practiceCursor %= std::size(ReplayInGame::_practiceMenuStrings);
 		}
 		if (relevent.n == 1)
 			this->_practiceConfirm();
@@ -128,12 +128,16 @@ namespace SpiralOfFate
 		auto rinput = game->battleMgr->getRightCharacter()->getInput();
 
 		if (!this->_paused) {
+			auto r1 = reinterpret_cast<ReplayInput *>(&*this->_manager->getLeftCharacter()->getInput());
+			auto r2 = reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput());
+
 			game->P1.first->update();
 			game->P1.second->update();
-			if (game->P1.first->isPressed(INPUT_PAUSE) || game->P1.second->isPressed(INPUT_PAUSE) || (
-				!reinterpret_cast<ReplayInput *>(&*this->_manager->getLeftCharacter()->getInput())->hasData() &&
-				!reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput())->hasData()
-			)) {
+			if (
+				game->P1.first->isPressed(INPUT_PAUSE) ||
+				game->P1.second->isPressed(INPUT_PAUSE) ||
+				(!r1->hasData() && !r2->hasData())
+			) {
 				this->_paused = 1;
 				return;
 			}
@@ -153,6 +157,10 @@ namespace SpiralOfFate
 	{
 		if (this->_moveList) {
 			game->battleMgr->render();
+			if (this->_inputDisplay & 1)
+				game->battleMgr->renderLeftInputs();
+			if (this->_inputDisplay & 2)
+				game->battleMgr->renderRightInputs();
 			this->_renderMoveList(this->_chr, this->_chr->name + L"'s " + this->_moveListName);
 			return;
 		}
@@ -171,17 +179,17 @@ namespace SpiralOfFate
 			return;
 		if (this->_practice)
 			return this->_practiceRender();
-		game->screen->displayElement({340 - 50, 240 - 600, 400, 175}, sf::Color{0x50, 0x50, 0x50, 0xC0});
+		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 240 - 600, 400, 175}, sf::Color{0x50, 0x50, 0x50, 0xC0});
 
 		bool end = !reinterpret_cast<ReplayInput *>(&*this->_manager->getLeftCharacter()->getInput())->hasData() &&
 			   !reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput())->hasData();
 
 		game->screen->textSize(20);
 		game->screen->fillColor(sf::Color::White);
-		game->screen->displayElement(end ? "Replay Mode | Replay ended" : "Replay Mode", {340 - 50, 245 - 600}, 400, Screen::ALIGN_CENTER);
+		game->screen->displayElement(end ? "Replay Mode | Replay ended" : "Replay Mode", {340 - 50 + STAGE_X_MIN, 245 - 600}, 400, Screen::ALIGN_CENTER);
 		for (size_t i = 0; i < sizeof(ReplayInGame::_menuStrings) / sizeof(*ReplayInGame::_menuStrings); i++) {
 			game->screen->fillColor(i == this->_pauseCursor ? sf::Color::Yellow : sf::Color::White);
-			game->screen->displayElement(ReplayInGame::_menuStrings[i], {350 - 50, 285 - 600 + 25.f * i});
+			game->screen->displayElement(ReplayInGame::_menuStrings[i], {350 - 50 + STAGE_X_MIN, 285 - 600 + 25.f * i});
 		}
 		game->screen->fillColor(sf::Color::White);
 		game->screen->textSize(30);
@@ -189,7 +197,7 @@ namespace SpiralOfFate
 
 	void ReplayInGame::_practiceRender() const
 	{
-		char const *values[sizeof(ReplayInGame::_practiceMenuStrings) / sizeof(*ReplayInGame::_practiceMenuStrings)];
+		char const *values[std::size(ReplayInGame::_practiceMenuStrings)];
 		std::string delay = std::to_string(this->_inputDelay);
 		const char *vals[] = {
 			"Hidden",
@@ -202,16 +210,16 @@ namespace SpiralOfFate
 		values[1] = !this->_manager->_showAttributes ? "Disabled" : "Enabled";
 		values[2] = vals[this->_inputDisplay];
 
-		game->screen->displayElement({340 - 50, 190 - 600, 400, 50 + 25 * (sizeof(ReplayInGame::_practiceMenuStrings) / sizeof(*ReplayInGame::_practiceMenuStrings))}, sf::Color{0x50, 0x50, 0x50, 0xC0});
+		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 190 - 600, 400, 50 + 25 * (std::size(ReplayInGame::_practiceMenuStrings))}, sf::Color{0x50, 0x50, 0x50, 0xC0});
 		game->screen->textSize(20);
 		game->screen->fillColor(sf::Color::White);
-		game->screen->displayElement("Replay Options", {340 - 50, 195 - 600}, 400, Screen::ALIGN_CENTER);
-		for (size_t i = 0; i < sizeof(ReplayInGame::_practiceMenuStrings) / sizeof(*ReplayInGame::_practiceMenuStrings); i++) {
+		game->screen->displayElement("Replay Options", {340 - 50 + STAGE_X_MIN, 195 - 600}, 400, Screen::ALIGN_CENTER);
+		for (size_t i = 0; i < std::size(ReplayInGame::_practiceMenuStrings); i++) {
 			char buffer[0x400];
 
 			sprintf(buffer, ReplayInGame::_practiceMenuStrings[i], values[i]);
 			game->screen->fillColor(i == this->_practiceCursor ? sf::Color::Yellow : sf::Color::White);
-			game->screen->displayElement(buffer, {350 - 50, 235 - 600 + 25.f * i});
+			game->screen->displayElement(buffer, {350 - 50 + STAGE_X_MIN, 235 - 600 + 25.f * i});
 		}
 		game->screen->fillColor(sf::Color::White);
 		game->screen->textSize(30);
@@ -278,36 +286,29 @@ namespace SpiralOfFate
 	{
 		checked_cast(realArgs, ReplayInGame::Arguments, args);
 
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P1's character (" + realArgs->lentry.name + L")");
+		auto params = InGame::createParams(
+			realArgs->stages,
+			realArgs->entries,
+			realArgs->reportProgressW,
+			realArgs->params,
+			realArgs->leftInput,
+			realArgs->rightInput
+		);
 
-		auto lChr = CharacterSelect::createCharacter(realArgs->lentry, realArgs->rentry, realArgs->lpos, realArgs->lpalette, realArgs->linput);
-
-		if (args->reportProgressW)
-			args->reportProgressW(L"Loading P2's character (" + realArgs->rentry.name + L")");
-
-		auto rChr = CharacterSelect::createCharacter(realArgs->rentry, realArgs->lentry, realArgs->rpos, realArgs->rpalette, realArgs->rinput);
-
+		game->battleRandom.seed(realArgs->params.seed);
 		if (args->reportProgressA)
 			args->reportProgressA("Creating scene...");
 		return new ReplayInGame(
-			realArgs->params,
+			params.params,
 			realArgs->frameCount,
-			realArgs->platforms,
-			realArgs->stage,
-			lChr,
-			rChr,
-			realArgs->licon,
-			realArgs->ricon,
-			realArgs->lJson,
-			realArgs->rJson
+			params.platforms,
+			params.stage,
+			params.leftChr,
+			params.rightChr,
+			params.licon,
+			params.ricon,
+			params.lJson,
+			params.rJson
 		);
-	}
-
-	ReplayInGame::Arguments::Arguments(CharacterEntry lentry, CharacterEntry rentry, StageEntry stage) :
-		lentry(lentry),
-		rentry(rentry),
-		stage(stage)
-	{
 	}
 }

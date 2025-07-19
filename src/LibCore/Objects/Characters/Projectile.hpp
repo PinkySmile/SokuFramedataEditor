@@ -12,6 +12,16 @@
 namespace SpiralOfFate
 {
 	class Projectile : public SubObject {
+	public:
+		enum TypeSwitch : unsigned char {
+			TYPESWITCH_NONE,
+			TYPESWITCH_NEUTRAL,
+			TYPESWITCH_VOID,
+			TYPESWITCH_MATTER,
+			TYPESWITCH_SPIRIT,
+			TYPESWITCH_NON_TYPED
+		};
+
 	private:
 		enum ProjectileAnimation {
 			ANIMATION_DISAPPEAR,
@@ -33,7 +43,7 @@ namespace SpiralOfFate
 			unsigned animationCtr;
 			unsigned debuffDuration;
 			bool disabled;
-			unsigned char typeSwitchFlags;
+			TypeSwitch typeSwitchFlags;
 		};
 		static_assert(sizeof(Data) == 14, "Data has wrong size");
 #pragma pack(pop)
@@ -43,7 +53,7 @@ namespace SpiralOfFate
 		unsigned _nbHit = 0;
 		unsigned _debuffDuration = 0;
 		bool _disabled = false;
-		unsigned char _typeSwitchFlags = 0;
+		TypeSwitch _typeSwitch = TYPESWITCH_NONE;
 
 		// Non-game state
 		unsigned _maxHit;
@@ -62,19 +72,12 @@ namespace SpiralOfFate
 		void _disableObject(const ProjectileAnimationData &data);
 
 	public:
-		enum TypeSwitchFlags {
-			TYPESWITCH_NEUTRAL = 1 << 0,
-			TYPESWITCH_SPIRIT  = 1 << 1,
-			TYPESWITCH_MATTER  = 1 << 2,
-			TYPESWITCH_VOID    = 1 << 3
-		};
-
 		Projectile(
 			bool owner,
 			class Character *ownerObj,
 			unsigned id,
 			const nlohmann::json &json,
-			unsigned char typeSwitchFlags,
+			TypeSwitch typeSwitchFlags,
 			unsigned debuffDuration
 		);
 		Projectile(
@@ -86,7 +89,7 @@ namespace SpiralOfFate
 			class Character *ownerObj,
 			unsigned id,
 			const nlohmann::json &json,
-			unsigned char typeSwitchFlags,
+			TypeSwitch typeSwitchFlags,
 			unsigned debuffDuration
 		);
 		void update() override;
