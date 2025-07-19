@@ -418,8 +418,8 @@
 		"spawn_offset": {
 			"anchorX": "owner",
 			"anchorY": "owner",
-			"x": -590,
-			"y": -135
+			"x": -600,
+			"y": 0
 		},
 		"dir": "back",
 		"shadow": "neutral",
