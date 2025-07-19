@@ -1080,7 +1080,7 @@ namespace SpiralOfFate
 			throw std::invalid_argument("INVALID_P1PAL");
 
 		stream.read(reinterpret_cast<char *>(&nb), sizeof(nb));
-		game->logger.debug("P1 has " + std::to_string(nb) + "inputs");
+		game->logger.debug("P1 has " + std::to_string(nb) + " inputs");
 		buffer = new char[nb * sizeof(ReplayData)];
 		stream.read(buffer, nb * sizeof(ReplayData));
 		buffer2 = reinterpret_cast<ReplayData *>(buffer);
@@ -1097,7 +1097,7 @@ namespace SpiralOfFate
 			throw std::invalid_argument("INVALID_P2PAL");
 
 		stream.read(reinterpret_cast<char *>(&nb), sizeof(nb));
-		game->logger.debug("P2 has " + std::to_string(nb) + "inputs");
+		game->logger.debug("P2 has " + std::to_string(nb) + " inputs");
 		buffer = new char[nb * sizeof(ReplayData)];
 		stream.read(buffer, nb * sizeof(ReplayData));
 		buffer2 = reinterpret_cast<ReplayData *>(buffer);

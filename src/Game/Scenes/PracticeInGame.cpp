@@ -119,7 +119,7 @@ namespace SpiralOfFate
 		game->screen->textSize(20);
 		game->screen->fillColor(sf::Color::White);
 		game->screen->displayElement("P" + std::to_string(this->_paused) + " | Practice Mode", {340 - 50 + STAGE_X_MIN, 245 - 600}, 400, Screen::ALIGN_CENTER);
-		for (size_t i = 0; i < sizeof(PracticeInGame::_menuStrings) / sizeof(*PracticeInGame::_menuStrings); i++) {
+		for (size_t i = 0; i < std::size(PracticeInGame::_menuStrings); i++) {
 			game->screen->fillColor(i == this->_pauseCursor ? sf::Color::Yellow : sf::Color::White);
 			game->screen->displayElement(PracticeInGame::_menuStrings[i], {350 - 50 + STAGE_X_MIN, 285 - 600 + 25.f * i});
 		}
@@ -246,7 +246,7 @@ namespace SpiralOfFate
 
 	void PracticeInGame::_practiceRender() const
 	{
-		char const *values[sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings)];
+		char const *values[std::size(PracticeInGame::_practiceMenuStrings)];
 		std::string delay = std::to_string(this->_inputDelay);
 		auto chVal = this->_manager->_leftCharacter->_counterHit;
 		const char *vals[] = {
@@ -269,11 +269,11 @@ namespace SpiralOfFate
 		values[10]= this->manaStateToString();
 		values[11]= vals[this->_inputDisplay];
 
-		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 190 - 600, 400, 50 + 25 * (sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings))}, sf::Color{0x50, 0x50, 0x50, 0xC0});
+		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 190 - 600, 400, 50 + 25 * (std::size(PracticeInGame::_practiceMenuStrings))}, sf::Color{0x50, 0x50, 0x50, 0xC0});
 		game->screen->textSize(20);
 		game->screen->fillColor(sf::Color::White);
 		game->screen->displayElement("P" + std::to_string(this->_paused) + " | Practice Options", {340 - 50 + STAGE_X_MIN, 195 - 600}, 400, Screen::ALIGN_CENTER);
-		for (size_t i = 0; i < sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings); i++) {
+		for (size_t i = 0; i < std::size(PracticeInGame::_practiceMenuStrings); i++) {
 			char buffer[0x400];
 
 			sprintf(buffer, PracticeInGame::_practiceMenuStrings[i], values[i]);
@@ -299,12 +299,12 @@ namespace SpiralOfFate
 			return;
 		}
 		if (relevent.verticalAxis == 1 || (relevent.verticalAxis >= 36 && relevent.verticalAxis % 6 == 0)) {
-			this->_practiceCursor += sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings);
+			this->_practiceCursor += std::size(PracticeInGame::_practiceMenuStrings);
 			this->_practiceCursor--;
-			this->_practiceCursor %= sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings);
+			this->_practiceCursor %= std::size(PracticeInGame::_practiceMenuStrings);
 		} else if (relevent.verticalAxis == -1 || (relevent.verticalAxis <= -36 && relevent.verticalAxis % 6 == 0)) {
 			this->_practiceCursor++;
-			this->_practiceCursor %= sizeof(PracticeInGame::_practiceMenuStrings) / sizeof(*PracticeInGame::_practiceMenuStrings);
+			this->_practiceCursor %= std::size(PracticeInGame::_practiceMenuStrings);
 		}
 		if (relevent.n == 1)
 			this->_practiceConfirm();
