@@ -106,6 +106,8 @@ namespace SpiralOfFate
 		static ProjectileAnimation animationFromString(const std::string &str);
 
 		unsigned int getDebuffDuration() const override;
+
+		void kill() override;
 	};
 }
 

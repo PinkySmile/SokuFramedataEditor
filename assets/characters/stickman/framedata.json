@@ -17103,10 +17103,6 @@
             "top": -183,
             "width": 57
           },
-          "counter_hit_speed": {
-            "x": 15.0,
-            "y": 30.0
-          },
           "defense_flag": 2236424,
           "gravity": {
             "x": 0.0,
@@ -17114,19 +17110,14 @@
           },
           "hit_boxes": [
             {
-              "height": 212,
-              "left": -90,
-              "top": -201,
-              "width": 180
+              "height": 1,
+              "left": 0,
+              "top": 0,
+              "width": 1
             }
           ],
           "hit_opponent_hit_stop": 30,
           "hit_player_hit_stop": 6,
-          "hit_speed": {
-            "x": 1.0,
-            "y": 10.0
-          },
-          "hit_stun": 120,
           "hurt_boxes": [
             {
               "height": 229,
@@ -17139,7 +17130,6 @@
             "x": 0,
             "y": -9
           },
-          "prorate": 120.0,
           "push_block": 6,
           "scale": {
             "x": 2.0,
@@ -17152,8 +17142,7 @@
             "left": 111,
             "top": 1002,
             "width": 79
-          },
-          "untech": 120
+          }
         },
         {
           "block_opponent_hit_stop": 6,
@@ -17254,10 +17243,6 @@
             "top": -183,
             "width": 57
           },
-          "counter_hit_speed": {
-            "x": 15.0,
-            "y": 30.0
-          },
           "defense_flag": 2236680,
           "gravity": {
             "x": 0.0,
@@ -17265,19 +17250,14 @@
           },
           "hit_boxes": [
             {
-              "height": 212,
-              "left": -90,
-              "top": -201,
-              "width": 180
+              "height": 1,
+              "left": 0,
+              "top": 0,
+              "width": 1
             }
           ],
           "hit_opponent_hit_stop": 30,
           "hit_player_hit_stop": 6,
-          "hit_speed": {
-            "x": 1.0,
-            "y": 10.0
-          },
-          "hit_stun": 120,
           "hurt_boxes": [
             {
               "height": 229,
@@ -17290,7 +17270,6 @@
             "x": 0,
             "y": -9
           },
-          "prorate": 120.0,
           "push_block": 6,
           "scale": {
             "x": 2.0,
@@ -17303,8 +17282,7 @@
             "left": 111,
             "top": 1002,
             "width": 79
-          },
-          "untech": 120
+          }
         },
         {
           "block_opponent_hit_stop": 6,

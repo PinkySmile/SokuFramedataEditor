@@ -77,6 +77,8 @@ namespace SpiralOfFate
 		void hit(Object &other, const FrameData *data) override;
 		bool hits(const Object &other) const override;
 
+		void kill() override;
+
 		friend VictoriaStar;
 	};
 }

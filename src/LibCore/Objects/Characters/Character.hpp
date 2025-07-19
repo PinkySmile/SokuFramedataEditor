@@ -774,6 +774,8 @@ namespace SpiralOfFate
 
 		unsigned int getDebuffDuration() const override;
 
+		void kill() override;
+
 		friend class ObjectFactory;
 		friend class SubObject;
 		friend class PracticeBattleManager;

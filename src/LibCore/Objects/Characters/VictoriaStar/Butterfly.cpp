@@ -451,4 +451,17 @@ namespace SpiralOfFate
 		}
 		return length + sizeof(HappyData);
 	}
+
+	void Butterfly::kill()
+	{
+		this->_actionBlock = 0;
+		this->_rotation = 0;
+		this->_animation = 0;
+		this->_animationCtr = 0;
+		this->_alpha = 1;
+		this->_hasHit = false;
+		this->_newAnim = true;
+		this->_attackTravelCtr = 0;
+		this->_attackAttackCtr = 0;
+	}
 }

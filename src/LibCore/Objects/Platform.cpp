@@ -61,8 +61,6 @@ namespace SpiralOfFate
 		if (this->isDestructed()) {
 			this->_hp = 0;
 			this->_deathTimer = this->_cooldown;
-			if (this->_action == 0)
-				this->_forceStartMove(1);
 		}
 	}
 
@@ -167,5 +165,14 @@ namespace SpiralOfFate
 			return 0;
 		}
 		return length + sizeof(Data);
+	}
+
+	void Platform::kill()
+	{
+		if (this->_action == 0) {
+			this->_hp = 0;
+			this->_forceStartMove(1);
+			this->_deathTimer = this->_cooldown;
+		}
 	}
 }

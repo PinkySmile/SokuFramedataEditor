@@ -1364,6 +1364,12 @@ namespace SpiralOfFate
 
 	void Character::hit(Object &other, const FrameData *data)
 	{
+		if (isRomanCancelAction(this->_action) && other.getCurrentFrameData()->dFlag.projectile) {
+			if (this->_opponent->_limit[LIMIT_NEUTRAL] < 100 || !dynamic_cast<Platform *>(&other))
+				other.kill();
+			return;
+		}
+
 		auto chr = dynamic_cast<Character *>(&other);
 		auto isHit = isHitAction(other._action);
 		auto realData = this->getCurrentFrameData();
@@ -2931,57 +2937,10 @@ namespace SpiralOfFate
 			for (auto limit : otherChr->_limit)
 				if (limit >= 100)
 					return false;
-
-			auto odata = otherChr->getCurrentFrameData();
-			auto mdata = this->getCurrentFrameData();
-
-			if (isRomanCancelAction(otherChr->_action) && (this->_action == ACTION_NEUTRAL_OVERDRIVE || this->_action == ACTION_NEUTRAL_AIR_OVERDRIVE))
+			if (isRomanCancelAction(this->_action))
 				return false;
-			if (isRomanCancelAction(this->_action) && (otherChr->_action == ACTION_NEUTRAL_OVERDRIVE || otherChr->_action == ACTION_NEUTRAL_AIR_OVERDRIVE))
-				return Object::hits(other);
-
-			if (this->_action == ACTION_NEUTRAL_OVERDRIVE || this->_action == ACTION_NEUTRAL_AIR_OVERDRIVE)
-				return Object::hits(other);
-			if (otherChr->_action == ACTION_NEUTRAL_OVERDRIVE || otherChr->_action == ACTION_NEUTRAL_AIR_OVERDRIVE)
-				return false;
-
-			if (
-				(odata->oFlag.voidElement || odata->oFlag.spiritElement) &&
-				(this->_action == ACTION_VOID_OVERDRIVE || this->_action == ACTION_VOID_AIR_OVERDRIVE)
-			)
-				return false;
-			if (
-				(odata->oFlag.spiritElement || odata->oFlag.matterElement) &&
-				(this->_action == ACTION_SPIRIT_OVERDRIVE || this->_action == ACTION_SPIRIT_AIR_OVERDRIVE)
-			)
-				return false;
-			if (
-				(odata->oFlag.matterElement || odata->oFlag.voidElement) &&
-				(this->_action == ACTION_MATTER_OVERDRIVE || this->_action == ACTION_MATTER_AIR_OVERDRIVE)
-			)
-				return false;
-
-			if (
-				(mdata->oFlag.voidElement || mdata->oFlag.spiritElement) &&
-				(otherChr->_action == ACTION_VOID_OVERDRIVE  || otherChr->_action == ACTION_VOID_AIR_OVERDRIVE)
-			)
-				return Object::hits(other);
-			if (
-				(mdata->oFlag.spiritElement || mdata->oFlag.matterElement) &&
-				(otherChr->_action == ACTION_SPIRIT_OVERDRIVE || otherChr->_action == ACTION_SPIRIT_AIR_OVERDRIVE)
-			)
-				return Object::hits(other);
-			if (
-				(mdata->oFlag.matterElement || mdata->oFlag.voidElement) &&
-				(otherChr->_action == ACTION_MATTER_OVERDRIVE || otherChr->_action == ACTION_MATTER_AIR_OVERDRIVE)
-			)
-				return Object::hits(other);
-
-			if (isOverdriveAction(otherChr->_action))
-				return false;
-		}
-		if (isRomanCancelAction(this->_action))
-			return false;
+		} else if (isRomanCancelAction(this->_action) && !this->getCurrentFrameData()->hitBoxes.empty())
+			return other.getCurrentFrameData()->dFlag.projectile;
 		return Object::hits(other);
 	}
 
@@ -5111,5 +5070,10 @@ namespace SpiralOfFate
 			assert_exp(!this->_typeDebuffEffects[id - SYS_PARTICLE_GENERATOR_SPIRIT_TYPE_DEBUFF].second || this->_typeDebuffEffects[id - SYS_PARTICLE_GENERATOR_SPIRIT_TYPE_DEBUFF].second->isDead());
 			this->_typeDebuffEffects[id - SYS_PARTICLE_GENERATOR_SPIRIT_TYPE_DEBUFF] = result;
 		}
+	}
+
+	void Character::kill()
+	{
+		assert_exp(false);
 	}
 }

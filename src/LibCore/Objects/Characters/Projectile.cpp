@@ -179,6 +179,11 @@ namespace SpiralOfFate
 			this->_position.y < STAGE_Y_MIN - 300;
 	}
 
+	void Projectile::kill()
+	{
+		this->_disableObject(this->_onGetHitDieAnim);
+	}
+
 	unsigned int Projectile::getBufferSize() const
 	{
 		return Object::getBufferSize() + sizeof(Data);

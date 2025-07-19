@@ -4,23 +4,15 @@
     "framedata": [
       [
         {
-          "defense_flag": 8,
+          "defense_flag": 262152,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 26,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -19
           },
-          "size": {
-            "x": 128,
-            "y": 20
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -31,23 +23,15 @@
           }
         },
         {
-          "defense_flag": 8,
+          "defense_flag": 262152,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 26,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -20
           },
-          "size": {
-            "x": 128,
-            "y": 20
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -58,23 +42,15 @@
           }
         },
         {
-          "defense_flag": 8,
+          "defense_flag": 262152,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 26,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -21
           },
-          "size": {
-            "x": 128,
-            "y": 20
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -85,23 +61,15 @@
           }
         },
         {
-          "defense_flag": 8,
+          "defense_flag": 262152,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 26,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -20
           },
-          "size": {
-            "x": 128,
-            "y": 20
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -121,21 +89,13 @@
         {
           "defense_flag": 8,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 10,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -26
           },
-          "size": {
-            "x": 128,
-            "y": 26
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -148,21 +108,13 @@
         {
           "defense_flag": 8,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 10,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -32
           },
-          "size": {
-            "x": 128,
-            "y": 32
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -175,21 +127,13 @@
         {
           "defense_flag": 8,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 10,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -40
           },
-          "size": {
-            "x": 128,
-            "y": 40
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -208,10 +152,6 @@
       [
         {
           "duration": 10,
-          "size": {
-            "x": 1,
-            "y": 1
-          },
           "sprite": "platforms.png",
           "texture_bounds": {
             "height": 1,
@@ -230,21 +170,13 @@
         {
           "defense_flag": 8,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 10,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -40
           },
-          "size": {
-            "x": 128,
-            "y": 40
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -257,21 +189,13 @@
         {
           "defense_flag": 8,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 10,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -32
           },
-          "size": {
-            "x": 128,
-            "y": 32
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
@@ -284,21 +208,13 @@
         {
           "defense_flag": 8,
           "duration": 10,
-          "hurt_boxes": [
-            {
-              "height": 10,
-              "left": -48,
-              "top": 4,
-              "width": 95
-            }
-          ],
           "offset": {
             "x": 0,
             "y": -26
           },
-          "size": {
-            "x": 128,
-            "y": 26
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
           },
           "sprite": "platforms.png",
           "texture_bounds": {
