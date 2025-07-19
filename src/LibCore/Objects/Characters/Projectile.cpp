@@ -12,12 +12,12 @@ namespace SpiralOfFate
 		class Character *ownerObj,
 		unsigned id,
 		const nlohmann::json &json,
-		unsigned char typeSwitchFlags,
+		TypeSwitch typeSwitchFlags,
 		unsigned debuffDuration
 	) :
 		SubObject(id, owner, ownerObj),
 		_debuffDuration(debuffDuration),
-		_typeSwitchFlags(typeSwitchFlags),
+		_typeSwitch(typeSwitchFlags),
 		_maxHit(json["hits"]),
 		_endBlock(json["end_block"]),
 		_onHitDieAnim(json["on_hit_die_animation"]),
@@ -37,7 +37,7 @@ namespace SpiralOfFate
 		class Character *ownerObj,
 		unsigned id,
 		const nlohmann::json &json,
-		unsigned char typeSwitchFlags,
+		TypeSwitch typeSwitchFlags,
 		unsigned debuffDuration
 	) :
 		Projectile(owner, ownerObj, id, json, typeSwitchFlags, debuffDuration)
@@ -192,7 +192,7 @@ namespace SpiralOfFate
 		dat->animationCtr = this->_animationCtr;
 		dat->disabled = this->_disabled;
 		dat->nbHit = this->_nbHit;
-		dat->typeSwitchFlags = this->_typeSwitchFlags;
+		dat->typeSwitchFlags = this->_typeSwitch;
 		dat->debuffDuration = this->_debuffDuration;
 	}
 
@@ -205,7 +205,7 @@ namespace SpiralOfFate
 		this->_animationCtr = dat->animationCtr;
 		this->_disabled = dat->disabled;
 		this->_nbHit = dat->nbHit;
-		this->_typeSwitchFlags = dat->typeSwitchFlags;
+		this->_typeSwitch = dat->typeSwitchFlags;
 		this->_debuffDuration = dat->debuffDuration;
 	}
 
@@ -288,14 +288,19 @@ namespace SpiralOfFate
 			this->_fdCache.hurtBoxes.clear();
 			this->_fdCache.collisionBox = nullptr;
 		}
-		if (this->_typeSwitchFlags) {
-			auto index = (this->_typeSwitchFlags & TYPESWITCH_VOID)   ? LIMIT_VOID :
-			             (this->_typeSwitchFlags & TYPESWITCH_MATTER) ? LIMIT_MATTER :
-			             (this->_typeSwitchFlags & TYPESWITCH_SPIRIT) ? LIMIT_SPIRIT : LIMIT_NEUTRAL;
+		if (this->_typeSwitch != TYPESWITCH_NONE) {
+			int index = LIMIT_NEUTRAL;
 
-			this->_fdCache.oFlag.voidElement   = (this->_typeSwitchFlags & (TYPESWITCH_NEUTRAL | TYPESWITCH_VOID))   != 0;
-			this->_fdCache.oFlag.matterElement = (this->_typeSwitchFlags & (TYPESWITCH_NEUTRAL | TYPESWITCH_MATTER)) != 0;
-			this->_fdCache.oFlag.spiritElement = (this->_typeSwitchFlags & (TYPESWITCH_NEUTRAL | TYPESWITCH_SPIRIT)) != 0;
+			static_assert(TYPESWITCH_NEUTRAL - 1 == LIMIT_NEUTRAL);
+			static_assert(TYPESWITCH_VOID - 1    == LIMIT_VOID);
+			static_assert(TYPESWITCH_MATTER - 1  == LIMIT_MATTER);
+			static_assert(TYPESWITCH_SPIRIT - 1  == LIMIT_SPIRIT);
+
+			if (this->_typeSwitch != TYPESWITCH_NON_TYPED)
+				index = this->_typeSwitch - 1;
+			this->_fdCache.oFlag.voidElement   = this->_typeSwitch == TYPESWITCH_NEUTRAL || this->_typeSwitch == TYPESWITCH_VOID;
+			this->_fdCache.oFlag.matterElement = this->_typeSwitch == TYPESWITCH_NEUTRAL || this->_typeSwitch == TYPESWITCH_MATTER;
+			this->_fdCache.oFlag.spiritElement = this->_typeSwitch == TYPESWITCH_NEUTRAL || this->_typeSwitch == TYPESWITCH_SPIRIT;
 			for (int i = 0; i < 4; i++) {
 				if (i == index)
 					continue;

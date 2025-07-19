@@ -282,12 +282,17 @@ namespace SpiralOfFate
 		bool dir = this->_getProjectileDirection(pdat);
 
 		if (!pdat.json.contains("shadow")) {
-			unsigned char flags = 0;
+			Projectile::TypeSwitch flags = Projectile::TYPESWITCH_NONE;
 
+			if (this->_neutralEffectTimer)
+				flags = Projectile::TYPESWITCH_NON_TYPED;
 			if (this->_installMoveStarted) {
-				flags |= this->_hasVoidInstall   * Projectile::TYPESWITCH_VOID;
-				flags |= this->_hasMatterInstall * Projectile::TYPESWITCH_MATTER;
-				flags |= this->_hasSpiritInstall * Projectile::TYPESWITCH_SPIRIT;
+				if (this->_hasVoidInstall)
+					flags = Projectile::TYPESWITCH_VOID;
+				if (this->_hasMatterInstall)
+					flags = Projectile::TYPESWITCH_MATTER;
+				if (this->_hasSpiritInstall)
+					flags = Projectile::TYPESWITCH_SPIRIT;
 			}
 			try {
 				return manager.registerObject<VictoriaProjectile>(
