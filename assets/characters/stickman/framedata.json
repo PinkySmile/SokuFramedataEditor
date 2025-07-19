@@ -14804,8 +14804,8 @@
           "hit_boxes": [
             {
               "height": 39,
-              "left": 6,
-              "top": -32,
+              "left": 9,
+              "top": -41,
               "width": 43
             }
           ],
@@ -14876,9 +14876,9 @@
           "hit_boxes": [
             {
               "height": 35,
-              "left": 2,
-              "top": -39,
-              "width": 55
+              "left": 5,
+              "top": -50,
+              "width": 48
             }
           ],
           "hit_opponent_hit_stop": 10,
@@ -14905,7 +14905,7 @@
           ],
           "mana_gain": 30,
           "neutral_limit": 20,
-          "offense_flag": 58723200,
+          "offense_flag": 2944,
           "offset": {
             "x": 5,
             "y": -4
@@ -14982,7 +14982,7 @@
           ],
           "mana_gain": 30,
           "neutral_limit": 20,
-          "offense_flag": 58723200,
+          "offense_flag": 2944,
           "offset": {
             "x": -3,
             "y": -4

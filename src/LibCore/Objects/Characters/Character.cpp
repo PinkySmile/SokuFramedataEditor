@@ -1158,6 +1158,8 @@ namespace SpiralOfFate
 			)
 		)
 			return false;
+		if (isParryAction(action) && LIMIT_EFFECT_TIMER(this->_limitEffects))
+			return false;
 		if (isOverdriveAction(action)) {
 			for (auto limit : this->_limit)
 				if (limit >= 100)
