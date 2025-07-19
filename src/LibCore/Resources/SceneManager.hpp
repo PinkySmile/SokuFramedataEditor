@@ -42,12 +42,10 @@ namespace SpiralOfFate
 		std::shared_ptr<IScene> _oldScene;
 		std::shared_ptr<IScene> _scene;
 		std::map<std::string, SceneConstructor> _factory;
-		std::thread _loadingThread;
 
-		void _applySwitchScene(bool sync);
+		void _applySwitchScene();
 
 	public:
-		~SceneManager();
 		void update();
 		void render() const;
 		void consumeEvent(const sf::Event &event);
