@@ -258,7 +258,7 @@ namespace SpiralOfFate
 			game->logger.debug(logStr);
 		else
 			game->logger.verbose(logStr);
-		this->_socket.send(packet, realSize, remote.ip, remote.port);
+		static_cast<void>(this->_socket.send(packet, realSize, remote.ip, remote.port));
 	}
 
 	void Connection::_handlePacket(Remote &remote, PacketHello &packet, size_t size)
@@ -597,7 +597,7 @@ namespace SpiralOfFate
 		this->_send(remote, &error, sizeof(error));
 	}
 
-	void Connection::_handlePacket(Connection::Remote &remote, PacketReplayListRequest &, size_t size)
+	void Connection::_handlePacket(Connection::Remote &remote, PacketReplayListRequest &, size_t)
 	{
 		std::vector<unsigned> ids;
 

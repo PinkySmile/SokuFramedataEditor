@@ -99,7 +99,7 @@ namespace SpiralOfFate
 	std::function<bool (const Character::LastInput &)> Character::getInputD = [](const Character::LastInput &input) { return input.d; };
 	std::function<bool (const Character::LastInput &)> Character::getInputA = [](const Character::LastInput &input) { return input.a; };
 
-	const std::map<CharacterActions, std::string> actionNames{
+	const std::unordered_map<CharacterActions, std::string> actionNames{
 		{ ACTION_IDLE,                           "Idle" },
 		{ ACTION_CROUCHING,                      "Crouching" },
 		{ ACTION_CROUCH,                         "Crouch" },
@@ -3704,7 +3704,7 @@ namespace SpiralOfFate
 		return this->_input;
 	}
 
-	const std::map<unsigned, std::vector<std::vector<FrameData>>> &Character::getFrameData()
+	const std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> &Character::getFrameData()
 	{
 		return this->_moves;
 	}

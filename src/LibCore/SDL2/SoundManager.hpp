@@ -6,7 +6,7 @@
 #define SOFGV_SOUNDMANAGER_HPP
 
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <SFML/Audio.hpp>
 #include "Sprite.hpp"
@@ -21,8 +21,8 @@ namespace SpiralOfFate
 		mutable sf::Sound _sound[64];
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
-		std::map<unsigned, sf::SoundBuffer> _sounds;
-		std::map<std::string, std::pair<unsigned, unsigned>> _allocatedSounds;
+		std::unordered_map<unsigned, sf::SoundBuffer> _sounds;
+		std::unordered_map<std::string, std::pair<unsigned, unsigned>> _allocatedSounds;
 
 	public:
 		unsigned load(std::string file);

@@ -21,7 +21,7 @@ namespace SpiralOfFate
 		std::string folder;
 		std::vector<std::vector<Color>> palettes;
 		std::vector<Sprite> icon;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> data;
+		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> data;
 
 		CharacterEntry(const nlohmann::json &json, const std::string &folder);
 		CharacterEntry(const CharacterEntry &entry);

@@ -112,7 +112,7 @@ namespace SpiralOfFate
 		"Pause"
 	};
 
-	KeyboardInput::KeyboardInput(const std::map<sf::Keyboard::Key, InputEnum> &keyMap) :
+	KeyboardInput::KeyboardInput(const std::unordered_map<sf::Keyboard::Key, InputEnum> &keyMap) :
 		_keyMap(keyMap)
 	{
 		this->_keyStates.fill(false);
@@ -197,7 +197,7 @@ namespace SpiralOfFate
 
 	void KeyboardInput::save(std::ofstream &stream) const
 	{
-		std::map<SpiralOfFate::InputEnum, sf::Keyboard::Key> realKeyboardMap;
+		std::unordered_map<SpiralOfFate::InputEnum, sf::Keyboard::Key> realKeyboardMap;
 
 		for (auto &pair : this->_keyMap)
 			realKeyboardMap[pair.second] = pair.first;

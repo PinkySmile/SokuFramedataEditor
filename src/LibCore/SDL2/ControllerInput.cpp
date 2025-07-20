@@ -2,13 +2,14 @@
 // Created by PinkySmile on 04/11/2023.
 //
 
+#include <map>
 #include <cmath>
 #include <fstream>
 #include "ControllerInput.hpp"
 
 namespace SpiralOfFate
 {
-	ControllerInput::ControllerInput(const std::map<InputEnum, ControllerKey *> &keyMap)
+	ControllerInput::ControllerInput(const std::unordered_map<InputEnum, ControllerKey *> &keyMap)
 	{
 		for (auto [key, value] : keyMap)
 			this->_keyMap.emplace(key, value);
@@ -82,7 +83,7 @@ namespace SpiralOfFate
 
 	void ControllerInput::save(std::ofstream &stream) const
 	{
-		std::map<SpiralOfFate::InputEnum, std::pair<bool, int>> controllerMap;
+		std::unordered_map<SpiralOfFate::InputEnum, std::pair<bool, int>> controllerMap;
 
 		for (auto &pair : this->_keyMap)
 			controllerMap[pair.first] = pair.second->save();

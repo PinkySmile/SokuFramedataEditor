@@ -1415,7 +1415,7 @@ namespace SpiralOfFate
 			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::class: " + std::to_string(cl1));
 			ptr1 += sizeof(unsigned char);
 
-			if ((ptrdiff_t)ptr1 - (ptrdiff_t)data >= size) {
+			if ((ptrdiff_t)ptr1 - (ptrdiff_t)data >= (ssize_t)size) {
 				game->logger.fatal("Invalid input frame");
 				return;
 			}
@@ -1439,7 +1439,7 @@ namespace SpiralOfFate
 
 				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::subobjectId: " + std::to_string(subobjid1));
 				ptr1 += sizeof(unsigned);
-				if ((ptrdiff_t)ptr1 - (ptrdiff_t)data >= size) {
+				if ((ptrdiff_t)ptr1 - (ptrdiff_t)data >= (ssize_t)size) {
 					game->logger.fatal("Invalid input frame");
 					return;
 				}
@@ -1467,13 +1467,14 @@ namespace SpiralOfFate
 	static float getTextSize(const std::string &str, const sf::Text &txt)
 	{
 		float size = 0;
+		auto &f = txt.getFont();
 
 		for (char c : str)
-			size += txt.getFont().getGlyph(c, txt.getCharacterSize(), false).advance;
+			size += f.getGlyph(c, txt.getCharacterSize(), false).advance;
 		return size;
 	}
 
-	static Vector2f getPos(Vector2f basePos, unsigned size, bool side)
+	static Vector2f getPos(Vector2f basePos, float size, bool side)
 	{
 		if (!side)
 			return basePos;
@@ -1485,12 +1486,7 @@ namespace SpiralOfFate
 
 	static Vector2f getPos(const std::string &str, const sf::Text &txt, Vector2f basePos, bool side)
 	{
-		if (!side)
-			return basePos;
-		return {
-			1100 - basePos.x - getTextSize(str, txt),
-			basePos.y
-		};
+		return getPos(basePos, getTextSize(str, txt), side);
 	}
 
 	static void renderText(sf::RenderTarget &output, const std::string &str, sf::Text &txt, Vector2f basePos, bool side)

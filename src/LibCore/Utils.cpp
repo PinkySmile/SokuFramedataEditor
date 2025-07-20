@@ -126,7 +126,7 @@ namespace SpiralOfFate::Utils
 			return "Unknown error " + std::to_string(ret);
 		}
 	}
-	static const std::map<std::string, std::string> _icons{
+	static const std::unordered_map<std::string, std::string> _icons{
 		{"folder", "assets/icons/folder.png"     },
 		{".rar",   "assets/icons/archive.png"    },
 		{".zip",   "assets/icons/archive.png"    },

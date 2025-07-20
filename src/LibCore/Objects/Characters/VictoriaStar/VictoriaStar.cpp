@@ -231,7 +231,7 @@ namespace SpiralOfFate
 			this->_stacksTimer = PASSIVE_STACK_PER_SHADOW_TIMER;
 	}
 
-	static std::map<std::string, Shadow *(*)(
+	static std::unordered_map<std::string, Shadow *(*)(
 		const std::vector<std::vector<FrameData>> &frameData,
 		unsigned int hp,
 		bool direction,
@@ -246,7 +246,7 @@ namespace SpiralOfFate
 		{"spirit", SpiritShadow::create },
 		{"void", VoidShadow::create },
 	};
-	static std::map<std::string, unsigned> shadowIndex{
+	static std::unordered_map<std::string, unsigned> shadowIndex{
 		{"neutral", 0 },
 		{"matter",  1 },
 		{"spirit",  2 },

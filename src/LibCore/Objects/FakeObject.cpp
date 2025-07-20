@@ -6,7 +6,7 @@
 #include "Objects/Characters/Character.hpp"
 #include "Resources/Battle/BattleManager.hpp"
 
-SpiralOfFate::FakeObject::FakeObject(const std::map<unsigned int, std::vector<std::vector<FrameData>>> &frameData)
+SpiralOfFate::FakeObject::FakeObject(const std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> &frameData)
 {
 	this->showBoxes = true;
 	this->_moves = frameData;

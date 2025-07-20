@@ -13,8 +13,6 @@
 #include "Inputs/RollbackInput.hpp"
 #include "Objects/Characters/Character.hpp"
 
-#define MAX_ROLLBACK 8
-
 namespace SpiralOfFate
 {
 	class RollbackMachine {

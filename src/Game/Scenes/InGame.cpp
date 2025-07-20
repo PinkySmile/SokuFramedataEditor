@@ -459,7 +459,7 @@ namespace SpiralOfFate
 	{
 		std::vector<unsigned> ultimates;
 		std::vector<unsigned> supers;
-		auto moveData = this->_paused == 1 ? this->_leftMoveData : this->_rightMoveData;
+		auto &moveData = this->_paused == 1 ? this->_leftMoveData : this->_rightMoveData;
 
 		for (size_t i = 0; i < this->_moveOrder.size(); i++) {
 			auto it = this->_moveList->find(this->_moveOrder[i]);

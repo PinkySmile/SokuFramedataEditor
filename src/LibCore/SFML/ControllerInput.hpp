@@ -6,7 +6,7 @@
 #define SOFGV_CONTROLLERINPUT_HPP
 
 
-#include <map>
+#include <unordered_map>
 #include <array>
 #include <memory>
 #include "Inputs/IInput.hpp"
@@ -56,13 +56,13 @@ namespace SpiralOfFate
 
 	class ControllerInput : public IInput {
 	private:
-		std::map<InputEnum, std::unique_ptr<ControllerKey>> _keyMap;
+		std::unordered_map<InputEnum, std::unique_ptr<ControllerKey>> _keyMap;
 		std::array<int, INPUT_NUMBER> _keyDuration;
 
 	public:
 		ControllerInput();
 		ControllerInput(std::ifstream &stream);
-		ControllerInput(const std::map<InputEnum, ControllerKey *> &keyMap);
+		ControllerInput(const std::unordered_map<InputEnum, ControllerKey *> &keyMap);
 		bool isPressed(InputEnum input) const override;
 		InputStruct getInputs() const override;
 		void update() override;
