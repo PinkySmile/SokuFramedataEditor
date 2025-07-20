@@ -185,6 +185,8 @@ namespace SpiralOfFate
 			Character *character;
 			unsigned icon;
 			Character::InitData data;
+
+			CharacterParams(bool side, Character *character, unsigned icon, const nlohmann::json &data);
 		};
 		struct StageParams {
 			std::string path;

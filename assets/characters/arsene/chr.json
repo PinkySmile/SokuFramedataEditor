@@ -8,13 +8,17 @@
   "air_movements":3,
   "guard_bar":900,
   "guard_break_cooldown":600,
-  "overdrive_cooldown":3600,
+  "neutral_overdrive_cooldown": 7200,
+  "spirit_overdrive_cooldown": 5400,
+  "matter_overdrive_cooldown": 5400,
+  "void_overdrive_cooldown": 5400,
+  "roman_cancel_cooldown": 2700,
   "ground_drag":0.73,
   "air_drag":{
     "x":0.985,
     "y":1
   },
-  "airdrift": {
+  "air_drift": {
     "up": {
       "accel": 0,
       "max": 0

@@ -1868,4 +1868,46 @@ namespace SpiralOfFate
 		this->score = data.score;
 		return *this;
 	}
+
+	BattleManager::CharacterParams::CharacterParams(bool side, Character *character, unsigned icon, const nlohmann::json &data) :
+		character(character),
+		icon(icon),
+		data{
+			.side = side,
+			.maxHp = data["hp"],
+			.maxJumps = data["jump_count"],
+			.maxAirDash = data["air_dash_count"],
+			.maxAirMovement = data["air_movements"],
+			.maxMana = data["mana_max"],
+			.startMana = data["mana_start"],
+			.manaRegen = data["mana_regen"],
+			.maxGuardBar = data["guard_bar"],
+			.maxGuardCooldown = data["guard_break_cooldown"],
+			.neutralOdCooldown = data["neutral_overdrive_cooldown"],
+			.spiritOdCooldown = data["spirit_overdrive_cooldown"],
+			.matterOdCooldown = data["matter_overdrive_cooldown"],
+			.voidOdCooldown = data["void_overdrive_cooldown"],
+			.rcCooldown = data["roman_cancel_cooldown"],
+			.groundDrag = data["ground_drag"],
+			.airDrag = { data["air_drag"]["x"], data["air_drag"]["y"] },
+			.gravity = { data["gravity"]["x"],  data["gravity"]["y"] },
+			.upDrift = {
+				data["air_drift"]["up"]["accel"],
+				data["air_drift"]["up"]["max"]
+			},
+			.downDrift = {
+				data["air_drift"]["down"]["accel"],
+				data["air_drift"]["down"]["max"]
+			},
+			.backDrift = {
+				data["air_drift"]["back"]["accel"],
+				data["air_drift"]["back"]["max"]
+			},
+			.frontDrift = {
+				data["air_drift"]["front"]["accel"],
+				data["air_drift"]["front"]["max"]
+			}
+		}
+	{
+	}
 }

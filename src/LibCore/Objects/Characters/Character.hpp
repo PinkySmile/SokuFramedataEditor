@@ -320,7 +320,11 @@ namespace SpiralOfFate
 			float manaRegen;
 			unsigned maxGuardBar;
 			unsigned maxGuardCooldown;
-			unsigned odCd;
+			unsigned neutralOdCooldown;
+			unsigned spiritOdCooldown;
+			unsigned matterOdCooldown;
+			unsigned voidOdCooldown;
+			unsigned rcCooldown;
 			float groundDrag;
 			Vector2f airDrag;
 			Vector2f gravity;
@@ -604,7 +608,11 @@ namespace SpiralOfFate
 		std::map<unsigned, std::vector<std::vector<FrameData>>> _subObjectsData;
 		std::vector<ParticleGenerator::InitData> _generators;
 		std::shared_ptr<IInput> _input;
-		unsigned _maxOdCooldown = 0;
+		unsigned _maxNeutralOdCooldown = 0;
+		unsigned _maxSpiritOdCooldown = 0;
+		unsigned _maxMatterOdCooldown = 0;
+		unsigned _maxVoidOdCooldown = 0;
+		unsigned _maxRcCooldown = 0;
 		unsigned _maxJumps = 0;
 		unsigned _maxAirDashes = 0;
 		unsigned _maxAirMovement = 0;
