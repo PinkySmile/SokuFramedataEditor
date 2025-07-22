@@ -39,9 +39,9 @@ namespace SpiralOfFate
 		std::optional<std::pair<unsigned, std::shared_ptr<Flower>>> _flower;
 
 		// Non-game state
-		std::map<unsigned, std::vector<std::vector<FrameData>>> _shadowFormFramedata;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> _flowerFormFramedata;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> _neutralFormFramedata;
+		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> _shadowFormFramedata;
+		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> _flowerFormFramedata;
+		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> _neutralFormFramedata;
 		const Object *_target = nullptr;
 		Sprite _hudScale;
 		Sprite _hudCursor;

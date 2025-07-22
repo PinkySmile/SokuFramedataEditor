@@ -6,7 +6,7 @@
 #define SOFGV_TEXTUREMANAGER_HPP
 
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <memory>
 #include <SDL2/SDL.h>
@@ -26,9 +26,9 @@ namespace SpiralOfFate
 
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
-		std::map<unsigned, TextureData> _textures;
-		std::map<std::string, std::pair<unsigned, unsigned>> _allocatedTextures;
-		std::map<std::string, std::string> _overrideList;
+		std::unordered_map<unsigned, TextureData> _textures;
+		std::unordered_map<std::string, std::pair<unsigned, unsigned>> _allocatedTextures;
+		std::unordered_map<std::string, std::string> _overrideList;
 
 		void _reload(const std::string &path, unsigned id);
 	public:

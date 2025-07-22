@@ -6,7 +6,7 @@
 #define SOFGV_FRAMEDATA_HPP
 
 
-#include <map>
+#include <unordered_map>
 #include <optional>
 #include <string>
 #include <vector>
@@ -306,8 +306,8 @@ namespace SpiralOfFate
 		static size_t printDifference(const char *msgStart, void *data1, void *data2, unsigned startOffset);
 		static size_t printContent(const char *msgStart, void *data, unsigned int startOffset, size_t dataSize);
 
-		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadFile(const std::string &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
-		static std::map<unsigned, std::vector<std::vector<FrameData>>> loadFileJson(const nlohmann::json &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
+		static std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> loadFile(const std::string &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
+		static std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> loadFileJson(const nlohmann::json &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette = {{}, {}});
 	};
 
 	inline void to_json(nlohmann::json &j, const FrameData &data) {

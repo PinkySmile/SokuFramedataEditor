@@ -338,7 +338,7 @@ namespace SpiralOfFate
 		ACTION_GROUND_HIGH_VOID_PARRY,
 	};
 
-	MYDLL_API const std::map<unsigned, MoveData> defaultMoveData = {
+	MYDLL_API const std::unordered_map<unsigned, MoveData> defaultMoveData = {
 		{ ACTION_5N, {
 			"5N",
 			"ACTION_5N",

@@ -31,78 +31,8 @@ namespace SpiralOfFate
 					return objects;
 				}
 			},
-			BattleManager::CharacterParams{
-				leftChr,
-				licon,
-				{
-					true,
-					lJson["hp"],
-					lJson["jump_count"],
-					lJson["air_dash_count"],
-					lJson["air_movements"],
-					lJson["mana_max"],
-					lJson["mana_start"],
-					lJson["mana_regen"],
-					lJson["guard_bar"],
-					lJson["guard_break_cooldown"],
-					lJson["overdrive_cooldown"],
-					lJson["ground_drag"],
-					{lJson["air_drag"]["x"], lJson["air_drag"]["y"]},
-					{lJson["gravity"]["x"], lJson["gravity"]["y"]},
-					{
-						lJson["airdrift"]["up"]["accel"],
-						lJson["airdrift"]["up"]["max"]
-					},
-					{
-						lJson["airdrift"]["down"]["accel"],
-						lJson["airdrift"]["down"]["max"]
-					},
-					{
-						lJson["airdrift"]["back"]["accel"],
-						lJson["airdrift"]["back"]["max"]
-					},
-					{
-						lJson["airdrift"]["front"]["accel"],
-						lJson["airdrift"]["front"]["max"]
-					},
-				}
-			},
-			BattleManager::CharacterParams{
-				rightChr,
-				ricon,
-				{
-					false,
-					rJson["hp"],
-					rJson["jump_count"],
-					rJson["air_dash_count"],
-					rJson["air_movements"],
-					rJson["mana_max"],
-					rJson["mana_start"],
-					rJson["mana_regen"],
-					rJson["guard_bar"],
-					rJson["guard_break_cooldown"],
-					rJson["overdrive_cooldown"],
-					rJson["ground_drag"],
-					{rJson["air_drag"]["x"], rJson["air_drag"]["y"]},
-					{rJson["gravity"]["x"], rJson["gravity"]["y"]},
-					{
-						rJson["airdrift"]["up"]["accel"],
-						rJson["airdrift"]["up"]["max"]
-					},
-					{
-						rJson["airdrift"]["down"]["accel"],
-						rJson["airdrift"]["down"]["max"]
-					},
-					{
-						rJson["airdrift"]["back"]["accel"],
-						rJson["airdrift"]["back"]["max"]
-					},
-					{
-						rJson["airdrift"]["front"]["accel"],
-						rJson["airdrift"]["front"]["max"]
-					},
-				}
-			}
+			BattleManager::CharacterParams{ true,  leftChr,  licon, lJson },
+			BattleManager::CharacterParams{ false, rightChr, ricon, rJson }
 		);
 		game->battleMgr.reset(this->_manager);
 		game->logger.debug("Practice session started");
@@ -426,8 +356,8 @@ namespace SpiralOfFate
 				this->_manager->_rightCharacter->_ultimateUsed &= this->_manager->_rightCharacter->getCurrentFrameData()->oFlag.ultimate;
 			}
 			if (this->_overdrive == 1) {
-				this->_manager->_leftCharacter->_odCooldown = this->_manager->_leftCharacter->_barMaxOdCooldown = this->_manager->_leftCharacter->_maxOdCooldown;
-				this->_manager->_rightCharacter->_odCooldown = this->_manager->_rightCharacter->_barMaxOdCooldown = this->_manager->_rightCharacter->_maxOdCooldown;
+				this->_manager->_leftCharacter->_odCooldown = this->_manager->_leftCharacter->_barMaxOdCooldown = 1;
+				this->_manager->_rightCharacter->_odCooldown = this->_manager->_rightCharacter->_barMaxOdCooldown = 1;
 			} else if (this->_overdrive == 2) {
 				this->_manager->_leftCharacter->_odCooldown = 0;
 				this->_manager->_rightCharacter->_odCooldown = 0;

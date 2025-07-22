@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "Resources/MSVCMacros.hpp"
 
 namespace SpiralOfFate
@@ -76,7 +76,7 @@ namespace SpiralOfFate
 	extern MYDLL_API const std::array<std::string, NB_SPRITES> spritesPaths;
 	extern MYDLL_API const std::vector<unsigned> defaultMoveOrder;
 	extern MYDLL_API const std::vector<unsigned> defaultCommandOrder;
-	extern MYDLL_API const std::map<unsigned, MoveData> defaultMoveData;
+	extern MYDLL_API const std::unordered_map<unsigned, MoveData> defaultMoveData;
 }
 
 

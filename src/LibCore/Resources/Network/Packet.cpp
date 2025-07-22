@@ -12,6 +12,7 @@
 #include "Packet.hpp"
 #include "Utils.hpp"
 
+#pragma GCC diagnostic ignored "-Wsizeof-pointer-memaccess"
 
 namespace SpiralOfFate
 {
@@ -284,11 +285,13 @@ namespace SpiralOfFate
 
 	std::shared_ptr<PacketState> PacketState::create(void *data, size_t size)
 	{
-		void *buffer = new char[size + 1];
+		void *buffer = new char[size + sizeof(PacketState)];
 		auto *packet = new(buffer) PacketState();
 
 		//TODO: Compress the data
 		assert_exp((void *)buffer == (void *)packet);
+		packet->compressedSize = size;
+		memcpy(packet->compressedData, data, size);
 		return {packet, deleteArray};
 	}
 

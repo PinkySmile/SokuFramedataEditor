@@ -16,7 +16,7 @@ namespace SpiralOfFate
 		void _applyNewAnimFlags() override;
 
 	public:
-		FakeObject(const std::map<unsigned, std::vector<std::vector<FrameData>>> &frameData);
+		FakeObject(const std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> &frameData);
 		void render() const override;
 
 		friend class InGame;

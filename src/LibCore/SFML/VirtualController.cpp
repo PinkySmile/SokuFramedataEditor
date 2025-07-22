@@ -176,7 +176,7 @@ namespace SpiralOfFate
 		}
 	}
 
-	void VirtualController::_onRelease(const Vector2f &location, int index)
+	void VirtualController::_onRelease(const Vector2f &, int index)
 	{
 		if (this->_indexes[0] == index) {
 			this->_indexes[0] = -30;

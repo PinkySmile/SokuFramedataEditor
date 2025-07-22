@@ -2,6 +2,7 @@
 // Created by PinkySmile on 25/09/2021.
 //
 
+#include <map>
 #include <cmath>
 #include <fstream>
 #include "ControllerInput.hpp"
@@ -41,21 +42,21 @@ namespace SpiralOfFate
 			{ INPUT_DASH,    {true,  (int)sf::Joystick::Axis::Z | ((256 - 30) << 3)} },
 			{ INPUT_PAUSE,   {false, 7} }
 		};
-		std::map<InputEnum, ControllerKey *> realControllerMap;
+		std::unordered_map<InputEnum, ControllerKey *> realControllerMap;
 
-		for (auto &pair : controllerMap)
-			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
-		for (auto &pair : controllerMap)
-			if (pair.second.first)
-				realControllerMap[pair.first] = new ControllerAxis(-1, (sf::Joystick::Axis)(pair.second.second & 7), pair.second.second >> 3);
+		for (auto &[_, pair] : controllerMap)
+			stream.read(reinterpret_cast<char *>(&pair), sizeof(pair));
+		for (auto &[key, pair] : controllerMap)
+			if (pair.first)
+				realControllerMap.emplace(key, new ControllerAxis(-1, (sf::Joystick::Axis)(pair.second & 7), pair.second >> 3));
 			else
-				realControllerMap[pair.first] = new ControllerButton(-1, pair.second.second);
+				realControllerMap.emplace(key, new ControllerButton(-1, pair.second));
 		for (auto [key, value] : realControllerMap)
 			this->_keyMap.emplace(key, value);
 		this->_keyDuration.fill(0);
 	}
 
-	ControllerInput::ControllerInput(const std::map<InputEnum, ControllerKey *> &keyMap)
+	ControllerInput::ControllerInput(const std::unordered_map<InputEnum, ControllerKey *> &keyMap)
 	{
 		for (auto [key, value] : keyMap)
 			this->_keyMap.emplace(key, value);

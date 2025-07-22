@@ -6,7 +6,7 @@
 #define SOFGV_TEXTUREMANAGER_HPP
 
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "Sprite.hpp"
@@ -20,9 +20,9 @@ namespace SpiralOfFate
 		sf::RenderTexture _dummy{{1, 1}};
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
-		std::map<unsigned, sf::Texture> _textures;
-		std::map<std::string, std::pair<unsigned, unsigned>> _allocatedTextures;
-		std::map<std::string, std::string> _overrideList;
+		std::unordered_map<unsigned, sf::Texture> _textures;
+		std::unordered_map<std::string, std::pair<unsigned, unsigned>> _allocatedTextures;
+		std::unordered_map<std::string, std::string> _overrideList;
 
 		void _reload(const std::string &path, unsigned id);
 	public:

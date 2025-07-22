@@ -99,7 +99,7 @@ namespace SpiralOfFate
 	std::function<bool (const Character::LastInput &)> Character::getInputD = [](const Character::LastInput &input) { return input.d; };
 	std::function<bool (const Character::LastInput &)> Character::getInputA = [](const Character::LastInput &input) { return input.a; };
 
-	const std::map<CharacterActions, std::string> actionNames{
+	const std::unordered_map<CharacterActions, std::string> actionNames{
 		{ ACTION_IDLE,                           "Idle" },
 		{ ACTION_CROUCHING,                      "Crouching" },
 		{ ACTION_CROUCH,                         "Crouch" },
@@ -560,11 +560,11 @@ namespace SpiralOfFate
 				assert_exp(this->_guardBar + this->_guardBarTmp / 2 <= this->_maxGuardBar);
 			}
 		} else {
-			this->_barMaxOdCooldown = this->_maxOdCooldown;
-			if (this->_odCooldown > 299 * this->_maxOdCooldown / 300)
-				this->_odCooldown = this->_maxOdCooldown;
+			this->_barMaxOdCooldown = 300;
+			if (this->_odCooldown >= 300)
+				this->_odCooldown = 300;
 			else
-				this->_odCooldown += this->_maxOdCooldown / 300;
+				this->_odCooldown++;
 			if (this->_guardCooldown > 299 * this->_maxGuardCooldown / 300)
 				this->_guardCooldown = this->_maxGuardCooldown;
 			else
@@ -754,7 +754,11 @@ namespace SpiralOfFate
 		this->_regen = data.manaRegen;
 		this->_maxGuardCooldown = data.maxGuardCooldown;
 		this->_guardBar = this->_maxGuardBar = data.maxGuardBar;
-		this->_maxOdCooldown = data.odCd;
+		this->_maxNeutralOdCooldown = data.neutralOdCooldown;
+		this->_maxSpiritOdCooldown = data.spiritOdCooldown;
+		this->_maxMatterOdCooldown = data.matterOdCooldown;
+		this->_maxVoidOdCooldown = data.voidOdCooldown;
+		this->_maxRcCooldown = data.rcCooldown;
 		this->_groundDrag = data.groundDrag;
 		this->_airDrag = data.airDrag;
 		this->_upDrift = data.upDrift;
@@ -1601,13 +1605,30 @@ namespace SpiralOfFate
 			}
 		}
 		if (isOverdriveAction(action) || isRomanCancelAction(action)) {
-			auto currentCd = this->_maxOdCooldown;
+			unsigned currentCd;
 
-			if (
-				action != ACTION_NEUTRAL_OVERDRIVE &&
-				action != ACTION_NEUTRAL_AIR_OVERDRIVE
-			)
-				currentCd /= 2;
+			switch (action) {
+			case ACTION_NEUTRAL_OVERDRIVE:
+			case ACTION_NEUTRAL_AIR_OVERDRIVE:
+				currentCd = this->_maxNeutralOdCooldown;
+				break;
+			case ACTION_MATTER_OVERDRIVE:
+			case ACTION_MATTER_AIR_OVERDRIVE:
+				currentCd = this->_maxMatterOdCooldown;
+				break;
+			case ACTION_SPIRIT_OVERDRIVE:
+			case ACTION_SPIRIT_AIR_OVERDRIVE:
+				currentCd = this->_maxSpiritOdCooldown;
+				break;
+			case ACTION_VOID_OVERDRIVE:
+			case ACTION_VOID_AIR_OVERDRIVE:
+				currentCd = this->_maxVoidOdCooldown;
+				break;
+			case ACTION_ROMAN_CANCEL:
+			case ACTION_AIR_ROMAN_CANCEL:
+				currentCd = this->_maxRcCooldown;
+				break;
+			}
 			this->_blockStun = 0;
 			this->_odCooldown = this->_barMaxOdCooldown = currentCd;
 		} else if (
@@ -3040,7 +3061,7 @@ namespace SpiralOfFate
 			this->_baseGravity.x,
 			this->_baseGravity.y,
 			this->_odCooldown,
-			this->_maxOdCooldown,
+			this->_barMaxOdCooldown,
 			this->_normalTreeFlag,
 			this->_jumpCanceled ? "true" : "false",
 			this->_timeSinceIdle,
@@ -3683,7 +3704,7 @@ namespace SpiralOfFate
 		return this->_input;
 	}
 
-	const std::map<unsigned, std::vector<std::vector<FrameData>>> &Character::getFrameData()
+	const std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> &Character::getFrameData()
 	{
 		return this->_moves;
 	}

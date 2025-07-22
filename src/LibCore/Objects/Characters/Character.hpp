@@ -301,7 +301,7 @@ namespace SpiralOfFate
 		/* 452  */ ACTION_AIR_REVERSAL,
 	};
 
-	extern MYDLL_API const std::map<CharacterActions, std::string> actionNames;
+	extern MYDLL_API const std::unordered_map<CharacterActions, std::string> actionNames;
 
 	class Character : public Object {
 	public:
@@ -320,7 +320,11 @@ namespace SpiralOfFate
 			float manaRegen;
 			unsigned maxGuardBar;
 			unsigned maxGuardCooldown;
-			unsigned odCd;
+			unsigned neutralOdCooldown;
+			unsigned spiritOdCooldown;
+			unsigned matterOdCooldown;
+			unsigned voidOdCooldown;
+			unsigned rcCooldown;
 			float groundDrag;
 			Vector2f airDrag;
 			Vector2f gravity;
@@ -545,7 +549,7 @@ namespace SpiralOfFate
 		std::array<std::pair<unsigned, std::shared_ptr<IObject>>, 4> _typeDebuffEffects;
 		std::vector<ReplayData> _replayData;
 		std::list<LastInput> _lastInputs;
-		std::map<unsigned, unsigned> _usedMoves;
+		std::unordered_map<unsigned, unsigned> _usedMoves;
 		std::array<std::pair<unsigned, std::shared_ptr<Object>>, 128> _subobjects;
 		std::array<unsigned, 4> _limit{0, 0, 0, 0};
 		InputStruct _inputBuffer = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -600,11 +604,15 @@ namespace SpiralOfFate
 		sf::Text _text2;
 		const FrameData *_oldData = nullptr;
 		Character *_opponent = nullptr;
-		std::map<unsigned, SubObjectData> _projectileData;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> _subObjectsData;
+		std::unordered_map<unsigned, SubObjectData> _projectileData;
+		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> _subObjectsData;
 		std::vector<ParticleGenerator::InitData> _generators;
 		std::shared_ptr<IInput> _input;
-		unsigned _maxOdCooldown = 0;
+		unsigned _maxNeutralOdCooldown = 0;
+		unsigned _maxSpiritOdCooldown = 0;
+		unsigned _maxMatterOdCooldown = 0;
+		unsigned _maxVoidOdCooldown = 0;
+		unsigned _maxRcCooldown = 0;
 		unsigned _maxJumps = 0;
 		unsigned _maxAirDashes = 0;
 		unsigned _maxAirMovement = 0;
@@ -748,7 +756,7 @@ namespace SpiralOfFate
 		virtual void postUpdate();
 		std::shared_ptr<IInput> &getInput();
 		const std::shared_ptr<IInput> &getInput() const;
-		const std::map<unsigned, std::vector<std::vector<FrameData>>> &getFrameData();
+		const std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> &getFrameData();
 		virtual int getAttackTier(unsigned int action) const;
 		virtual void setAttacksDisabled(bool disabled);
 		virtual void disableInputs(bool disabled);

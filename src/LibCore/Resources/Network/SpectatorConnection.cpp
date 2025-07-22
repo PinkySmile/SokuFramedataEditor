@@ -70,7 +70,7 @@ namespace SpiralOfFate
 		game->scene.switchScene("spectator_char_select", args);
 	}
 
-	void SpectatorConnection::_handlePacket(Connection::Remote &remote, PacketMenuSwitch &packet, size_t size)
+	void SpectatorConnection::_handlePacket(Connection::Remote &remote, PacketMenuSwitch &, size_t size)
 	{
 		PacketError error{ERROR_UNEXPECTED_OPCODE, OPCODE_MENU_SWITCH, size};
 

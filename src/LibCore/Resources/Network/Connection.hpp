@@ -88,9 +88,9 @@ namespace SpiralOfFate
 		unsigned _nextExpectedFrame = 0;
 		unsigned _nextExpectedDiffFrame = 0;
 		unsigned _gameId = 0;
-		std::map<unsigned, unsigned> _states;
+		std::unordered_map<unsigned, unsigned> _states;
 		Remote *_opponent = nullptr;
-		std::map<unsigned, ReplayData> _replayData;
+		std::unordered_map<unsigned, ReplayData> _replayData;
 		std::list<PacketInput> _buffer;
 		std::list<std::pair<unsigned, PacketInput>> _sendBuffer;
 		std::list<std::pair<unsigned, long long>> _sendSyncBuffer;

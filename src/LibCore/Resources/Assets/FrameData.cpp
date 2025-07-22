@@ -9,15 +9,15 @@
 
 namespace SpiralOfFate
 {
-	std::map<unsigned int, std::vector<std::vector<FrameData>>> SpiralOfFate::FrameData::loadFile(const std::string &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
+	std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> SpiralOfFate::FrameData::loadFile(const std::string &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
 	{
 		game->logger.debug("Loading framedata file " + path);
 		return loadFileJson(nlohmann::json::parse(game->fileMgr.readFull(path)), folder, palette);
 	}
 
-	std::map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadFileJson(const nlohmann::json &json, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
+	std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadFileJson(const nlohmann::json &json, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
 	{
-		std::map<unsigned int, std::vector<std::vector<FrameData>>> data;
+		std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> data;
 
 		game->logger.debug("Loading json");
 		assert_msg(json.is_array(), "Invalid json");

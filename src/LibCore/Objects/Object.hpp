@@ -81,7 +81,7 @@ namespace SpiralOfFate
 		mutable Sprite _sprite;
 		Vector2f _airDrag = {1, 1};
 		float _groundDrag = 1;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> _moves;
+		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> _moves;
 		float _baseRotation = 0;
 		Vector2f _baseGravity = {0, 0};
 		unsigned short _baseHp = 0;

@@ -2,6 +2,7 @@
 // Created by PinkySmile on 25/09/2021.
 //
 
+#include <map>
 #include <algorithm>
 #include <fstream>
 #include "KeyboardInput.hpp"
@@ -145,7 +146,7 @@ namespace SpiralOfFate
 			{ INPUT_DASH,    sf::Keyboard::Key::LShift },
 			{ INPUT_PAUSE,   sf::Keyboard::Key::Tab }
 		};
-		std::map<sf::Keyboard::Key, InputEnum> realKeyboardMap;
+		std::unordered_map<sf::Keyboard::Key, InputEnum> realKeyboardMap;
 
 		for (auto &pair : keyboardMap)
 			stream.read(reinterpret_cast<char *>(&pair.second), sizeof(pair.second));
@@ -156,7 +157,7 @@ namespace SpiralOfFate
 		this->_keyDuration.fill(0);
 	}
 
-	KeyboardInput::KeyboardInput(const std::map<sf::Keyboard::Key, InputEnum> &keyMap) :
+	KeyboardInput::KeyboardInput(const std::unordered_map<sf::Keyboard::Key, InputEnum> &keyMap) :
 		_keyMap(keyMap)
 	{
 		this->_keyStates.fill(false);

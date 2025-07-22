@@ -443,8 +443,16 @@ namespace SpiralOfFate
 			throw std::invalid_argument("guard_bar is missing");
 		if (!json.contains("guard_break_cooldown"))
 			throw std::invalid_argument("guard_break_cooldown is missing");
-		if (!json.contains("overdrive_cooldown"))
-			throw std::invalid_argument("overdrive_cooldown is missing");
+		if (!json.contains("neutral_overdrive_cooldown"))
+			throw std::invalid_argument("neutral_overdrive_cooldown is missing");
+		if (!json.contains("spirit_overdrive_cooldown"))
+			throw std::invalid_argument("spirit_overdrive_cooldown is missing");
+		if (!json.contains("matter_overdrive_cooldown"))
+			throw std::invalid_argument("matter_overdrive_cooldown is missing");
+		if (!json.contains("void_overdrive_cooldown"))
+			throw std::invalid_argument("void_overdrive_cooldown is missing");
+		if (!json.contains("roman_cancel_cooldown"))
+			throw std::invalid_argument("roman_cancel_cooldown is missing");
 		if (!json.contains("gravity"))
 			throw std::invalid_argument("gravity is missing");
 		if (!json["gravity"].contains("x"))
@@ -465,31 +473,31 @@ namespace SpiralOfFate
 			throw std::invalid_argument("mana_regen is missing");
 		if (!json.contains("palettes"))
 			throw std::invalid_argument("palettes is missing");
-		if (!json.contains("airdrift"))
+		if (!json.contains("air_drift"))
 			throw std::invalid_argument("gravity is missing");
-		if (!json["airdrift"].contains("up"))
+		if (!json["air_drift"].contains("up"))
 			throw std::invalid_argument("airdrift.up is missing");
-		if (!json["airdrift"].contains("down"))
+		if (!json["air_drift"].contains("down"))
 			throw std::invalid_argument("airdrift.down is missing");
-		if (!json["airdrift"].contains("back"))
+		if (!json["air_drift"].contains("back"))
 			throw std::invalid_argument("airdrift.back is missing");
-		if (!json["airdrift"].contains("front"))
+		if (!json["air_drift"].contains("front"))
 			throw std::invalid_argument("airdrift.front is missing");
-		if (!json["airdrift"]["up"].contains("accel"))
+		if (!json["air_drift"]["up"].contains("accel"))
 			throw std::invalid_argument("airdrift.up.accel is missing");
-		if (!json["airdrift"]["up"].contains("max"))
+		if (!json["air_drift"]["up"].contains("max"))
 			throw std::invalid_argument("airdrift.up.max is missing");
-		if (!json["airdrift"]["down"].contains("accel"))
+		if (!json["air_drift"]["down"].contains("accel"))
 			throw std::invalid_argument("airdrift.down.accel is missing");
-		if (!json["airdrift"]["down"].contains("max"))
+		if (!json["air_drift"]["down"].contains("max"))
 			throw std::invalid_argument("airdrift.down.max is missing");
-		if (!json["airdrift"]["back"].contains("accel"))
+		if (!json["air_drift"]["back"].contains("accel"))
 			throw std::invalid_argument("airdrift.back.accel is missing");
-		if (!json["airdrift"]["back"].contains("max"))
+		if (!json["air_drift"]["back"].contains("max"))
 			throw std::invalid_argument("airdrift.back.max is missing");
-		if (!json["airdrift"]["front"].contains("accel"))
+		if (!json["air_drift"]["front"].contains("accel"))
 			throw std::invalid_argument("airdrift.front.accel is missing");
-		if (!json["airdrift"]["front"].contains("max"))
+		if (!json["air_drift"]["front"].contains("max"))
 			throw std::invalid_argument("airdrift.front.max is missing");
 
 		for (auto &j : json["palettes"]) {

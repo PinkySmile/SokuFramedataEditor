@@ -9,6 +9,7 @@
 
 #define DIFF_TIME_NB_AVG 10
 #define MAX_SETBACK 1000LL
+#define MAX_ROLLBACK 15
 #ifdef _DEBUG
 #define CHECKSUM_CHECK_INTERVAL 1
 #else

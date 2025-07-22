@@ -6,7 +6,7 @@
 #define SOFGV_KEYBOARDINPUT_HPP
 
 
-#include <map>
+#include <unordered_map>
 #include <array>
 #include <SFML/Window/Keyboard.hpp>
 #include "Inputs/IInput.hpp"
@@ -15,12 +15,12 @@ namespace SpiralOfFate
 {
 	class KeyboardInput : public IInput {
 	private:
-		std::map<sf::Keyboard::Key, InputEnum> _keyMap;
+		std::unordered_map<sf::Keyboard::Key, InputEnum> _keyMap;
 		std::array<bool, INPUT_NUMBER> _keyStates;
 		std::array<int, INPUT_NUMBER> _keyDuration;
 
 	public:
-		KeyboardInput(const std::map<sf::Keyboard::Key, InputEnum> &keyMap);
+		KeyboardInput(const std::unordered_map<sf::Keyboard::Key, InputEnum> &keyMap);
 		bool isPressed(InputEnum input) const override;
 		InputStruct getInputs() const override;
 		void update() override;

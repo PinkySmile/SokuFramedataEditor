@@ -87,10 +87,10 @@ namespace SpiralOfFate
 			"Return to character select",
 			"Return to title screen"
 		};
-		const std::map<unsigned, std::vector<std::vector<FrameData>>> *_moveList = nullptr;
-		std::map<unsigned, MoveData> _moveData;
-		std::map<unsigned, MoveData> _leftMoveData;
-		std::map<unsigned, MoveData> _rightMoveData;
+		const std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> *_moveList = nullptr;
+		std::unordered_map<unsigned, MoveData> _moveData;
+		std::unordered_map<unsigned, MoveData> _leftMoveData;
+		std::unordered_map<unsigned, MoveData> _rightMoveData;
 		std::unique_ptr<FakeObject> _moveListObject;
 		std::wstring _moveListName;
 		unsigned int _moveListCursorMax = 0;
