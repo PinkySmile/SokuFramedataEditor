@@ -124,10 +124,9 @@ namespace SpiralOfFate
 			return;
 		}
 
-		auto linput = game->battleMgr->getLeftCharacter()->getInput();
-		auto rinput = game->battleMgr->getRightCharacter()->getInput();
-
 		if (!this->_paused) {
+			auto linput = game->battleMgr->getLeftCharacter()->getInput();
+			auto rinput = game->battleMgr->getRightCharacter()->getInput();
 			auto r1 = reinterpret_cast<ReplayInput *>(&*this->_manager->getLeftCharacter()->getInput());
 			auto r2 = reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput());
 
@@ -141,7 +140,7 @@ namespace SpiralOfFate
 				this->_paused = 1;
 				return;
 			}
-			if (!SpiralOfFate::game->battleMgr->update()) {
+			if (!game->battleMgr->update()) {
 				this->_paused = 1;
 				return;
 			}

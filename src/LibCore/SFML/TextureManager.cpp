@@ -42,14 +42,14 @@ namespace SpiralOfFate
 		}
 
 		if (file != path)
-			game->logger.debug("Loading file " + file + " (" + path + ")");
+			game->logger.debug("Loading texture " + file + " (" + path + ")");
 		else
-			game->logger.debug("Loading file " + file);
+			game->logger.debug("Loading texture " + file);
 		if (!this->_textures[index].loadFromFile(file)) {
-			this->_freedIndexes.push_back(index);
-			game->logger.error("Failed to load " + file);
-			return 0;
-		}
+			game->logger.warn("Failed to load texture " + file);
+			assert_exp(this->_textures[index].resize({1, 1}));
+		} else
+			game->logger.verbose("Loaded texture" + file + " successfully");
 
 		if (size)
 			*size = this->_textures[index].getSize();
@@ -57,7 +57,6 @@ namespace SpiralOfFate
 		this->_textures[index].setRepeated(repeated);
 		this->_allocatedTextures[file].first = index;
 		this->_allocatedTextures[file].second = 1;
-		game->logger.verbose("Loaded " + file + " successfully");
 		return index;
 	}
 
@@ -105,8 +104,10 @@ namespace SpiralOfFate
 		auto pixels = TextureManager::loadPixels(file, realSize);
 
 		if (!pixels) {
-			game->logger.debug("Loading failed");
-			return 0;
+			pixels = new Color[1];
+			realSize.x = 1;
+			realSize.y = 1;
+			*pixels = Color::White;
 		}
 		for (unsigned x = 0; x < realSize.x; x++)
 			for (unsigned y = 0; y < realSize.y; y++) {
@@ -156,16 +157,9 @@ namespace SpiralOfFate
 			return nullptr;
 		size = image.getSize();
 
-		Color * buffer = new Color[size.x * size.y];
-		auto ptr = image.getPixelsPtr();
+		auto buffer = new Color[size.x * size.y];
 
-		for (unsigned x = 0; x < size.x; x++)
-			for (unsigned y = 0; y < size.y; y++) {
-				buffer[x + y * size.x].r = reinterpret_cast<const Color *>(ptr)[x + y * size.x].r;
-				buffer[x + y * size.x].g = reinterpret_cast<const Color *>(ptr)[x + y * size.x].g;
-				buffer[x + y * size.x].b = reinterpret_cast<const Color *>(ptr)[x + y * size.x].b;
-				buffer[x + y * size.x].a = reinterpret_cast<const Color *>(ptr)[x + y * size.x].a;
-			}
+		memcpy(buffer, image.getPixelsPtr(), size.x * size.y * sizeof(*buffer));
 		return buffer;
 	}
 
@@ -240,8 +234,12 @@ namespace SpiralOfFate
 		std::vector<Color> pal1;
 		std::vector<Color> pal2;
 
-		if (!pixels)
-			return game->logger.debug("Loading failed");
+		if (!pixels) {
+			pixels = new Color[1];
+			realSize.x = 1;
+			realSize.y = 1;
+			*pixels = Color::White;
+		}
 		p = path.substr(pos + 1);
 		pos = path.find('|');
 		while (pos != std::string::npos) {

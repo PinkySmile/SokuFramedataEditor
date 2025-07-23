@@ -11,15 +11,6 @@
 
 namespace SpiralOfFate
 {
-	SoundManager::SoundManager()
-	{
-		sf::SoundBuffer buffer;
-
-		this->_sound.reserve(MAX_SOUND);
-		for (int i = 0; i < MAX_SOUND; i++)
-			this->_sound.emplace_back(buffer);
-	}
-
 	unsigned SoundManager::load(std::string file)
 	{
 		for (auto pos = file.find('\\'); pos != std::string::npos; pos = file.find('\\'))
@@ -54,12 +45,13 @@ namespace SpiralOfFate
 			this->_freedIndexes.pop_back();
 		}
 
-		game->logger.debug("Loading file " + file);
-		if (!this->_sounds[index].loadFromFile(file)) {
-			this->_freedIndexes.push_back(index);
-			return 0;
-		}
+		game->logger.debug("Loading sound file " + file);
+		if (!this->_sounds[index].buffer.loadFromFile(file))
+			game->logger.warn("Failed to sound load " + file);
+		else
+			game->logger.verbose("Loaded sound " + file + " successfully");
 
+		this->_sounds[index].sound.setVolume(this->_volume);
 		this->_allocatedSounds[file].first = index;
 		this->_allocatedSounds[file].second = 1;
 		return index;
@@ -94,15 +86,7 @@ namespace SpiralOfFate
 		if (id == 0)
 			return;
 		game->logger.debug("Playing sound " + std::to_string(id));
-
-		auto &sound = this->_sound[this->_lastSound];
-
-		try {
-			sound.setBuffer(this->_sounds.at(id));
-			sound.play();
-			this->_lastSound++;
-			this->_lastSound %= 64;
-		} catch (...) {}
+		this->_sounds.at(id).sound.play();
 	}
 
 	void SoundManager::addRef(unsigned int id)
@@ -122,7 +106,8 @@ namespace SpiralOfFate
 
 	void SoundManager::setVolume(float volume)
 	{
-		for (auto &sound : this->_sound)
-			sound.setVolume(volume);
+		this->_volume = volume;
+		for (auto &pair : this->_sounds)
+			pair.second.sound.setVolume(volume);
 	}
 }

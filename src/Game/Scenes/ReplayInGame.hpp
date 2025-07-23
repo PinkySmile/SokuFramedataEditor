@@ -28,6 +28,7 @@ namespace SpiralOfFate
 
 		Character *_chr;
 		size_t _startTime = 0;
+		std::vector<unsigned char *> _savedFrames;
 
 		void _pauseUpdate() override;
 		void _practiceUpdate() override;
