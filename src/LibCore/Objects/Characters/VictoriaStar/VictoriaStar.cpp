@@ -200,7 +200,7 @@ namespace SpiralOfFate
 
 		Character::postUpdate();
 		for (auto &s : this->_shadows) {
-			if (!s.second)
+			if (!s.first)
 				continue;
 			if (s.second->isDead()) {
 				if (s.second->wasKilledByOwner())
@@ -407,7 +407,8 @@ namespace SpiralOfFate
 		}
 		if (action == ACTION_FORWARD_DASH)
 			for (auto &shadow : this->_shadows)
-				shadow.second->setInvincible(40);
+				if (shadow.first)
+					shadow.second->setInvincible(40);
 		this->_hitShadow = false;
 		Character::_forceStartMove(action);
 	}
