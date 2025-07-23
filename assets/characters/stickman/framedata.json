@@ -24590,6 +24590,7 @@
             }
           ],
           "offense_flag": 16,
+          "rotation": 1.0000000278275352,
           "scale": {
             "x": 2.0,
             "y": 2.0
@@ -24657,8 +24658,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 4,
-          "hit_player_hit_stop": 4,
+          "hit_opponent_hit_stop": 2,
+          "hit_player_hit_stop": 2,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24681,7 +24682,7 @@
           },
           "prorate": 92.0,
           "push_block": 1,
-          "rotation": 45.000001328130075,
+          "rotation": 34.99999968381689,
           "scale": {
             "x": 2.0,
             "y": 2.0
@@ -24756,8 +24757,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 4,
-          "hit_player_hit_stop": 4,
+          "hit_opponent_hit_stop": 2,
+          "hit_player_hit_stop": 2,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24773,18 +24774,19 @@
             }
           ],
           "mana_gain": 10,
-          "offense_flag": 2107920,
+          "offense_flag": 2099728,
           "offset": {
             "x": 1,
             "y": -15
           },
           "prorate": 92.0,
           "push_block": 1,
-          "rotation": 45.000001328130075,
+          "rotation": 34.99999968381689,
           "scale": {
             "x": 2.0,
             "y": 2.0
           },
+          "sound": "g",
           "speed": {
             "x": 1.0,
             "y": 0.0
@@ -24816,7 +24818,7 @@
           },
           "damage": 300,
           "defense_flag": 16640,
-          "duration": 2,
+          "duration": 4,
           "gravity": {
             "x": 0.0,
             "y": -0.6499999761581421
@@ -24854,8 +24856,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 4,
-          "hit_player_hit_stop": 4,
+          "hit_opponent_hit_stop": 2,
+          "hit_player_hit_stop": 2,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24878,7 +24880,7 @@
           },
           "prorate": 92.0,
           "push_block": 1,
-          "rotation": 45.000001328130075,
+          "rotation": 34.99999968381689,
           "scale": {
             "x": 2.0,
             "y": 2.0
@@ -24910,7 +24912,7 @@
           },
           "damage": 300,
           "defense_flag": 16640,
-          "duration": 2,
+          "duration": 4,
           "gravity": {
             "x": 0.0,
             "y": -0.6499999761581421
@@ -24948,8 +24950,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 4,
-          "hit_player_hit_stop": 4,
+          "hit_opponent_hit_stop": 2,
+          "hit_player_hit_stop": 2,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24972,7 +24974,7 @@
           },
           "prorate": 92.0,
           "push_block": 1,
-          "rotation": 45.000001328130075,
+          "rotation": 34.99999968381689,
           "scale": {
             "x": 2.0,
             "y": 2.0
@@ -25004,7 +25006,7 @@
           },
           "damage": 300,
           "defense_flag": 16640,
-          "duration": 2,
+          "duration": 4,
           "gravity": {
             "x": 0.0,
             "y": -0.6499999761581421
@@ -25042,8 +25044,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 4,
-          "hit_player_hit_stop": 4,
+          "hit_opponent_hit_stop": 2,
+          "hit_player_hit_stop": 2,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 4.0,
@@ -25066,10 +25068,14 @@
           },
           "prorate": 92.0,
           "push_block": 1,
-          "rotation": 45.000001328130075,
+          "rotation": 34.99999968381689,
           "scale": {
             "x": 2.0,
             "y": 2.0
+          },
+          "speed": {
+            "x": -0.10000000149011612,
+            "y": 0.0
           },
           "spirit_limit": 10,
           "sprite": "sheet.png",
@@ -25107,6 +25113,10 @@
             "x": 2.0,
             "y": 2.0
           },
+          "speed": {
+            "x": -0.10000000149011612,
+            "y": 0.0
+          },
           "sprite": "sheet.png",
           "texture_bounds": {
             "height": 94,
@@ -25140,6 +25150,10 @@
           "scale": {
             "x": 2.0,
             "y": 2.0
+          },
+          "speed": {
+            "x": -0.10000000149011612,
+            "y": 0.0
           },
           "sprite": "sheet.png",
           "texture_bounds": {
