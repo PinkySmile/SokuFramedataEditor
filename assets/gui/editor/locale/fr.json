@@ -1,5 +1,5 @@
 {
-	"message_box.title.load_failed":   "Erreur de charger du fichier",
+	"message_box.title.load_failed":   "Erreur de chargement du fichier",
 	"message_box.title.backup_exists": "Données de restauration existantes",
 	"message_box.title.not_saved":     "Fichiers non-sauvegardés",
 	"message_box.not_saved":           "Un ou plusieurs fichier(s) ont des changements non sauvegardés.",
