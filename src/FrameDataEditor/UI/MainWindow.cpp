@@ -40,7 +40,7 @@ std::string to_hex(unsigned long long value)
 	return buffer;
 }
 
-#define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset) \
+#define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset, noEmpty) \
 do {                                                                                                             \
         auto __elem = container.get<tgui::EditBox>(guiId);                                                       \
                                                                                                                  \
@@ -50,7 +50,7 @@ do {                                                                            
         __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                         \
         __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); });        \
         __elem->onTextChange.connect([this](const tgui::String &s){                                              \
-                if (s.empty()) return;                                                                           \
+                if constexpr (noEmpty) if (s.empty()) return;                                                    \
                 try {                                                                                            \
                         fromStringPre(s)                                                                         \
                         this->updateTransaction([&]{ return new operation(                                       \
@@ -181,23 +181,23 @@ do {                                                                            
 ")"
 
 #define PLACE_HOOK_STRING(container, guiId, field, name, operation, reset) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, STRING_TO_STRING, NO_FROMSTRING_PRE, STRING_FROM_STRING, _, reset)
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, STRING_TO_STRING, NO_FROMSTRING_PRE, STRING_FROM_STRING, _, reset, false)
 #define PLACE_HOOK_NUMBER(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset)
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset, true)
 #define PLACE_HOOK_NUMBER_DEG(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_RAD_TO_STRING, NO_FROMSTRING_PRE, NUMBER_RAD_FROM_STRING, precision, reset)
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_RAD_TO_STRING, NO_FROMSTRING_PRE, NUMBER_RAD_FROM_STRING, precision, reset, true)
 #define PLACE_HOOK_OPTIONAL_NUMBER(container, guiId, field, name, operation, reset, precision) \
 	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset)
 #define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation, reset) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _, reset)
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _, reset, true)
 #define PLACE_HOOK_VECTOR(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset)
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset, true)
 #define PLACE_HOOK_OPTIONAL_VECTOR(container, guiId, field, name, operation, reset, precision) \
 	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset)
 #define PLACE_HOOK_OPTIONAL_SNAP(container, guiId, field, name, operation, reset) \
 	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, SNAP_TO_STRING, SNAP_FROM_STRING_PRE, SNAP_FROM_STRING, _, reset)
 #define PLACE_HOOK_RECT(container, guiId, field, name, operation, reset) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0, reset)
+	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0, reset, true)
 #define PLACE_HOOK_FLAG(container, guiId, field, index, name, reset)               \
 do {                                                                               \
         auto __elem = container.get<tgui::CheckBox>(guiId);                        \
