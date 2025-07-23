@@ -342,14 +342,14 @@ namespace SpiralOfFate
 			this->counterHitSpeed.y = data["counter_hit_speed"]["y"];
 		}
 		if (!this->soundPath.empty()) {
-			if (this->soundPath.find('.') == std::string::npos) {
+			if (std::ranges::all_of(this->soundPath, [](char c){ return std::isdigit(c) == 1; })) {
 				this->soundHandle = std::stoul(this->soundPath);
 				game->soundMgr.addRef(this->soundHandle);
 			} else
 				this->soundHandle = game->soundMgr.load("assets/sfxs/se/" + this->soundPath);
 		}
 		if (!this->hitSoundPath.empty()){
-			if (this->hitSoundPath.find('.') == std::string::npos) {
+			if (std::ranges::all_of(this->hitSoundPath, [](char c){ return std::isdigit(c) == 1; })) {
 				this->hitSoundHandle = std::stoul(this->hitSoundPath);
 				game->soundMgr.addRef(this->hitSoundHandle);
 			} else
