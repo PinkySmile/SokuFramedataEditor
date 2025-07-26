@@ -101,13 +101,13 @@ namespace SpiralOfFate
 		};
 		game->connection->onDesync = [](Connection::Remote &, unsigned frameId, unsigned, unsigned) {
 			try {
-				std::filesystem::create_directory("frames");
+				std::filesystem::create_directory("desync-frames");
 			} catch (std::exception &e) {
 				game->logger.error("Cannot save frame " + std::to_string(frameId) + ": " + e.what());
 				return;
 			}
 
-			auto path = "frames/frames-" + std::to_string(frameId) + ".frame";
+			auto path = "desync-frames/frames-" + std::to_string(frameId) + ".sofgv_frame";
 			std::ofstream stream{path, std::ofstream::binary};
 
 			if (!stream) {
@@ -469,12 +469,22 @@ namespace SpiralOfFate
 		return game->battleMgr->update();
 	}
 
-	const std::pair<long long int, long long int> &RollbackMachine::getLastAvgTimes() const
+	std::pair<long long int, long long int> RollbackMachine::getLastAvgDelayTimes() const
 	{
-		return this->_lastAvgTimes;
+		std::pair<long long int, long long int> times{0, 0};
+
+		for (auto t : this->_opDiffTimes)
+			times.first += t;
+		for (auto t : this->_diffTimes)
+			times.second += t;
+		if (!this->_opDiffTimes.empty())
+			times.first /= (long long int)this->_opDiffTimes.size();
+		if (!this->_diffTimes.empty())
+			times.second /= (long long int)this->_diffTimes.size();
+		return times;
 	}
 
-	std::pair<long long int, long long int> RollbackMachine::getLastTimes() const
+	std::pair<long long int, long long int> RollbackMachine::getLastDelayTimes() const
 	{
 		std::pair<long long int, long long int> times{0, 0};
 

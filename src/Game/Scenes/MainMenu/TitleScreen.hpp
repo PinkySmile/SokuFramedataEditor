@@ -27,7 +27,6 @@ namespace SpiralOfFate
 		mutable Sprite _titleSpiral;
 		mutable std::vector<Sprite> _inputs;
 		Menu _menuObject;
-		std::thread _thread;
 		std::map<unsigned, std::map<sf::Joystick::Axis, int>> _oldStickValues;
 		std::pair<unsigned, unsigned> _spec;
 		unsigned _latestJoystickId = 0;

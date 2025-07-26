@@ -126,6 +126,8 @@ namespace SpiralOfFate::Utils
 		return result;
 	}
 
+	bool isBeingDebugged();
+
 #ifdef USE_TGUI
 	//! @brief Display a focused window.
 	//! @param gui The gui handling the window.

@@ -10,14 +10,6 @@ namespace SpiralOfFate
 	PracticeBattleManager::PracticeBattleManager(const StageParams &stage, const CharacterParams &leftCharacter, const CharacterParams &rightCharacter) :
 		BattleManager(stage, leftCharacter, rightCharacter)
 	{
-		this->_startingState = new unsigned char[this->getBufferSize()];
-		this->copyToBuffer(this->_startingState);
-	}
-
-	PracticeBattleManager::~PracticeBattleManager()
-	{
-		delete[] this->_savedState;
-		delete[] this->_startingState;
 	}
 
 	bool PracticeBattleManager::_updateLoop()
@@ -57,36 +49,6 @@ namespace SpiralOfFate
 			game->screen->borderColor(0, sf::Color::Transparent);
 		}
 		this->_displayFrameStuff();
-	}
-
-	void PracticeBattleManager::consumeEvent(const sf::Event &event)
-	{
-		BattleManager::consumeEvent(event);
-		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
-			if (e->code == sf::Keyboard::Key::F11)
-				this->_step = !this->_step;
-#ifdef _DEBUG
-			if (e->code == sf::Keyboard::Key::F2)
-#else
-			if (e->code == sf::Keyboard::Key::F12)
-#endif
-				this->_next = true;
-			if (e->code == sf::Keyboard::Key::F9)
-				this->_speed--;
-			if (e->code == sf::Keyboard::Key::F10)
-				this->_speed++;
-			if (!this->replay) {
-				if (e->code == sf::Keyboard::Key::F8 && this->_savedState)
-					this->restoreFromBuffer(this->_savedState);
-				if (e->code == sf::Keyboard::Key::F7) {
-					delete[] this->_savedState;
-					this->_savedState = new unsigned char[this->getBufferSize()];
-					this->copyToBuffer(this->_savedState);
-				}
-				if (e->code == sf::Keyboard::Key::F6)
-					this->restoreFromBuffer(this->_startingState);
-			}
-		}
 	}
 
 	void PracticeBattleManager::_updateFrameStuff()
@@ -207,21 +169,6 @@ namespace SpiralOfFate
 		case ACTION_AIR_NEUTRAL_BLOCK:
 		case ACTION_AIR_HIT:
 			return me._blockStun == 1;
-		}
-		return true;
-	}
-
-	bool PracticeBattleManager::update()
-	{
-		if (this->_step && !this->_next)
-			return true;
-		this->_next = false;
-
-		this->_time += this->_speed / 60.f;
-		while (this->_time >= 1) {
-			this->_time -= 1;
-			if (!this->_updateLoop())
-				return false;
 		}
 		return true;
 	}

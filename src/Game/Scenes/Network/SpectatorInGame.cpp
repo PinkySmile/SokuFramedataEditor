@@ -20,7 +20,6 @@ namespace SpiralOfFate
 		this->_replaySaved = false;
 		this->_endScene = "title_screen";
 		this->_replay = true;
-		this->_manager->replay = true;
 		game->battleMgr->onFrameSkipped = [this]{
 			auto inputs = this->_inputManager->getInputs();
 

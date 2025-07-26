@@ -420,16 +420,13 @@ if (NOT USE_SDL2)
 	add_executable(PaletteExtractor src/PaletteExtractor/main.cpp)
 	target_link_libraries(
 		PaletteExtractor
-		${SFML_GRAPHICS_LIB}
-		${SFML_SYSTEM_LIB}
-		${SFML_WINDOW_LIB}
+		SFML::Graphics
 	)
 
 	add_executable(LagSwitch src/LagSwitch/main.cpp)
 	target_link_libraries(
 		LagSwitch
-		${SFML_SYSTEM_LIB}
-		${SFML_NETWORK_LIB}
+		SFML::Network
 	)
 	target_include_directories(LagSwitch PRIVATE src/LibCore)
 endif ()

@@ -9,6 +9,7 @@
 #include "Logger.hpp"
 #include "MainMenu/TitleScreen.hpp"
 #include "Objects/StageObjects/StageObject.hpp"
+#include "Utils.hpp"
 
 namespace SpiralOfFate
 {
@@ -34,8 +35,16 @@ namespace SpiralOfFate
 			BattleManager::CharacterParams{ true,  leftChr,  licon, lJson },
 			BattleManager::CharacterParams{ false, rightChr, ricon, rJson }
 		);
+		this->_startingState = new unsigned char[this->_manager->getBufferSize()];
+		this->_manager->copyToBuffer(this->_startingState);
 		game->battleMgr.reset(this->_manager);
 		game->logger.debug("Practice session started");
+	}
+
+	PracticeInGame::~PracticeInGame()
+	{
+		delete[] this->_savedState;
+		delete[] this->_startingState;
 	}
 
 	void PracticeInGame::_renderPause() const
@@ -302,15 +311,13 @@ namespace SpiralOfFate
 		return false;
 	}
 
-	void PracticeInGame::update()
+	void PracticeInGame::_updateLoop()
 	{
 		InGame::update();
-		if (this->_paused)
+		if (this->_paused || this->_replay)
 			return;
-		if (!this->_replay) {
-			this->_manager->_leftHUDData.score = 0;
-			this->_manager->_rightHUDData.score = 0;
-		}
+		this->_manager->_leftHUDData.score = 0;
+		this->_manager->_rightHUDData.score = 0;
 		if (this->_block == Character::BLOCK_1ST_HIT) {
 			if (this->_manager->_rightCharacter->_blockStun) {
 				this->_manager->_rightCharacter->_forceBlock = Character::NO_BLOCK;
@@ -332,22 +339,27 @@ namespace SpiralOfFate
 			this->_manager->_leftCharacter->_mana = this->_manager->_leftCharacter->_manaMax;
 			this->_manager->_rightCharacter->_mana = this->_manager->_rightCharacter->_manaMax;
 		}
-		if (!this->_manager->_leftCharacter->_comboCtr && !this->_manager->_leftCharacter->_blockStun && !this->_manager->_rightCharacter->_comboCtr && !this->_manager->_rightCharacter->_blockStun) {
+		if (
+			!this->_manager->_leftCharacter->_comboCtr &&
+			!this->_manager->_leftCharacter->_blockStun &&
+			!this->_manager->_rightCharacter->_comboCtr &&
+			!this->_manager->_rightCharacter->_blockStun
+		) {
 			switch (this->_mana) {
-			case 0:
-				break;
-			case 1:
-				this->_manager->_leftCharacter->_mana = 0;
-				this->_manager->_rightCharacter->_mana = 0;
-				break;
-			case 2:
-				this->_manager->_leftCharacter->_mana = this->_manager->_leftCharacter->_manaMax / 2.f;
-				this->_manager->_rightCharacter->_mana = this->_manager->_rightCharacter->_manaMax / 2.f;
-				break;
-			case 3:
-				this->_manager->_leftCharacter->_mana = this->_manager->_leftCharacter->_manaMax;
-				this->_manager->_rightCharacter->_mana = this->_manager->_rightCharacter->_manaMax;
-				break;
+				case 0:
+					break;
+				case 1:
+					this->_manager->_leftCharacter->_mana = 0;
+					this->_manager->_rightCharacter->_mana = 0;
+					break;
+				case 2:
+					this->_manager->_leftCharacter->_mana = this->_manager->_leftCharacter->_manaMax / 2.f;
+					this->_manager->_rightCharacter->_mana = this->_manager->_rightCharacter->_manaMax / 2.f;
+					break;
+				case 3:
+					this->_manager->_leftCharacter->_mana = this->_manager->_leftCharacter->_manaMax;
+					this->_manager->_rightCharacter->_mana = this->_manager->_rightCharacter->_manaMax;
+					break;
 			}
 			if (!this->_replay) {
 				this->_manager->_leftCharacter->_hp = this->_manager->_leftCharacter->_baseHp;
@@ -371,6 +383,19 @@ namespace SpiralOfFate
 				this->_manager->_rightCharacter->_guardCooldown = 0;
 				this->_manager->_rightCharacter->_guardBar = this->_manager->_rightCharacter->_maxGuardBar;
 			}
+		}
+	}
+
+	void PracticeInGame::update()
+	{
+		if (this->_step && !this->_next)
+			return;
+		this->_next = false;
+
+		this->_time += this->_speed / 60.f;
+		while (this->_time >= 1) {
+			this->_time -= 1;
+			this->_updateLoop();
 		}
 	}
 
@@ -451,5 +476,34 @@ namespace SpiralOfFate
 			params.lJson,
 			params.rJson
 		);
+	}
+
+	void PracticeInGame::consumeEvent(const Event &event)
+	{
+		InGame::consumeEvent(event);
+		if (auto e = event.getIf<sf::Event::KeyPressed>()) {
+			if (e->code == sf::Keyboard::Key::F11)
+				this->_step = !this->_step;
+			// FIXME: When we are being debugged, F12 will trap the debugger in some cases (maybe depends on the debugger?)
+			//        Using GDB doesn't do it, but I'm sure I had to rebind this key to F2 because I couldn't use it at all.
+			//if (Utils::isBeingDebugged() ? e->code == sf::Keyboard::Key::F2 : e->code == sf::Keyboard::Key::F12)
+			if (e->code == sf::Keyboard::Key::F12)
+				this->_next = true;
+			if (e->code == sf::Keyboard::Key::F9)
+				this->_speed--;
+			if (e->code == sf::Keyboard::Key::F10)
+				this->_speed++;
+			if (!this->_replay) {
+				if (e->code == sf::Keyboard::Key::F8 && this->_savedState)
+					this->_manager->restoreFromBuffer(this->_savedState);
+				if (e->code == sf::Keyboard::Key::F7) {
+					delete[] this->_savedState;
+					this->_savedState = new unsigned char[this->_manager->getBufferSize()];
+					this->_manager->copyToBuffer(this->_savedState);
+				}
+				if (e->code == sf::Keyboard::Key::F6)
+					this->_manager->restoreFromBuffer(this->_startingState);
+			}
+		}
 	}
 }

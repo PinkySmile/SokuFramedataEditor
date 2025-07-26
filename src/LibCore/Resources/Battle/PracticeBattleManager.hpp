@@ -34,11 +34,6 @@ namespace SpiralOfFate
 		BlockingState _right;
 		bool _showBoxes = false;
 		bool _showAttributes = false;
-		float _time = 0;
-		bool _step = false;
-		bool _next = false;
-		unsigned char *_startingState = nullptr;
-		unsigned char *_savedState = nullptr;
 
 		static bool _isBlocking(const Character &me);
 		static bool _isAttacking(const Character &me);
@@ -53,13 +48,9 @@ namespace SpiralOfFate
 		bool _updateLoop() override;
 
 	public:
-		bool replay = false;
-
 		PracticeBattleManager(const StageParams &stage, const CharacterParams &leftCharacter, const CharacterParams &rightCharacter);
-		~PracticeBattleManager();
+		~PracticeBattleManager() override = default;
 		void render() override;
-		bool update() override;
-		void consumeEvent(const sf::Event &event) override;
 
 		friend class ReplayInGame;
 		friend class PracticeInGame;

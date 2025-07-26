@@ -17,6 +17,22 @@
 
 namespace SpiralOfFate
 {
+	static void warpToTitle(const char *error)
+	{
+		auto args = new TitleScreenArguments();
+		size_t time = 0;
+
+		args->errorMessage = error;
+		// If we are in the loading screen, we need to finish the loading first, before starting to go to the title screen.
+		// The loading finished callback is called synchronously in the update function of the scene.
+		while (game->scene.isLoading()) {
+			assert_exp(time++ < 10);
+			game->scene.update();
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+		game->scene.switchScene("title_screen", args);
+	}
+
 	Connection::Connection()
 	{
 		this->_socket.setBlocking(false);
@@ -200,11 +216,8 @@ namespace SpiralOfFate
 					continue;
 				}
 				if (this->_opponent == &*iter) {
-					auto args = new TitleScreenArguments();
-
-					args->errorMessage = "Connection lost.";
-					game->scene.switchScene("title_screen", args);
 					this->terminate();
+					warpToTitle("Connection lost.");
 					break;
 				}
 				if (this->onDisconnect)
@@ -468,12 +481,8 @@ namespace SpiralOfFate
 		// It is supposed to be only the opcode but if they want to quit,
 		// who am I to disagree.
 		if (remote.connectPhase == CONNECTION_STATE_PLAYER) {
-			auto args = new TitleScreenArguments();
-
-			args->errorMessage = "Your opponent left.";
-			game->scene.switchScene("title_screen", args);
 			this->terminate();
-			return;
+			return warpToTitle("Your opponent left.");
 		}
 		remote.connectPhase = CONNECTION_STATE_DISCONNECTED;
 		if (size != sizeof(packet)) {
@@ -719,6 +728,15 @@ namespace SpiralOfFate
 		}
 	}
 
+	Connection::Remote::Remote(Connection &base, const sf::IpAddress &ip, unsigned short port) :
+		base(base),
+		ip(ip),
+		port(port),
+		pingThread{&Remote::_pingLoop, this}
+	{
+		pthread_setname_np(this->pingThread.native_handle(), ("Ping " + ip.toString() + ":" + std::to_string(port)).c_str());
+	}
+
 	Connection::Remote::~Remote()
 	{
 		if (this->connectPhase != CONNECTION_STATE_DISCONNECTED) {
@@ -729,14 +747,5 @@ namespace SpiralOfFate
 		}
 		if (this->pingThread.joinable())
 			this->pingThread.join();
-	}
-
-	Connection::Remote::Remote(Connection &base, const sf::IpAddress &ip, unsigned short port) :
-		base(base),
-		ip(ip),
-		port(port)/*,
-		pingThread{&Remote::_pingLoop, this}*/
-	{
-
 	}
 }

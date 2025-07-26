@@ -18,6 +18,7 @@ namespace SpiralOfFate
 		auto fctCopy = new std::function<IScene *(LoadingScene *)>(fct);
 
 		this->_thread = std::thread{[this, fctCopy]{
+
 #if !defined(_DEBUG) || defined(_WIN32) || defined(__ANDROID__)
 			try {
 #endif
@@ -35,6 +36,7 @@ namespace SpiralOfFate
 			}
 #endif
 		}};
+		pthread_setname_np(this->_thread.native_handle(), "Scene loading thread");
 	}
 
 	LoadingScene::~LoadingScene()

@@ -39,36 +39,10 @@ void initEditor()
 	editor = new FrameDataEditor();
 }
 
-#ifndef _WIN32
-#include <sys/types.h>
-#include <sys/ptrace.h>
-
-// https://forum.juce.com/t/detecting-if-a-process-is-being-run-under-a-debugger/2098
-bool runningUnderDebugger()
-{
-	static bool isCheckedAlready = false;
-	static bool underDebugger = false;
-
-	if (!isCheckedAlready) {
-		if (ptrace(PTRACE_TRACEME, 0, 1, 0) < 0)
-			underDebugger = true;
-		else
-			ptrace(PTRACE_DETACH, 0, 1, 0);
-		isCheckedAlready = true;
-	}
-	return underDebugger;
-}
-#else
-bool runningUnderDebugger()
-{
-     return IsDebuggerPresent() == TRUE;
-}
-#endif
-
 int main()
 {
 #ifdef _DEBUG
-	if (runningUnderDebugger()) {
+	if (Utils::isBeingDebugged()) {
 		initEditor();
 		run();
 		game->logger.info("Goodbye !");

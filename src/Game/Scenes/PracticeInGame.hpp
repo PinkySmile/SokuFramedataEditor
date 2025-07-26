@@ -12,6 +12,13 @@ namespace SpiralOfFate
 {
 	class PracticeInGame : public InGame {
 	protected:
+		float _time = 0;
+		bool _step = false;
+		bool _next = false;
+		unsigned char *_startingState = nullptr;
+		unsigned char *_savedState = nullptr;
+		unsigned char _speed = 60;
+
 		class PracticeBattleManager *_manager;
 		bool _replay = false;
 		unsigned _practiceCursor = 0;
@@ -55,6 +62,7 @@ namespace SpiralOfFate
 		void _renderPause() const override;
 		void _pauseUpdate() override;
 		bool _pauseConfirm() override;
+		void _updateLoop();
 
 		virtual void _practiceRender() const;
 		virtual void _practiceUpdate();
@@ -62,8 +70,10 @@ namespace SpiralOfFate
 
 	public:
 		PracticeInGame(const GameParams &params, const std::vector<struct PlatformSkeleton> &platforms, const struct StageEntry &stage, Character *leftChr, Character *rightChr, unsigned licon, unsigned ricon, const nlohmann::json &lJson, const nlohmann::json &rJson);
+		~PracticeInGame() override;
 		void update() override;
 		void render() const override;
+		void consumeEvent(const Event &event) override;
 
 		static PracticeInGame *create(SceneArguments *);
 	};

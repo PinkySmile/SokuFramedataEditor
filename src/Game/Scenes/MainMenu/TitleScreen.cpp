@@ -222,8 +222,6 @@ namespace SpiralOfFate
 			this->onDestruct();
 		game->logger.debug("~TitleScreen");
 		game->soundMgr.remove(this->_netbellSound);
-		if (this->_thread.joinable())
-			this->_thread.join();
 	}
 
 	void TitleScreen::render() const

@@ -4,6 +4,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/types.h>
+#include <sys/ptrace.h>
 #endif
 #ifdef __GNUG__
 #include <cxxabi.h>
@@ -384,6 +387,29 @@ namespace SpiralOfFate::Utils
 			*end = 0;
 		return locale;
 #endif
+	}
+#endif
+
+#ifndef _WIN32
+	// https://forum.juce.com/t/detecting-if-a-process-is-being-run-under-a-debugger/2098
+	bool isBeingDebugged()
+	{
+		static bool isCheckedAlready = false;
+		static bool underDebugger = false;
+
+		if (!isCheckedAlready) {
+			if (ptrace(PTRACE_TRACEME, 0, 1, 0) < 0)
+				underDebugger = true;
+			else
+				ptrace(PTRACE_DETACH, 0, 1, 0);
+			isCheckedAlready = true;
+		}
+		return underDebugger;
+	}
+#else
+	bool isBeingDebugged()
+	{
+	     return IsDebuggerPresent() == TRUE;
 	}
 #endif
 }

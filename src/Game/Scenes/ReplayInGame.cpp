@@ -16,7 +16,6 @@ namespace SpiralOfFate
 	{
 		this->_endScene = "title_screen";
 		this->_replay = true;
-		this->_manager->replay = true;
 		this->_startTime = frameCount;
 	}
 

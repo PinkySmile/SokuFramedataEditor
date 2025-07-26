@@ -76,8 +76,8 @@ namespace SpiralOfFate
 		UpdateStatus update(bool useP1Inputs, bool useP2Inputs);
 		UpdateStatus syncTestUpdate(bool useP1Inputs, bool useP2Inputs);
 		void consumeEvent(const sf::Event &event);
-		std::pair<long long int, long long int> getLastTimes() const;
-		const std::pair<long long int, long long int> &getLastAvgTimes() const;
+		std::pair<long long int, long long int> getLastDelayTimes() const;
+		std::pair<long long int, long long int> getLastAvgDelayTimes() const;
 		size_t getBufferSize() const;
 		size_t getMaxBufferSize() const;
 	};

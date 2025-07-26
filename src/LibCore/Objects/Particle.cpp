@@ -64,7 +64,7 @@ namespace SpiralOfFate
 			};
 			game->screen->draw(arr, sf::RenderStates(&this->_sprite.getTexture()));
 		}
-		if (this->showBoxes) {
+		if (this->showAttributes) {
 			sf::VertexArray arr{sf::PrimitiveType::TriangleFan, 4};
 			sf::VertexArray arr2{sf::PrimitiveType::LineStrip, 5};
 			Rectangle box = {

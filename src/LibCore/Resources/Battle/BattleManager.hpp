@@ -146,7 +146,6 @@ namespace SpiralOfFate
 		sf::Texture _cross;
 		std::array<sf::Texture, 5 + FIRST_TO * 2 - 1> _roundSprites;
 		sf::Sprite _roundSprite;
-		unsigned char _speed = 60;
 		//TODO: Also save these in the rollback
 		std::vector<std::unique_ptr<Object>> _stageObjects;
 		std::array<unsigned, NB_SPRITES> _moveSprites;
