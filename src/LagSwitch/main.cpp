@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 	sf::UdpSocket sock;
 	sf::IpAddress caddr = sf::IpAddress::Any;
-	sf::IpAddress haddr{argv[2]};
+	sf::IpAddress haddr = *sf::IpAddress::resolve(argv[2]);
 	unsigned short cport = 0;
 	unsigned short hport = std::stoul(argv[3]);
 	float packet_lost = 0;
@@ -55,23 +55,23 @@ int main(int argc, char **argv)
 		}
 		exit(EXIT_SUCCESS);
 	}}.detach();
-	if (sock.bind(std::stoul(argv[1])) != sf::Socket::Done)
+	if (sock.bind(std::stoul(argv[1])) != sf::Socket::Status::Done)
 		return EXIT_FAILURE;
 	sock.setBlocking(false);
 	while (true) {
 		auto buffer = std::shared_ptr<char>((char *)malloc(1024 * 1024), free);
 		size_t total = 0;
-		sf::IpAddress addr = sf::IpAddress::Any;
+		std::optional<sf::IpAddress> addr;
 		unsigned short port = 0;
 
-		if (sock.receive(&*buffer, 1024 * 1024, total, addr, port) == sf::Socket::Done) {
+		if (sock.receive(&*buffer, 1024 * 1024, total, addr, port) == sf::Socket::Status::Done) {
 			auto t = delay_dist(random_gen);
 			sf::IpAddress raddr = addr == haddr && port == hport ? caddr : haddr;
 			unsigned short rport = addr == haddr && port == hport ? cport : hport;
 
 			//std::cout << "C" << (addr == haddr && port == hport ? '<' : '>') << "H " << total << "bytes ";
 			if ((addr != haddr || port != hport) && cport == 0) {
-				caddr = addr;
+				caddr = *addr;
 				cport = port;
 			}
 			if (loss_dist(random_gen) < packet_lost) {
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 			//std::cout << t / 1000 << "ms" << std::endl;
 			std::thread{[t, buffer, total, raddr, rport, &sock] {
 				std::this_thread::sleep_for(std::chrono::microseconds(t));
-				sock.send(&*buffer, total, raddr, rport);
+				static_cast<void>(sock.send(&*buffer, total, raddr, rport));
 			}}.detach();
 		}
 	}
