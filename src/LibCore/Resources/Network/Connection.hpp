@@ -143,7 +143,7 @@ namespace SpiralOfFate
 		void quitGame();
 		void updateDelay(unsigned int delay);
 		virtual bool send(const InputStruct &inputs);
-		unsigned int getCurrentDelay();
+		unsigned int getCurrentDelay() const;
 		std::list<PacketInput> receive() override;
 		void terminate();
 		bool isTerminated() const;

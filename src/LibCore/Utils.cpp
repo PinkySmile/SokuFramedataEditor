@@ -412,4 +412,39 @@ namespace SpiralOfFate::Utils
 	     return IsDebuggerPresent() == TRUE;
 	}
 #endif
+
+	void mergeInputs(InputStruct &inputs1, const InputStruct &inputs2)
+	{
+		if (std::abs(inputs1.horizontalAxis) < std::abs(inputs2.horizontalAxis))
+			inputs1.horizontalAxis = inputs2.horizontalAxis;
+		if (std::abs(inputs1.verticalAxis) < std::abs(inputs2.verticalAxis))
+			inputs1.verticalAxis = inputs2.verticalAxis;
+		for (size_t i = 2; i < sizeof(inputs1) / sizeof(int); i++)
+			((int *)&inputs1)[i] = std::max(((int *)&inputs1)[i], ((int *)&inputs2)[i]);
+	}
+
+	unsigned char *allocateManually(size_t size)
+	{
+		return new unsigned char[size];
+	}
+	void deallocateManually(unsigned char *buffer)
+	{
+		delete[] buffer;
+	}
+
+	std::string toHex(const unsigned char *buffer, size_t size, bool endian)
+	{
+		char digits[] = "0123456789ABCDEF";
+		std::string result;
+
+		result.resize(size * 2);
+		for (size_t i = 0; i < size; i++) {
+			size_t index = endian == TOHEX_ENDIAN_BIG ? i : size - i - 1;
+			unsigned char c = buffer[index];
+
+			result[i * 2 + 0] = digits[c >> 4];
+			result[i * 2 + 1] = digits[c & 0xF];
+		}
+		return result;
+	}
 }

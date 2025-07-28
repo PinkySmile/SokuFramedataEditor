@@ -13,7 +13,7 @@
 namespace SpiralOfFate
 {
 	SpectatorInGame::SpectatorInGame(const InGame::GameParams &params, const std::vector<struct PlatformSkeleton> &platforms, const struct StageEntry &stage, Character *leftChr, Character *rightChr, unsigned licon, unsigned ricon, const nlohmann::json &lJson, const nlohmann::json &rJson, std::shared_ptr<SpectatorInputManager> inputManager, SpectatorConnection *connection) :
-		PracticeInGame(params, platforms, stage, leftChr, rightChr, licon, ricon, lJson, rJson),
+		PracticeInGame(params, platforms, stage, leftChr, rightChr, licon, ricon, lJson, rJson, false),
 		_connection(connection),
 		_inputManager(std::move(inputManager))
 	{
@@ -115,43 +115,38 @@ namespace SpiralOfFate
 
 	void SpectatorInGame::update()
 	{
+		game->P1.first->update();
+		game->P1.second->update();
+
 		if (this->_moveList) {
-			game->P1.first->update();
-			game->P1.second->update();
+			auto keyboard = game->P1.first->getInputs();
+			auto controller = game->P1.second->getInputs();
 
-			auto relevent = game->P1.first->getInputs();
-			auto other = game->P1.second->getInputs();
-
-			if (std::abs(((int *)&relevent)[0]) < std::abs(((int *)&other)[0]))
-				((int *)&relevent)[0] = ((int *)&other)[0];
-			if (std::abs(((int *)&relevent)[1]) < std::abs(((int *)&other)[1]))
-				((int *)&relevent)[1] = ((int *)&other)[1];
-			for (size_t i = 2; i < sizeof(relevent) / sizeof(int); i++)
-				((int *)&relevent)[i] = std::max(((int *)&relevent)[i], ((int *)&other)[i]);
-			this->_moveListUpdate(relevent);
-			return;
+			Utils::mergeInputs(keyboard, controller);
+			this->_moveListUpdate(keyboard);
 		}
 
 		if ((this->_inputManager->getLastReceivedFrame() != this->_inputManager->getEnd() || !this->_inputManager->getEnd()))
-			if (this->_inputManager->getCurrentFrame() % 60 == 0 || !this->_inputManager->hasInputs())
+			if (this->_inputManager->getCurrentFrame() % 60 == 0 || this->_inputManager->getBufferSize() < 8)
 				this->_connection->requestInputs(this->_inputManager->getLastReceivedFrame());
 
-		auto isEnd = this->_inputManager->hasInputs() && !SpiralOfFate::game->battleMgr->update();
+		for (size_t i = 0; this->_inputManager->getBufferSize() > (i * 8); i = 1) {
+			auto isEnd = !SpiralOfFate::game->battleMgr->update();
 
-		this->_inputManager->update();
-		if (isEnd || (this->_inputManager->getCurrentFrame() == this->_inputManager->getEnd() && this->_inputManager->getEnd())) {
-			auto args = new SpectatorArguments();
+			this->_inputManager->update();
+			if (isEnd || (this->_inputManager->getCurrentFrame() == this->_inputManager->getEnd() && this->_inputManager->getEnd())) {
+				auto args = new SpectatorArguments();
 
-			args->connection = reinterpret_cast<SpectatorConnection *>(&*game->connection);
-			game->scene.switchScene("spectator_char_select", args);
-			return;
+				args->connection = reinterpret_cast<SpectatorConnection *>(&*game->connection);
+				game->scene.switchScene("spectator_char_select", args);
+				return;
+			}
 		}
-		if (!this->_paused) {
-			game->P1.first->update();
-			game->P1.second->update();
-			if (game->P1.first->isPressed(INPUT_PAUSE) || game->P1.second->isPressed(INPUT_PAUSE))
-				this->_paused = 1;
-		} else
+		if (!this->_paused && (
+			game->P1.first->isPressed(INPUT_PAUSE) || game->P1.second->isPressed(INPUT_PAUSE)
+		))
+			this->_paused = 1;
+		else
 			this->_pauseUpdate();
 	}
 

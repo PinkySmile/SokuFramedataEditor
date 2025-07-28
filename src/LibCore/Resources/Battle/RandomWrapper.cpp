@@ -4,6 +4,7 @@
 
 #include <istream>
 #include "RandomWrapper.hpp"
+#include "Resources/Assert.hpp"
 
 namespace SpiralOfFate
 {
@@ -36,6 +37,7 @@ namespace SpiralOfFate
 
 	void RandomWrapper::rollback(unsigned long long int z)
 	{
+		assert_exp(z < 1000000000);
 		this->ser.invoke_count = z;
 		this->rng = std::mt19937(this->ser.seed);
 		this->rng.discard(this->ser.invoke_count);

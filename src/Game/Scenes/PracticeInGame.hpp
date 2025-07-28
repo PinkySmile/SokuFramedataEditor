@@ -6,7 +6,9 @@
 #define SOFGV_PRACTICEINGAME_HPP
 
 
+#include <memory>
 #include "InGame.hpp"
+#include "Utils.hpp"
 
 namespace SpiralOfFate
 {
@@ -15,8 +17,12 @@ namespace SpiralOfFate
 		float _time = 0;
 		bool _step = false;
 		bool _next = false;
-		unsigned char *_startingState = nullptr;
-		unsigned char *_savedState = nullptr;
+		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> _startingState = {
+			nullptr, &Utils::deallocateManually
+		};
+		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> _savedState = {
+			nullptr, &Utils::deallocateManually
+		};
 		unsigned char _speed = 60;
 
 		class PracticeBattleManager *_manager;
@@ -68,9 +74,19 @@ namespace SpiralOfFate
 		virtual void _practiceUpdate();
 		virtual bool _practiceConfirm();
 
+		virtual void _saveState();
+		virtual void _restoreState(unsigned char *buffer);
+
 	public:
-		PracticeInGame(const GameParams &params, const std::vector<struct PlatformSkeleton> &platforms, const struct StageEntry &stage, Character *leftChr, Character *rightChr, unsigned licon, unsigned ricon, const nlohmann::json &lJson, const nlohmann::json &rJson);
-		~PracticeInGame() override;
+		PracticeInGame(
+			const GameParams &params,
+			const std::vector<struct PlatformSkeleton> &platforms,
+			const struct StageEntry &stage,
+			Character *leftChr, Character *rightChr,
+			unsigned licon, unsigned ricon,
+			const nlohmann::json &lJson, const nlohmann::json &rJson,
+			bool saveState = true
+		);
 		void update() override;
 		void render() const override;
 		void consumeEvent(const Event &event) override;

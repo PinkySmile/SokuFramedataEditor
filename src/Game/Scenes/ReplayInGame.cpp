@@ -12,16 +12,19 @@
 namespace SpiralOfFate
 {
 	ReplayInGame::ReplayInGame(const InGame::GameParams &params, unsigned frameCount, const std::vector<struct PlatformSkeleton> &platforms, const struct StageEntry &stage, Character *leftChr, Character *rightChr, unsigned licon, unsigned ricon, const nlohmann::json &lJson, const nlohmann::json &rJson) :
-		PracticeInGame(params, platforms, stage, leftChr, rightChr, licon, ricon, lJson, rJson)
+		PracticeInGame(params, platforms, stage, leftChr, rightChr, licon, ricon, lJson, rJson, false)
 	{
 		this->_endScene = "title_screen";
 		this->_replay = true;
 		this->_startTime = frameCount;
+		this->_p1 = reinterpret_cast<ReplayInput *>(&*leftChr->getInput());
+		this->_p2 = reinterpret_cast<ReplayInput *>(&*rightChr->getInput());
+		this->_startingState.reset(this->_serializeState());
 	}
 
 	void ReplayInGame::consumeEvent(const sf::Event &event)
 	{
-		InGame::consumeEvent(event);
+		PracticeInGame::consumeEvent(event);
 		if (auto e = event.getIf<sf::Event::JoystickButtonPressed>())
 			game->P1.second->setJoystickId(e->joystickId);
 		if (auto e = event.getIf<sf::Event::JoystickButtonReleased>())
@@ -32,13 +35,42 @@ namespace SpiralOfFate
 		game->P1.second->consumeEvent(event);
 	}
 
+	unsigned char *ReplayInGame::_serializeState()
+	{
+		size_t mSize = this->_manager->getBufferSize();
+		size_t p1Size = this->_p1->getBufferSize();
+		size_t p2Size = this->_p2->getBufferSize();
+		size_t size = mSize + p1Size + p2Size;
+		auto buffer = Utils::allocateManually(size);
+		unsigned char *ptr = buffer;
+
+		game->logger.info("Saving ReplayInGame state: " + std::to_string(size) + " bytes total (" + std::to_string(mSize) + " + " + std::to_string(p1Size) + " + " + std::to_string(p2Size) + ")");
+		this->_manager->copyToBuffer(ptr);
+		ptr += mSize;
+		this->_p1->copyToBuffer(ptr);
+		ptr += p1Size;
+		this->_p2->copyToBuffer(ptr);
+		return buffer;
+	}
+
+	void ReplayInGame::_saveState()
+	{
+		this->_savedState.reset(this->_serializeState());
+	}
+
+	void ReplayInGame::_restoreState(unsigned char *buffer)
+	{
+		this->_manager->restoreFromBuffer(buffer);
+		buffer += this->_manager->getBufferSize();
+		this->_p1->restoreFromBuffer(buffer);
+		buffer += this->_p1->getBufferSize();
+		this->_p2->restoreFromBuffer(buffer);
+	}
+
 	void ReplayInGame::_pauseUpdate()
 	{
 		if (this->_paused != 3 && this->_practice)
 			return this->_practiceUpdate();
-
-		game->P1.first->update();
-		game->P1.second->update();
 
 		auto relevent = game->P1.first->getInputs();
 		auto other = game->P1.second->getInputs();
@@ -75,9 +107,6 @@ namespace SpiralOfFate
 
 	void ReplayInGame::_practiceUpdate()
 	{
-		game->P1.first->update();
-		game->P1.second->update();
-
 		auto relevent = game->P1.first->getInputs();
 		auto other = game->P1.second->getInputs();
 
@@ -106,35 +135,29 @@ namespace SpiralOfFate
 
 	void ReplayInGame::update()
 	{
+		game->P1.first->update();
+		game->P1.second->update();
+
 		if (this->_moveList) {
-			game->P1.first->update();
-			game->P1.second->update();
+			auto keyboard = game->P1.first->getInputs();
+			auto controller = game->P1.second->getInputs();
 
-			auto relevent = game->P1.first->getInputs();
-			auto other = game->P1.second->getInputs();
-
-			if (std::abs(((int *)&relevent)[0]) < std::abs(((int *)&other)[0]))
-				((int *)&relevent)[0] = ((int *)&other)[0];
-			if (std::abs(((int *)&relevent)[1]) < std::abs(((int *)&other)[1]))
-				((int *)&relevent)[1] = ((int *)&other)[1];
-			for (size_t i = 2; i < sizeof(relevent) / sizeof(int); i++)
-				((int *)&relevent)[i] = std::max(((int *)&relevent)[i], ((int *)&other)[i]);
-			this->_moveListUpdate(relevent);
+			Utils::mergeInputs(keyboard, controller);
+			this->_moveListUpdate(keyboard);
 			return;
 		}
-
 		if (!this->_paused) {
+			if (this->_step && !this->_next)
+				return;
+			this->_next = false;
+
 			auto linput = game->battleMgr->getLeftCharacter()->getInput();
 			auto rinput = game->battleMgr->getRightCharacter()->getInput();
-			auto r1 = reinterpret_cast<ReplayInput *>(&*this->_manager->getLeftCharacter()->getInput());
-			auto r2 = reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput());
 
-			game->P1.first->update();
-			game->P1.second->update();
 			if (
 				game->P1.first->isPressed(INPUT_PAUSE) ||
 				game->P1.second->isPressed(INPUT_PAUSE) ||
-				(!r1->hasData() && !r2->hasData())
+				(!this->_p1->hasData() && !this->_p2->hasData())
 			) {
 				this->_paused = 1;
 				return;

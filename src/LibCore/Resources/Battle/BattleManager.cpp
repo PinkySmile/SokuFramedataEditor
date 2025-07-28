@@ -7,6 +7,7 @@
 #include "Logger.hpp"
 #include "Resources/Game.hpp"
 #include "Objects/Characters/SubObject.hpp"
+#include "Utils.hpp"
 
 #define INPUT_DISPLAY_SIZE 24
 #define LIMIT_SPRITE_VOID 0
@@ -692,7 +693,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>(data);
 		char *ptr = (char *)data + sizeof(Data);
 
-		game->logger.verbose("Saving BattleManager (Data size: " + std::to_string(sizeof(Data)) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving BattleManager (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->random = game->battleRandom.ser.invoke_count;
 		dat->_limitAnimTimer = this->_limitAnimTimer;
 		dat->_ended = this->_ended;
@@ -787,7 +788,7 @@ namespace SpiralOfFate
 		}
 		this->_leftCharacter->resolveSubObjects(*this);
 		this->_rightCharacter->resolveSubObjects(*this);
-		game->logger.verbose("Restored BattleManager @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored BattleManager @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	bool BattleManager::_updateLoop()

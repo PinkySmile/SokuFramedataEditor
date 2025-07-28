@@ -5,6 +5,8 @@
 #include <cstring>
 #include "ReplayInput.hpp"
 #include "Logger.hpp"
+#include "Resources/Game.hpp"
+#include "Utils.hpp"
 
 namespace SpiralOfFate
 {
@@ -99,5 +101,66 @@ namespace SpiralOfFate
 	size_t ReplayInput::getRemainingTime() const
 	{
 		return this->_totalTime;
+	}
+
+	size_t ReplayInput::getBufferSize() const
+	{
+		return sizeof(Data) + this->_inputs.size() * sizeof(*Data::inputs);
+	}
+
+	void ReplayInput::copyToBuffer(unsigned char *buffer) const
+	{
+		auto data = reinterpret_cast<Data *>(buffer);
+
+		game->logger.verbose("Saving ReplayInput (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)buffer));
+		data->totalTime = this->_totalTime;
+		data->keyStates = this->_keyStates.to_ulong();
+		data->keyDuration = this->_keyDuration;
+		data->nbInputs = this->_inputs.size();
+		for (size_t i = 0; i < this->_inputs.size(); i++)
+			data->inputs[i] = this->_inputs[i];
+	}
+
+	void ReplayInput::restoreFromBuffer(unsigned char *buffer)
+	{
+		auto data = reinterpret_cast<Data *>(buffer);
+
+		this->_totalTime = data->totalTime;
+		this->_keyStates = data->keyStates;
+		this->_keyDuration = data->keyDuration;
+		this->_inputs.resize(data->nbInputs);
+		for (size_t i = 0; i < this->_inputs.size(); i++)
+			this->_inputs[i] = data->inputs[i];
+		game->logger.verbose("Restored ReplayInput @" + Utils::toHex((uintptr_t)buffer));
+	}
+
+	size_t ReplayInput::getBufferSizeLight() const
+	{
+		return sizeof(DataLight);
+	}
+
+	void ReplayInput::copyToBufferLight(unsigned char *buffer) const
+	{
+		auto data = reinterpret_cast<DataLight *>(buffer);
+
+		game->logger.verbose("Saving ReplayInput (Light) (Data size: " + std::to_string(sizeof(DataLight)) + ") @" + Utils::toHex((uintptr_t)buffer));
+		data->totalTime = this->_totalTime;
+		data->keyStates = this->_keyStates.to_ulong();
+		data->keyDuration = this->_keyDuration;
+		data->lastInputs = this->_inputs.front();
+	}
+
+	void ReplayInput::restoreFromBufferLight(unsigned char *buffer)
+	{
+		auto data = reinterpret_cast<DataLight *>(buffer);
+
+		this->_totalTime = data->totalTime;
+		this->_keyStates = data->keyStates;
+		this->_keyDuration = data->keyDuration;
+		if (data->lastInputs.time == 0)
+			this->_inputs.push_front(data->lastInputs);
+		else
+			this->_inputs.front() = data->lastInputs;
+		game->logger.verbose("Restored ReplayInput (Light) @" + Utils::toHex((uintptr_t)buffer));
 	}
 }

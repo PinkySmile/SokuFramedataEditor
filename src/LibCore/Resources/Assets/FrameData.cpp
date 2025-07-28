@@ -3,6 +3,7 @@
 //
 
 #include <fstream>
+#include "Utils.hpp"
 #include "FrameData.hpp"
 #include "Resources/Game.hpp"
 #include "Logger.hpp"
@@ -690,7 +691,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>(data);
 		unsigned i = 0;
 
-		game->logger.verbose("Saving FrameData (Data size: " + std::to_string(this->getBufferSize()) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving FrameData (Data size: " + std::to_string(this->getBufferSize()) + ") @" + Utils::toHex((uintptr_t)dat));
 		memset(dat->texturePath, 0, sizeof(dat->texturePath));
 		strncpy(dat->texturePath, this->spritePath.c_str(), sizeof(dat->texturePath));
 		dat->particleGenerator = this->particleGenerator;
@@ -761,9 +762,12 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>(data);
 		unsigned i = 0;
 
-		this->spritePath = std::string(dat->texturePath, strnlen(dat->texturePath, sizeof(dat->texturePath)));
+		assert_exp(!this->_slave);
 		game->textureMgr.remove(this->textureHandle);
 		game->textureMgr.remove(this->textureHandleEffects);
+		delete this->collisionBox;
+
+		this->spritePath = std::string(dat->texturePath, strnlen(dat->texturePath, sizeof(dat->texturePath)));
 		this->textureHandle = game->textureMgr.load(__folder + "/" + this->spritePath, __palette);
 		this->textureHandleEffects = game->textureMgr.load(__folder + "/effects/" + this->spritePath, __palette);
 		this->particleGenerator = dat->particleGenerator;
@@ -825,7 +829,7 @@ namespace SpiralOfFate
 			this->hurtBoxes.emplace_back(dat->boxes[i++]);
 		while (i < dat->hurtBoxesCount + dat->hitBoxesCount)
 			this->hitBoxes.emplace_back(dat->boxes[i++]);
-		game->logger.verbose("Restored FrameData @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored FrameData @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	size_t FrameData::printDifference(const char *msgStart, void *data1, void *data2, unsigned startOffset)

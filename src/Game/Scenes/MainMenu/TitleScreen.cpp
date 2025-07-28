@@ -55,12 +55,6 @@ enum TitleScreenButton3 {
 	BUTTON3_HOST,
 	BUTTON3_CONNECT,
 	BUTTON3_SPECTATE,
-#ifdef HAS_NETWORK
-#ifdef _DEBUG
-#define HAS_SYNC_TEST
-	BUTTON3_SYNC_TEST,
-#endif
-#endif
 	BUTTON3_BACK
 };
 
@@ -78,6 +72,27 @@ enum TitleScreenButton5 {
 	BUTTON5_CREDITS,
 	BUTTON5_COMMUNITY,
 	BUTTON5_BACK
+};
+
+#ifdef _DEBUG
+enum TitleScreenButton6 {
+#ifdef HAS_NETWORK
+#define HAS_SYNC_TEST
+	BUTTON6_SYNC_TEST,
+#endif
+	BUTTON6_BACK
+};
+#endif
+
+enum TitleScreenChunks {
+	CHUNK_MAIN_MENU,
+	CHUNK_SOLO_MODE,
+	CHUNK_MULTIPLAYER_MODE,
+	CHUNK_SETTINGS,
+	CHUNK_EXTRA,
+#ifdef _DEBUG
+	CHUNK_DEBUG,
+#endif
 };
 
 #define TITLE_SCREEN_BUTTON(index, name) ((index - 1) << 8 | BUTTON##index##_##name)
@@ -121,19 +136,21 @@ namespace SpiralOfFate
 		_menuObject{"assets/ui/copperplate-gothic-light.ttf", "assets/ui/gillsansmt.ttf", {
 			{
 				{"Solo mode", "Fight by yourself", [this]{
-					this->_menuObject.setEnabledMenu(1, false);
+					this->_menuObject.setEnabledMenu(CHUNK_SOLO_MODE, false);
 				}},
 				{"Multiplayer mode", "Fight a human opponent", [this]{
-					this->_menuObject.setEnabledMenu(2, false);
+					this->_menuObject.setEnabledMenu(CHUNK_MULTIPLAYER_MODE, false);
 				}},
 				{"Settings", "Change settings", [this]{
-					this->_menuObject.setEnabledMenu(3, false);
+					this->_menuObject.setEnabledMenu(CHUNK_SETTINGS, false);
 				}},
 				{"Extra", "Other", [this]{
-					this->_menuObject.setEnabledMenu(4, false);
+					this->_menuObject.setEnabledMenu(CHUNK_EXTRA, false);
 				}},
 			#ifdef _DEBUG
-				{"Debug", "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?", nullptr},
+				{"Debug", "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?", [this]{
+					this->_menuObject.setEnabledMenu(CHUNK_DEBUG, false);
+				}},
 			#endif
 				{"Quit", "Quit game", []{
 					game->screen->close();
@@ -148,7 +165,7 @@ namespace SpiralOfFate
 				{"Trial Mode", "Combo training", nullptr},
 				{"Tutorial", "Learn the basics", nullptr},
 				{"Back", "Go back to the main menu", [this]{
-					this->_menuObject.setEnabledMenu(0);
+					this->_menuObject.setEnabledMenu(CHUNK_MAIN_MENU);
 				}},
 			},
 			{
@@ -166,13 +183,8 @@ namespace SpiralOfFate
 					this->_spectate();
 				}},
 			#endif
-			#ifdef HAS_SYNC_TEST
-				{"Sync Test", "Verify that rollback doesn't desync", [this]{
-					this->_askingInputs = true;
-				}},
-			#endif
 				{"Back", "Go back to the main menu", [this]{
-					this->_menuObject.setEnabledMenu(0);
+					this->_menuObject.setEnabledMenu(CHUNK_MAIN_MENU);
 				}},
 			},
 			{
@@ -184,12 +196,12 @@ namespace SpiralOfFate
 					this->_cursorInputs = 0;
 				}},
 				{"Back", "Go back to the main menu", [this]{
-					this->_menuObject.setEnabledMenu(0);
+					this->_menuObject.setEnabledMenu(CHUNK_MAIN_MENU);
 				}},
 			},
 			{
 				{"Replays", "Select a replay to watch", [this]{
-					auto window = Utils::openFileDialog(game->gui, "Open replay", "./replays");
+					auto window = Utils::openFileDialog(game->gui, "Open replay", "replays");
 
 					window->setFileTypeFilters({ {"Replay file (*.replay)", {"*.replay"}}, {"All files", {}} }, 0);
 					window->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
@@ -203,9 +215,21 @@ namespace SpiralOfFate
 				{"Music Room", "Catchy tune!", nullptr},
 				{"Credits", "", nullptr},
 				{"Back", "Go back to the main menu", [this]{
-					this->_menuObject.setEnabledMenu(0);
+					this->_menuObject.setEnabledMenu(CHUNK_MAIN_MENU);
+				}},
+			},
+#ifdef _DEBUG
+			{
+#ifdef HAS_SYNC_TEST
+				{"Sync Test", "Verify that rollback doesn't desync", [this]{
+					this->_askingInputs = true;
+				}},
+#endif
+				{"Back", "Go back to the main menu", [this]{
+					this->_menuObject.setEnabledMenu(CHUNK_MAIN_MENU);
 				}},
 			}
+#endif
 		}}
 	{
 		game->logger.info("Title scene created");
@@ -520,7 +544,7 @@ namespace SpiralOfFate
 			break;
 	#endif
 	#ifdef HAS_SYNC_TEST
-		case TITLE_SCREEN_BUTTON(3, SYNC_TEST):
+		case TITLE_SCREEN_BUTTON(6, SYNC_TEST):
 			args = new CharacterSelect::Arguments();
 			args->leftInput = TitleScreen::_getInputFromId(this->_leftInput - 1, game->P1);
 			args->rightInput = TitleScreen::_getInputFromId(this->_rightInput - 1, game->P2);
@@ -552,7 +576,7 @@ namespace SpiralOfFate
 			return false;
 		}
 		if (ev.code == sf::Keyboard::Key::F3 && this->_changingInputs > 1) {
-			auto dialog = Utils::openFileDialog(game->gui, "Load inputs", "./profiles");
+			auto dialog = Utils::openFileDialog(game->gui, "Load inputs", "profiles");
 
 			dialog->setFileTypeFilters({ {"Inputs file (*.in)", {"*.in"}}, {"All files", {}} }, 0);
 			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
@@ -660,7 +684,7 @@ namespace SpiralOfFate
 		if (
 			item == TITLE_SCREEN_BUTTON(3, OFFLINE) ||
 		#ifdef HAS_SYNC_TEST
-			item == TITLE_SCREEN_BUTTON(3, SYNC_TEST) ||
+			item == TITLE_SCREEN_BUTTON(6, SYNC_TEST) ||
 		#endif
 			item == TITLE_SCREEN_BUTTON(2, PRACTICE)
 		)
@@ -672,7 +696,7 @@ namespace SpiralOfFate
 		if (this->_leftInput && (
 			item == TITLE_SCREEN_BUTTON(3, OFFLINE) ||
 		#ifdef HAS_SYNC_TEST
-			item == TITLE_SCREEN_BUTTON(3, SYNC_TEST) ||
+			item == TITLE_SCREEN_BUTTON(6, SYNC_TEST) ||
 		#endif
 			item == TITLE_SCREEN_BUTTON(2, PRACTICE)
 		)) {
@@ -696,7 +720,7 @@ namespace SpiralOfFate
 		if (this->_leftInput && (this->_rightInput || (
 			item != TITLE_SCREEN_BUTTON(3, OFFLINE) &&
 		#ifdef HAS_SYNC_TEST
-			item != TITLE_SCREEN_BUTTON(3, SYNC_TEST) &&
+			item != TITLE_SCREEN_BUTTON(6, SYNC_TEST) &&
 		#endif
 			item != TITLE_SCREEN_BUTTON(2, PRACTICE)
 		)))
@@ -911,7 +935,7 @@ namespace SpiralOfFate
 			if (this->_rightInput || (this->_leftInput && (
 				item != TITLE_SCREEN_BUTTON(3, OFFLINE) &&
 			#ifdef HAS_SYNC_TEST
-				item != TITLE_SCREEN_BUTTON(3, SYNC_TEST) &&
+				item != TITLE_SCREEN_BUTTON(6, SYNC_TEST) &&
 			#endif
 				item != TITLE_SCREEN_BUTTON(2, PRACTICE)
 			)))
@@ -950,7 +974,7 @@ namespace SpiralOfFate
 			if (this->_rightInput && (
 				item == TITLE_SCREEN_BUTTON(3, OFFLINE) ||
 			#ifdef HAS_SYNC_TEST
-				item == TITLE_SCREEN_BUTTON(3, SYNC_TEST) ||
+				item == TITLE_SCREEN_BUTTON(6, SYNC_TEST) ||
 			#endif
 				item == TITLE_SCREEN_BUTTON(2, PRACTICE)
 			))

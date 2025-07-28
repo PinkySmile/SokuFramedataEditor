@@ -33,6 +33,11 @@
 #define MB_ICONWARNING 0x30
 #endif
 
+#ifdef __GNUG__
+#define COALESCE(ptr1, ptr2) ((ptr1) ?: (ptr2))
+#else
+#define COALESCE(ptr1, ptr2) ((ptr1) ? (ptr1) : (ptr2))
+#endif
 
 namespace SpiralOfFate::Utils
 {
@@ -127,6 +132,26 @@ namespace SpiralOfFate::Utils
 	}
 
 	bool isBeingDebugged();
+	// FIXME: Forward declare
+	void mergeInputs(class InputStruct &inputs1, const class InputStruct &inputs2);
+
+	unsigned char *allocateManually(size_t size);
+	void deallocateManually(unsigned char *buffer);
+
+#define TOHEX_ENDIAN_LITTLE false
+#define TOHEX_ENDIAN_BIG true
+	std::string toHex(const unsigned char *buffer, size_t size, bool endian);
+
+	template<typename T, size_t size = sizeof(T)>
+	std::enable_if_t<std::is_integral_v<T>, std::string> toHex(const T &v)
+	{
+		if constexpr (std::endian::native == std::endian::big)
+			return toHex(reinterpret_cast<const unsigned char *>(&v), size, TOHEX_ENDIAN_BIG);
+		else if constexpr (std::endian::native == std::endian::little)
+			return toHex(reinterpret_cast<const unsigned char *>(&v), size, TOHEX_ENDIAN_LITTLE);
+		else
+			static_assert(false, "Unknown endianness");
+	}
 
 #ifdef USE_TGUI
 	//! @brief Display a focused window.

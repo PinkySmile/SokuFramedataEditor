@@ -13,7 +13,15 @@
 
 namespace SpiralOfFate
 {
-	PracticeInGame::PracticeInGame(const GameParams &params, const std::vector<struct PlatformSkeleton> &platforms, const struct StageEntry &stage, Character *leftChr, Character *rightChr, unsigned licon, unsigned ricon, const nlohmann::json &lJson, const nlohmann::json &rJson) :
+	PracticeInGame::PracticeInGame(
+		const GameParams &params,
+		const std::vector<struct PlatformSkeleton> &platforms,
+		const struct StageEntry &stage,
+		Character *leftChr, Character *rightChr,
+		unsigned licon, unsigned ricon,
+		const nlohmann::json &lJson, const nlohmann::json &rJson,
+		bool saveState
+	) :
 		InGame(params)
 	{
 		this->_replaySaved = true;
@@ -35,16 +43,12 @@ namespace SpiralOfFate
 			BattleManager::CharacterParams{ true,  leftChr,  licon, lJson },
 			BattleManager::CharacterParams{ false, rightChr, ricon, rJson }
 		);
-		this->_startingState = new unsigned char[this->_manager->getBufferSize()];
-		this->_manager->copyToBuffer(this->_startingState);
+		if (saveState) {
+			this->_startingState.reset(Utils::allocateManually(this->_manager->getBufferSize()));
+			this->_manager->copyToBuffer(&*this->_startingState);
+		}
 		game->battleMgr.reset(this->_manager);
 		game->logger.debug("Practice session started");
-	}
-
-	PracticeInGame::~PracticeInGame()
-	{
-		delete[] this->_savedState;
-		delete[] this->_startingState;
 	}
 
 	void PracticeInGame::_renderPause() const
@@ -313,7 +317,39 @@ namespace SpiralOfFate
 
 	void PracticeInGame::_updateLoop()
 	{
-		InGame::update();
+		auto linput = game->battleMgr->getLeftCharacter()->getInput();
+		auto rinput = game->battleMgr->getRightCharacter()->getInput();
+
+		if (this->_moveList) {
+			linput->update();
+			rinput->update();
+			this->_moveListUpdate((this->_paused == 1 ? linput : rinput)->getInputs());
+		} else if (!this->_paused) {
+			if (this->_step && !this->_next)
+				return;
+			this->_next = false;
+			if (!game->battleMgr->update()) {
+				auto args = new CharacterSelect::Arguments();
+
+				args->leftInput = game->battleMgr->getLeftCharacter()->getInput();
+				args->rightInput = game->battleMgr->getRightCharacter()->getInput();
+				args->leftPos = game->battleMgr->getLeftCharacter()->index & 0xFFFF;
+				args->rightPos = game->battleMgr->getRightCharacter()->index & 0xFFFF;
+				args->leftPalette = game->battleMgr->getLeftCharacter()->index >> 16;
+				args->rightPalette = game->battleMgr->getRightCharacter()->index >> 16;
+				//TODO: Save the stage and platform config properly
+				args->stage = 0;
+				args->platformCfg = 0;
+				args->inGameName = game->scene.getCurrentScene().first;
+				game->scene.switchScene(this->_endScene, args);
+				return;
+			}
+			if (linput->getInputs().pause == 1)
+				this->_paused = 1;
+			else if (rinput->getInputs().pause == 1)
+				this->_paused = 2;
+		} else
+			this->_pauseUpdate();
 		if (this->_paused || this->_replay)
 			return;
 		this->_manager->_leftHUDData.score = 0;
@@ -388,10 +424,6 @@ namespace SpiralOfFate
 
 	void PracticeInGame::update()
 	{
-		if (this->_step && !this->_next)
-			return;
-		this->_next = false;
-
 		this->_time += this->_speed / 60.f;
 		while (this->_time >= 1) {
 			this->_time -= 1;
@@ -478,6 +510,17 @@ namespace SpiralOfFate
 		);
 	}
 
+	void PracticeInGame::_saveState()
+	{
+		this->_savedState.reset(Utils::allocateManually(this->_manager->getBufferSize()));
+		this->_manager->copyToBuffer(&*this->_savedState);
+	}
+
+	void PracticeInGame::_restoreState(unsigned char *buffer)
+	{
+		this->_manager->restoreFromBuffer(buffer);
+	}
+
 	void PracticeInGame::consumeEvent(const Event &event)
 	{
 		InGame::consumeEvent(event);
@@ -493,17 +536,12 @@ namespace SpiralOfFate
 				this->_speed--;
 			if (e->code == sf::Keyboard::Key::F10)
 				this->_speed++;
-			if (!this->_replay) {
-				if (e->code == sf::Keyboard::Key::F8 && this->_savedState)
-					this->_manager->restoreFromBuffer(this->_savedState);
-				if (e->code == sf::Keyboard::Key::F7) {
-					delete[] this->_savedState;
-					this->_savedState = new unsigned char[this->_manager->getBufferSize()];
-					this->_manager->copyToBuffer(this->_savedState);
-				}
-				if (e->code == sf::Keyboard::Key::F6)
-					this->_manager->restoreFromBuffer(this->_startingState);
-			}
+			if (e->code == sf::Keyboard::Key::F8)
+				this->_restoreState(&*COALESCE(this->_savedState, this->_startingState));
+			if (e->code == sf::Keyboard::Key::F7)
+				this->_saveState();
+			if (e->code == sf::Keyboard::Key::F6)
+				this->_restoreState(&*this->_startingState);
 		}
 	}
 }

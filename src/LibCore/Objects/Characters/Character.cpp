@@ -5,6 +5,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include "Utils.hpp"
 #include "Character.hpp"
 #include "Resources/Game.hpp"
 #include "Logger.hpp"
@@ -3734,7 +3735,7 @@ namespace SpiralOfFate
 		size_t i = 0;
 
 		Object::copyToBuffer(data);
-		game->logger.verbose("Saving Character (Data size: " + std::to_string(sizeof(Data) + sizeof(LastInput) * this->_lastInputs.size()) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving Character (Data size: " + std::to_string(sizeof(Data) + sizeof(LastInput) * this->_lastInputs.size()) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->_hardKD = this->_hardKD;
 		dat->_guardBarTmp = this->_guardBarTmp;
 		dat->_limitEffects = this->_limitEffects;
@@ -3903,7 +3904,7 @@ namespace SpiralOfFate
 			this->_usedMoves[p[0]] = p[1];
 			p += 2;
 		}
-		game->logger.verbose("Restored Character @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored Character @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	void Character::resolveSubObjects(const BattleManager &manager)

@@ -5,6 +5,7 @@
 #include "VoidShadow.hpp"
 #include "Resources/Game.hpp"
 #include "Objects/Characters/VictoriaStar/VictoriaStar.hpp"
+#include "Utils.hpp"
 
 namespace SpiralOfFate
 {
@@ -96,7 +97,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Shadow::getBufferSize());
 
 		Shadow::copyToBuffer(data);
-		game->logger.verbose("Saving VoidShadow (Data size: " + std::to_string(sizeof(Data)) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving VoidShadow (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->_attacking = this->_attacking;
 	}
 
@@ -107,7 +108,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Shadow::getBufferSize());
 
 		this->_attacking = dat->_attacking;
-		game->logger.verbose("Restored VictoriaStar @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored VictoriaStar @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	size_t VoidShadow::printDifference(const char *msgStart, void *data1, void *data2, unsigned startOffset) const

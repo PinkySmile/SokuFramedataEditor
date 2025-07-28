@@ -85,7 +85,7 @@ namespace SpiralOfFate
 		return true;
 	}
 
-	unsigned int Connection::getCurrentDelay()
+	unsigned int Connection::getCurrentDelay() const
 	{
 		return this->_delay;
 	}
@@ -611,8 +611,8 @@ namespace SpiralOfFate
 		std::vector<unsigned> ids;
 
 		ids.reserve(this->_replayData.size());
-		for (auto pair : this->_replayData)
-			ids.push_back(pair.first);
+		for (auto &[id, _] : this->_replayData)
+			ids.push_back(id);
 
 		auto packet = PacketReplayList::create(ids);
 

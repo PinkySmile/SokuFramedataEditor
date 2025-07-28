@@ -19,6 +19,24 @@ namespace SpiralOfFate
 {
 	class ReplayInput : public IInput {
 	private:
+	#pragma pack(push, 1)
+		// Stores the entire state
+		struct Data {
+			size_t nbInputs;
+			size_t totalTime;
+			unsigned long keyStates;
+			std::array<int, INPUT_NUMBER - 1> keyDuration;
+			ReplayData inputs[];
+		};
+		// Stores state to go back one frame (and one frame only)
+		struct DataLight {
+			size_t totalTime;
+			unsigned long keyStates;
+			std::array<int, INPUT_NUMBER - 1> keyDuration;
+			ReplayData lastInputs;
+		};
+	#pragma pack(pop)
+
 		size_t _totalTime = 0;
 		std::deque<ReplayData> _inputs;
 		std::bitset<INPUT_NUMBER - 1> _keyStates;
@@ -36,6 +54,14 @@ namespace SpiralOfFate
 		std::vector<std::string> getKeyNames() const override;
 		bool hasData() const;
 		size_t getRemainingTime() const;
+
+		size_t getBufferSize() const;
+		void copyToBuffer(unsigned char *) const;
+		void restoreFromBuffer(unsigned char *);
+
+		size_t getBufferSizeLight() const;
+		void copyToBufferLight(unsigned char *) const;
+		void restoreFromBufferLight(unsigned char *);
 	};
 }
 

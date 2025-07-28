@@ -6,6 +6,7 @@
 #include <iostream>
 #include "RollbackMachine.hpp"
 #include "Resources/Game.hpp"
+#include "Utils.hpp"
 
 #define DIFF_TIME_NB_AVG 10
 #define MAX_SETBACK 1000LL
@@ -272,6 +273,9 @@ namespace SpiralOfFate
 		return result ? UPDATESTATUS_OK : UPDATESTATUS_GAME_ENDED;
 	}
 
+#define DATA_BEFORE 256
+#define DATA_AFTER 256
+#define EXTRA_SIZE (DATA_AFTER + DATA_BEFORE)
 	RollbackMachine::UpdateStatus RollbackMachine::syncTestUpdate(bool useP1Inputs, bool useP2Inputs)
 	{
 		//TODO: Use useP1Inputs, useP2Inputs and check the fake pause
@@ -281,15 +285,29 @@ namespace SpiralOfFate
 		unsigned int dataSizeBefore = game->battleMgr->getBufferSize();
 		unsigned int dataSizeAfter;
 		unsigned int dataSizeAfter2;
-		char *dataBefore = new char[dataSizeBefore];
-		char *dataAfter;
-		char *dataAfter2;
+		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> dataBefore = {
+			Utils::allocateManually(dataSizeBefore + EXTRA_SIZE),
+			&Utils::deallocateManually
+		};
+		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> dataAfter = {
+			nullptr, &Utils::deallocateManually
+		};
+		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> dataAfter2 = {
+			nullptr, &Utils::deallocateManually
+		};
 		int checksum1;
 		int checksum2;
 		auto lDur = this->inputLeft->_keyDuration;
 		auto rDur = this->inputRight->_keyDuration;
+		char garbageBefore[DATA_BEFORE];
+		char garbageAfter[DATA_AFTER];
 
-		game->battleMgr->copyToBuffer(dataBefore);
+		memset(garbageBefore, 0xDD, sizeof(garbageBefore));
+		memset(garbageAfter, 0xDD, sizeof(garbageAfter));
+		memset(&*dataBefore, 0xDD, dataSizeBefore + EXTRA_SIZE);
+		game->battleMgr->copyToBuffer(&*dataBefore + DATA_BEFORE);
+		assert_eq(memcmp(&*dataBefore + dataSizeBefore + DATA_AFTER, garbageAfter, DATA_AFTER), 0);
+		assert_eq(memcmp(&*dataBefore, garbageBefore, DATA_BEFORE), 0);
 		this->_realInputLeft->update();
 		for (int i = 0; i < INPUT_NUMBER - 1; ++i)
 			this->inputLeft->_keyStates[i] = this->_realInputLeft->isPressed(static_cast<InputEnum>(i));
@@ -297,52 +315,57 @@ namespace SpiralOfFate
 		for (int i = 0; i < INPUT_NUMBER - 1; ++i)
 			this->inputRight->_keyStates[i] = this->_realInputRight->isPressed(static_cast<InputEnum>(i));
 
+
 		auto result1 = game->battleMgr->update();
 		auto lDur2 = this->inputLeft->_keyDuration;
 		auto rDur2 = this->inputRight->_keyDuration;
 
 		dataSizeAfter = game->battleMgr->getBufferSize();
-		dataAfter = new char[dataSizeAfter];
-		memset(dataAfter, 0xCD, dataSizeAfter);
-		game->battleMgr->copyToBuffer(dataAfter);
-		checksum1 = _computeCheckSum((short *)dataAfter, dataSizeAfter / sizeof(short));
+		dataAfter.reset(Utils::allocateManually(dataSizeAfter + EXTRA_SIZE));
+		memset(garbageBefore, 0xCD, sizeof(garbageBefore));
+		memset(garbageAfter, 0xCD, sizeof(garbageAfter));
+		memset(&*dataAfter, 0xCD, dataSizeAfter + EXTRA_SIZE);
+		game->battleMgr->copyToBuffer(&*dataAfter + DATA_BEFORE);
+		assert_eq(memcmp(&*dataAfter + dataSizeAfter + DATA_AFTER, garbageAfter, DATA_AFTER), 0);
+		assert_eq(memcmp(&*dataAfter, garbageBefore, DATA_BEFORE), 0);
+		checksum1 = _computeCheckSum((short *)(&*dataAfter + DATA_BEFORE), dataSizeAfter / sizeof(short));
 
-		game->battleMgr->restoreFromBuffer(dataBefore);
+		game->battleMgr->restoreFromBuffer(&*dataBefore + DATA_BEFORE);
 		this->inputLeft->_keyDuration = lDur;
 		this->inputRight->_keyDuration = rDur;
 
 		auto result2 = game->battleMgr->update();
 
 		dataSizeAfter2 = game->battleMgr->getBufferSize();
-		dataAfter2 = new char[dataSizeAfter2];
-		memset(dataAfter2, 0xDC, dataSizeAfter2);
-		game->battleMgr->copyToBuffer(dataAfter2);
-		checksum2 = _computeCheckSum((short *)dataAfter2, dataSizeAfter2 / sizeof(short));
+		dataAfter2.reset(Utils::allocateManually(dataSizeAfter2 + EXTRA_SIZE));
+		memset(garbageBefore, 0xDC, sizeof(garbageBefore));
+		memset(garbageAfter, 0xDC, sizeof(garbageAfter));
+		memset(&*dataAfter2, 0xDC, dataSizeAfter2 + EXTRA_SIZE);
+		game->battleMgr->copyToBuffer(&*dataAfter2 + DATA_BEFORE);
+		assert_eq(memcmp(&*dataAfter2 + dataSizeAfter2 + DATA_AFTER, garbageAfter, DATA_AFTER), 0);
+		assert_eq(memcmp(&*dataAfter2, garbageBefore, DATA_BEFORE), 0);
+		checksum2 = _computeCheckSum((short *)(&*dataAfter2 + DATA_BEFORE), dataSizeAfter2 / sizeof(short));
 
 		if (checksum1 != checksum2) {
 			game->logger.fatal("RollbackMachine::debugRollback: Checksum mismatch");
-			game->logger.fatal("Old checksum: " + std::to_string(checksum1) + " vs new checksum: " + std::to_string(checksum2));
+			game->logger.fatal("Old checksum: 0x" + Utils::toHex(checksum1) + " vs new checksum: 0x" + Utils::toHex(checksum2));
 			if (dataSizeAfter != dataSizeAfter2)
 				game->logger.fatal("Old data size: " + std::to_string(dataSizeAfter) + " vs new data size: " + std::to_string(dataSizeAfter2));
-			else
-				for (size_t i = 0; i < dataSizeAfter; i++)
-					if (((char *)dataAfter)[i] != ((char *)dataAfter2)[i])
-						game->logger.fatal("Old data at index " + std::to_string(i) + ": " + std::to_string(((char *)dataAfter)[i]) + " vs new data at index " + std::to_string(i) + ": " + std::to_string(((char *)dataAfter2)[i]));
-			game->battleMgr->logDifference(dataAfter, dataAfter2);
-			delete[] dataBefore;
-			delete[] dataAfter;
-			delete[] dataAfter2;
+			else for (size_t i = DATA_BEFORE; i < dataSizeAfter; i++)
+				if (((char *)&*dataAfter)[i] != ((char *)&*dataAfter2)[i])
+					game->logger.fatal(
+						"Old data at index " + std::to_string(i - DATA_BEFORE) + ": 0x" + Utils::toHex((&*dataAfter)[i]) + " vs "
+						"New data at index " + std::to_string(i - DATA_BEFORE) + ": 0x" + Utils::toHex((&*dataAfter2)[i])
+					);
+			game->battleMgr->logDifference(&*dataAfter + DATA_BEFORE, &*dataAfter2 + DATA_BEFORE);
 			throw AssertionFailedExceptionMsg(
 				"checksum1 == checksum2",
-				std::to_string(checksum1) + " != " + std::to_string(checksum2)
+				Utils::toHex(checksum1) + " != " + Utils::toHex(checksum2)
 			);
 		}
 		assert_exp(result1 == result2);
 		assert_exp(lDur2 == this->inputLeft->_keyDuration);
 		assert_exp(rDur2 == this->inputRight->_keyDuration);
-		delete[] dataBefore;
-		delete[] dataAfter;
-		delete[] dataAfter2;
 		return result1 ? UPDATESTATUS_OK : UPDATESTATUS_GAME_ENDED;
 	}
 

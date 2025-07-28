@@ -2,6 +2,7 @@
 // Created by PinkySmile on 26/02/23.
 //
 
+#include "Utils.hpp"
 #include "VictoriaStar.hpp"
 #include "Resources/Game.hpp"
 #include "Objects/Characters/VictoriaStar/Shadow.hpp"
@@ -112,7 +113,7 @@ namespace SpiralOfFate
 		size_t i;
 
 		Character::copyToBuffer(data);
-		game->logger.verbose("Saving VictoriaStar (Data size: " + std::to_string(sizeof(Data)) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving VictoriaStar (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->_hitShadow = this->_hitShadow;
 		dat->_stacks = this->_stacks;
 		dat->_stacksTimer = this->_stacksTimer;
@@ -143,7 +144,7 @@ namespace SpiralOfFate
 			this->_shadows[i].first = dat->_shadows[i];
 			this->_shadows[i].second.reset();
 		}
-		game->logger.verbose("Restored VictoriaStar @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored VictoriaStar @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	size_t VictoriaStar::printDifference(const char *msgStart, void *data1, void *data2, unsigned startOffset) const

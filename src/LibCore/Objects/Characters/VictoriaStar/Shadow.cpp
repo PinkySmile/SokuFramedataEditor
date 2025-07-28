@@ -2,6 +2,7 @@
 // Created by PinkySmile on 29/03/23.
 //
 
+#include "Utils.hpp"
 #include "Shadow.hpp"
 #include "Resources/Game.hpp"
 
@@ -98,7 +99,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Object::getBufferSize());
 
 		Object::copyToBuffer(data);
-		game->logger.verbose("Saving Shadow (Data size: " + std::to_string(sizeof(Data)) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving Shadow (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->_killedByOwner = this->_killedByOwner;
 		dat->_invincibleTime = this->_invincibleTime;
 		dat->_boxSize = this->_boxSize;
@@ -117,7 +118,7 @@ namespace SpiralOfFate
 		this->_loopInfo = dat->_loopInfo;
 		this->_idleCounter = dat->_idleCounter;
 		this->_killedByOwner = dat->_killedByOwner;
-		game->logger.verbose("Restored Shadow @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored Shadow @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	size_t Shadow::printDifference(const char *msgStart, void *data1, void *data2, unsigned startOffset) const

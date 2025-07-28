@@ -11,6 +11,9 @@
 
 namespace SpiralOfFate
 {
+	// FIXME: Create a forward header with all classes' forward declarations
+	class ReplayInput;
+
 	class ReplayInGame : public PracticeInGame {
 	protected:
 		constexpr static const char *_menuStrings[] = {
@@ -28,7 +31,9 @@ namespace SpiralOfFate
 
 		Character *_chr;
 		size_t _startTime = 0;
-		std::vector<unsigned char *> _savedFrames;
+		class ReplayInput *_p1;
+		class ReplayInput *_p2;
+		std::vector<std::unique_ptr<unsigned char *, decltype(&free)>> _savedFrames;
 
 		void _pauseUpdate() override;
 		void _practiceUpdate() override;
@@ -36,6 +41,11 @@ namespace SpiralOfFate
 		bool _pauseConfirm() override;
 		void _practiceRender() const override;
 		bool _practiceConfirm() override;
+		unsigned char *_serializeState();
+
+		void _saveState() override;
+
+		void _restoreState(unsigned char *buffer) override;
 
 	public:
 		struct Arguments : public InGame::Arguments {

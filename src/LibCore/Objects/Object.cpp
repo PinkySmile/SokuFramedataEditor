@@ -2,6 +2,7 @@
 // Created by PinkySmile on 18/09/2021.
 //
 
+#include "Utils.hpp"
 #include "Object.hpp"
 #include "Resources/Game.hpp"
 #include "Logger.hpp"
@@ -114,7 +115,7 @@ namespace SpiralOfFate
 
 	Object::Object()
 	{
-		this->_fdCache.setSlave();
+		//this->_fdCache.setSlave();
 	}
 
 	void Object::_render(Vector2f spritePos, Vector2f scale) const
@@ -597,7 +598,7 @@ namespace SpiralOfFate
 
 		//TODO: The cache shouldn't need to be saved. There definitely is something wrong here...
 		this->_fdCache.copyToBuffer(data);
-		game->logger.verbose("Saving Object (Data size: " + std::to_string(sizeof(Data)) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving Object (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->_position = this->_position;
 		dat->_speed = this->_speed;
 		dat->_gravity = this->_gravity;
@@ -647,7 +648,7 @@ namespace SpiralOfFate
 		this->_fadeTimer = dat->_fadeTimer;
 		this->_fadeTimerMax = dat->_fadeTimerMax;
 		this->_fadeDir = dat->_fadeDir;
-		game->logger.verbose("Restored Object @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored Object @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	unsigned int Object::getClassId() const

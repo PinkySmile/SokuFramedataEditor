@@ -7,6 +7,7 @@
 #include "Resources/Battle/PracticeBattleManager.hpp"
 #include "Objects/Characters/CharacterParams.hpp"
 #include "Objects/Characters/Projectile.hpp"
+#include "Utils.hpp"
 
 #define SPECIAL_INSTALL_COST 300
 
@@ -117,7 +118,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Character::getBufferSize());
 
 		Character::copyToBuffer(data);
-		game->logger.verbose("Saving Stickman (Data size: " + std::to_string(sizeof(Data)) + ") @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Saving Stickman (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
 		dat->_time = this->_time;
 		dat->_oldAction = this->_oldAction;
 		dat->_hasBuff = this->_hasBuff;
@@ -132,7 +133,7 @@ namespace SpiralOfFate
 		this->_time = dat->_time;
 		this->_oldAction = dat->_oldAction;
 		this->_hasBuff = dat->_hasBuff;
-		game->logger.verbose("Restored Stickman @" + std::to_string((uintptr_t)dat));
+		game->logger.verbose("Restored Stickman @" + Utils::toHex((uintptr_t)dat));
 	}
 
 	void Stickman::onMatchEnd()
