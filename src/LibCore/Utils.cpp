@@ -29,106 +29,129 @@
 #undef min
 #endif
 
-namespace SpiralOfFate::Utils
+namespace SpiralOfFate::Utils::Z
 {
-	namespace Z
+	static constexpr long int CHUNK = {16384};
+
+	int compress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level)
 	{
-		static constexpr long int CHUNK = {16384};
+		int ret;
+		unsigned have;
+		z_stream strm;
+		unsigned char out[CHUNK];
 
-		int compress(unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level)
-		{
-			int ret;
-			unsigned have;
-			z_stream strm;
-			unsigned char out[CHUNK];
+		outBuffer.clear();
+		strm.zalloc = Z_NULL;
+		strm.zfree = Z_NULL;
+		strm.opaque = Z_NULL;
+		ret = deflateInit(&strm, level);
+		if (ret != Z_OK)
+			return ret;
 
-			outBuffer.clear();
-			strm.zalloc = Z_NULL;
-			strm.zfree = Z_NULL;
-			strm.opaque = Z_NULL;
-			ret = deflateInit(&strm, level);
-			if (ret != Z_OK)
-				return ret;
+		strm.avail_in = size;
+		strm.next_in = inBuffer;
+		do {
+			strm.avail_out = CHUNK;
+			strm.next_out = out;
+			ret = deflate(&strm, Z_FINISH);    /* anyone error value */
+			assert_exp(ret != Z_STREAM_ERROR);
+			have = CHUNK - strm.avail_out;
+			outBuffer.insert(outBuffer.end(), out, out + have);
+		} while (strm.avail_out == 0);
+		assert_exp(strm.avail_in == 0);
+		assert_exp(ret == Z_STREAM_END);
+		deflateEnd(&strm);
+		return Z_OK;
+	}
 
-			strm.avail_in = size;
-			strm.next_in = inBuffer;
-			do {
-				strm.avail_out = CHUNK;
-				strm.next_out = out;
-				ret = deflate(&strm, Z_FINISH);    /* anyone error value */
-				assert_exp(ret != Z_STREAM_ERROR);
-				have = CHUNK - strm.avail_out;
-				outBuffer.insert(outBuffer.end(), out, out + have);
-			} while (strm.avail_out == 0);
-			assert_exp(strm.avail_in == 0);
-			assert_exp(ret == Z_STREAM_END);
-			deflateEnd(&strm);
-			return Z_OK;
-		}
+	int decompress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer)
+	{
+		int ret;
+		unsigned have;
+		z_stream strm;
+		unsigned char out[CHUNK];
 
-		int decompress(unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer)
-		{
-			int ret;
-			unsigned have;
-			z_stream strm;
-			unsigned char out[CHUNK];
+		strm.zalloc = Z_NULL;
+		strm.zfree = Z_NULL;
+		strm.opaque = Z_NULL;
+		strm.avail_in = 0;
+		strm.next_in = Z_NULL;
+		ret = inflateInit(&strm);
+		if (ret != Z_OK)
+			return ret;
 
-			strm.zalloc = Z_NULL;
-			strm.zfree = Z_NULL;
-			strm.opaque = Z_NULL;
-			strm.avail_in = 0;
-			strm.next_in = Z_NULL;
-			ret = inflateInit(&strm);
-			if (ret != Z_OK)
-				return ret;
+		strm.avail_in = size;
+		strm.next_in = inBuffer;
 
-			strm.avail_in = size;
-			strm.next_in = inBuffer;
-
-			do {
-				strm.avail_out = CHUNK;
-				strm.next_out = out;
-				ret = inflate(&strm, Z_NO_FLUSH);
-				assert_exp(ret != Z_STREAM_ERROR);
-				switch (ret) {
-				case Z_NEED_DICT:
-					ret = Z_DATA_ERROR;
-				// FALLTHROUGH
-				case Z_DATA_ERROR:
-				case Z_MEM_ERROR:
-					inflateEnd(&strm);
-					return ret;
-				}
-				have = CHUNK - strm.avail_out;
-				outBuffer.insert(outBuffer.end(), out, out + have);
-			} while (strm.avail_out == 0);
-			assert_exp(ret == Z_STREAM_END);
-
-			inflateEnd(&strm);
-			return Z_OK;
-		}
-
-		std::string error(int ret)
-		{
+		do {
+			strm.avail_out = CHUNK;
+			strm.next_out = out;
+			ret = inflate(&strm, Z_NO_FLUSH);
+			assert_exp(ret != Z_STREAM_ERROR);
 			switch (ret) {
-			case Z_ERRNO:
-				if (ferror(stdin))
-					return "Error reading from stdin.";
-				else if (ferror(stdout))
-					return "Error writing ro stdout.";
-				return "Errno error";
-			case Z_STREAM_ERROR:
-				return "Invalid compression level.";
+			case Z_NEED_DICT:
+				ret = Z_DATA_ERROR;
+				// FALLTHROUGH
 			case Z_DATA_ERROR:
-				return "Empty data, invalid or incomplete.";
 			case Z_MEM_ERROR:
-				return "No memory.";
-			case Z_VERSION_ERROR:
-				return "zlib version is incompatible.";
+				inflateEnd(&strm);
+				return ret;
+			default:
+				have = CHUNK - strm.avail_out;
+				outBuffer.insert(outBuffer.end(), out, out + have);
 			}
+		} while (strm.avail_out == 0);
+		assert_exp(ret == Z_STREAM_END);
+
+		inflateEnd(&strm);
+		return Z_OK;
+	}
+
+	std::vector<unsigned char> compress(const std::vector<unsigned char> &buffer, int level)
+	{
+		std::vector<unsigned char> result;
+		int ret = compress(buffer.data(), buffer.size(), result, level);
+
+		if (ret != Z_OK)
+			throw std::runtime_error(error(ret));
+		return result;
+	}
+
+	std::vector<unsigned char> decompress(const std::vector<unsigned char> &buffer)
+	{
+		std::vector<unsigned char> result;
+		int ret = decompress(buffer.data(), buffer.size(), result);
+
+		if (ret != Z_OK)
+			throw std::runtime_error(error(ret));
+		return result;
+	}
+
+	std::string error(int ret)
+	{
+		switch (ret) {
+		case Z_ERRNO:
+			if (ferror(stdin))
+				return "Error reading from stdin.";
+			else if (ferror(stdout))
+				return "Error writing ro stdout.";
+			return "Errno error";
+		case Z_STREAM_ERROR:
+			return "Invalid compression level.";
+		case Z_DATA_ERROR:
+			return "Empty data, invalid or incomplete.";
+		case Z_MEM_ERROR:
+			return "No memory.";
+		case Z_VERSION_ERROR:
+			return "zlib version is incompatible.";
+		default:
 			return "Unknown error " + std::to_string(ret);
 		}
 	}
+}
+
+namespace SpiralOfFate::Utils
+{
 	static const std::unordered_map<std::string, std::string> _icons{
 		{"folder", "assets/icons/folder.png"     },
 		{".rar",   "assets/icons/archive.png"    },

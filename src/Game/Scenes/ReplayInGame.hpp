@@ -33,7 +33,7 @@ namespace SpiralOfFate
 		size_t _startTime = 0;
 		class ReplayInput *_p1;
 		class ReplayInput *_p2;
-		std::vector<std::unique_ptr<unsigned char *, decltype(&free)>> _savedFrames;
+		std::vector<std::vector<unsigned char>> _savedFrames;
 
 		void _pauseUpdate() override;
 		void _practiceUpdate() override;
@@ -41,10 +41,7 @@ namespace SpiralOfFate
 		bool _pauseConfirm() override;
 		void _practiceRender() const override;
 		bool _practiceConfirm() override;
-		unsigned char *_serializeState();
-
-		void _saveState() override;
-
+		std::vector<unsigned char> _saveState() override;
 		void _restoreState(unsigned char *buffer) override;
 
 	public:

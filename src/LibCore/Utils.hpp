@@ -33,17 +33,15 @@
 #define MB_ICONWARNING 0x30
 #endif
 
-#ifdef __GNUG__
-#define COALESCE(ptr1, ptr2) ((ptr1) ?: (ptr2))
-#else
-#define COALESCE(ptr1, ptr2) ((ptr1) ? (ptr1) : (ptr2))
-#endif
+#define COALESCE(ptr1, ptr2) ((ptr1) ? *(ptr1) : (ptr2))
 
 namespace SpiralOfFate::Utils
 {
 	namespace Z {
-		int compress(unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level);
-		int decompress(unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer);
+		std::vector<unsigned char> compress(const std::vector<unsigned char> &buffer, int level);
+		std::vector<unsigned char> decompress(const std::vector<unsigned char> &buffer);
+		int compress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level);
+		int decompress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer);
 		std::string error(int ret);
 	}
 

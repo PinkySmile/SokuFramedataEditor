@@ -17,12 +17,8 @@ namespace SpiralOfFate
 		float _time = 0;
 		bool _step = false;
 		bool _next = false;
-		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> _startingState = {
-			nullptr, &Utils::deallocateManually
-		};
-		std::unique_ptr<unsigned char, decltype(&Utils::deallocateManually)> _savedState = {
-			nullptr, &Utils::deallocateManually
-		};
+		std::vector<unsigned char> _startingState;
+		std::optional<std::vector<unsigned char>> _savedState;
 		unsigned char _speed = 60;
 
 		class PracticeBattleManager *_manager;
@@ -74,7 +70,7 @@ namespace SpiralOfFate
 		virtual void _practiceUpdate();
 		virtual bool _practiceConfirm();
 
-		virtual void _saveState();
+		virtual std::vector<unsigned char> _saveState();
 		virtual void _restoreState(unsigned char *buffer);
 
 	public:

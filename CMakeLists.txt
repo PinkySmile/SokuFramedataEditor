@@ -3,7 +3,7 @@ project(SoFGV CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_compile_definitions(_USE_MATH_DEFINES)
+add_compile_definitions(_USE_MATH_DEFINES ZLIB_CONST)
 
 if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
 	set(USE_SDL2 ON)

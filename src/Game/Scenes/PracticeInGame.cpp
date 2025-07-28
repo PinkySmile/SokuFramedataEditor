@@ -43,10 +43,8 @@ namespace SpiralOfFate
 			BattleManager::CharacterParams{ true,  leftChr,  licon, lJson },
 			BattleManager::CharacterParams{ false, rightChr, ricon, rJson }
 		);
-		if (saveState) {
-			this->_startingState.reset(Utils::allocateManually(this->_manager->getBufferSize()));
-			this->_manager->copyToBuffer(&*this->_startingState);
-		}
+		if (saveState)
+			this->_startingState = this->PracticeInGame::_saveState();
 		game->battleMgr.reset(this->_manager);
 		game->logger.debug("Practice session started");
 	}
@@ -510,10 +508,13 @@ namespace SpiralOfFate
 		);
 	}
 
-	void PracticeInGame::_saveState()
+	std::vector<unsigned char> PracticeInGame::_saveState()
 	{
-		this->_savedState.reset(Utils::allocateManually(this->_manager->getBufferSize()));
-		this->_manager->copyToBuffer(&*this->_savedState);
+		std::vector<unsigned char> result;
+
+		result.resize(this->_manager->getBufferSize());
+		this->_manager->copyToBuffer(result.data());
+		return result;
 	}
 
 	void PracticeInGame::_restoreState(unsigned char *buffer)
@@ -537,11 +538,11 @@ namespace SpiralOfFate
 			if (e->code == sf::Keyboard::Key::F10)
 				this->_speed++;
 			if (e->code == sf::Keyboard::Key::F8)
-				this->_restoreState(&*COALESCE(this->_savedState, this->_startingState));
+				this->_restoreState(COALESCE(this->_savedState, this->_startingState).data());
 			if (e->code == sf::Keyboard::Key::F7)
-				this->_saveState();
+				this->_savedState = this->_saveState();
 			if (e->code == sf::Keyboard::Key::F6)
-				this->_restoreState(&*this->_startingState);
+				this->_restoreState(this->_startingState.data());
 		}
 	}
 }

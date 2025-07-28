@@ -19,7 +19,7 @@ namespace SpiralOfFate
 		this->_startTime = frameCount;
 		this->_p1 = reinterpret_cast<ReplayInput *>(&*leftChr->getInput());
 		this->_p2 = reinterpret_cast<ReplayInput *>(&*rightChr->getInput());
-		this->_startingState.reset(this->_serializeState());
+		this->_startingState = this->ReplayInGame::_saveState();
 	}
 
 	void ReplayInGame::consumeEvent(const sf::Event &event)
@@ -35,14 +35,17 @@ namespace SpiralOfFate
 		game->P1.second->consumeEvent(event);
 	}
 
-	unsigned char *ReplayInGame::_serializeState()
+	std::vector<unsigned char> ReplayInGame::_saveState()
 	{
 		size_t mSize = this->_manager->getBufferSize();
 		size_t p1Size = this->_p1->getBufferSize();
 		size_t p2Size = this->_p2->getBufferSize();
 		size_t size = mSize + p1Size + p2Size;
-		auto buffer = Utils::allocateManually(size);
-		unsigned char *ptr = buffer;
+		std::vector<unsigned char> buffer;
+
+		buffer.resize(size);
+
+		unsigned char *ptr = buffer.data();
 
 		game->logger.info("Saving ReplayInGame state: " + std::to_string(size) + " bytes total (" + std::to_string(mSize) + " + " + std::to_string(p1Size) + " + " + std::to_string(p2Size) + ")");
 		this->_manager->copyToBuffer(ptr);
@@ -51,11 +54,6 @@ namespace SpiralOfFate
 		ptr += p1Size;
 		this->_p2->copyToBuffer(ptr);
 		return buffer;
-	}
-
-	void ReplayInGame::_saveState()
-	{
-		this->_savedState.reset(this->_serializeState());
 	}
 
 	void ReplayInGame::_restoreState(unsigned char *buffer)
@@ -72,34 +70,28 @@ namespace SpiralOfFate
 		if (this->_paused != 3 && this->_practice)
 			return this->_practiceUpdate();
 
-		auto relevent = game->P1.first->getInputs();
-		auto other = game->P1.second->getInputs();
+		auto keyboard = game->P1.first->getInputs();
+		auto controller = game->P1.second->getInputs();
 
-		if (std::abs(((int *)&relevent)[0]) < std::abs(((int *)&other)[0]))
-			((int *)&relevent)[0] = ((int *)&other)[0];
-		if (std::abs(((int *)&relevent)[1]) < std::abs(((int *)&other)[1]))
-			((int *)&relevent)[1] = ((int *)&other)[1];
-		for (size_t i = 2; i < sizeof(relevent) / sizeof(int); i++)
-			((int *)&relevent)[i] = std::max(((int *)&relevent)[i], ((int *)&other)[i]);
-
+		Utils::mergeInputs(keyboard, controller);
 		if (this->_paused == 3) {
 			this->_paused = 0;
 			return;
 		}
-		if (relevent.pause == 1 || relevent.s == 1) {
+		if (keyboard.pause == 1 || keyboard.s == 1) {
 			this->_pauseCursor = 0;
 			this->_paused = 3;
 			return;
 		}
-		if (relevent.verticalAxis == 1 || (relevent.verticalAxis >= 36 && relevent.verticalAxis % 6 == 0)) {
+		if (keyboard.verticalAxis == 1 || (keyboard.verticalAxis >= 36 && keyboard.verticalAxis % 6 == 0)) {
 			this->_pauseCursor += sizeof(InGame::_menuStrings) / sizeof(*InGame::_menuStrings);
 			this->_pauseCursor--;
 			this->_pauseCursor %= sizeof(InGame::_menuStrings) / sizeof(*InGame::_menuStrings);
-		} else if (relevent.verticalAxis == -1 || (relevent.verticalAxis <= -36 && relevent.verticalAxis % 6 == 0)) {
+		} else if (keyboard.verticalAxis == -1 || (keyboard.verticalAxis <= -36 && keyboard.verticalAxis % 6 == 0)) {
 			this->_pauseCursor++;
 			this->_pauseCursor %= sizeof(InGame::_menuStrings) / sizeof(*InGame::_menuStrings);
 		}
-		if (relevent.n == 1 && this->_pauseConfirm()) {
+		if (keyboard.n == 1 && this->_pauseConfirm()) {
 			this->_pauseCursor = 0;
 			this->_paused = 3;
 		}
@@ -107,29 +99,23 @@ namespace SpiralOfFate
 
 	void ReplayInGame::_practiceUpdate()
 	{
-		auto relevent = game->P1.first->getInputs();
-		auto other = game->P1.second->getInputs();
+		auto keyboard = game->P1.first->getInputs();
+		auto controller = game->P1.second->getInputs();
 
-		if (std::abs(((int *)&relevent)[0]) < std::abs(((int *)&other)[0]))
-			((int *)&relevent)[0] = ((int *)&other)[0];
-		if (std::abs(((int *)&relevent)[1]) < std::abs(((int *)&other)[1]))
-			((int *)&relevent)[1] = ((int *)&other)[1];
-		for (size_t i = 2; i < sizeof(relevent) / sizeof(int); i++)
-			((int *)&relevent)[i] = std::max(((int *)&relevent)[i], ((int *)&other)[i]);
-
-		if (relevent.pause == 1 || relevent.s == 1) {
+		Utils::mergeInputs(keyboard, controller);
+		if (keyboard.pause == 1 || keyboard.s == 1) {
 			this->_practice = false;
 			return;
 		}
-		if (relevent.verticalAxis == 1 || (relevent.verticalAxis >= 36 && relevent.verticalAxis % 6 == 0)) {
+		if (keyboard.verticalAxis == 1 || (keyboard.verticalAxis >= 36 && keyboard.verticalAxis % 6 == 0)) {
 			this->_practiceCursor += std::size(ReplayInGame::_practiceMenuStrings);
 			this->_practiceCursor--;
 			this->_practiceCursor %= std::size(ReplayInGame::_practiceMenuStrings);
-		} else if (relevent.verticalAxis == -1 || (relevent.verticalAxis <= -36 && relevent.verticalAxis % 6 == 0)) {
+		} else if (keyboard.verticalAxis == -1 || (keyboard.verticalAxis <= -36 && keyboard.verticalAxis % 6 == 0)) {
 			this->_practiceCursor++;
 			this->_practiceCursor %= std::size(ReplayInGame::_practiceMenuStrings);
 		}
-		if (relevent.n == 1)
+		if (keyboard.n == 1)
 			this->_practiceConfirm();
 	}
 
@@ -146,32 +132,53 @@ namespace SpiralOfFate
 			this->_moveListUpdate(keyboard);
 			return;
 		}
-		if (!this->_paused) {
-			if (this->_step && !this->_next)
-				return;
-			this->_next = false;
+		if (this->_paused)
+			return this->_pauseUpdate();
+		if (this->_step && !this->_next)
+			return;
+		this->_next = false;
 
-			auto linput = game->battleMgr->getLeftCharacter()->getInput();
-			auto rinput = game->battleMgr->getRightCharacter()->getInput();
+		auto linput = game->battleMgr->getLeftCharacter()->getInput();
+		auto rinput = game->battleMgr->getRightCharacter()->getInput();
 
-			if (
-				game->P1.first->isPressed(INPUT_PAUSE) ||
-				game->P1.second->isPressed(INPUT_PAUSE) ||
-				(!this->_p1->hasData() && !this->_p2->hasData())
-			) {
-				this->_paused = 1;
-				return;
-			}
+		if (
+			game->P1.first->isPressed(INPUT_PAUSE) ||
+			game->P1.second->isPressed(INPUT_PAUSE) ||
+			(!this->_p1->hasData() && !this->_p2->hasData())
+		) {
+			this->_paused = 1;
+			return;
+		}
+
+		if (game->P1.first->isPressed(INPUT_RIGHT)) {
+			if (this->_savedFrames.size() <= this->_manager->getCurrentFrame())
+				// TODO: Z-compress the state if it ends up being too big
+				this->_savedFrames.push_back(this->_saveState());
 			if (!game->battleMgr->update()) {
 				this->_paused = 1;
 				return;
 			}
-			if (linput->getInputs().pause == 1)
+		}
+		if (game->P1.first->isPressed(INPUT_LEFT)) {
+			auto update = this->_manager->getCurrentFrame() > 1;
+
+			if (this->_manager->getCurrentFrame() > 1) {
+				this->_restoreState(this->_savedFrames[this->_manager->getCurrentFrame() - 2].data());
+				if (update && !game->battleMgr->update()) {
+					this->_paused = 1;
+					return;
+				}
+			} else
+				this->_restoreState(this->_startingState.data());
+		} else {
+			if (this->_savedFrames.size() <= this->_manager->getCurrentFrame())
+				// TODO: Z-compress the state if it ends up being too big
+				this->_savedFrames.push_back(this->_saveState());
+			if (!game->battleMgr->update()) {
 				this->_paused = 1;
-			else if (rinput->getInputs().pause == 1)
-				this->_paused = 2;
-		} else
-			this->_pauseUpdate();
+				return;
+			}
+		}
 	}
 
 	void ReplayInGame::render() const
@@ -203,7 +210,7 @@ namespace SpiralOfFate
 		game->screen->displayElement({340 - 50 + STAGE_X_MIN, 240 - 600, 400, 175}, sf::Color{0x50, 0x50, 0x50, 0xC0});
 
 		bool end = !reinterpret_cast<ReplayInput *>(&*this->_manager->getLeftCharacter()->getInput())->hasData() &&
-			   !reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput())->hasData();
+		           !reinterpret_cast<ReplayInput *>(&*this->_manager->getRightCharacter()->getInput())->hasData();
 
 		game->screen->textSize(20);
 		game->screen->fillColor(sf::Color::White);
