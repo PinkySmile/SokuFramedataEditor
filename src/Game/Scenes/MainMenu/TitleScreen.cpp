@@ -1048,7 +1048,7 @@ namespace SpiralOfFate
 		unsigned magic = 0;
 		unsigned frameCount;
 		unsigned expectedMagic = getMagic();
-		RandomWrapper::SerializedWrapper random;
+		uint32_t random;
 
 		if (!stream)
 			throw std::invalid_argument("Cannot load " + path.string() + ": " + strerror(errno));
@@ -1108,7 +1108,7 @@ namespace SpiralOfFate
 		auto args = new ReplayInGame::Arguments{};
 
 		args->frameCount = frameCount;
-		args->params.seed = random.seed;
+		args->params.seed = random;
 		args->params.p1chr = P1pos;
 		args->params.p1pal = P1palette;
 		args->params.p2chr = P2pos;
