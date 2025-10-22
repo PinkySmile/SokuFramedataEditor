@@ -17,6 +17,7 @@
 	"menu_item.file.save":             "Enregister",
 	"menu_item.file.save_as":          "Enregister sous",
 	"menu_item.file.settings":         "Paramètres",
+	"menu_item.file.shortcuts":        "Modifier les raccourcis",
 	"menu_item.file.quit":             "Quitter",
 	"menu_item.edit":                  "Édition",
 	"menu_item.edit.undo":             "Défaire",

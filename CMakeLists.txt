@@ -219,15 +219,18 @@ else ()
 endif ()
 
 if (WIN32)
-	set(GICON src/Game/game.rc)
-	set(FDICON src/FrameDataEditor/fdeditor.rc)
+	set(CRES src/LibCore/version.rc)
+	set(GICON src/Game/game.rc src/Game/version.rc)
+	set(FDICON src/FrameDataEditor/fdeditor.rc src/FrameDataEditor/version.rc)
 else()
+	set(CRES)
 	set(GICON)
 	set(FDICON)
 endif()
 
 add_library(
 	SoFGVCore SHARED
+	${CRES}
 	src/LibCore/Data/Vector.hpp
 	src/LibCore/Inputs/DelayInput.cpp
 	src/LibCore/Inputs/DelayInput.hpp

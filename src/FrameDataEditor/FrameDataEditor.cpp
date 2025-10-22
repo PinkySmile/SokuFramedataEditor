@@ -35,6 +35,28 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 
 	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
+	this->_shortcutsNames["menu_item.file.new"]           = { .code = sf::Keyboard::Key::N,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.load"]          = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.save"]          = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.save_as"]       = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	// this->_shortcutsNames["menu_item.file.settings"]      = { .code = sf::Keyboard::Key::LAlt, .alt = false, .control = false, .shift = false, .meta = false };
+	// this->_shortcutsNames["menu_item.file.shortcuts"]     = { .code = sf::Keyboard::Key::LAlt, .alt = false, .control = false, .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.quit"]          = { .code = sf::Keyboard::Key::Q,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.undo"]          = { .code = sf::Keyboard::Key::Z,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.redo"]          = { .code = sf::Keyboard::Key::Y,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.frame"]          = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.frame_end"]      = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.new.block"]          = { .code = sf::Keyboard::Key::B,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.action"]         = { .code = sf::Keyboard::Key::A,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.hurt_box"]       = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.hit_box"]        = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.remove.frame"]       = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.remove.block"]       = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.remove.action"]      = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = true, .meta = true };
+	this->_shortcutsNames["menu_item.misc.copy_box_last"] = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true, .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.copy_box_next"] = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true, .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.flatten"]       = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true, .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.reload"]        = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true, .shift = true, .meta = false };
 	this->_menuHierarchy = menu->getMenus();
 	this->setLocale(this->_locale);
 	Utils::setRenderer(game->gui);
@@ -98,47 +120,412 @@ std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
 	return it->second;
 }
 
+std::string SpiralOfFate::FrameDataEditor::_shortcutToString(const SpiralOfFate::FrameDataEditor::Shortcut &s)
+{
+	std::string result;
+
+	switch (s.code) {
+	case sf::Keyboard::Key::A:
+		result = "A";
+		break;
+	case sf::Keyboard::Key::B:
+		result = "B";
+		break;
+	case sf::Keyboard::Key::C:
+		result = "C";
+		break;
+	case sf::Keyboard::Key::D:
+		result = "D";
+		break;
+	case sf::Keyboard::Key::E:
+		result = "E";
+		break;
+	case sf::Keyboard::Key::F:
+		result = "F";
+		break;
+	case sf::Keyboard::Key::G:
+		result = "G";
+		break;
+	case sf::Keyboard::Key::H:
+		result = "H";
+		break;
+	case sf::Keyboard::Key::I:
+		result = "I";
+		break;
+	case sf::Keyboard::Key::J:
+		result = "J";
+		break;
+	case sf::Keyboard::Key::K:
+		result = "K";
+		break;
+	case sf::Keyboard::Key::L:
+		result = "L";
+		break;
+	case sf::Keyboard::Key::M:
+		result = "M";
+		break;
+	case sf::Keyboard::Key::N:
+		result = "N";
+		break;
+	case sf::Keyboard::Key::O:
+		result = "O";
+		break;
+	case sf::Keyboard::Key::P:
+		result = "P";
+		break;
+	case sf::Keyboard::Key::Q:
+		result = "Q";
+		break;
+	case sf::Keyboard::Key::R:
+		result = "R";
+		break;
+	case sf::Keyboard::Key::S:
+		result = "S";
+		break;
+	case sf::Keyboard::Key::T:
+		result = "T";
+		break;
+	case sf::Keyboard::Key::U:
+		result = "U";
+		break;
+	case sf::Keyboard::Key::V:
+		result = "V";
+		break;
+	case sf::Keyboard::Key::W:
+		result = "W";
+		break;
+	case sf::Keyboard::Key::X:
+		result = "X";
+		break;
+	case sf::Keyboard::Key::Y:
+		result = "Y";
+		break;
+	case sf::Keyboard::Key::Z:
+		result = "Z";
+		break;
+	case sf::Keyboard::Key::Num0:
+		result = "0";
+		break;
+	case sf::Keyboard::Key::Num1:
+		result = "1";
+		break;
+	case sf::Keyboard::Key::Num2:
+		result = "2";
+		break;
+	case sf::Keyboard::Key::Num3:
+		result = "3";
+		break;
+	case sf::Keyboard::Key::Num4:
+		result = "4";
+		break;
+	case sf::Keyboard::Key::Num5:
+		result = "5";
+		break;
+	case sf::Keyboard::Key::Num6:
+		result = "6";
+		break;
+	case sf::Keyboard::Key::Num7:
+		result = "7";
+		break;
+	case sf::Keyboard::Key::Num8:
+		result = "8";
+		break;
+	case sf::Keyboard::Key::Num9:
+		result = "9";
+		break;
+	case sf::Keyboard::Key::Escape:
+		result = "Esc";
+		break;
+	case sf::Keyboard::Key::LControl:
+		result = "LCtrl";
+		break;
+	case sf::Keyboard::Key::LShift:
+		result = "LShift";
+		break;
+	case sf::Keyboard::Key::LAlt:
+		result = "LAlt";
+		break;
+	case sf::Keyboard::Key::LSystem:
+		result = "LMeta";
+		break;
+	case sf::Keyboard::Key::RControl:
+		result = "RCtrl";
+		break;
+	case sf::Keyboard::Key::RShift:
+		result = "RShift";
+		break;
+	case sf::Keyboard::Key::RAlt:
+		result = "RAlt";
+		break;
+	case sf::Keyboard::Key::RSystem:
+		result = "RMeta";
+		break;
+	case sf::Keyboard::Key::Menu:
+		result = "Menu";
+		break;
+	case sf::Keyboard::Key::LBracket:
+		result = "[";
+		break;
+	case sf::Keyboard::Key::RBracket:
+		result = "]";
+		break;
+	case sf::Keyboard::Key::Semicolon:
+		result = ";";
+		break;
+	case sf::Keyboard::Key::Comma:
+		result = ",";
+		break;
+	case sf::Keyboard::Key::Period:
+		result = ".";
+		break;
+	case sf::Keyboard::Key::Apostrophe:
+		result = "'";
+		break;
+	case sf::Keyboard::Key::Slash:
+		result = "/";
+		break;
+	case sf::Keyboard::Key::Backslash:
+		result = "\\";
+		break;
+	case sf::Keyboard::Key::Grave:
+		result = "`";
+		break;
+	case sf::Keyboard::Key::Equal:
+		result = "=";
+		break;
+	case sf::Keyboard::Key::Hyphen:
+		result = "-";
+		break;
+	case sf::Keyboard::Key::Space:
+		result = "Space";
+		break;
+	case sf::Keyboard::Key::Enter:
+		result = "Enter";
+		break;
+	case sf::Keyboard::Key::Backspace:
+		result = "BSpace";
+		break;
+	case sf::Keyboard::Key::Tab:
+		result = "Tab";
+		break;
+	case sf::Keyboard::Key::PageUp:
+		result = "PgUp";
+		break;
+	case sf::Keyboard::Key::PageDown:
+		result = "PgDown";
+		break;
+	case sf::Keyboard::Key::End:
+		result = "End";
+		break;
+	case sf::Keyboard::Key::Home:
+		result = "Home";
+		break;
+	case sf::Keyboard::Key::Insert:
+		result = "Insert";
+		break;
+	case sf::Keyboard::Key::Delete:
+		result = "Del";
+		break;
+	case sf::Keyboard::Key::Add:
+		result = "+";
+		break;
+	case sf::Keyboard::Key::Subtract:
+		result = "Min";
+		break;
+	case sf::Keyboard::Key::Multiply:
+		result = "Mul";
+		break;
+	case sf::Keyboard::Key::Divide:
+		result = "Div";
+		break;
+	case sf::Keyboard::Key::Left:
+		result = "Left";
+		break;
+	case sf::Keyboard::Key::Right:
+		result = "Right";
+		break;
+	case sf::Keyboard::Key::Up:
+		result = "Up";
+		break;
+	case sf::Keyboard::Key::Down:
+		result = "Down";
+		break;
+	case sf::Keyboard::Key::Numpad0:
+		result = "Num0";
+		break;
+	case sf::Keyboard::Key::Numpad1:
+		result = "Num1";
+		break;
+	case sf::Keyboard::Key::Numpad2:
+		result = "Num2";
+		break;
+	case sf::Keyboard::Key::Numpad3:
+		result = "Num3";
+		break;
+	case sf::Keyboard::Key::Numpad4:
+		result = "Num4";
+		break;
+	case sf::Keyboard::Key::Numpad5:
+		result = "Num5";
+		break;
+	case sf::Keyboard::Key::Numpad6:
+		result = "Num6";
+		break;
+	case sf::Keyboard::Key::Numpad7:
+		result = "Num7";
+		break;
+	case sf::Keyboard::Key::Numpad8:
+		result = "Num8";
+		break;
+	case sf::Keyboard::Key::Numpad9:
+		result = "Num9";
+		break;
+	case sf::Keyboard::Key::F1:
+		result = "F1";
+		break;
+	case sf::Keyboard::Key::F2:
+		result = "F2";
+		break;
+	case sf::Keyboard::Key::F3:
+		result = "F3";
+		break;
+	case sf::Keyboard::Key::F4:
+		result = "F4";
+		break;
+	case sf::Keyboard::Key::F5:
+		result = "F5";
+		break;
+	case sf::Keyboard::Key::F6:
+		result = "F6";
+		break;
+	case sf::Keyboard::Key::F7:
+		result = "F7";
+		break;
+	case sf::Keyboard::Key::F8:
+		result = "F8";
+		break;
+	case sf::Keyboard::Key::F9:
+		result = "F9";
+		break;
+	case sf::Keyboard::Key::F10:
+		result = "F10";
+		break;
+	case sf::Keyboard::Key::F11:
+		result = "F11";
+		break;
+	case sf::Keyboard::Key::F12:
+		result = "F12";
+		break;
+	case sf::Keyboard::Key::F13:
+		result = "F13";
+		break;
+	case sf::Keyboard::Key::F14:
+		result = "F14";
+		break;
+	case sf::Keyboard::Key::F15:
+		result = "F15";
+		break;
+	case sf::Keyboard::Key::Pause:
+		result = "Pause";
+		break;
+	default:
+		result = "Unknown";
+		break;
+	}
+	if (s.control && s.code != sf::Keyboard::Key::LControl && s.code != sf::Keyboard::Key::RControl)
+		result = "Ctrl+" + result;
+	if (s.alt && s.code != sf::Keyboard::Key::LAlt && s.code != sf::Keyboard::Key::RAlt)
+		result = "Alt+" + result;
+	if (s.meta && s.code != sf::Keyboard::Key::LSystem && s.code != sf::Keyboard::Key::RSystem)
+		result = "Meta+" + result;
+	if (s.shift && s.code != sf::Keyboard::Key::LShift && s.code != sf::Keyboard::Key::RShift)
+		result = "Shift+" + result;
+	return result;
+}
+
+void SpiralOfFate::FrameDataEditor::_connectShortcut(const tgui::MenuBar::Ptr &menu, const std::vector<std::string> &hierarchy, void (FrameDataEditor::*callback)())
+{
+	std::vector<tgui::String> tguiHierarchy;
+
+	tguiHierarchy.reserve(hierarchy.size());
+	for (size_t i = 0; i < hierarchy.size() - 1; i++)
+		tguiHierarchy.emplace_back(this->localize(hierarchy[i]));
+
+	std::string name = this->localize(hierarchy.back());
+	auto it = this->_shortcutsNames.find(hierarchy.back());
+
+	if (it != this->_shortcutsNames.end()) {
+		std::string sname = FrameDataEditor::_shortcutToString(it->second);
+
+		game->logger.debug(name + " shortcut is " + sname);
+		name += " (";
+		name += sname;
+		name.push_back(')');
+		this->_shortcuts.emplace(it->second, callback);
+	}
+	tguiHierarchy.emplace_back(name);
+	menu->connectMenuItem(tguiHierarchy, callback, this);
+}
+
 void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr &menu)
 {
-	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.new")      }, &FrameDataEditor::_newFramedata, this);
-	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.load")     }, &FrameDataEditor::_loadFramedata, this);
-	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.save")     }, &FrameDataEditor::_save, this);
-	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.save_as")  }, &FrameDataEditor::_saveAs, this);
-	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.settings") }, &FrameDataEditor::_settings, this);
-	menu->connectMenuItem({ this->localize("menu_item.file"), this->localize("menu_item.file.quit")     }, &FrameDataEditor::_quit, this);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.new"       }, &FrameDataEditor::_newFramedata);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.load"      }, &FrameDataEditor::_loadFramedata);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.save"      }, &FrameDataEditor::_save);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.save_as"   }, &FrameDataEditor::_saveAs);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.settings"  }, &FrameDataEditor::_settings);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.shortcuts" }, &FrameDataEditor::_editShortcuts);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.quit"      }, &FrameDataEditor::_quit);
 
-	menu->connectMenuItem({ this->localize("menu_item.edit"), this->localize("menu_item.edit.undo")  }, &FrameDataEditor::_undo, this);
-	menu->connectMenuItem({ this->localize("menu_item.edit"), this->localize("menu_item.edit.redo")  }, &FrameDataEditor::_redo, this);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.undo"  }, &FrameDataEditor::_undo);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.redo"  }, &FrameDataEditor::_redo);
 
-	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.frame")     }, &FrameDataEditor::_newFrame, this);
-	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.frame_end") }, &FrameDataEditor::_newEndFrame, this);
-	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.block")     }, &FrameDataEditor::_newAnimationBlock, this);
-	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.action")    }, &FrameDataEditor::_newAction, this);
-	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.hurt_box")  }, &FrameDataEditor::_newHurtBox, this);
-	menu->connectMenuItem({ this->localize("menu_item.new"), this->localize("menu_item.new.hit_box")   }, &FrameDataEditor::_newHitBox, this);
+	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.frame"     }, &FrameDataEditor::_newFrame);
+	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.frame_end" }, &FrameDataEditor::_newEndFrame);
+	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.block"     }, &FrameDataEditor::_newAnimationBlock);
+	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.action"    }, &FrameDataEditor::_newAction);
+	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.hurt_box"  }, &FrameDataEditor::_newHurtBox);
+	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.hit_box"   }, &FrameDataEditor::_newHitBox);
 
-	menu->connectMenuItem({ this->localize("menu_item.remove"), this->localize("menu_item.remove.frame")  }, &FrameDataEditor::_removeFrame, this);
-	menu->connectMenuItem({ this->localize("menu_item.remove"), this->localize("menu_item.remove.block")  }, &FrameDataEditor::_removeAnimationBlock, this);
-	menu->connectMenuItem({ this->localize("menu_item.remove"), this->localize("menu_item.remove.action") }, &FrameDataEditor::_removeAction, this);
+	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.frame"  }, &FrameDataEditor::_removeFrame);
+	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.block"  }, &FrameDataEditor::_removeAnimationBlock);
+	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.action" }, &FrameDataEditor::_removeAction);
 
-	menu->connectMenuItem({ this->localize("menu_item.misc"), this->localize("menu_item.misc.copy_box_last") }, &FrameDataEditor::_copyBoxesFromLastFrame, this);
-	menu->connectMenuItem({ this->localize("menu_item.misc"), this->localize("menu_item.misc.copy_box_next") }, &FrameDataEditor::_copyBoxesFromNextFrame, this);
-	menu->connectMenuItem({ this->localize("menu_item.misc"), this->localize("menu_item.misc.flatten")       }, &FrameDataEditor::_flattenThisMoveCollisionBoxes, this);
-	menu->connectMenuItem({ this->localize("menu_item.misc"), this->localize("menu_item.misc.reload")        }, &FrameDataEditor::_reloadTextures, this);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_last" }, &FrameDataEditor::_copyBoxesFromLastFrame);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_next" }, &FrameDataEditor::_copyBoxesFromNextFrame);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten"       }, &FrameDataEditor::_flattenThisMoveCollisionBoxes);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reload"        }, &FrameDataEditor::_reloadTextures);
 }
 
 void SpiralOfFate::FrameDataEditor::_addMenu(const tgui::MenuBar::Ptr &menu, const tgui::MenuBar::GetMenusElement &element, std::vector<tgui::String> hierarchy)
 {
-	hierarchy.emplace_back(this->localize(std::string(element.text)));
-	menu->addMenuItem(hierarchy);
-	for (auto &d : element.menuItems)
-		this->_addMenu(menu, d, hierarchy);
+	if (element.menuItems.empty()) {
+		std::string name = this->localize(std::string(element.text));
+		auto it = this->_shortcutsNames.find(std::string(element.text));
+
+		if (it != this->_shortcutsNames.end()) {
+			std::string sname = FrameDataEditor::_shortcutToString(it->second);
+
+			game->logger.debug(name + " shortcut is " + sname);
+			name += " (";
+			name += sname;
+			name.push_back(')');
+		}
+		hierarchy.emplace_back(name);
+		menu->addMenuItem(hierarchy);
+	} else {
+		hierarchy.emplace_back(this->localize(std::string(element.text)));
+		menu->addMenuItem(hierarchy);
+		for (auto &d: element.menuItems)
+			this->_addMenu(menu, d, hierarchy);
+	}
 }
 
 void SpiralOfFate::FrameDataEditor::_buildMenu()
 {
 	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
+	this->_shortcuts.clear();
 	game->gui.remove(menu);
 	menu = tgui::MenuBar::create();
 	game->gui.add(menu, "MainBar");
@@ -225,6 +612,8 @@ std::string SpiralOfFate::FrameDataEditor::getLocale() const
 
 void SpiralOfFate::FrameDataEditor::_newFramedata()
 {
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
@@ -330,6 +719,12 @@ void SpiralOfFate::FrameDataEditor::_settings()
 	window->setTitle(this->localize("settings.title"));
 }
 
+void SpiralOfFate::FrameDataEditor::_editShortcuts()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
 void SpiralOfFate::FrameDataEditor::_quit()
 {
 	game->screen->close();
@@ -424,7 +819,38 @@ void SpiralOfFate::FrameDataEditor::setHasUndo(bool hasUndo)
 	menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.undo") }, hasUndo);
 }
 
+bool SpiralOfFate::FrameDataEditor::canHandleKeyPress(const sf::Event::KeyPressed &event)
+{
+	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
+
+	game->logger.debug("Pressed keys: " + FrameDataEditor::_shortcutToString(s));
+	return this->_shortcuts.contains(s);
+}
+
+void SpiralOfFate::FrameDataEditor::keyPressed(const sf::Event::KeyPressed &event)
+{
+	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
+	auto it = this->_shortcuts.find(s);
+
+	assert_exp(it != this->_shortcuts.end());
+	game->logger.debug("Execute shortcut: " + FrameDataEditor::_shortcutToString(s));
+	(this->*(it->second))();
+}
+
 const std::map<std::string, std::string> &SpiralOfFate::FrameDataEditor::getLocalizationData() const
 {
 	return this->_localization;
+}
+
+bool SpiralOfFate::FrameDataEditor::Shortcut::operator<(const SpiralOfFate::FrameDataEditor::Shortcut &other) const
+{
+	if (this->meta != other.meta)
+		return other.meta;
+	if (this->alt != other.alt)
+		return other.alt;
+	if (this->shift != other.shift)
+		return other.shift;
+	if (this->control != other.control)
+		return other.control;
+	return this->code < other.code;
 }

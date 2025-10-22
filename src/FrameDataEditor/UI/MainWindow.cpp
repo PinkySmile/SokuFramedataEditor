@@ -255,7 +255,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, FrameData
 	this->setResizable();
 	this->setCloseBehavior(CloseBehavior::None);
 	this->onClose.connect([this]{
-		// TODO: Check if needs to be saved
+		// TODO: Check if it needs to be saved
 		std::error_code err;
 
 		std::filesystem::remove(this->_path + ".bak");
@@ -517,8 +517,8 @@ SpiralOfFate::LocalizedContainer<tgui::ChildWindow>::Ptr SpiralOfFate::MainWindo
 
 	contentPanel->loadLocalizedWidgetsFromFile(path);
 	for (auto &w : contentPanel->getWidgets()) {
-		size.x = std::max(size.x, w->getFullSize().x + w->getPosition().x + 20);
-		size.y = std::max(size.y, w->getFullSize().y + w->getPosition().y + 20);
+		size.x = std::max(size.x, w->getFullSize().x + w->getPosition().x + 10);
+		size.y = std::max(size.y, w->getFullSize().y + w->getPosition().y + 10);
 	}
 	size.y += contentPanel->getSize().y - contentPanel->getInnerSize().y;
 	contentPanel->setSize(size);
@@ -862,18 +862,15 @@ void SpiralOfFate::MainWindow::newAction()
 		auto &data = this->_object->getFrameData();
 		auto action = std::stoul(idBox->getText().toStdString());
 
-		if (this->_object->_moves.contains(action)) {
-			this->_object->_action = action;
-			this->_object->_actionBlock = 0;
-			this->_object->_animation = 0;
-			this->_rePopulateData();
-		} else
+		if (!this->_object->_moves.contains(action)) {
 			this->applyOperation(new CreateMoveOperation(
 				*this->_object,
 				this->_editor.localize("operation.create_move"),
 				action, {{data}}
 			));
-		windowW.lock()->close();
+			windowW.lock()->close();
+		} else
+			Utils::dispMsg(game->gui, "Already exists", "This action already exist. Delete it first if you want to replace it.", MB_ICONERROR);
 	});
 }
 
@@ -907,32 +904,38 @@ void SpiralOfFate::MainWindow::removeFrame()
 
 void SpiralOfFate::MainWindow::removeAnimationBlock()
 {
-
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::MainWindow::removeAction()
 {
-
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::MainWindow::copyBoxesFromLastFrame()
 {
-
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::MainWindow::copyBoxesFromNextFrame()
 {
-
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
 {
-
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::MainWindow::reloadTextures()
 {
-
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 
@@ -1117,7 +1120,7 @@ void SpiralOfFate::MainWindow::_updateTextureTitleBar()
 
 	this->m_titleBarHeightCached = getSharedRenderer()->getTitleBarHeight();
 	this->updateTitleBarHeight();
-	if (oldTitleBarHeight != m_titleBarHeightCached) {
+	if (oldTitleBarHeight != this->m_titleBarHeightCached) {
 		if (this->m_decorationLayoutY && (this->m_decorationLayoutY == this->m_size.y.getRightOperand()))
 			this->m_decorationLayoutY->replaceValue(
 				this->m_bordersCached.getTop() +
@@ -1153,8 +1156,8 @@ void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
 			this->cancelTransaction();
 			this->_rePopulateData();
 			// FIXME: Special case for when you were dragging a box
-			//        Right now will start a transation that will never be removed
-			//        and starting a new one will crash because of the assert
+			//        Right now it will start a transaction that will never be removed
+			//        and starting a new one will crash because of the assertion
 			this->startTransaction();
 		}
 	} else

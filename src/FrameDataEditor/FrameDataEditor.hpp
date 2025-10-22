@@ -17,14 +17,26 @@ namespace SpiralOfFate
 	private:
 		std::string _locale;
 
-		bool _force = false;
+		struct Shortcut {
+			sf::Keyboard::Key code;
+			bool alt;
+			bool control;
+			bool shift;
+			bool meta;
+
+			bool operator<(const Shortcut &other) const;
+		};
+
 		float _timer = 0;
 		sf::Clock _clock;
+		std::map<std::string, Shortcut> _shortcutsNames;
+		std::map<Shortcut, void (FrameDataEditor::*)()> _shortcuts;
 		std::vector<tgui::MenuBar::GetMenusElement> _menuHierarchy;
 		std::map<std::string, std::string> _localization;
 		std::vector<std::shared_ptr<MainWindow>> _openWindows;
 		std::shared_ptr<MainWindow> _focusedWindow;
 
+		void _connectShortcut(const tgui::MenuBar::Ptr &menu, const std::vector<std::string> &hierarchy, void (FrameDataEditor::*callback)());
 		void _placeMenuCallbacks(const tgui::MenuBar::Ptr &menu);
 		void _addMenu(const tgui::MenuBar::Ptr &menu, const tgui::MenuBar::GetMenusElement &element, std::vector<tgui::String> hierarchy);
 		void _buildMenu();
@@ -38,6 +50,7 @@ namespace SpiralOfFate
 		void _save();
 		void _saveAs();
 		void _settings();
+		void _editShortcuts();
 		void _quit();
 
 		void _undo();
@@ -58,6 +71,8 @@ namespace SpiralOfFate
 		void _copyBoxesFromNextFrame();
 		void _flattenThisMoveCollisionBoxes();
 		void _reloadTextures();
+
+		static std::string _shortcutToString(const Shortcut &s);
 
 	public:
 		FrameDataEditor();
@@ -94,6 +109,9 @@ namespace SpiralOfFate
 
 		void setHasRedo(bool hasRedo);
 		void setHasUndo(bool hasRedo);
+
+		void keyPressed(const sf::Event::KeyPressed &event);
+		bool canHandleKeyPress(const sf::Event::KeyPressed &event);
 	};
 }
 

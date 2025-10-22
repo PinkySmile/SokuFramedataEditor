@@ -5,7 +5,9 @@
 #include "Logger.hpp"
 #include "Screen.hpp"
 #include "Resources/Game.hpp"
+#ifdef __linux__
 #include <X11/Xlib.h>
+#endif
 
 namespace SpiralOfFate
 {
@@ -227,7 +229,7 @@ namespace SpiralOfFate
 
 void libraryInit()
 {
-#ifndef _WIN32
+#ifdef __linux__
 	XInitThreads();
 #endif
 }

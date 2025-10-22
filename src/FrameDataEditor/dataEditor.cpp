@@ -20,6 +20,12 @@ void run()
 				else
 					Utils::dispMsg(game->gui, editor->localize("message_box.title.not_saved"), editor->localize("message_box.not_saved"), MB_ICONINFORMATION);
 			}
+			if (auto key = event->getIf<sf::Event::KeyPressed>()) {
+				if (editor->canHandleKeyPress(*key)) {
+					editor->keyPressed(*key);
+					continue;
+				}
+			}
 			game->gui.handleEvent(*event);
 		}
 	}
