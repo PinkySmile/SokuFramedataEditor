@@ -84,6 +84,7 @@ namespace SpiralOfFate
 
 		const std::map<std::string, std::string> &getLocalizationData() const;
 		bool hasLocalization(const std::string &s) const;
+		std::string localizeShortcut(const std::string &s) const;
 		std::string localize(const std::string &s) const;
 		template<typename ...Args>
 		std::string localize(const std::string &s, const Args... args) const
