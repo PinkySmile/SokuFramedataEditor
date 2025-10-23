@@ -103,6 +103,7 @@ namespace SpiralOfFate
 		FrameDataEditor &_editor;
 		PreviewWidget::Ptr _preview;
 		bool _paused = true;
+		bool _showingPalette = false;
 		std::string _path;
 		std::string _character;
 		std::unique_ptr<Operation> _pendingTransaction;

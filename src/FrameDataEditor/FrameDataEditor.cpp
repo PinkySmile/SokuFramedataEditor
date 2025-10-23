@@ -75,7 +75,10 @@ bool SpiralOfFate::FrameDataEditor::closeAll()
 	for (auto &widget : vec)
 		if (!widget->isModified())
 			widget->close();
-	return this->_openWindows.empty();
+	if (this->_openWindows.empty())
+		return true;
+	Utils::dispMsg(game->gui, this->localize("message_box.title.not_saved"), this->localize("message_box.not_saved"), MB_ICONINFORMATION);
+	return false;
 }
 
 void SpiralOfFate::FrameDataEditor::_loadSettings()
@@ -729,7 +732,8 @@ void SpiralOfFate::FrameDataEditor::_editShortcuts()
 
 void SpiralOfFate::FrameDataEditor::_quit()
 {
-	game->screen->close();
+	if (this->closeAll())
+		game->screen->close();
 }
 
 void SpiralOfFate::FrameDataEditor::_undo()

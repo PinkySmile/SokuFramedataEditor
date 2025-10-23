@@ -11,6 +11,13 @@
 
 namespace SpiralOfFate
 {
+	enum BoxType {
+		BOXTYPE_NONE,
+		BOXTYPE_HITBOX,
+		BOXTYPE_HURTBOX,
+		BOXTYPE_COLLISIONBOX,
+	};
+
 	class BoxModificationOperation : public Operation {
 	protected:
 		EditableObject &_obj;
@@ -18,6 +25,7 @@ namespace SpiralOfFate
 		unsigned _actionBlock;
 		unsigned _animation;
 		unsigned _boxIndex;
+		BoxType _type;
 		Box _oldValue;
 		Box _newValue;
 		std::string _fieldName;
@@ -25,7 +33,7 @@ namespace SpiralOfFate
 		Box &_getBox();
 
 	public:
-		BoxModificationOperation(EditableObject &obj, const std::string &&name, unsigned boxIndex, Box newValue);
+		BoxModificationOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, Box newValue);
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;

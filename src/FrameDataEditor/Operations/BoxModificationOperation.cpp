@@ -8,14 +8,17 @@ SpiralOfFate::Box &SpiralOfFate::BoxModificationOperation::_getBox()
 {
 	auto &data = this->_obj.getFrameData();
 
-	return this->_boxIndex == data.hurtBoxes.size() + data.hitBoxes.size() + 1 ? *data.collisionBox :
-	       this->_boxIndex <= data.hurtBoxes.size() ? data.hurtBoxes[this->_boxIndex - 1] :
-	       data.hitBoxes[this->_boxIndex - 1 - data.hurtBoxes.size()];
+	if (this->_type == BOXTYPE_COLLISIONBOX)
+		return *data.collisionBox;
+	if (this->_type == BOXTYPE_HITBOX)
+		return data.hitBoxes[this->_boxIndex];
+	return data.hurtBoxes[this->_boxIndex];
 }
 
 SpiralOfFate::BoxModificationOperation::BoxModificationOperation(
 	EditableObject &obj,
 	const std::string &&name,
+	BoxType type,
 	unsigned int boxIndex,
 	SpiralOfFate::Box newValue
 ) :
@@ -24,6 +27,7 @@ SpiralOfFate::BoxModificationOperation::BoxModificationOperation(
 	_actionBlock(obj._actionBlock),
 	_animation(obj._animation),
 	_boxIndex(boxIndex),
+	_type(type),
 	_oldValue(this->_getBox()),
 	_newValue(newValue),
 	_fieldName(name)

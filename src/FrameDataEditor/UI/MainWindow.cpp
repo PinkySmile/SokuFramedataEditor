@@ -40,6 +40,49 @@ std::string to_hex(unsigned long long value)
 	return buffer;
 }
 
+#define PLACE_HOOK_BOX(container, guiId, field, other, name)                                              \
+do {                                                                                                      \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                                \
+                                                                                                          \
+        if (!__elem)                                                                                      \
+                break;                                                                                    \
+        __elem->onFocus.connect([this]{ this->startTransaction(); });                                     \
+        __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                  \
+        __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); }); \
+        __elem->onTextChange.connect([this](const tgui::String &s){                                       \
+                auto box = this->_preview->getSelectedBox();                                              \
+                                                                                                          \
+                if (box.first == BOXTYPE_NONE || s.empty()) return;                                       \
+                try {                                                                                     \
+			auto pos = s.find(',');                                                           \
+			auto __x = s.substr(1, pos - 1).toStdString();                                    \
+			auto __y = s.substr(pos + 1, s.size() - pos - 1).toStdString();                   \
+                        decltype(Box::field) __##field{                                                   \
+				(decltype(Box::field.x))std::stoi(__x),                                   \
+				(decltype(Box::field.y))std::stoi(__y)                                    \
+			};                                                                                \
+                        decltype(Box::other) __##other = this->_preview->getSelectedBoxRef()->other;      \
+                                                                                                          \
+                        this->updateTransaction([&]{ return new BoxModificationOperation(                 \
+                                *this->_object,                                                           \
+                                name,                                                                     \
+                                box.first, box.second,                                                    \
+                                Box{ .pos = __pos, .size = __size }                                       \
+                        ); });                                                                            \
+                } catch (...) { return; }                                                                 \
+        });                                                                                               \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                               \
+                Box *box = this->_preview->getSelectedBoxRef();                                           \
+                                                                                                          \
+                if (!box) return;                                                                         \
+                __elem->onTextChange.setEnabled(false);                                                   \
+                __elem->setText("(" +                                                                     \
+			std::to_string(box->field.x) + "," +                                              \
+			std::to_string(box->field.y) +                                                    \
+		")");                                                                                     \
+                __elem->onTextChange.setEnabled(true);                                                    \
+        });                                                                                               \
+} while (false)
 #define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset, noEmpty) \
 do {                                                                                                             \
         auto __elem = container.get<tgui::EditBox>(guiId);                                                       \
@@ -239,6 +282,12 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, FrameData
 	this->_preview = std::make_shared<PreviewWidget>(std::ref(editor), std::ref(*this), *this->_object);
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
+	this->_preview->onBoxSelect.connect([this]{
+		this->_rePopulateFrameData();
+	});
+	this->_preview->onBoxUnselect.connect([this]{
+		this->_rePopulateFrameData();
+	});
 
 	this->m_renderer = aurora::makeCopied<Renderer>();
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/character/animationWindow.gui");
@@ -246,8 +295,12 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, FrameData
 	auto panel = this->get<tgui::Panel>("AnimationPanel");
 	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
 	auto displace = panel->get<tgui::BitmapButton>("Displace");
+	auto ctrlPanel = this->get<tgui::Panel>("ControlPanel");
 
+	ctrlPanel->loadWidgetsFromFile("assets/gui/editor/character/framedata.gui");
+	this->_localizeWidgets(*ctrlPanel, true);
 	Utils::setRenderer(this);
+
 	this->setSize(1200, 600);
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
@@ -666,7 +719,29 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	auto hitEdit = container.get<tgui::Button>("HitEdit");
 	auto blockEdit = container.get<tgui::Button>("BlockEdit");
 	auto generalEdit = container.get<tgui::Button>("GeneralEdit");
+	auto ctrl = container.get<tgui::Tabs>("ControlTabs");
+	auto ctrlPanel = container.get<tgui::Panel>("ControlPanel");
+	auto boxes = container.get<tgui::Panel>("SelectedBoxPanel");
+	auto boxLabel = container.get<tgui::Label>("SelectedBoxName");
 
+	if (ctrl)
+		ctrl->onTabSelect.connect([this, ctrlPanel](std::weak_ptr<tgui::Tabs> This){
+			auto selected = This.lock()->getSelectedIndex();
+
+			if (selected == this->_showingPalette)
+				return;
+			this->_showingPalette = selected;
+			ctrlPanel->loadWidgetsFromFile(
+				selected == 0 ?
+				"assets/gui/editor/character/framedata.gui" :
+				"assets/gui/editor/character/palette.gui"
+			);
+			this->_localizeWidgets(*ctrlPanel, true);
+			Utils::setRenderer(static_cast<tgui::Container::Ptr>(ctrlPanel));
+			this->_placeUIHooks(*ctrlPanel);
+			this->_populateData(*ctrlPanel);
+			this->_preview->showingPalette = this->_showingPalette;
+		}, std::weak_ptr(ctrl));
 	if (action)
 		action->onReturnOrUnfocus.connect([this](std::weak_ptr<tgui::EditBox> This, const tgui::String &s){
 			if (std::to_string(this->_object->_action) == s)
@@ -697,19 +772,19 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->applyOperation(new ClearBlockOperation(*this->_object, this->_editor));
 		});
 	if (aFlags)
-		// TODO: character/subobject
+		// TODO: Change flags label if a character or subobject
 		aFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/attackFlags.gui");
 	if (dFlags)
-		// TODO: character/subobject
+		// TODO: Change flags label if a character or subobject
 		dFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/defenseFlags.gui");
 	if (hitEdit)
-		// TODO: character/subobject
+		// TODO: Change fields label if a character or subobject
 		hitEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/hitProperties.gui");
 	if (blockEdit)
-		// TODO: character/subobject
+		// TODO: Change fields label if a character or subobject
 		blockEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/blockProperties.gui");
 	if (generalEdit)
-		// TODO: character/subobject
+		// TODO: Change fields label if a character or subobject
 		generalEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
 	if (actionSelect)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this, [this](unsigned move){
@@ -796,10 +871,37 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	PLACE_HOOK_NUMBER(container, "BlockStun",  blockStun,           this->_editor.localize("animation.block.stun"),    BasicDataOperation, false, 0);
 	PLACE_HOOK_NUMBER(container, "WBlockStun", wrongBlockStun,      this->_editor.localize("animation.block.wstun"),   BasicDataOperation, false, 0);
 
+	PLACE_HOOK_BOX(container, "SelectedBoxPos",  pos,  size, this->_editor.localize("animation.selectedbox.pos"));
+	PLACE_HOOK_BOX(container, "SelectedBoxSize", size, pos,  this->_editor.localize("animation.selectedbox.size"));
+
 	for (size_t i = 0; i < 64; i++)
 		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)), false);
 	for (size_t i = 0; i < 64; i++)
 		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)), i == 8 || i == 13 || i == 21);
+	if (boxes)
+		this->_updateFrameElements[&container].emplace_back([boxes, this]{
+			boxes->setVisible(this->_preview->getSelectedBox().first != BOXTYPE_NONE);
+			for (auto &fct : this->_updateFrameElements[&*boxes])
+				fct();
+		});
+	if (boxLabel)
+		this->_updateFrameElements[&container].emplace_back([boxLabel, this] {
+			auto box = this->_preview->getSelectedBox();
+
+			switch (box.first) {
+			case BOXTYPE_HITBOX:
+				boxLabel->setText(this->_editor.localize("animation.selectedbox.hitbox", std::to_string(box.second)));
+				break;
+			case BOXTYPE_HURTBOX:
+				boxLabel->setText(this->_editor.localize("animation.selectedbox.hurtbox", std::to_string(box.second)));
+				break;
+			case BOXTYPE_COLLISIONBOX:
+				boxLabel->setText(this->_editor.localize("animation.selectedbox.collision"));
+				break;
+			default:
+				boxLabel->setText("");
+			}
+		});
 }
 
 
@@ -961,6 +1063,7 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 	auto blockSpin = container.get<tgui::SpinButton>("BlockSpin");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
 	auto frame = container.get<tgui::Slider>("Frame");
+	auto ctrl = container.get<tgui::Tabs>("ControlTabs");
 
 	if (action)
 		action->setText(std::to_string(this->_object->_action));
@@ -990,6 +1093,11 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 		frame->setMinimum(0);
 		frame->setMaximum(this->_object->_moves.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1);
 		frame->onValueChange.setEnabled(true);
+	}
+	if (ctrl) {
+		ctrl->onTabSelect.setEnabled(false);
+		ctrl->select(this->_showingPalette);
+		ctrl->onTabSelect.setEnabled(true);
 	}
 
 	this->_populateFrameData(container);

@@ -13,7 +13,7 @@ namespace SpiralOfFate
 {
 	template<typename BaseContainer>
 	class LocalizedContainer : public BaseContainer {
-	private:
+	protected:
 		void _localizeWidgets(tgui::Container &container, bool first)
 		{
 			// TODO: Create struct LocalizationData and use that instead

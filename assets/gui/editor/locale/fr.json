@@ -56,6 +56,12 @@
 	"animation.generalproperties":     "Propriétés générales",
 	"animation.edit":                  "Modifier",
 
+	"animation.selectedbox.hitbox":    "Hitbox #%1 selectionnée",
+	"animation.selectedbox.hurtbox":   "Hurtbox #%1 selectionnée",
+	"animation.selectedbox.collision": "Boîte de collision selectionnée",
+	"animation.selectedbox.pos":       "Position",
+	"animation.selectedbox.size":      "Taille",
+
 	"animation.general.partgenerator": "Générateur de particules",
 	"animation.general.subobj":        "Sous-objet",
 	"animation.general.marker":        "Marqueur spécifique",

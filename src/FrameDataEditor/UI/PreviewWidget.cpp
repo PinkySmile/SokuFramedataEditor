@@ -23,6 +23,34 @@ SpiralOfFate::PreviewWidget::PreviewWidget(const FrameDataEditor &editor, MainWi
 	assert_exp(this->_stageTexture.loadFromFile("assets/stages/editor.png"));
 }
 
+std::pair<SpiralOfFate::BoxType, unsigned int> SpiralOfFate::PreviewWidget::getSelectedBox()
+{
+	if (this->_boxSelected == 0)
+		return {BOXTYPE_NONE, 0};
+
+	auto &data = this->_object.getFrameData();
+
+	if (this->_boxSelected <= data.hurtBoxes.size())
+		return {BOXTYPE_HURTBOX, this->_boxSelected - 1};
+	if (this->_boxSelected <= data.hurtBoxes.size() + data.hitBoxes.size())
+		return {BOXTYPE_HITBOX, this->_boxSelected - 1 - data.hurtBoxes.size()};
+	return {BOXTYPE_COLLISIONBOX, 0};
+}
+
+SpiralOfFate::Box *SpiralOfFate::PreviewWidget::getSelectedBoxRef()
+{
+	if (this->_boxSelected == 0)
+		return nullptr;
+
+	auto &data = this->_object.getFrameData();
+
+	if (this->_boxSelected <= data.hurtBoxes.size())
+		return &data.hurtBoxes[this->_boxSelected - 1];
+	if (this->_boxSelected <= data.hurtBoxes.size() + data.hitBoxes.size())
+		return &data.hitBoxes[this->_boxSelected - 1 - data.hurtBoxes.size()];
+	return data.collisionBox;
+}
+
 void SpiralOfFate::PreviewWidget::_drawBox(const SpiralOfFate::Rectangle &box, const SpiralOfFate::Color &color, sf::RenderStates &states, bool hovered, bool selected) const
 {
 	sf::VertexArray arr{ sf::PrimitiveType::TriangleFan, 4 };
@@ -105,7 +133,7 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	realTarget->draw(this->_stageSprite, statesSFML);
 	this->_object.render(*realTarget, statesSFML, this->displaceObject);
 
-	if (this->displayBoxes) {
+	if (this->displayBoxes && !this->showingPalette) {
 		size_t index = 1;
 		auto modifiedHurtBoxes = this->_object._getModifiedHurtBoxes(this->displaceObject);
 		auto modifiedHitBoxes = this->_object._getModifiedHitBoxes(this->displaceObject);
@@ -234,6 +262,9 @@ void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const tgui::Vector2f &po
 
 void SpiralOfFate::PreviewWidget::_updateHover(const tgui::Vector2f &pos)
 {
+	if (this->showingPalette || !this->displayBoxes)
+		return;
+
 	size_t index = 1;
 	std::vector<size_t> old;
 	size_t highest = 0;
@@ -385,11 +416,14 @@ void SpiralOfFate::PreviewWidget::_handleBoxResize(const tgui::Vector2f &pos)
 		}
 		break;
 	}
+
 	this->_main.updateTransaction([this, &bpos, &bsize]{
+		auto box = this->getSelectedBox();
+
 		return new BoxModificationOperation(
 			this->_object,
 			this->_editor.localize("operation.resize_box"),
-			this->_boxSelected, { bpos, bsize }
+			box.first, box.second, { bpos, bsize }
 		);
 	});
 	this->_commited = true;
@@ -411,10 +445,12 @@ void SpiralOfFate::PreviewWidget::_handleBoxMove(const tgui::Vector2f &pos)
 	diff.rotate(-angle, {0, 0});
 	box.pos += diff;
 	this->_main.updateTransaction([this, &box]{
+		auto b = this->getSelectedBox();
+
 		return new BoxModificationOperation(
 			this->_object,
 			this->_editor.localize("operation.move_box"),
-			this->_boxSelected, box
+			b.first, b.second, box
 		);
 	});
 	this->_commited = true;
@@ -476,8 +512,15 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 		this->_updateHover(translatedPos);
 	if (this->_cornerHovered)
 		this->_cornerSelected = this->_cornerHovered;
-	else
+	else {
 		this->_boxSelected = this->_boxHovered;
+		if (this->_boxSelected == 0)
+			this->onBoxUnselect.emit(this);
+		else {
+			auto b = this->getSelectedBox();
+			this->onBoxSelect.emit(this, b.first, b.second);
+		}
+	}
 	if (this->_boxSelected || this->_cornerSelected) {
 		auto &data = this->_object.getFrameData();
 

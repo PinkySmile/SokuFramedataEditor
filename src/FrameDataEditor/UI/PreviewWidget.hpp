@@ -8,6 +8,7 @@
 
 #include <TGUI/Widgets/ClickableWidget.hpp>
 #include "../EditableObject.hpp"
+#include "../Operations/BoxModificationOperation.hpp"
 
 namespace SpiralOfFate
 {
@@ -41,15 +42,22 @@ namespace SpiralOfFate
 		void _drawBoxBorder(const Rectangle &box, sf::RenderStates &states, bool rotate) const;
 		void _drawBox(const Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const;
 	public:
+		tgui::SignalTyped2<BoxType, unsigned> onBoxSelect = {"BoxSelected"};
+		tgui::Signal onBoxUnselect = {"BoxUnselected"};
+		tgui::SignalUInt onColorSelect = {"ColorSelected"};
+
 		typedef std::shared_ptr<PreviewWidget> Ptr; //!< Shared widget pointer
 		typedef std::shared_ptr<const PreviewWidget> ConstPtr; //!< Shared constant widget pointer
 
 		bool displayBoxes = true;
 		bool displaceObject = true;
+		bool showingPalette = false;
 
 		PreviewWidget(const FrameDataEditor &editor, MainWindow &main, EditableObject &object);
 		~PreviewWidget() override = default;
 
+		std::pair<BoxType, unsigned> getSelectedBox();
+		Box *getSelectedBoxRef();
 		void frameChanged();
 		bool leftMousePressed(tgui::Vector2f pos) override;
 		bool scrolled(float delta, tgui::Vector2f pos, bool touch) override;
