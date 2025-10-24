@@ -17,6 +17,7 @@ namespace SpiralOfFate
 
 	class PreviewWidget : public tgui::ClickableWidget {
 	private:
+		sf::Clock _doubleClick;
 		sf::Texture _stageTexture;
 		mutable sf::Sprite _stageSprite;
 		EditableObject &_object;
@@ -24,6 +25,9 @@ namespace SpiralOfFate
 		MainWindow &_main;
 		bool _commited = false;
 		bool _dragStarted = false;
+		bool _translateDragStarted = false;
+		tgui::Vector2f _scale = {1, 1};
+		tgui::Vector2f _translate = {0, 0};
 		tgui::Vector2f _lastMousePos;
 		tgui::Vector2f _startMousePos;
 		std::vector<size_t> _hoveredBoxes;
@@ -60,10 +64,10 @@ namespace SpiralOfFate
 		Box *getSelectedBoxRef();
 		void frameChanged();
 		bool leftMousePressed(tgui::Vector2f pos) override;
+		void leftMouseButtonNoLongerDown() override;
 		bool scrolled(float delta, tgui::Vector2f pos, bool touch) override;
 		void mouseMoved(tgui::Vector2f pos) override;
 		void draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const override;
-		void leftMouseReleased(tgui::Vector2f pos) override;
 		void mouseNoLongerOnWidget() override;
 		void keyPressed(const tgui::Event::KeyEvent &event) override;
 		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;

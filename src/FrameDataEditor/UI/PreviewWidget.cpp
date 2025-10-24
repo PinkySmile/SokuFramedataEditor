@@ -117,13 +117,19 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	sf::RenderStates statesSFML;
 	auto realTarget = sfmlTarget.getTarget();
 
-	this->_stageSprite.setPosition({-150, 50 - this->getSize().y});
+	this->_stageSprite.setPosition({-150 - this->_translate.x, 50 - this->getSize().y - this->_translate.y});
 	this->_stageSprite.setTextureRect(sf::IntRect{
-		{-100, (int)this->_stageTexture.getSize().y - (int)this->getSize().y - 50},
-		{(int)this->getSize().x + 100, (int)this->getSize().y + 100}
+		{
+			static_cast<int>(-100 - this->_translate.x),
+			static_cast<int>((int)this->_stageTexture.getSize().y - (int)this->getSize().y - 50 - this->_translate.y)
+		},
+		{
+			(int)this->getSize().x + 100,
+			(int)this->getSize().y + 100
+		}
 	});
 
-	states.transform.translate({100, this->getSize().y - 150});
+	states.transform.translate({100 + this->_translate.x, this->getSize().y - 150 + this->_translate.y});
 	statesSFML.transform = sf::Transform(
 		transformMatrix[0], transformMatrix[4], transformMatrix[12],
 		transformMatrix[1], transformMatrix[5], transformMatrix[13],
@@ -461,9 +467,18 @@ void SpiralOfFate::PreviewWidget::mouseMoved(tgui::Vector2f pos)
 {
 	auto translatedPos = pos;
 
-	translatedPos.x -= 100;
-	translatedPos.y -= this->getSize().y - 150;
-	if (!this->_dragStarted)
+	translatedPos.x -= 100 + this->_translate.x;
+	translatedPos.y -= this->getSize().y - 150 + this->_translate.y;
+	if (this->_translateDragStarted) {
+		// TODO: Hardcoded key
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
+			this->_translate += translatedPos - this->_lastMousePos;
+			this->_lastMousePos = pos;
+			this->_lastMousePos.x -= 100 + this->_translate.x;
+			this->_lastMousePos.y -= this->getSize().y - 150 + this->_translate.y;
+		} else
+			this->_translateDragStarted = false;
+	} else if (!this->_dragStarted)
 		this->_updateHover(translatedPos);
 	else if (this->_cornerSelected)
 		this->_handleBoxResize(translatedPos);
@@ -506,8 +521,15 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 {
 	auto translatedPos = pos;
 
-	translatedPos.x -= 100;
-	translatedPos.y -= this->getSize().y - 150;
+	translatedPos.x -= 100 + this->_translate.x;
+	translatedPos.y -= this->getSize().y - 150 + this->_translate.y;
+	// TODO: Hardcoded key
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
+		this->_translateDragStarted = true;
+		this->_lastMousePos = translatedPos;
+		this->_startMousePos = translatedPos;
+		return true;
+	}
 	if (this->_boxHovered == 0)
 		this->_updateHover(translatedPos);
 	if (this->_cornerHovered)
@@ -534,17 +556,12 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 		this->_lastMousePos = translatedPos;
 		this->_startMousePos = translatedPos;
 		return true;
+	// TODO: Should be a setting
+	} else if (this->_doubleClick.restart().asSeconds() < 0.2) {
+		this->_translate = {0, 0};
+		this->_scale = {1, 1};
 	}
 	return ClickableWidget::leftMousePressed(pos);
-}
-
-void SpiralOfFate::PreviewWidget::leftMouseReleased(tgui::Vector2f pos)
-{
-	this->_cornerSelected = 0;
-	if (this->_dragStarted)
-		this->_main.commitTransaction();
-	this->_dragStarted = false;
-	ClickableWidget::leftMouseReleased(pos);
 }
 
 void SpiralOfFate::PreviewWidget::mouseNoLongerOnWidget()
@@ -572,4 +589,14 @@ bool SpiralOfFate::PreviewWidget::canHandleKeyPress(const tgui::Event::KeyEvent 
 	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Delete && this->_boxSelected)
 		return true;
 	return Widget::canHandleKeyPress(event);
+}
+
+void SpiralOfFate::PreviewWidget::leftMouseButtonNoLongerDown()
+{
+	this->_cornerSelected = 0;
+	if (this->_dragStarted)
+		this->_main.commitTransaction();
+	this->_dragStarted = false;
+	this->_translateDragStarted = false;
+	Widget::leftMouseButtonNoLongerDown();
 }
