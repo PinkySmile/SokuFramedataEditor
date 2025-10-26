@@ -437,7 +437,7 @@ void SpiralOfFate::PreviewWidget::_handleBoxResize(const tgui::Vector2f &pos)
 		);
 	});
 	this->_commited = true;
-	this->_lastMousePos = pos;
+	this->_lastMousePos = pos + this->_translate;
 }
 
 void SpiralOfFate::PreviewWidget::_handleBoxMove(const tgui::Vector2f &pos)
@@ -464,7 +464,7 @@ void SpiralOfFate::PreviewWidget::_handleBoxMove(const tgui::Vector2f &pos)
 		);
 	});
 	this->_commited = true;
-	this->_lastMousePos = pos;
+	this->_lastMousePos = pos + this->_translate;
 }
 
 void SpiralOfFate::PreviewWidget::mouseMoved(tgui::Vector2f pos)
@@ -479,8 +479,9 @@ void SpiralOfFate::PreviewWidget::mouseMoved(tgui::Vector2f pos)
 	if (this->_translateDragStarted) {
 		// TODO: Hardcoded key
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
-			this->_translate += pos - this->_lastMousePos;
-			this->_lastMousePos = pos;
+			transformedPos += this->_translate;
+			this->_translate += transformedPos - this->_lastMousePos;
+			this->_lastMousePos = transformedPos;
 		} else
 			this->_translateDragStarted = false;
 	} else if (!this->_dragStarted)
@@ -540,7 +541,7 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 	// TODO: Hardcoded key
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
 		this->_translateDragStarted = true;
-		this->_lastMousePos = pos;
+		this->_lastMousePos = transformedPos + this->_translate;
 		this->_startMousePos = transformedPos;
 		return true;
 	}
@@ -567,7 +568,7 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 		this->_dragStarted = true;
 		this->_commited = false;
 		this->_main.startTransaction();
-		this->_lastMousePos = pos;
+		this->_lastMousePos = transformedPos + this->_translate;
 		this->_startMousePos = transformedPos;
 		return true;
 	// TODO: Should be a setting
