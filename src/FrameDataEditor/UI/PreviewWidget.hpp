@@ -26,7 +26,7 @@ namespace SpiralOfFate
 		bool _commited = false;
 		bool _dragStarted = false;
 		bool _translateDragStarted = false;
-		tgui::Vector2f _scale = {1, 1};
+		float _scale = 1;
 		tgui::Vector2f _translate = {0, 0};
 		tgui::Vector2f _lastMousePos;
 		tgui::Vector2f _startMousePos;
