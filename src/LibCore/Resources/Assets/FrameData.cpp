@@ -10,13 +10,13 @@
 
 namespace SpiralOfFate
 {
-	std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> SpiralOfFate::FrameData::loadFile(const std::string &path, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
+	std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> SpiralOfFate::FrameData::loadFile(const std::string &path, const std::string &folder, const std::string &palette)
 	{
 		game->logger.debug("Loading framedata file " + path);
 		return loadFileJson(nlohmann::json::parse(game->fileMgr.readFull(path)), folder, palette);
 	}
 
-	std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadFileJson(const nlohmann::json &json, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
+	std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadFileJson(const nlohmann::json &json, const std::string &folder, const std::string &palette)
 	{
 		std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> data;
 
@@ -49,7 +49,7 @@ namespace SpiralOfFate
 		return data;
 	}
 
-	FrameData::FrameData(const nlohmann::json &data, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
+	FrameData::FrameData(const nlohmann::json &data, const std::string &folder, const std::string &palette)
 	{
 		Vector2u textureSize{0, 0};
 
@@ -506,13 +506,13 @@ namespace SpiralOfFate
 		return *this;
 	}
 
-	void FrameData::reloadTexture(const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette)
+	void FrameData::reloadTexture()
 	{
 		assert_exp(!this->_slave);
 		game->textureMgr.remove(this->textureHandle);
 		game->textureMgr.remove(this->textureHandleEffects);
-		this->textureHandle = game->textureMgr.load(folder + "/" + this->spritePath, palette);
-		this->textureHandleEffects = game->textureMgr.load(folder + "/effects/" + this->spritePath, palette);
+		this->textureHandle = game->textureMgr.load(this->__folder + "/" + this->spritePath, this->__palette);
+		this->textureHandleEffects = game->textureMgr.load(this->__folder + "/effects/" + this->spritePath, this->__palette);
 	}
 
 	void FrameData::reloadSound()

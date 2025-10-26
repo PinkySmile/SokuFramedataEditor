@@ -743,7 +743,7 @@ namespace SpiralOfFate
 		const std::vector<ParticleGenerator::InitData> *systemParticles = nullptr;
 
 		Character();
-		Character(unsigned index, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette, std::shared_ptr<IInput> input);
+		Character(unsigned index, const std::string &folder, const std::string &palette, std::shared_ptr<IInput> input);
 		~Character() override = default;
 		void setOpponent(Character *opponent);
 		bool hits(const Object &other) const override;

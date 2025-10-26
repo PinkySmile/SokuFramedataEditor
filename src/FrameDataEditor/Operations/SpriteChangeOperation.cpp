@@ -21,7 +21,7 @@ void SpiralOfFate::SpriteChangeOperation::apply()
 
 	auto &data = this->_obj.getFrameData();
 
-	data.reloadTexture(data.__folder);
+	data.reloadTexture();
 }
 
 void SpiralOfFate::SpriteChangeOperation::undo()
@@ -30,5 +30,5 @@ void SpiralOfFate::SpriteChangeOperation::undo()
 
 	auto &data = this->_obj.getFrameData();
 
-	data.reloadTexture(data.__folder);
+	data.reloadTexture();
 }

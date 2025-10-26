@@ -690,18 +690,16 @@ namespace SpiralOfFate
 	Character *InGame::createCharacter(const CharacterEntry &entry, const CharacterEntry &entryOp, int pos, int palette, std::shared_ptr<IInput> input)
 	{
 		Character *chr;
-		std::pair<std::vector<Color>, std::vector<Color>> palettes;
+		std::string palette_;
 
-		if (!entry.palettes.empty() && palette) {
-			palettes.first = entry.palettes.front();
-			palettes.second = entry.palettes[palette];
-		}
+		if (!entry.palettes.empty())
+			palette_ = entry.palettes[palette];
 		switch (entry._class) {
 		case 2:
 			chr = new VictoriaStar{
 				static_cast<unsigned>(palette << 16 | pos),
 				entry.folder,
-				palettes,
+				palette_,
 				std::move(input),
 				std::filesystem::path(entryOp.folder).filename().string()
 			};
@@ -710,7 +708,7 @@ namespace SpiralOfFate
 			chr = new Stickman{
 				static_cast<unsigned>(palette << 16 | pos),
 				entry.folder,
-				palettes,
+				palette_,
 				std::move(input)
 			};
 			break;
@@ -718,7 +716,7 @@ namespace SpiralOfFate
 			chr = new Character{
 				static_cast<unsigned>(palette << 16 | pos),
 				entry.folder,
-				palettes,
+				palette_,
 				std::move(input)
 			};
 			break;

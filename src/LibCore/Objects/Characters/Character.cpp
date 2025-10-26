@@ -379,7 +379,7 @@ namespace SpiralOfFate
 	{
 	}
 
-	Character::Character(unsigned index, const std::string &folder, const std::pair<std::vector<Color>, std::vector<Color>> &palette, std::shared_ptr<IInput> input) :
+	Character::Character(unsigned index, const std::string &folder, const std::string &palette, std::shared_ptr<IInput> input) :
 		Character()
 	{
 		this->index = index;

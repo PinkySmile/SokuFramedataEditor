@@ -19,7 +19,7 @@ namespace SpiralOfFate
 		unsigned _class;
 		std::wstring name;
 		std::string folder;
-		std::vector<std::vector<Color>> palettes;
+		std::vector<std::string> palettes;
 		std::vector<Sprite> icon;
 		std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> data;
 

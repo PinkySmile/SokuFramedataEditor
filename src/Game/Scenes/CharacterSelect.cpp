@@ -425,99 +425,46 @@ namespace SpiralOfFate
 	CharacterEntry::CharacterEntry(const nlohmann::json &json, const std::string &folder) :
 		entry(json)
 	{
-		if (!json.contains("pos"))
-			throw std::invalid_argument("pos is missing");
-		if (!json.contains("name"))
-			throw std::invalid_argument("name is missing");
-		if (!json.contains("ground_drag"))
-			throw std::invalid_argument("ground_drag is missing");
-		if (!json.contains("air_drag"))
-			throw std::invalid_argument("air_drag is missing");
-		if (!json["air_drag"].contains("x"))
-			throw std::invalid_argument("air_drag.x is missing");
-		if (!json["air_drag"].contains("y"))
-			throw std::invalid_argument("air_drag.y is missing");
-		if (!json.contains("hp"))
-			throw std::invalid_argument("hp is missing");
-		if (!json.contains("guard_bar"))
-			throw std::invalid_argument("guard_bar is missing");
-		if (!json.contains("guard_break_cooldown"))
-			throw std::invalid_argument("guard_break_cooldown is missing");
-		if (!json.contains("neutral_overdrive_cooldown"))
-			throw std::invalid_argument("neutral_overdrive_cooldown is missing");
-		if (!json.contains("spirit_overdrive_cooldown"))
-			throw std::invalid_argument("spirit_overdrive_cooldown is missing");
-		if (!json.contains("matter_overdrive_cooldown"))
-			throw std::invalid_argument("matter_overdrive_cooldown is missing");
-		if (!json.contains("void_overdrive_cooldown"))
-			throw std::invalid_argument("void_overdrive_cooldown is missing");
-		if (!json.contains("roman_cancel_cooldown"))
-			throw std::invalid_argument("roman_cancel_cooldown is missing");
-		if (!json.contains("gravity"))
-			throw std::invalid_argument("gravity is missing");
-		if (!json["gravity"].contains("x"))
-			throw std::invalid_argument("gravity.x is missing");
-		if (!json["gravity"].contains("y"))
-			throw std::invalid_argument("gravity.y is missing");
-		if (!json.contains("jump_count"))
-			throw std::invalid_argument("jump_count is missing");
-		if (!json.contains("air_dash_count"))
-			throw std::invalid_argument("air_dash_count is missing");
-		if (!json.contains("air_movements"))
-			throw std::invalid_argument("air_movements is missing");
-		if (!json.contains("mana_max"))
-			throw std::invalid_argument("mana_max is missing");
-		if (!json.contains("mana_start"))
-			throw std::invalid_argument("mana_start is missing");
-		if (!json.contains("mana_regen"))
-			throw std::invalid_argument("mana_regen is missing");
-		if (!json.contains("palettes"))
-			throw std::invalid_argument("palettes is missing");
-		if (!json.contains("air_drift"))
-			throw std::invalid_argument("gravity is missing");
-		if (!json["air_drift"].contains("up"))
-			throw std::invalid_argument("airdrift.up is missing");
-		if (!json["air_drift"].contains("down"))
-			throw std::invalid_argument("airdrift.down is missing");
-		if (!json["air_drift"].contains("back"))
-			throw std::invalid_argument("airdrift.back is missing");
-		if (!json["air_drift"].contains("front"))
-			throw std::invalid_argument("airdrift.front is missing");
-		if (!json["air_drift"]["up"].contains("accel"))
-			throw std::invalid_argument("airdrift.up.accel is missing");
-		if (!json["air_drift"]["up"].contains("max"))
-			throw std::invalid_argument("airdrift.up.max is missing");
-		if (!json["air_drift"]["down"].contains("accel"))
-			throw std::invalid_argument("airdrift.down.accel is missing");
-		if (!json["air_drift"]["down"].contains("max"))
-			throw std::invalid_argument("airdrift.down.max is missing");
-		if (!json["air_drift"]["back"].contains("accel"))
-			throw std::invalid_argument("airdrift.back.accel is missing");
-		if (!json["air_drift"]["back"].contains("max"))
-			throw std::invalid_argument("airdrift.back.max is missing");
-		if (!json["air_drift"]["front"].contains("accel"))
-			throw std::invalid_argument("airdrift.front.accel is missing");
-		if (!json["air_drift"]["front"].contains("max"))
-			throw std::invalid_argument("airdrift.front.max is missing");
+		assert_exp(json.contains("pos"));
+		assert_exp(json.contains("name"));
+		assert_exp(json.contains("ground_drag"));
+		assert_exp(json.contains("air_drag"));
+		assert_exp(json["air_drag"].contains("x"));
+		assert_exp(json["air_drag"].contains("y"));
+		assert_exp(json.contains("hp"));
+		assert_exp(json.contains("guard_bar"));
+		assert_exp(json.contains("guard_break_cooldown"));
+		assert_exp(json.contains("neutral_overdrive_cooldown"));
+		assert_exp(json.contains("spirit_overdrive_cooldown"));
+		assert_exp(json.contains("matter_overdrive_cooldown"));
+		assert_exp(json.contains("void_overdrive_cooldown"));
+		assert_exp(json.contains("roman_cancel_cooldown"));
+		assert_exp(json.contains("gravity"));
+		assert_exp(json["gravity"].contains("x"));
+		assert_exp(json["gravity"].contains("y"));
+		assert_exp(json.contains("jump_count"));
+		assert_exp(json.contains("air_dash_count"));
+		assert_exp(json.contains("air_movements"));
+		assert_exp(json.contains("mana_max"));
+		assert_exp(json.contains("mana_start"));
+		assert_exp(json.contains("mana_regen"));
+		assert_exp(json.contains("palettes"));
+		assert_exp(json.contains("air_drift"));
+		assert_exp(json["air_drift"].contains("up"));
+		assert_exp(json["air_drift"].contains("down"));
+		assert_exp(json["air_drift"].contains("back"));
+		assert_exp(json["air_drift"].contains("front"));
+		assert_exp(json["air_drift"]["up"].contains("accel"));
+		assert_exp(json["air_drift"]["up"].contains("max"));
+		assert_exp(json["air_drift"]["down"].contains("accel"));
+		assert_exp(json["air_drift"]["down"].contains("max"));
+		assert_exp(json["air_drift"]["back"].contains("accel"));
+		assert_exp(json["air_drift"]["back"].contains("max"));
+		assert_exp(json["air_drift"]["front"].contains("accel"));
+		assert_exp(json["air_drift"]["front"].contains("max"));
 
-		for (auto &j : json["palettes"]) {
-			this->palettes.emplace_back();
-			for (auto &c : j) {
-				if (!c.contains("r"))
-					throw std::invalid_argument("c.r is missing");
-				if (!c.contains("g"))
-					throw std::invalid_argument("c.g is missing");
-				if (!c.contains("b"))
-					throw std::invalid_argument("c.b is missing");
-				this->palettes.back().push_back(Color{
-					c["r"],
-					c["g"],
-					c["b"],
-					255
-				});
-			}
-			assert_exp(this->palettes.size() == 1 || this->palettes[this->palettes.size() - 2].size() == this->palettes.back().size());
-		}
+		for (auto &j : json["palettes"])
+			this->palettes.push_back(folder + "/" + j.get<std::string>());
 
 		this->pos = json["pos"];
 		this->name = Utils::utf8ToUtf16(json["name"].get<std::string>());
@@ -531,7 +478,7 @@ namespace SpiralOfFate
 		else {
 			this->icon.reserve(this->palettes.size());
 			for (auto &palette : this->palettes)
-				this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png", {this->palettes[0], palette}));
+				this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png", palette));
 		}
 	}
 
