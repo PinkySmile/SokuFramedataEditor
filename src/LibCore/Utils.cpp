@@ -236,18 +236,6 @@ namespace SpiralOfFate::Utils
 	}
 
 #ifdef USE_TGUI
-	tgui::MessageBox::Ptr dispMsg(tgui::Gui &gui, const std::string &title, const std::string &content, int)
-	{
-		auto dialog = tgui::MessageBox::create(title, content, { "OK" });
-
-		// TODO: use variate
-		openWindowWithFocus(gui, 0, 0, dialog);
-		dialog->onButtonPress.connect([](const std::weak_ptr<tgui::MessageBox> &d){
-			d.lock()->close();
-		}, std::weak_ptr(dialog));
-		return dialog;
-	}
-
 	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title, const std::string &basePath, bool overWriteWarning, bool mustExist)
 	{
 		auto dialog = tgui::FileDialog::create(title, overWriteWarning ? "Save" : "Open", overWriteWarning);

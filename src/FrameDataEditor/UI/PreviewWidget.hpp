@@ -26,6 +26,7 @@ namespace SpiralOfFate
 		bool _commited = false;
 		bool _dragStarted = false;
 		bool _translateDragStarted = false;
+		unsigned char _selectedColor = 0;
 		float _scale = 1;
 		tgui::Vector2f _translate = {0, 0};
 		tgui::Vector2f _lastMousePos;
@@ -53,6 +54,8 @@ namespace SpiralOfFate
 		typedef std::shared_ptr<PreviewWidget> Ptr; //!< Shared widget pointer
 		typedef std::shared_ptr<const PreviewWidget> ConstPtr; //!< Shared constant widget pointer
 
+		static constexpr const char StaticWidgetType[] = "FDPreviewWidget"; //!< Type name of the widget
+
 		bool displayBoxes = true;
 		bool displaceObject = true;
 		bool showingPalette = false;
@@ -71,6 +74,10 @@ namespace SpiralOfFate
 		void mouseNoLongerOnWidget() override;
 		void keyPressed(const tgui::Event::KeyEvent &event) override;
 		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
+		void setSelectedColor(unsigned char index);
+		unsigned char getSelectedColor() const;
+		void setPalette(const std::array<Color, 256> *palette);
+		void invalidatePalette();
 	};
 }
 

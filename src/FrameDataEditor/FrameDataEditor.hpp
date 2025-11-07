@@ -104,6 +104,7 @@ namespace SpiralOfFate
 			return localize;
 		}
 
+		void refreshInterface();
 		void update();
 		void render();
 		bool closeAll();

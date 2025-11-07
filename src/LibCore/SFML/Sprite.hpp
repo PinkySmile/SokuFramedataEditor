@@ -21,6 +21,7 @@ namespace SpiralOfFate
 		Sprite(const Sprite &o);
 		~Sprite();
 
+		using sf::Sprite::setTexture;
 		void setTexture(unsigned handle, bool resetRect = false);
 		unsigned getHandle() const;
 		Vector2u getTextureSize() const;

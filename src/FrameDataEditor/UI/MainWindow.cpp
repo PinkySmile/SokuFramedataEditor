@@ -16,6 +16,27 @@
 #include "../Operations/CreateBlockOperation.hpp"
 #include "../Operations/CreateBoxOperation.hpp"
 #include "../Operations/RemoveFrameOperation.hpp"
+#include "ColorPlaneWidget.hpp"
+#include "ColorSliderWidget.hpp"
+#include "../Operations/ColorEditionOperation.hpp"
+#include "../Operations/CreatePaletteOperation.hpp"
+#include "../Operations/RemovePaletteOperation.hpp"
+
+static ColorConversionCb colorConversions[] = {
+	[](unsigned r, unsigned g, unsigned b) {
+		return SpiralOfFate::Color(r, g, b, 255);
+	}
+};
+static ReverseColorConversionCb colorConversionsReverse[] = {
+	[](const SpiralOfFate::Color &color) {
+		return WidgetColor{color.r, color.g, color.b};
+	}
+};
+
+static ColorSpaceRanges colorSpaces[] = {
+	{std::pair{0U, 255U}, std::pair{0U, 255U}, std::pair{0U, 255U}},
+};
+
 
 template<typename T>
 std::string to_string(T value, int)
@@ -40,6 +61,119 @@ std::string to_hex(unsigned long long value)
 	return buffer;
 }
 
+#define PLACE_HOOK_WIDGET(elem, src) do {                                                                \
+        if (!elem)                                                                                       \
+                break;                                                                                   \
+        elem->onChangeStarted.connect([this]{                                                            \
+                if (this->_palettes.empty())                                                             \
+                        return;                                                                          \
+                this->startTransaction();                                                                \
+        });                                                                                              \
+        elem->onChanged.connect([this](WidgetColor color){                                               \
+                if (this->_palettes.empty())                                                             \
+                        return;                                                                          \
+                this->updateTransaction([this, color] {                                                  \
+                        return new ColorEditionOperation(                                                \
+                                this->_editor.localize("color.edit"),                                    \
+                                this->_palettes[this->_selectedPalette],                                 \
+                                this->_selectedPalette,                                                  \
+                                this->_selectedColor,                                                    \
+                                colorConversions[this->_selectColorMethod](color[0], color[1], color[2]),\
+                                [this]{ this->_colorChangeSource = src; }                                \
+                        );                                                                               \
+                });                                                                                      \
+        });                                                                                              \
+        elem->onChangeEnded.connect([this]{                                                              \
+                if (this->_palettes.empty())                                                             \
+                        return;                                                                          \
+                this->commitTransaction();                                                               \
+        });                                                                                              \
+        this->_containers.emplace(&container);                                                           \
+} while (false)
+#define PLACE_HOOK_HEXCOLOR(elem) do {                                                                  \
+        if (!elem)                                                                                      \
+                break;                                                                                  \
+        elem->onFocus.connect([this]{                                                                   \
+                if (this->_palettes.empty())                                                            \
+                        return;                                                                         \
+	        this->startTransaction();                                                               \
+	}); 	        	        	        	                                        \
+        elem->onUnfocus.connect([this]{                                                                 \
+                if (this->_palettes.empty())                                                            \
+                        return;                                                                         \
+	        this->commitTransaction();                                                              \
+	}); 	        	        	        	                                        \
+        elem->onReturnKeyPress.connect([this]{                                                          \
+                if (this->_palettes.empty())                                                            \
+                        return;                                                                         \
+	        this->commitTransaction();                                                              \
+	        this->startTransaction();                                                               \
+	}); 	        	        	        	                                        \
+        elem->onTextChange.connect([this](const tgui::String &s){                                       \
+                if (this->_palettes.empty())                                                            \
+                        return;                                                                         \
+                                                                                                        \
+                Color color;                                                                            \
+                                                                                                        \
+                if (s.size() < 7)                                                                       \
+                        return;                                                                         \
+                sscanf(s.toStdString().c_str(), "#%02hhX%02hhX%02hhX", &color.r, &color.g, &color.b);   \
+                this->updateTransaction([this, color]{                                                  \
+                        return new ColorEditionOperation(                                               \
+                                this->_editor.localize("color.edit"),                                   \
+                                this->_palettes[this->_selectedPalette],                                \
+                                this->_selectedPalette,                                                 \
+                                this->_selectedColor,                                                   \
+                                color,                                                                  \
+                                [this]{ this->_colorChangeSource = 5; }                                 \
+                        );                                                                              \
+                });                                                                                     \
+        });                                                                                             \
+        this->_containers.emplace(&container);                                                          \
+} while (false)
+#define PLACE_HOOK_COLOR_COMPONENT(elem, index) do {                                                                 \
+        if (!elem)                                                                                                   \
+                break;                                                                                               \
+        elem->onFocus.connect([this]{                                                                                \
+                if (this->_palettes.empty())                                                                         \
+                        return;                                                                                      \
+	        this->startTransaction();                                                                            \
+	}); 	        	        	        	                                                     \
+        elem->onUnfocus.connect([this]{                                                                              \
+                if (this->_palettes.empty())                                                                         \
+                        return;                                                                                      \
+	        this->commitTransaction();                                                                           \
+	}); 	        	        	        	                                                     \
+        elem->onReturnKeyPress.connect([this]{                                                                       \
+                if (this->_palettes.empty())                                                                         \
+                        return;                                                                                      \
+	        this->commitTransaction();                                                                           \
+	        this->startTransaction();                                                                            \
+	}); 	        	        	        	                                                     \
+        elem->onTextChange.connect([this](const tgui::String &s){                                                    \
+                if (this->_palettes.empty())                                                                         \
+                        return;                                                                                      \
+                if (s.empty())                                                                                       \
+                        return;                                                                                      \
+                                                                                                                     \
+                auto value = std::stoul(s.toStdString());                                                            \
+                auto color = this->_palettes[this->_selectedPalette].colors[this->_selectedColor];                   \
+                auto converted = colorConversionsReverse[this->_selectColorMethod](color);                           \
+                                                                                                                     \
+                converted[index] = value;                                                                            \
+                this->updateTransaction([this, converted]{                                                           \
+                        return new ColorEditionOperation(                                                            \
+                                this->_editor.localize("color.edit"),                                                \
+                                this->_palettes[this->_selectedPalette],                                             \
+                                this->_selectedPalette,                                                              \
+                                this->_selectedColor,                                                                \
+                                colorConversions[this->_selectColorMethod](converted[0], converted[1], converted[2]),\
+                                [this]{ this->_colorChangeSource = index + 2;  }                                     \
+                        );                                                                                           \
+                });                                                                                                  \
+        });                                                                                                          \
+        this->_containers.emplace(&container);                                                                       \
+} while (false)
 #define PLACE_HOOK_BOX(container, guiId, field, other, name)                                              \
 do {                                                                                                      \
         auto __elem = container.get<tgui::EditBox>(guiId);                                                \
@@ -82,6 +216,7 @@ do {                                                                            
 		")");                                                                                     \
                 __elem->onTextChange.setEnabled(true);                                                    \
         });                                                                                               \
+        this->_containers.emplace(&container);                                                            \
 } while (false)
 #define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset, noEmpty) \
 do {                                                                                                             \
@@ -111,6 +246,7 @@ do {                                                                            
                 __elem->setText(toString(data.field, arg));                                                      \
                 __elem->onTextChange.setEnabled(true);                                                           \
         });                                                                                                      \
+        this->_containers.emplace(&container);                                                                   \
 } while (false)
 #define PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset) \
 do {                                                                                                                             \
@@ -154,6 +290,7 @@ do {                                                                            
                         __elem->setText("");                                                                                     \
                 __elem->onTextChange.setEnabled(true);                                                                           \
         });                                                                                                                      \
+        this->_containers.emplace(&container);                                                                                   \
 } while (false)
 
 #define NO_FROMSTRING_PRE(s)
@@ -262,6 +399,7 @@ do {                                                                            
                 __elem->setChecked(data.field.flags & (1ULL << index));            \
                 __elem->onChange.setEnabled(true);                                 \
         });                                                                        \
+        this->_containers.emplace(&container);                                     \
 } while (false)
 
 
@@ -272,11 +410,13 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, CloseButtonF
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MaximizeButtonFocused, "ChildWindowButton")
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButtonFocused, "ChildWindowButton")
 
-SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, FrameDataEditor &editor) :
+SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath, FrameDataEditor &editor) :
 	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
 	_editor(editor),
 	_path(frameDataPath),
-	_character(std::filesystem::path(frameDataPath).parent_path().filename().string()),
+	_pathBak(frameDataPath),
+	_chrPath(frameDataPath.parent_path()),
+	_character(frameDataPath.parent_path().filename().string()),
 	_object(new EditableObject(frameDataPath))
 {
 	this->_preview = std::make_shared<PreviewWidget>(std::ref(editor), std::ref(*this), *this->_object);
@@ -288,9 +428,55 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, FrameData
 	this->_preview->onBoxUnselect.connect([this]{
 		this->_rePopulateFrameData();
 	});
+	this->_pathBak += ".bak";
+
+	std::ifstream chrStream{this->_chrPath / "chr.json"};
+
+	if (chrStream.fail())
+		throw std::invalid_argument("Failed to open " + (this->_chrPath / "chr.json").string() + " for reading: " + strerror(errno));
+	chrStream >> this->_characterData;
+
+	auto palettes = this->_characterData["palettes"].get<std::vector<std::string>>();
 
 	this->m_renderer = aurora::makeCopied<Renderer>();
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/character/animationWindow.gui");
+	if (!palettes.empty()) {
+		std::array<unsigned char, 768> paletteData;
+
+		for (auto &ppath : palettes) {
+			std::ifstream paletteStream{this->_chrPath / ppath};
+
+			this->_palettes.emplace_back();
+
+			auto &pal = this->_palettes.back();
+
+			pal.path = ppath;
+			if (paletteStream.fail()) {
+				game->logger.error("Failed to open " + (this->_chrPath / ppath).string() + " for reading: " + strerror(errno));
+				continue;
+			}
+			paletteStream.read(reinterpret_cast<char *>(paletteData.data()), paletteData.size());
+			if (paletteStream.fail()) {
+				game->logger.error("Failed to read " + (this->_chrPath / ppath).string() + ".");
+				continue;
+			}
+			for (size_t i = 0 ; i < 251; i++) {
+				pal.colors[i].r = paletteData[i * 3];
+				pal.colors[i].g = paletteData[i * 3 + 1];
+				pal.colors[i].b = paletteData[i * 3 + 2];
+				pal.colors[i].a = i == 0 ? 0 : 255;
+			}
+
+			pal.colors[251] = game->typeColors[TYPECOLOR_NEUTRAL];
+			pal.colors[252] = game->typeColors[TYPECOLOR_NON_TYPED];
+			pal.colors[253] = game->typeColors[TYPECOLOR_MATTER];
+			pal.colors[254] = game->typeColors[TYPECOLOR_SPIRIT];
+			pal.colors[255] = game->typeColors[TYPECOLOR_VOID];
+		}
+		this->_preview->setPalette(&this->_palettes.front().colors);
+	} else
+		// TODO: Hardcoded string
+		Utils::dispMsg(*this, "No palette found", "Warning: No palette is provided for this character", MB_ICONWARNING);
 
 	auto panel = this->get<tgui::Panel>("AnimationPanel");
 	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
@@ -304,14 +490,14 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &frameDataPath, FrameData
 	this->setSize(1200, 600);
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
-	this->setTitle(frameDataPath);
+	this->setTitle(frameDataPath.string());
 	this->setResizable();
 	this->setCloseBehavior(CloseBehavior::None);
 	this->onClose.connect([this]{
 		// TODO: Check if it needs to be saved
 		std::error_code err;
 
-		std::filesystem::remove(this->_path + ".bak");
+		std::filesystem::remove(this->_pathBak);
 		this->m_parent->remove(this->shared_from_this());
 		this->onRealClose.emit(this);
 	});
@@ -368,13 +554,14 @@ void SpiralOfFate::MainWindow::redo()
 		this->commitTransaction();
 	if (this->_operationIndex == this->_operationQueue.size())
 		return;
+
+	auto wasModified = this->isModified();
+
 	this->_operationQueue[this->_operationIndex]->apply();
 	this->_operationIndex++;
-	this->_rePopulateData();
-	if (this->isModified())
-		this->setTitle(this->_path + "*");
-	else
-		this->setTitle(this->_path);
+	this->_requireReload = true;
+	if (!wasModified)
+		this->setTitle(this->_path.string() + "*");
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(this->hasRedoData());
 	this->autoSave();
@@ -388,13 +575,12 @@ void SpiralOfFate::MainWindow::undo()
 	}
 	if (this->_operationIndex == 0)
 		return;
+
 	this->_operationIndex--;
 	this->_operationQueue[this->_operationIndex]->undo();
-	this->_rePopulateData();
-	if (this->isModified())
-		this->setTitle(this->_path + "*");
-	else
-		this->setTitle(this->_path);
+	this->_requireReload = true;
+	if (!this->isModified())
+		this->setTitle(this->_path.string());
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setHasRedo(true);
 	this->autoSave();
@@ -403,23 +589,29 @@ void SpiralOfFate::MainWindow::undo()
 void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operation)
 {
 	assert_exp(!this->_pendingTransaction);
+
+	auto wasModified = this->isModified();
+
 	if (!operation)
 		operation = new DummyOperation();
 	this->_pendingTransaction.reset(operation);
 	this->_pendingTransaction->apply();
-	if (this->_pendingTransaction->hasModification())
-		this->setTitle(this->_path + "*");
+	if (!wasModified && this->_pendingTransaction->hasModification())
+		this->setTitle(this->_path.string() + "*");
 	this->_editor.setHasUndo(this->hasUndoData());
 }
 
 void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *()> &operation)
 {
 	assert_exp(this->_pendingTransaction);
+
+	auto wasModified = this->isModified();
+
 	this->_pendingTransaction->undo();
 	this->_pendingTransaction.reset(operation());
 	this->_pendingTransaction->apply();
-	if (this->_pendingTransaction->hasModification())
-		this->setTitle(this->_path + "*");
+	if (!wasModified && this->_pendingTransaction->hasModification())
+		this->setTitle(this->_path.string() + "*");
 	this->_editor.setHasUndo(this->hasUndoData());
 }
 
@@ -428,10 +620,8 @@ void SpiralOfFate::MainWindow::cancelTransaction()
 	assert_exp(this->_pendingTransaction);
 	this->_pendingTransaction->undo();
 	this->_pendingTransaction.reset();
-	if (this->isModified())
-		this->setTitle(this->_path + "*");
-	else
-		this->setTitle(this->_path);
+	if (!this->isModified())
+		this->setTitle(this->_path.string());
 	this->_editor.setHasUndo(this->hasUndoData());
 }
 
@@ -440,13 +630,17 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	assert_exp(this->_pendingTransaction);
 	if (!this->_pendingTransaction->hasModification())
 		return this->_pendingTransaction.reset();
+
+	auto wasModified = this->isModified();
+
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(nullptr);
 	this->_operationQueue.back().swap(this->_pendingTransaction);
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
-	this->setTitle(this->_path + "*");
+	if (!wasModified)
+		this->setTitle(this->_path.string() + "*");
 	this->autoSave();
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
@@ -458,37 +652,44 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 		delete operation;
 		return;
 	}
+
+	auto wasModified = this->isModified();
+
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
 	this->_operationQueue.back()->apply();
-	this->_rePopulateData();
+	this->_requireReload = true;
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
-	this->setTitle(this->_path + "*");
+	if (wasModified)
+		this->setTitle(this->_path.string() + "*");
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
 	this->autoSave();
 }
 
-void SpiralOfFate::MainWindow::save(const std::string &path)
+void SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
 {
-	std::error_code err;
-
-	std::filesystem::rename(this->_path + ".bak", path + ".bak", err);
-	if (err) {
-		// TODO: Hardcoded string
-		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot rename " + this->_path + ".bak to " + path + ".bak: " + strerror(errno), MB_ICONERROR);
-		return;
-	}
 	this->setPath(path);
 	this->save();
 }
 
-void SpiralOfFate::MainWindow::setPath(const std::string &path)
+void SpiralOfFate::MainWindow::setPath(const std::filesystem::path &path)
 {
+	std::error_code err;
+	std::filesystem::path pathBak = path;
+
+	pathBak += ".bak";
+	std::filesystem::rename(this->_pathBak, pathBak, err);
+	if (err)
+		// TODO: Hardcoded string
+		// FIXME: strerror only works on Linux (err.message()?)
+		game->logger.error("Cannot rename " + this->_pathBak.string() + " to " + pathBak.string() + ": " + strerror(errno));
 	this->_path = path;
+	this->_pathBak = pathBak;
+	for (auto &pal : this->_palettes)
+		pal.modified = true;
 }
 
 void SpiralOfFate::MainWindow::save()
@@ -497,24 +698,58 @@ void SpiralOfFate::MainWindow::save()
 
 	if (this->_pendingTransaction)
 		this->commitTransaction();
-	for (auto &[key, value] : this->_object->_moves) {
+	for (auto &[key, value] : this->_object->_moves)
 		j.push_back({
 			{"action", key},
 			{"framedata", value}
 		});
-	}
 
 	std::ofstream stream{this->_path};
 
 	if (stream.fail()) {
 		// TODO: Hardcoded string
 		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + this->_path + ": " + strerror(errno), MB_ICONERROR);
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + this->_path.string() + ": " + strerror(errno), MB_ICONERROR);
 		return;
 	}
 	stream << j.dump(2);
+
+	for (auto &pal : this->_palettes) {
+		auto p = this->_chrPath / pal.path;
+		std::ofstream palStream{p};
+
+		if (palStream.fail()) {
+			// TODO: Hardcoded string
+			// FIXME: strerror only works on Linux (err.message()?)
+			SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + p.string() + ": " + strerror(errno), MB_ICONERROR);
+			continue;
+		}
+
+		std::array<unsigned char, 768> paletteData;
+
+		for (size_t i = 0 ; i < 256; i++) {
+			paletteData[i * 3]     = pal.colors[i].r;
+			paletteData[i * 3 + 1] = pal.colors[i].g;
+			paletteData[i * 3 + 2] = pal.colors[i].b;
+		}
+		palStream.write(reinterpret_cast<char *>(paletteData.data()), paletteData.size());
+	}
+
+	auto p = this->_chrPath / "chr.json";
+	std::ofstream chrStream{p};
+
+	this->_characterData["palettes"] = nlohmann::json::array();
+	for (auto &pal : this->_palettes)
+		this->_characterData["palettes"].push_back(pal.path);
+	if (!chrStream.fail())
+		chrStream << this->_characterData.dump(2);
+	else
+		// TODO: Hardcoded string
+		// FIXME: strerror only works on Linux (err.message()?)
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + p.string() + ": " + strerror(errno), MB_ICONERROR);
+
 	this->_operationSaved = this->_operationIndex;
-	this->setTitle(this->_path);
+	this->setTitle(this->_path.string());
 }
 
 void SpiralOfFate::MainWindow::autoSave()
@@ -528,10 +763,10 @@ void SpiralOfFate::MainWindow::autoSave()
 		});
 	}
 
-	std::ofstream stream{this->_path + ".bak"};
+	std::ofstream stream{this->_pathBak};
 
 	if (stream.fail()) {
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_path + ".bak: " + strerror(errno), MB_ICONERROR);
+		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_pathBak.string() + ": " + strerror(errno), MB_ICONERROR);
 		return;
 	}
 	stream << j.dump(2);
@@ -565,6 +800,7 @@ SpiralOfFate::LocalizedContainer<tgui::ChildWindow>::Ptr SpiralOfFate::MainWindo
 		this->remove(outsidePanel.lock());
 		this->remove(content);
 		this->_updateFrameElements.erase(&*content);
+		this->_containers.erase(&*content);
 	};
 	auto data = this->_object->getFrameData();
 
@@ -599,6 +835,7 @@ void SpiralOfFate::MainWindow::_createGenericPopup(const std::string &path)
 		this->remove(outsidePanel.lock());
 		this->remove(content);
 		this->_updateFrameElements.erase(&*content);
+		this->_containers.erase(&*content);
 	};
 	auto data = this->_object->getFrameData();
 
@@ -723,6 +960,121 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	auto ctrlPanel = container.get<tgui::Panel>("ControlPanel");
 	auto boxes = container.get<tgui::Panel>("SelectedBoxPanel");
 	auto boxLabel = container.get<tgui::Label>("SelectedBoxName");
+	auto plane = container.get<ColorPlaneWidget>("ColorPlane");
+	auto slider = container.get<ColorSliderWidget>("ColorSlider");
+	auto comp1 = container.get<tgui::EditBox>("ColorComponent1");
+	auto comp2 = container.get<tgui::EditBox>("ColorComponent2");
+	auto comp3 = container.get<tgui::EditBox>("ColorComponent3");
+	auto hexcode = container.get<tgui::EditBox>("RGBColor");
+	auto addPal = container.get<tgui::Button>("AddPalette");
+	auto removePal = container.get<tgui::Button>("RemovePalette");
+	auto preview = container.get<tgui::Label>("ColorPreview");
+	auto paletteList = container.get<tgui::ComboBox>("PaletteList");
+	auto colorPanel = container.get<tgui::ScrollablePanel>("AllColorPanel");
+
+	if (colorPanel) {
+		float stepX = (colorPanel->getSize().x - 24) / 8.f;
+		float stepY = stepX - 8;
+		float extra = this->getSize().y - this->getInnerSize().y;
+
+		colorPanel->setSize("&.w - 20", tgui::Layout("(&.h - y) - 10 - " + std::to_string(extra)));
+		colorPanel->removeAllWidgets();
+		for (size_t i = 0; i < 256; i++) {
+			auto button = tgui::Button::create();
+
+			button->setSize({24, 16});
+			button->setPosition({(i % 8) * stepX, (i / 8) * stepY});
+			colorPanel->add(button, "Color" + std::to_string(i));
+
+			button->onClick.connect([this, i, &container]{
+				this->_selectedColor = i;
+				this->_populateColorData(container);
+			});
+		}
+	}
+	this->_preview->onColorSelect.disconnectAll();
+	this->_preview->onColorSelect.connect([this, &container](unsigned colorIndex){
+		this->_selectedColor = colorIndex;
+		this->_populateColorData(container);
+	});
+	if (paletteList)
+		paletteList->onItemSelect.connect([this, &container](unsigned index){
+			if (this->_palettes.empty())
+				return;
+			this->_selectedPalette = index;
+			this->_populateColorData(container);
+			this->_preview->setPalette(&this->_palettes[this->_selectedPalette].colors);
+		});
+
+	PLACE_HOOK_WIDGET(plane, 0);
+	PLACE_HOOK_WIDGET(slider, 1);
+	PLACE_HOOK_COLOR_COMPONENT(comp1, 0);
+	PLACE_HOOK_COLOR_COMPONENT(comp2, 1);
+	PLACE_HOOK_COLOR_COMPONENT(comp3, 2);
+	PLACE_HOOK_HEXCOLOR(hexcode);
+
+	if (addPal)
+		addPal->onClick.connect([this]{
+			auto window = this->_createPopup("assets/gui/editor/palette/add.gui");
+			auto create = window->get<tgui::Button>("CreatePalette");
+			auto cancel = window->get<tgui::Button>("CancelPalette");
+			auto name = window->get<tgui::EditBox>("PaletteName");
+			auto list = window->get<tgui::ComboBox>("PaletteList");
+
+			for (auto &pal : this->_palettes)
+				list->addItem(pal.path);
+			if (this->_palettes.empty())
+				list->setEnabled(false);
+			list->setSelectedItemByIndex(this->_selectedPalette);
+			create->setEnabled(false);
+
+			name->onTextChange.connect([this](std::weak_ptr<tgui::Button> ptr, const tgui::String &s){
+				auto button = ptr.lock();
+
+				if (s.empty()) {
+					button->setEnabled(false);
+					return;
+				}
+				for (auto &pal : this->_palettes)
+					if (pal.path == s.toStdString()) {
+						button->setEnabled(false);
+						return;
+					}
+				button->setEnabled(true);
+			}, std::weak_ptr(create));
+			create->onClick.connect([this, name, list](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
+				std::array<Color, 256> colors;
+
+				if (this->_palettes.empty()) {
+					colors.fill(Color::Black);
+					colors[0] = Color::Transparent;
+					colors[251] = game->typeColors[TYPECOLOR_NEUTRAL];
+					colors[252] = game->typeColors[TYPECOLOR_NON_TYPED];
+					colors[253] = game->typeColors[TYPECOLOR_MATTER];
+					colors[254] = game->typeColors[TYPECOLOR_SPIRIT];
+					colors[255] = game->typeColors[TYPECOLOR_VOID];
+				} else
+					colors = this->_palettes[list->getSelectedItemIndex()].colors;
+				this->applyOperation(new CreatePaletteOperation(
+					this->_palettes,
+					this->_editor.localize("palette.create_action"),
+					{ .path = name->getText().toStdString(), .colors = colors, .modified = true },
+					this->_selectedPalette
+				));
+				ptr.lock()->close();
+			}, std::weak_ptr(window));
+			cancel->onClick.connect([](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
+				ptr.lock()->close();
+			}, std::weak_ptr(window));
+		});
+	if (removePal)
+		removePal->onClick.connect([this]{
+			this->applyOperation(new RemovePaletteOperation(
+				this->_palettes,
+				this->_editor.localize("palette.remove_action"),
+				this->_selectedPalette
+			));
+		});
 
 	if (ctrl)
 		ctrl->onTabSelect.connect([this, ctrlPanel](std::weak_ptr<tgui::Tabs> This){
@@ -734,8 +1086,9 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			ctrlPanel->loadWidgetsFromFile(
 				selected == 0 ?
 				"assets/gui/editor/character/framedata.gui" :
-				"assets/gui/editor/character/palette.gui"
+				"assets/gui/editor/palette/palette.gui"
 			);
+			this->_initSidePanel(*ctrlPanel);
 			this->_localizeWidgets(*ctrlPanel, true);
 			Utils::setRenderer(static_cast<tgui::Container::Ptr>(ctrlPanel));
 			this->_placeUIHooks(*ctrlPanel);
@@ -761,7 +1114,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_actionBlock = 0;
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
-			this->_rePopulateData();
+			this->_requireReload = true;
 		}, std::weak_ptr(action));
 	if (clearHit)
 		clearHit->onClick.connect([this]{
@@ -792,7 +1145,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 			this->_object->_actionBlock = 0;
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
-			this->_rePopulateData();
+			this->_requireReload = true;
 		}, false);
 	if (play)
 		play->onPress.connect([this]{
@@ -824,7 +1177,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		blockSpin->onValueChange.connect([this](float value){
 			this->_object->_actionBlock = value;
 			this->_object->_animation = 0;
-			this->_rePopulateData();
+			this->_requireReload = true;
 		});
 
 	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation, false);
@@ -878,13 +1231,15 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)), false);
 	for (size_t i = 0; i < 64; i++)
 		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)), i == 8 || i == 13 || i == 21);
-	if (boxes)
+	if (boxes) {
 		this->_updateFrameElements[&container].emplace_back([boxes, this]{
 			boxes->setVisible(this->_preview->getSelectedBox().first != BOXTYPE_NONE);
 			for (auto &fct : this->_updateFrameElements[&*boxes])
 				fct();
 		});
-	if (boxLabel)
+		this->_containers.emplace(&container);
+	}
+	if (boxLabel) {
 		this->_updateFrameElements[&container].emplace_back([boxLabel, this] {
 			auto box = this->_preview->getSelectedBox();
 
@@ -902,6 +1257,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 				boxLabel->setText("");
 			}
 		});
+		this->_containers.emplace(&container);
+	}
 }
 
 
@@ -1040,10 +1397,9 @@ void SpiralOfFate::MainWindow::reloadTextures()
 	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
-
 void SpiralOfFate::MainWindow::_rePopulateData()
 {
-	for (auto &[key, _] : this->_updateFrameElements)
+	for (auto key : this->_containers)
 		this->_populateData(*key);
 	this->_object->resetState();
 	this->_preview->frameChanged();
@@ -1051,7 +1407,7 @@ void SpiralOfFate::MainWindow::_rePopulateData()
 
 void SpiralOfFate::MainWindow::_rePopulateFrameData()
 {
-	for (auto &[key, _] : this->_updateFrameElements)
+	for (auto key: this->_containers)
 		this->_populateFrameData(*key);
 }
 
@@ -1101,12 +1457,134 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 	}
 
 	this->_populateFrameData(container);
+	this->_populateColorData(container);
+}
+
+void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &container)
+{
+	auto removePal = container.get<tgui::Button>("RemovePalette");
+
+	if (removePal)
+		removePal->setEnabled(this->_palettes.size() > 1);
+
+	if (this->_palettes.empty())
+		return;
+
+	auto plane = container.get<ColorPlaneWidget>("ColorPlane");
+	auto slider = container.get<ColorSliderWidget>("ColorSlider");
+	auto comp1 = container.get<tgui::EditBox>("ColorComponent1");
+	auto comp2 = container.get<tgui::EditBox>("ColorComponent2");
+	auto comp3 = container.get<tgui::EditBox>("ColorComponent3");
+	auto hexcode = container.get<tgui::EditBox>("RGBColor");
+	auto paletteList = container.get<tgui::ComboBox>("PaletteList");
+	auto preview = container.get<tgui::Label>("ColorPreview");
+	auto colorIndex = container.get<tgui::Label>("ColorIndex");
+	auto colorPanel = container.get<tgui::ScrollablePanel>("AllColorPanel");
+	auto comp1lab = container.get<tgui::Label>("ColorComponentName1");
+	auto comp2lab = container.get<tgui::Label>("ColorComponentName2");
+	auto comp3lab = container.get<tgui::Label>("ColorComponentName3");
+	auto color = this->_palettes[this->_selectedPalette].colors[this->_selectedColor];
+	auto colorConv = colorConversionsReverse[this->_selectColorMethod](color);
+
+	if (colorPanel) {
+		float extra = this->getSize().y - this->getInnerSize().y;
+
+		colorPanel->setSize("&.w - 20", tgui::Layout("(&.h - y) - 10 - " + std::to_string(extra)));
+		for (size_t i = 0; i < 256; i++) {
+			auto button = colorPanel->get<tgui::Button>("Color" + std::to_string(i));
+			auto render = button->getRenderer();
+			auto ccolor = this->_palettes[this->_selectedPalette].colors[i];
+
+			render->setBorders({1, 1, 1, 1});
+			render->setBorderColor(tgui::Color{0, 0, 0});
+			render->setBorderColorHover(tgui::Color{100, 100, 100});
+			render->setBorderColorDisabled(tgui::Color{200, 200, 200});
+			render->setBorderColorFocused(tgui::Color{0, 0, 255});
+			render->setBorderColorDown(tgui::Color{0, 0, 0});
+			render->setBorderColorDownDisabled(tgui::Color{0, 0, 0});
+			render->setBorderColorDownFocused(tgui::Color{0, 0, 0});
+			render->setBorderColorDownHover(tgui::Color{0, 0, 0});
+
+			render->setBackgroundColor(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorHover(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorDisabled(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorFocused(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorDown(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorDownDisabled(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorDownFocused(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+			render->setBackgroundColorDownHover(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
+
+			render->setTexture(tgui::Texture{});
+			render->setTextureHover(tgui::Texture{});
+			render->setTextureDisabled(tgui::Texture{});
+			render->setTextureFocused(tgui::Texture{});
+			render->setTextureDown(tgui::Texture{});
+			render->setTextureDownDisabled(tgui::Texture{});
+			render->setTextureDownFocused(tgui::Texture{});
+			render->setTextureDownHover(tgui::Texture{});
+		}
+	}
+	if (colorIndex)
+		colorIndex->setText("#" + std::to_string(this->_selectedColor));
+	if (paletteList) {
+		paletteList->onItemSelect.setEnabled(false);
+		paletteList->removeAllItems();
+		for (auto &s : this->_palettes)
+			paletteList->addItem(s.path);
+		paletteList->setSelectedItemByIndex(this->_selectedPalette);
+		paletteList->onItemSelect.setEnabled(true);
+	}
+	if (preview) {
+		auto r = preview->getRenderer();
+
+		r->setBorders({1, 1, 1, 1});
+		r->setBackgroundColor(sf::Color(color));
+	}
+	if (plane && this->_colorChangeSource != 0) {
+		plane->onChanged.setEnabled(false);
+		plane->setColor(colorConv);
+		plane->onChanged.setEnabled(true);
+	}
+	if (slider && this->_colorChangeSource != 1) {
+		slider->onChanged.setEnabled(false);
+		slider->setColor(colorConv);
+		slider->onChanged.setEnabled(true);
+	}
+	if (comp1 && this->_colorChangeSource != 2) {
+		comp1->onTextChange.setEnabled(false);
+		comp1->setText(std::to_string(colorConv[0]));
+		comp1->onTextChange.setEnabled(true);
+	}
+	if (comp2 && this->_colorChangeSource != 3) {
+		comp2->onTextChange.setEnabled(false);
+		comp2->setText(std::to_string(colorConv[1]));
+		comp2->onTextChange.setEnabled(true);
+	}
+	if (comp3 && this->_colorChangeSource != 4) {
+		comp3->onTextChange.setEnabled(false);
+		comp3->setText(std::to_string(colorConv[2]));
+		comp3->onTextChange.setEnabled(true);
+	}
+	if (comp1lab && this->_colorChangeSource == 255)
+		comp1lab->setText(this->_editor.localize("color.type" + std::to_string(this->_selectColorMethod) + ".component1"));
+	if (comp2lab && this->_colorChangeSource == 255)
+		comp2lab->setText(this->_editor.localize("color.type" + std::to_string(this->_selectColorMethod) + ".component2"));
+	if (comp3lab && this->_colorChangeSource == 255)
+		comp3lab->setText(this->_editor.localize("color.type" + std::to_string(this->_selectColorMethod) + ".component3"));
+	if (hexcode && this->_colorChangeSource != 5) {
+		char buffer[8];
+
+		sprintf(buffer, "#%02X%02X%02X", color.r, color.g, color.b);
+		hexcode->onTextChange.setEnabled(false);
+		hexcode->setText(buffer);
+		hexcode->onTextChange.setEnabled(true);
+	}
 }
 
 void SpiralOfFate::MainWindow::_populateFrameData(const tgui::Container &container)
 {
-	for (const auto &pair : this->_updateFrameElements[&container])
-		pair();
+	for (const auto &fct : this->_updateFrameElements[&container])
+		fct();
 
 	auto frameLabel = container.get<tgui::Label>("FrameLabel");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
@@ -1134,11 +1612,22 @@ void SpiralOfFate::MainWindow::tick()
 {
 	auto animation = this->_object->_animation;
 
+	if (this->_requireReload) {
+		this->_rePopulateData();
+		this->_requireReload = false;
+	}
+	this->_timer++;
+	if (this->_timer % 4 == 0) {
+		if (this->_colorChangeSource != 255) {
+			this->_colorChangeSource = 255;
+			this->_preview->invalidatePalette();
+		}
+	}
 	if (!this->_paused)
 		this->_object->update();
 	if (animation != this->_object->_animation) {
 		this->_preview->frameChanged();
-		for (auto &[key, _]: this->_updateFrameElements)
+		for (auto key : this->_containers)
 			this->_populateFrameData(*key);
 	}
 }
@@ -1262,7 +1751,7 @@ void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
 	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Escape) {
 		if (this->_pendingTransaction) {
 			this->cancelTransaction();
-			this->_rePopulateData();
+			this->_requireReload = true;
 			// FIXME: Special case for when you were dragging a box
 			//        Right now it will start a transaction that will never be removed
 			//        and starting a new one will crash because of the assertion
@@ -1277,4 +1766,29 @@ bool SpiralOfFate::MainWindow::canHandleKeyPress(const tgui::Event::KeyEvent &ev
 	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Escape)
 		return true;
 	return ChildWindow::canHandleKeyPress(event);
+}
+
+void SpiralOfFate::MainWindow::_initSidePanel(tgui::Panel &panel)
+{
+	if (!this->_showingPalette)
+		return;
+
+	auto rect = panel.get<tgui::Panel>("ColorSpaceRectPanel");
+
+	if (rect) {
+		rect->removeAllWidgets();
+
+		auto colorPlane = ColorPlaneWidget::create(colorConversions[this->_selectColorMethod], colorSpaces[this->_selectColorMethod], {0, 1}, {"&.w - 30", "&.w - 30"});
+		auto colorSlider= ColorSliderWidget::create(colorConversions[this->_selectColorMethod], colorSpaces[this->_selectColorMethod], 2, true, {"20", "&.w - 30"});
+
+		rect->add(colorPlane, "ColorPlane");
+		rect->add(colorSlider, "ColorSlider");
+		colorPlane->setPosition(0, 0);
+		colorSlider->setPosition("ColorPlane.x + ColorPlane.w", 0);
+	}
+}
+
+void SpiralOfFate::MainWindow::refreshInterface()
+{
+	this->_populateData(*this);
 }

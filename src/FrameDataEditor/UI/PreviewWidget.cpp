@@ -135,7 +135,7 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	);
 	statesSFML.coordinateType = sf::CoordinateType::Normalized;
 	realTarget->draw(this->_stageSprite, statesSFML);
-	this->_object.render(*realTarget, statesSFML, this->displaceObject);
+	this->_object.render(*realTarget, statesSFML, this->displaceObject && !this->showingPalette);
 
 	if (this->displayBoxes && !this->showingPalette) {
 		size_t index = 1;
@@ -266,7 +266,19 @@ void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const tgui::Vector2f &po
 
 void SpiralOfFate::PreviewWidget::_updateHover(const tgui::Vector2f &pos)
 {
-	if (this->showingPalette || !this->displayBoxes)
+	if (this->showingPalette) {
+		SpiralOfFate::Vector2f p = {pos.x, pos.y};
+
+		this->_object.setMousePosition(&p);
+		if (this->_selectedColor != 0 && this->_object._paletteIndex <= 0) {
+			this->_object._paletteIndex = this->_selectedColor;
+			this->_object._generateOverlaySprite();
+		}
+		return;
+	}
+
+	this->_object.setMousePosition(nullptr);
+	if (!this->displayBoxes)
 		return;
 
 	size_t index = 1;
@@ -324,6 +336,8 @@ void SpiralOfFate::PreviewWidget::_updateHover(const tgui::Vector2f &pos)
 			this->_boxCounter = it - this->_hoveredBoxes.begin();
 		this->_boxHovered = this->_hoveredBoxes[this->_boxCounter];
 	}
+	if (this->_boxHovered)
+		cursor = tgui::Cursor::Type::Hand;
 	if (this->_boxSelected)
 		this->_updateBoxSliderHover(pos, cursor);
 	this->setMouseCursor(cursor);
@@ -494,7 +508,8 @@ bool SpiralOfFate::PreviewWidget::scrolled(float delta, tgui::Vector2f pos, bool
 			this->_scale *= 0.8;
 		else if (delta > 0)
 			this->_scale *= 1.25;
-	} else if (this->_hoveredBoxes.empty())
+	} else if (this->showingPalette);
+	else if (this->_hoveredBoxes.empty())
 		this->_boxHovered = 0;
 	else if (delta < 0) {
 		this->_boxCounter++;
@@ -536,6 +551,18 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 		this->_lastMousePos = transformedPos + this->_translate;
 		this->_startMousePos = transformedPos;
 		return true;
+	}
+	if (this->showingPalette) {
+		auto old = this->_selectedColor;
+
+		this->_updateHover(transformedPos);
+		if (this->_object._paletteIndex <= 0)
+			this->_selectedColor = 0;
+		else
+			this->_selectedColor = this->_object._paletteIndex;
+		if (old != this->_selectedColor)
+			this->onColorSelect.emit(this, this->_selectedColor);
+		return ClickableWidget::leftMousePressed(pos);
 	}
 	if (this->_boxHovered == 0)
 		this->_updateHover(transformedPos);
@@ -606,4 +633,33 @@ void SpiralOfFate::PreviewWidget::leftMouseButtonNoLongerDown()
 	this->_dragStarted = false;
 	this->_translateDragStarted = false;
 	Widget::leftMouseButtonNoLongerDown();
+}
+
+void SpiralOfFate::PreviewWidget::setSelectedColor(unsigned char index)
+{
+	this->_selectedColor = index;
+	this->_object._generateOverlaySprite();
+}
+
+unsigned char SpiralOfFate::PreviewWidget::getSelectedColor() const
+{
+	return this->_selectedColor;
+}
+
+void SpiralOfFate::PreviewWidget::setPalette(const std::array<Color, 256> *palette)
+{
+	for (auto &[aid, moves] : this->_object._moves)
+		for (auto &block : moves)
+			for (auto &data : block) {
+				data.__paletteData = palette;
+				data.__requireReload = true;
+			}
+}
+
+void SpiralOfFate::PreviewWidget::invalidatePalette()
+{
+	for (auto &[aid, moves] : this->_object._moves)
+		for (auto &block : moves)
+			for (auto &data : block)
+				data.__requireReload = true;
 }

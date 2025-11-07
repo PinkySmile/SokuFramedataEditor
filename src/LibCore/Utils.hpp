@@ -157,8 +157,8 @@ namespace SpiralOfFate::Utils
 	//! @param width The width of the window.
 	//! @param height The height of the window.
 	//! @return A pointer to the window
-	template<typename WindowType = tgui::ChildWindow, typename ...Args>
-	typename WindowType::Ptr openWindowWithFocus(tgui::Gui &gui, tgui::Layout width, tgui::Layout height, typename WindowType::Ptr window = nullptr, bool closeOut = true, Args ...args)
+	template<typename T, typename WindowType = tgui::ChildWindow, typename ...Args>
+	typename WindowType::Ptr openWindowWithFocus(T &gui, tgui::Layout width, tgui::Layout height, typename WindowType::Ptr window = nullptr, bool closeOut = true, Args ...args)
 	{
 		auto panel = tgui::Panel::create({"100%", "100%"});
 
@@ -176,11 +176,9 @@ namespace SpiralOfFate::Utils
 
 		window->setFocused(true);
 
-		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
-		auto closeWindow = [&gui, window, panel, tabUsageEnabled]{
+		auto closeWindow = [&gui, window, panel]{
 			gui.remove(window);
 			gui.remove(panel);
-			gui.setTabKeyUsageEnabled(tabUsageEnabled);
 		};
 
 		if (closeOut)
@@ -197,7 +195,18 @@ namespace SpiralOfFate::Utils
 	//! @param variate A bit combination of the window attributes (see Windows MessageBox function for a list of the enums).
 	//! @return The button clicked by the user.
 	//! @note On Non-Windows systems, it will simulate the Windows dialog box. Only MB_ICONERROR and MB_OK are simulated on those systems.
-	tgui::MessageBox::Ptr dispMsg(tgui::Gui &gui, const std::string &title, const std::string &content, int variate);
+	template<typename T>
+	tgui::MessageBox::Ptr dispMsg(T &gui, const std::string &title, const std::string &content, int variate)
+	{
+		auto dialog = tgui::MessageBox::create(title, content, { "OK" });
+
+		// TODO: use variate
+		openWindowWithFocus(gui, 0, 0, dialog);
+		dialog->onButtonPress.connect([](const std::weak_ptr<tgui::MessageBox> &d){
+			d.lock()->close();
+		}, std::weak_ptr(dialog));
+		return dialog;
+	}
 
 	//! @brief Opens a FileDialog
 	//! @param title Title of the FileDialog

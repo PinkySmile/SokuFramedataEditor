@@ -371,8 +371,10 @@ namespace SpiralOfFate
 
 	FrameData::FrameData(const FrameData &other)
 	{
-		__folder = other.__folder;
-		__palette = other.__palette;
+		this->__folder = other.__folder;
+		this->__palette = other.__palette;
+		this->__requireReload = other.__requireReload;
+		this->__paletteData = other.__paletteData;
 		this->particleGenerator = other.particleGenerator;
 		this->chipDamage = other.chipDamage;
 		this->priority = other.priority;
@@ -438,8 +440,10 @@ namespace SpiralOfFate
 
 	FrameData &FrameData::operator=(const FrameData &other)
 	{
-		__folder = other.__folder;
-		__palette = other.__palette;
+		this->__folder = other.__folder;
+		this->__palette = other.__palette;
+		this->__requireReload = other.__requireReload;
+		this->__paletteData = other.__paletteData;
 		if (!this->_slave) {
 			game->textureMgr.remove(this->textureHandle);
 			game->textureMgr.remove(this->textureHandleEffects);
@@ -506,13 +510,25 @@ namespace SpiralOfFate
 		return *this;
 	}
 
+	void FrameData::checkReloadTexture()
+	{
+		if (this->__requireReload)
+			this->reloadTexture();
+		this->__requireReload = false;
+	}
+
 	void FrameData::reloadTexture()
 	{
 		assert_exp(!this->_slave);
 		game->textureMgr.remove(this->textureHandle);
 		game->textureMgr.remove(this->textureHandleEffects);
-		this->textureHandle = game->textureMgr.load(this->__folder + "/" + this->spritePath, this->__palette);
-		this->textureHandleEffects = game->textureMgr.load(this->__folder + "/effects/" + this->spritePath, this->__palette);
+		if (!this->__paletteData) {
+			this->textureHandle = game->textureMgr.load(this->__folder + "/" + this->spritePath, this->__palette);
+			this->textureHandleEffects = game->textureMgr.load(this->__folder + "/effects/" + this->spritePath, this->__palette);
+		} else {
+			this->textureHandle = game->textureMgr.load(this->__folder + "/" + this->spritePath, *this->__paletteData);
+			this->textureHandleEffects = game->textureMgr.load(this->__folder + "/effects/" + this->spritePath, *this->__paletteData);
+		}
 	}
 
 	void FrameData::reloadSound()

@@ -240,6 +240,17 @@
 	"animation.aflags.flag62":         "Flag 63",
 	"animation.aflags.flag63":         "Flag 64",
 
+	"color.type0.component1":          "Rouge",
+	"color.type0.component2":          "Vert",
+	"color.type0.component3":          "Bleu",
+	"color.hexcode":                   "Code hex",
+	"color.edit":                      "Modification de couleur",
+
+	"palette.create":                  "Ajouter",
+	"palette.cancel":                  "Annuler",
+	"palette.create_action":           "Créer palette",
+	"palette.delete_action":           "Supprimer palette",
+
 	"settings.save":                   "Sauvegarder",
 	"settings.cancel":                 "Annuler",
 	"settings.title":                  "Paramètres",

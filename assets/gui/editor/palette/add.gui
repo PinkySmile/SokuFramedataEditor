@@ -1,0 +1,127 @@
+Renderer.1 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorDown = #EBEBEB;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorDown = black;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorDown = black;
+    TextColorHover = black;
+    Texture = None;
+    TextureDisabled = None;
+    TextureDown = None;
+    TextureDownFocused = None;
+    TextureDownHover = None;
+    TextureFocused = None;
+    TextureHover = None;
+}
+
+ComboBox.PaletteList {
+    ChangeItemOnScroll = false;
+    ItemsToDisplay = 0;
+    MaximumItems = 0;
+    Position = (10, 10);
+    Size = (280, 21);
+    TextSize = 13;
+
+    Renderer {
+        ArrowBackgroundColor = #F5F5F5;
+        ArrowBackgroundColorHover = white;
+        ArrowColor = #3C3C3C;
+        ArrowColorHover = black;
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Padding = (0, 0, 0, 0);
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        TextureArrow = None;
+        TextureArrowDisabled = None;
+        TextureArrowHover = None;
+        TextureBackground = None;
+        TextureBackgroundDisabled = None;
+
+        ListBox {
+            BackgroundColor = #F5F5F5;
+            BackgroundColorHover = white;
+            BorderColor = black;
+            Borders = (1, 1, 1, 1);
+            Padding = (0, 0, 0, 0);
+            SelectedBackgroundColor = #006EFF;
+            SelectedBackgroundColorHover = #1E96FF;
+            SelectedTextColor = white;
+            TextColor = #3C3C3C;
+            TextColorHover = black;
+            TextureBackground = None;
+
+            Scrollbar {
+                ArrowBackgroundColor = #F5F5F5;
+                ArrowBackgroundColorHover = white;
+                ArrowColor = #3C3C3C;
+                ArrowColorHover = black;
+                TextureArrowDown = None;
+                TextureArrowDownHover = None;
+                TextureArrowUp = None;
+                TextureArrowUpHover = None;
+                TextureThumb = None;
+                TextureThumbHover = None;
+                TextureTrack = None;
+                TextureTrackHover = None;
+                ThumbColor = #DCDCDC;
+                ThumbColorHover = #E6E6E6;
+                TrackColor = #F5F5F5;
+            }
+        }
+    }
+}
+
+EditBox.PaletteName {
+    Position = (10, 40);
+    Size = (280, 21);
+    TextSize = 13;
+
+    Renderer {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        CaretColor = black;
+        CaretWidth = 1;
+        DefaultTextColor = #A0A0A0;
+        Padding = (0, 0, 0, 0);
+        SelectedTextBackgroundColor = #006EFF;
+        SelectedTextColor = white;
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        Texture = None;
+        TextureDisabled = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Button.CreatePalette {
+    Position = ((&.w - w) - 10, 70);
+    Renderer = &1;
+    Size = (((&.w - 20) / 2) - 5, 21);
+    Text = "palette.create";
+    TextSize = 13;
+}
+
+Button.CancelPalette {
+    Position = (10, 70);
+    Renderer = &1;
+    Size = (((&.w - 20) / 2) - 5, 21);
+    Text = "palette.cancel";
+    TextSize = 13;
+}

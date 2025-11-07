@@ -604,6 +604,7 @@ void SpiralOfFate::FrameDataEditor::setLocale(const std::string &name)
 	}
 	this->_buildMenu();
 	localizeGui(game->gui);
+	this->refreshInterface();
 }
 
 std::string SpiralOfFate::FrameDataEditor::getLocale() const
@@ -620,8 +621,8 @@ void SpiralOfFate::FrameDataEditor::_newFramedata()
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
 {
 	// TODO: Hardcoded string
-	auto file = Utils::openFileDialog(game->gui, "Open Framedata", "assets/characters");
-	auto load = [this](const std::string &path){
+	auto file = Utils::openFileDialog(game->gui, "Open Character", "assets/characters");
+	auto load = [this](const std::filesystem::path &path){
 		try {
 			this->_openWindows.emplace_back(new MainWindow(path, *this));
 			this->_focusedWindow = this->_openWindows.back();
@@ -672,17 +673,19 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 	file->setMultiSelect(true);
 	file->onFileSelect.connect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
 		for (auto &p : arr) {
-			auto path = p.asString().toStdString();
+			const std::filesystem::path &filePath = p;
+			std::filesystem::path pathBackup = p;
 
-			if (!std::filesystem::exists(path + ".bak")) {
-				load(path);
+			pathBackup += ".bak";
+			if (!std::filesystem::exists(pathBackup)) {
+				load(filePath);
 				return;
 			}
 
 			auto dialog = Utils::dispMsg(
 				game->gui,
 				this->localize("message_box.title.backup_exists"),
-				this->localize("message_box.backup_exists", path),
+				this->localize("message_box.backup_exists", filePath),
 				MB_ICONINFORMATION
 			);
 
@@ -690,11 +693,11 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 				this->localize("message_box.button.yes"),
 				this->localize("message_box.button.no")
 			});
-			dialog->onButtonPress.connect([this, load, path](const tgui::String &d){
+			dialog->onButtonPress.connect([this, load, filePath, pathBackup](const tgui::String &d){
 				if (d == this->localize("message_box.button.no"))
-					load(path);
-				else if (load(path + ".bak"))
-					this->_focusedWindow->setPath(path);
+					load(filePath);
+				else if (load(pathBackup))
+					this->_focusedWindow->setPath(filePath);
 			});
 		}
 	});
@@ -719,7 +722,7 @@ void SpiralOfFate::FrameDataEditor::_saveAs()
 
 void SpiralOfFate::FrameDataEditor::_settings()
 {
-	auto window = Utils::openWindowWithFocus<SettingsWindow>(game->gui, 0, 0, nullptr, false, std::ref(*this));
+	auto window = Utils::openWindowWithFocus<tgui::Gui, SettingsWindow>(game->gui, 0, 0, nullptr, false, std::ref(*this));
 
 	window->setTitle(this->localize("settings.title"));
 }
@@ -813,18 +816,18 @@ void SpiralOfFate::FrameDataEditor::_reloadTextures()
 
 void SpiralOfFate::FrameDataEditor::setHasRedo(bool hasRedo)
 {
-	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
-
-	menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.redo") }, hasRedo);
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.redo") },
+		hasRedo
+	);
 }
 
 void SpiralOfFate::FrameDataEditor::setHasUndo(bool hasUndo)
 {
-	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
-	std::vector<tgui::String> h{ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.undo") };
-
-	std::cout << h.back() << " " << hasUndo << std::endl;
-	menu->setMenuItemEnabled(h, hasUndo);
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.undo") },
+		hasUndo
+	);
 }
 
 bool SpiralOfFate::FrameDataEditor::canHandleKeyPress(const sf::Event::KeyPressed &event)
@@ -848,6 +851,12 @@ void SpiralOfFate::FrameDataEditor::keyPressed(const sf::Event::KeyPressed &even
 const std::map<std::string, std::string> &SpiralOfFate::FrameDataEditor::getLocalizationData() const
 {
 	return this->_localization;
+}
+
+void SpiralOfFate::FrameDataEditor::refreshInterface()
+{
+	for (auto &win : this->_openWindows)
+		win->refreshInterface();
 }
 
 bool SpiralOfFate::FrameDataEditor::Shortcut::operator<(const SpiralOfFate::FrameDataEditor::Shortcut &other) const

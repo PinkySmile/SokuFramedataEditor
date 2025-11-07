@@ -110,6 +110,17 @@
 	"animation.block.chip":            "Chip",
 	"animation.block.guarddmg":        "Guard damage",
 
+	"color.type0.component1":          "Red",
+	"color.type0.component2":          "Green",
+	"color.type0.component3":          "Blue",
+	"color.hexcode":                   "Hex code",
+	"color.edit":                      "Edit color",
+
+	"palette.create":                  "Create",
+	"palette.cancel":                  "Cancel",
+	"palette.create_action":           "Create palette",
+	"palette.delete_action":           "Delete palette",
+
 	"settings.save":                   "Save",
 	"settings.cancel":                 "Cancel",
 	"settings.title":                  "Settings",

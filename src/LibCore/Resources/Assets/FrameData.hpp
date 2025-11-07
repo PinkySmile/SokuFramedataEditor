@@ -240,6 +240,8 @@ namespace SpiralOfFate
 	public:
 		std::string __palette;
 		std::string __folder;
+		bool __requireReload = false;
+		const std::array<Color, 256> *__paletteData = nullptr;
 
 		std::string spritePath;
 		std::string soundPath;
@@ -295,6 +297,7 @@ namespace SpiralOfFate
 		FrameData(const FrameData &other);
 		FrameData(const nlohmann::json &json, const std::string &folder, const std::string &palette = {});
 		FrameData &operator=(const FrameData &other);
+		void checkReloadTexture();
 		void reloadTexture();
 		void reloadSound();
 		void setSlave(bool slave = true);

@@ -412,8 +412,21 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/RemoveFrameOperation.hpp
 			src/FrameDataEditor/Operations/RemoveBoxOperation.cpp
 			src/FrameDataEditor/Operations/RemoveBoxOperation.hpp
+			src/FrameDataEditor/UI/ColorPlaneWidget.cpp
+			src/FrameDataEditor/UI/ColorPlaneWidget.hpp
+			src/FrameDataEditor/UI/ColorWidgets.hpp
+			src/FrameDataEditor/UI/ColorSliderWidget.cpp
+			src/FrameDataEditor/UI/ColorSliderWidget.hpp
+			src/FrameDataEditor/PngLoader.cpp
+			src/FrameDataEditor/PngLoader.hpp
+			src/FrameDataEditor/Operations/ColorEditionOperation.cpp
+			src/FrameDataEditor/Operations/ColorEditionOperation.hpp
+			src/FrameDataEditor/Operations/CreatePaletteOperation.cpp
+			src/FrameDataEditor/Operations/CreatePaletteOperation.hpp
+			src/FrameDataEditor/Operations/RemovePaletteOperation.cpp
+			src/FrameDataEditor/Operations/RemovePaletteOperation.hpp
 		)
-		target_link_libraries(FrameDataEditor SoFGVCore)
+		target_link_libraries(FrameDataEditor SoFGVCore png)
 	endif ()
 
 	add_executable(FrameComparer src/FrameComparer/main.cpp)

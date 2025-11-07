@@ -45,10 +45,11 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 
 		editor.setLocale(locale.toStdString());
 	});
-	theme->onItemSelect.connect([this](const tgui::String &, const tgui::String &id){
+	theme->onItemSelect.connect([this, &editor](const tgui::String &, const tgui::String &id){
 		tgui::Theme::setDefault(tgui::Theme::create("assets/gui/themes/" + id + ".style"));
 		Utils::setRenderer(game->gui);
 		this->_resize();
+		editor.refreshInterface();
 	});
 
 	auto cancel = this->get<tgui::Button>("Cancel");
@@ -70,6 +71,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		editor.setLocale(this->_oldLocale);
 		tgui::Theme::setDefault(tgui::Theme::create(this->_oldTheme));
 		Utils::setRenderer(game->gui);
+		editor.refreshInterface();
 	});
 }
 

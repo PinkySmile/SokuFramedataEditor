@@ -5,13 +5,16 @@
 #include <filesystem>
 #include "Color.hpp"
 #include "EditableObject.hpp"
+#include "PngLoader.hpp"
 
 using namespace SpiralOfFate;
 
+// TODO: Use std::filesystem::path for paths
 EditableObject::EditableObject(const std::string &frameData) :
 	_folder(frameData.substr(0, frameData.find_last_of(std::filesystem::path::preferred_separator)))
 {
-	this->_moves = FrameData::loadFile(frameData, this->_folder);
+	for (auto &pair : FrameData::loadFile(frameData, this->_folder))
+		this->_moves[pair.first] = pair.second;
 }
 
 void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes) const
@@ -23,8 +26,8 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, b
 		data.scale.y * data.textureBounds.size.y
 	};
 	auto result = data.offset;
-	Sprite sprite;
 
+	data.checkReloadTexture();
 	if (displaceBoxes)
 		result += this->_position;
 	result.y *= -1;
@@ -36,31 +39,68 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, b
 		data.textureBounds.size.x * data.scale.x / 2,
 		data.textureBounds.size.y * data.scale.y / 2
 	};
-	sprite.setColor(Color::White);
-	sprite.setOrigin(data.textureBounds.size / 2.f);
+
+	this->_sprite.setColor(Color::White);
+	this->_sprite.setOrigin(data.textureBounds.size / 2.f);
 	if (displaceBoxes)
-		sprite.setRotation(sf::radians(this->_rotation));
+		this->_sprite.setRotation(sf::radians(this->_rotation));
 	else
-		sprite.setRotation(sf::radians(0));
-	sprite.setPosition(result);
-	sprite.setScale(data.scale);
-	sprite.setTexture(data.textureHandle);
-	sprite.setTextureRect(data.textureBounds);
-	target.draw(sprite, states);
+		this->_sprite.setRotation(sf::radians(0));
+	this->_sprite.setPosition(result);
+	this->_sprite.setScale(data.scale);
+	this->_sprite.setTexture(data.textureHandle);
+	this->_sprite.setTextureRect(data.textureBounds);
+	target.draw(this->_sprite, states);
+
+	if (this->_textureValid) {
+		this->_overlaySprite.setColor(Color::White);
+		this->_overlaySprite.setOrigin(data.textureBounds.size / 2.f);
+		if (displaceBoxes)
+			this->_overlaySprite.setRotation(sf::radians(this->_rotation));
+		else
+			this->_overlaySprite.setRotation(sf::radians(0));
+		this->_overlaySprite.setPosition(result);
+		this->_overlaySprite.setScale(data.scale);
+		this->_overlaySprite.setTexture(this->_overlayTexture, true);
+		this->_overlaySprite.setTextureRect(data.textureBounds);
+		target.draw(this->_overlaySprite, states);
+	}
+
+	this->_spriteEffect.setColor(Color::White);
+	this->_spriteEffect.setOrigin(data.textureBounds.size / 2.f);
+	if (displaceBoxes)
+		this->_spriteEffect.setRotation(sf::radians(this->_rotation));
+	else
+		this->_spriteEffect.setRotation(sf::radians(0));
+	this->_spriteEffect.setPosition(result);
+	this->_spriteEffect.setScale(data.scale);
+	this->_spriteEffect.setTexture(data.textureHandleEffects);
+	this->_spriteEffect.setTextureRect(data.textureBounds);
 	if (data.oFlag.spiritElement == data.oFlag.matterElement && data.oFlag.matterElement == data.oFlag.voidElement)
-		sprite.setColor(game->typeColors[data.oFlag.spiritElement ? TYPECOLOR_NEUTRAL : TYPECOLOR_NON_TYPED]);
+		this->_spriteEffect.setColor(game->typeColors[data.oFlag.spiritElement ? TYPECOLOR_NEUTRAL : TYPECOLOR_NON_TYPED]);
 	else if (data.oFlag.spiritElement)
-		sprite.setColor(game->typeColors[TYPECOLOR_SPIRIT]);
+		this->_spriteEffect.setColor(game->typeColors[TYPECOLOR_SPIRIT]);
 	else if (data.oFlag.matterElement)
-		sprite.setColor(game->typeColors[TYPECOLOR_MATTER]);
+		this->_spriteEffect.setColor(game->typeColors[TYPECOLOR_MATTER]);
 	else if (data.oFlag.voidElement)
-		sprite.setColor(game->typeColors[TYPECOLOR_VOID]);
-	sprite.setTexture(data.textureHandleEffects);
-	target.draw(sprite, states);
+		this->_spriteEffect.setColor(game->typeColors[TYPECOLOR_VOID]);
+	target.draw(this->_spriteEffect, states);
+
+	rect.setOutlineThickness(1);
+	rect.setScale(data.scale);
+	rect.setOutlineColor(Color::White);
+	rect.setFillColor(Color::Transparent);
+	rect.setPosition(this->_sprite.getPosition());
+	rect.setOrigin(data.textureBounds.size / 2.f);
+	rect.setSize(data.textureBounds.size);
+	target.draw(rect, states);
 
 	rect.setOutlineThickness(2);
 	rect.setOutlineColor(Color::White);
 	rect.setFillColor(Color::Black);
+	rect.setOrigin({0, 0});
+	rect.setScale({1, 1});
+	rect.setRotation(sf::radians(0));
 	if (displaceBoxes)
 		rect.setPosition(Vector2f{-4 + this->_position.x, -4 - this->_position.y});
 	else
@@ -83,6 +123,7 @@ void EditableObject::update()
 		data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
 		this->resetState();
 		game->soundMgr.play(data->soundHandle);
+		this->_generateOverlaySprite();
 	}
 	this->_simulate(*data);
 }
@@ -154,6 +195,7 @@ void EditableObject::resetState()
 		this->_simulate(data);
 	}
 	this->_animationCtr--;
+	this->_generateOverlaySprite();
 }
 
 void EditableObject::_simulate(const SpiralOfFate::FrameData &data)
@@ -182,4 +224,105 @@ void EditableObject::_simulate(const SpiralOfFate::FrameData &data)
 		this->_position.y = 0;
 		this->_speed.y = 0;
 	}
+}
+
+void EditableObject::_generateOverlaySprite()
+{
+	this->_textureValid = false;
+	if (this->_paletteIndex <= 0)
+		return;
+
+	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+	auto &img = pngLoader.loadImage(data.__folder + "/" + data.spritePath);
+
+	if (img.bitsPerPixel != 8)
+		return;
+
+	sf::Image image;
+	auto &pal = game->textureMgr.getPalette(data.textureHandle);
+	const std::array<SpiralOfFate::Color, 256> *palette = &img.palette;
+
+	if (pal)
+		palette = &*pal;
+
+	auto color = (*palette)[this->_paletteIndex];
+
+	color.r = 255 - color.r;
+	color.g = 255 - color.g;
+	color.b = 255 - color.b;
+	image.resize(data.textureBounds.size, sf::Color::Transparent);
+	for (unsigned y_off = 0; y_off < data.textureBounds.size.y; y_off++) {
+		int y = data.textureBounds.pos.y + y_off;
+
+		if (y < 0)
+			y = 0;
+		else if ((unsigned)y >= img.height)
+			y = img.height - 1;
+		for (unsigned x_off = 0; x_off < data.textureBounds.size.x; x_off++) {
+			int x = data.textureBounds.pos.x + x_off;
+
+			if (x < 0)
+				x = 0;
+			else if ((unsigned)x >= img.width)
+				x = img.width - 1;
+
+			auto index = img.raw[y * img.paddedWidth + x];
+
+			if (index != this->_paletteIndex)
+				continue;
+			image.setPixel(sf::Vector2u(x_off, y_off), color);
+		}
+	}
+	assert_exp(this->_overlayTexture.loadFromImage(image));
+	this->_textureValid = true;
+}
+
+void EditableObject::setMousePosition(const SpiralOfFate::Vector2f *pos)
+{
+	if (pos == nullptr) {
+		this->_paletteIndex = -1;
+		this->_textureValid = false;
+		return;
+	}
+
+	auto sPos = this->_mousePosToImgPos(*pos);
+	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+
+	if (sPos.x < 0 || sPos.y < 0 || sPos.x >= data.textureBounds.size.x || sPos.y >= data.textureBounds.size.y) {
+		this->_paletteIndex = -1;
+		this->_textureValid = false;
+		return;
+	}
+
+	auto &img = pngLoader.loadImage(data.__folder + "/" + data.spritePath);
+
+	if (img.bitsPerPixel != 8) {
+		this->_paletteIndex = -1;
+		this->_textureValid = false;
+		return;
+	}
+	sPos += data.textureBounds.pos;
+	this->_paletteIndex = img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)];
+	this->_generateOverlaySprite();
+}
+
+SpiralOfFate::Vector2f EditableObject::_mousePosToImgPos(const SpiralOfFate::Vector2i &mouse)
+{
+	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
+	auto size = Vector2f{
+		data.scale.x * data.textureBounds.size.x,
+		data.scale.y * data.textureBounds.size.y
+	};
+	auto result = data.offset.to<float>();
+
+	result.y *= -1;
+	result -= Vector2f{
+		size.x / 2.f,
+		size.y
+	};
+	result = mouse - result;
+	result.x /= data.scale.x;
+	result.y /= data.scale.y;
+	this->_mousePos = result;
+	return result;
 }

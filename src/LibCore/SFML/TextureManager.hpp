@@ -17,11 +17,19 @@ namespace SpiralOfFate
 {
 	class TextureManager {
 	private:
+		struct AllocatedTexture {
+			unsigned index;
+			unsigned count;
+			std::optional<std::array<Color, 256>> palette;
+			std::optional<std::array<unsigned char, 768>> paletteData;
+		};
+
 		sf::RenderTexture _dummy{{1, 1}};
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
 		std::unordered_map<unsigned, sf::Texture> _textures;
-		std::unordered_map<std::string, std::pair<unsigned, unsigned>> _allocatedTextures;
+		std::unordered_map<unsigned, std::string> _allocatedTexturesPaths;
+		std::unordered_map<std::string, AllocatedTexture> _allocatedTextures;
 		std::unordered_map<std::string, std::string> _overrideList;
 
 		void _reload(const std::string &path, unsigned id);
@@ -30,9 +38,11 @@ namespace SpiralOfFate
 
 		unsigned load(std::string file, Vector2u *size = nullptr, bool repeated = false);
 		unsigned load(const std::string &file, const std::string &palette, Vector2u *size = nullptr, bool repeated = false);
+		unsigned load(const std::string &file, const std::array<Color, 256> &palette, Vector2u *size = nullptr, bool repeated = false);
 		Vector2u getTextureSize(unsigned id) const;
 		void addRef(unsigned id);
 		void remove(unsigned id);
+		const std::optional<std::array<Color, 256>> &getPalette(unsigned id);
 		const sf::Texture &getTexture(unsigned id) const;
 		void reloadEverything();
 		void addOverride(const std::string &base, const std::string &newVal);

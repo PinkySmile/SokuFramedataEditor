@@ -32,10 +32,14 @@ SpiralOfFate::Sprite::~Sprite()
 
 void SpiralOfFate::Sprite::setTexture(unsigned int handle, bool resetRect)
 {
-	game->textureMgr.remove(this->_textureHandle);
-	game->textureMgr.addRef(handle);
-	this->_textureHandle = handle;
-	this->sf::Sprite::setTexture(game->textureMgr.getTexture(handle), resetRect);
+	if (this->_textureHandle != handle) {
+		if (this->_textureHandle)
+			game->textureMgr.remove(this->_textureHandle);
+		if (handle)
+			game->textureMgr.addRef(handle);
+		this->_textureHandle = handle;
+	}
+	this->setTexture(game->textureMgr.getTexture(handle), resetRect);
 }
 
 unsigned SpiralOfFate::Sprite::getHandle() const
