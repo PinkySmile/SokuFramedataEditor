@@ -23,7 +23,6 @@ namespace SpiralOfFate
 		unsigned _oldSelectedColor;
 		unsigned &_selectedPalette;
 		unsigned &_selectedColor;
-		std::function<void()> _updateUi;
 
 	public:
 		ColorEditionOperation(
@@ -31,8 +30,7 @@ namespace SpiralOfFate
 			MainWindow::Palette &palette,
 			unsigned &selectedPalette,
 			unsigned &selectedColor,
-			Color newValue,
-			std::function<void()> updateUI
+			Color newValue
 		);
 		void apply() override;
 		void undo() override;

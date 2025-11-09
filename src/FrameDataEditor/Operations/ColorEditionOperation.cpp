@@ -11,8 +11,7 @@ namespace SpiralOfFate
 		MainWindow::Palette &palette,
 		unsigned &selectedPalette,
 		unsigned &selectedColor,
-		Color newValue,
-		std::function<void()> updateUi
+		Color newValue
 	) :
 		_palette(palette),
 		_oldValue(palette.colors[selectedColor]),
@@ -22,8 +21,7 @@ namespace SpiralOfFate
 		_oldSelectedPalette(selectedPalette),
 		_oldSelectedColor(selectedColor),
 		_selectedPalette(selectedPalette),
-		_selectedColor(selectedColor),
-		_updateUi(std::move(updateUi))
+		_selectedColor(selectedColor)
 	{
 	}
 
@@ -35,7 +33,6 @@ namespace SpiralOfFate
 		this->_selectedColor = this->_oldSelectedColor;
 		this->_palette.colors[this->_selectedColor] = this->_newValue;
 		this->_palette.modified = true;
-		this->_updateUi();
 	}
 
 	void ColorEditionOperation::undo()
@@ -46,7 +43,6 @@ namespace SpiralOfFate
 		this->_selectedColor = this->_oldSelectedColor;
 		this->_palette.colors[this->_selectedColor] = this->_oldValue;
 		this->_palette.modified = this->_wasModified;
-		this->_updateUi();
 	}
 
 	std::string ColorEditionOperation::getName() const noexcept

@@ -72,14 +72,14 @@ std::string to_hex(unsigned long long value)
         elem->onChanged.connect([this](WidgetColor color){                                               \
                 if (this->_palettes.empty())                                                             \
                         return;                                                                          \
+                this->_colorChangeSource = src;                                                          \
                 this->updateTransaction([this, color] {                                                  \
                         return new ColorEditionOperation(                                                \
                                 this->_editor.localize("color.edit"),                                    \
                                 this->_palettes[this->_selectedPalette],                                 \
                                 this->_selectedPalette,                                                  \
                                 this->_selectedColor,                                                    \
-                                colorConversions[this->_selectColorMethod](color[0], color[1], color[2]),\
-                                [this]{ this->_colorChangeSource = src; }                                \
+                                colorConversions[this->_selectColorMethod](color[0], color[1], color[2]) \
                         );                                                                               \
                 });                                                                                      \
         });                                                                                              \
@@ -118,14 +118,14 @@ std::string to_hex(unsigned long long value)
                 if (s.size() < 7)                                                                       \
                         return;                                                                         \
                 sscanf(s.toStdString().c_str(), "#%02hhX%02hhX%02hhX", &color.r, &color.g, &color.b);   \
+                this->_colorChangeSource = 5;                                                           \
                 this->updateTransaction([this, color]{                                                  \
                         return new ColorEditionOperation(                                               \
                                 this->_editor.localize("color.edit"),                                   \
                                 this->_palettes[this->_selectedPalette],                                \
                                 this->_selectedPalette,                                                 \
                                 this->_selectedColor,                                                   \
-                                color,                                                                  \
-                                [this]{ this->_colorChangeSource = 5; }                                 \
+                                color                                                                   \
                         );                                                                              \
                 });                                                                                     \
         });                                                                                             \
@@ -161,14 +161,14 @@ std::string to_hex(unsigned long long value)
                 auto converted = colorConversionsReverse[this->_selectColorMethod](color);                           \
                                                                                                                      \
                 converted[index] = value;                                                                            \
+                this->_colorChangeSource = index + 2;                                                                \
                 this->updateTransaction([this, converted]{                                                           \
                         return new ColorEditionOperation(                                                            \
                                 this->_editor.localize("color.edit"),                                                \
                                 this->_palettes[this->_selectedPalette],                                             \
                                 this->_selectedPalette,                                                              \
                                 this->_selectedColor,                                                                \
-                                colorConversions[this->_selectColorMethod](converted[0], converted[1], converted[2]),\
-                                [this]{ this->_colorChangeSource = index + 2;  }                                     \
+                                colorConversions[this->_selectColorMethod](converted[0], converted[1], converted[2]) \
                         );                                                                                           \
                 });                                                                                                  \
         });                                                                                                          \
@@ -658,7 +658,6 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
 	this->_operationQueue.back()->apply();
-	this->_requireReload = true;
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
@@ -1614,11 +1613,14 @@ void SpiralOfFate::MainWindow::tick()
 
 	if (this->_requireReload) {
 		this->_rePopulateData();
+		this->_preview->invalidatePalette();
 		this->_requireReload = false;
 	}
 	this->_timer++;
-	if (this->_timer % 4 == 0) {
+	if (this->_timer % 2 == 0) {
 		if (this->_colorChangeSource != 255) {
+			for (auto container : this->_containers)
+				this->_populateColorData(*container);
 			this->_colorChangeSource = 255;
 			this->_preview->invalidatePalette();
 		}
