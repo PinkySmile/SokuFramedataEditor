@@ -145,7 +145,7 @@ void ColorPlaneWidget::setComponent(unsigned char component, unsigned int v)
 		this->_setPointerPosition();
 }
 
-void ColorPlaneWidget::mouseMoved(tgui::Vector2f pos)
+void ColorPlaneWidget::mouseMovedAbs(tgui::Vector2f pos)
 {
 	if (!this->_dragging)
 		return;

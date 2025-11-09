@@ -27,7 +27,7 @@ public:
 	sf::Color getColorRGB() const;
 	void setColorSpace(ColorConversionCb colorConversion, ColorSpaceRanges colorSpace);
 
-	void mouseMoved(tgui::Vector2f pos) override;
+	void mouseMovedAbs(tgui::Vector2f pos);
 	void leftMouseButtonNoLongerDown() override;
 	bool leftMousePressed(tgui::Vector2f pos) override;
 

@@ -135,7 +135,7 @@ void ColorSliderWidget::setComponent(unsigned char component, unsigned int v)
 		this->_setPointerPosition();
 }
 
-void ColorSliderWidget::mouseMoved(tgui::Vector2f pos)
+void ColorSliderWidget::mouseMovedAbs(tgui::Vector2f pos)
 {
 	if (!this->_dragging)
 		return;

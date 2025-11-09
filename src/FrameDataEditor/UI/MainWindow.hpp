@@ -10,6 +10,8 @@
 #include "LocalizedContainer.hpp"
 #include "PreviewWidget.hpp"
 #include "../Operations/Operation.hpp"
+#include "ColorPlaneWidget.hpp"
+#include "ColorSliderWidget.hpp"
 
 namespace SpiralOfFate
 {
@@ -49,7 +51,7 @@ namespace SpiralOfFate
 		const Renderer *getSharedRenderer() const override;
 		Renderer *getRenderer() override;
 
-		bool hasPalette() const;
+		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void undo();
 		void redo();
 		void save();
@@ -110,6 +112,8 @@ namespace SpiralOfFate
 	private:
 		FrameDataEditor &_editor;
 		PreviewWidget::Ptr _preview;
+		std::vector<ColorPlaneWidget::Ptr> _planes;
+		std::vector<ColorSliderWidget::Ptr> _sliders;
 		unsigned char _timer = 0;
 		bool _paused = true;
 		bool _showingPalette = false;

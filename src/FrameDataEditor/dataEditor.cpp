@@ -22,6 +22,8 @@ void run()
 					continue;
 				}
 			}
+			if (auto mouse = event->getIf<sf::Event::MouseMoved>())
+				editor->mouseMovedAbsolute(tgui::Vector2f(mouse->position.x, mouse->position.y));
 			game->gui.handleEvent(*event);
 		}
 	}

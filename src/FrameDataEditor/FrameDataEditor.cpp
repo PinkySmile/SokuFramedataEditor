@@ -859,6 +859,12 @@ void SpiralOfFate::FrameDataEditor::refreshInterface()
 		win->refreshInterface();
 }
 
+void SpiralOfFate::FrameDataEditor::mouseMovedAbsolute(tgui::Vector2f pos)
+{
+	if (this->_focusedWindow)
+		this->_focusedWindow->mouseMovedAbsolute(pos);
+}
+
 bool SpiralOfFate::FrameDataEditor::Shortcut::operator<(const SpiralOfFate::FrameDataEditor::Shortcut &other) const
 {
 	if (this->meta != other.meta)

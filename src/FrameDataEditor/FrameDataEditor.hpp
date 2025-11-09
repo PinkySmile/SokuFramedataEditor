@@ -78,6 +78,7 @@ namespace SpiralOfFate
 		FrameDataEditor();
 		~FrameDataEditor();
 
+		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void setLocale(const std::string &name);
 		std::string getLocale() const;
 		void saveSettings();

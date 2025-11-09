@@ -1172,6 +1172,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			if (selected == this->_showingPalette)
 				return;
 
+			this->_planes.clear();
+			this->_sliders.clear();
 			this->_showingPalette = selected;
 			sidePanel.loadWidgetsFromFile(
 				selected == 0 ?
@@ -1918,10 +1920,20 @@ void SpiralOfFate::MainWindow::_initSidePanel(tgui::Container &panel)
 		rect->add(colorSlider, "ColorSlider");
 		colorPlane->setPosition(0, 0);
 		colorSlider->setPosition("ColorPlane.x + ColorPlane.w", 0);
+		this->_planes.push_back(colorPlane);
+		this->_sliders.push_back(colorSlider);
 	}
 }
 
 void SpiralOfFate::MainWindow::refreshInterface()
 {
 	this->_populateData(*this);
+}
+
+void SpiralOfFate::MainWindow::mouseMovedAbsolute(tgui::Vector2f pos)
+{
+	for (auto &widget : this->_planes)
+		widget->mouseMovedAbs(pos - widget->getAbsolutePosition());
+	for (auto &widget : this->_sliders)
+		widget->mouseMovedAbs(pos - widget->getAbsolutePosition());
 }
