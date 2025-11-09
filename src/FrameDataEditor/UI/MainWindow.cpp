@@ -1420,6 +1420,7 @@ void SpiralOfFate::MainWindow::newAction()
 				action, {{data}}
 			));
 			windowW.lock()->close();
+			this->_rePopulateData();
 		} else
 			Utils::dispMsg(game->gui, "Already exists", "This action already exist. Delete it first if you want to replace it.", MB_ICONERROR);
 	});
