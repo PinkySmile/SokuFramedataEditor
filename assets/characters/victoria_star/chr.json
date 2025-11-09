@@ -1,36 +1,50 @@
 {
-  "class": 2,
-  "hp": 24000,
-  "mana_max": 2000,
-  "mana_start": 200,
-  "mana_regen": 0.000125,
-  "jump_count": 4,
   "air_dash_count": 1,
-  "air_movements": 5,
-  "guard_bar": 1500,
-  "guard_break_cooldown": 600,
-  "neutral_overdrive_cooldown": 6600,
-  "spirit_overdrive_cooldown": 5400,
-  "matter_overdrive_cooldown": 5400,
-  "void_overdrive_cooldown": 4950,
-  "roman_cancel_cooldown": 2475,
-  "ground_drag": 0.73,
-  "air_drag":{
+  "air_drag": {
     "x": 0.99,
     "y": 1
   },
-  "gravity":{
+  "air_drift": {
+    "back": {
+      "accel": 0.15,
+      "max": 2.5
+    },
+    "down": {
+      "accel": 0,
+      "max": 0
+    },
+    "front": {
+      "accel": 0.15,
+      "max": 2.5
+    },
+    "up": {
+      "accel": 0,
+      "max": 0
+    }
+  },
+  "air_movements": 5,
+  "class": 2,
+  "gravity": {
     "x": 0,
     "y": -0.9
   },
-  "air_drift": {
-    "up":    { "accel": 0,    "max": 0 },
-    "down":  { "accel": 0,    "max": 0 },
-    "back":  { "accel": 0.15, "max": 2.5 },
-    "front": { "accel": 0.15, "max": 2.5 }
-  },
+  "ground_drag": 0.73,
+  "guard_bar": 1500,
+  "guard_break_cooldown": 600,
   "hidden": true,
-  "palettes": [],
+  "hp": 24000,
+  "jump_count": 4,
+  "mana_max": 2000,
+  "mana_regen": 0.000125,
+  "mana_start": 200,
+  "matter_overdrive_cooldown": 5400,
   "name": "Victoria Star",
-  "pos": 0
+  "neutral_overdrive_cooldown": 6600,
+  "palettes": [
+    "pallette1.act"
+  ],
+  "pos": 0,
+  "roman_cancel_cooldown": 2475,
+  "spirit_overdrive_cooldown": 5400,
+  "void_overdrive_cooldown": 4950
 }

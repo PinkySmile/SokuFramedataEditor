@@ -220,6 +220,31 @@
 		"on_owner_hit_die_animation":null
 	},
 
+		{
+		"index": 12,
+		"action": 13,
+		"spawn_offset": {
+			"anchorX": "owner",
+			"anchorY": "owner",
+			"x": 0,
+			"y": 0
+		},
+		"dir": "front",
+		"hits": 1,
+		"end_block": 0,
+		"loop": false,
+		"disable_on_hit": true,
+		"disable_animation": "fade",
+		"animation_data": 6,
+		"hp": 10000,
+		"loop": false,
+		"end_block": 0,
+		"on_hit_die_animation":null,
+		"on_block_die_animation":null,
+		"on_get_hit_die_animation":null,
+		"on_owner_hit_die_animation":null
+	},
+
 	{
 		"index": 128,
 		"action": 1,
