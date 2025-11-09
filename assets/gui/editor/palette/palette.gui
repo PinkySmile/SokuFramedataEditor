@@ -191,7 +191,7 @@ Label.Label1 {
 }
 
 Panel.ColorSpaceRectPanel {
-    Position = (0, 145);
+    Position = (0, 165);
     Size = (&.w - 90, w - 30);
 
     Renderer {
@@ -296,7 +296,7 @@ ComboBox.PaletteList {
 EditBox.ColorComponent1 {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (210, 165);
+    Position = (210, 185);
     Renderer = &1;
     Size = (80, 21);
     Text = 240;
@@ -306,7 +306,7 @@ EditBox.ColorComponent1 {
 EditBox.ColorComponent2 {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (210, 210);
+    Position = (210, 230);
     Renderer = &1;
     Size = (80, 21);
     Text = 240;
@@ -316,7 +316,7 @@ EditBox.ColorComponent2 {
 EditBox.ColorComponent3 {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (210, 255);
+    Position = (210, 275);
     Renderer = &1;
     Size = (80, 21);
     Text = 240;
@@ -326,7 +326,7 @@ EditBox.ColorComponent3 {
 EditBox.RGBColor {
     Alignment = Center;
     InputValidator = "#[0-9A-Fa-f]{1,6}";
-    Position = (210, 300);
+    Position = (210, 320);
     Renderer = &1;
     Size = (80, 21);
     Text = "#FFFFFF";
@@ -335,7 +335,7 @@ EditBox.RGBColor {
 
 Label.ColorComponentName1 {
     HorizontalAlignment = Center;
-    Position = (200, 150);
+    Position = (200, 170);
     Renderer = &3;
     ScrollbarPolicy = Automatic;
     Size = (100, 17);
@@ -345,7 +345,7 @@ Label.ColorComponentName1 {
 
 Label.ColorComponentName2 {
     HorizontalAlignment = Center;
-    Position = (200, 195);
+    Position = (200, 215);
     Renderer = &3;
     ScrollbarPolicy = Automatic;
     Size = (100, 17);
@@ -355,7 +355,7 @@ Label.ColorComponentName2 {
 
 Label.ColorComponentName3 {
     HorizontalAlignment = Center;
-    Position = (200, 240);
+    Position = (200, 260);
     Renderer = &3;
     ScrollbarPolicy = Automatic;
     Size = (100, 17);
@@ -365,7 +365,7 @@ Label.ColorComponentName3 {
 
 Label.RGBColorName {
     HorizontalAlignment = Center;
-    Position = (200, 285);
+    Position = (200, 305);
     Renderer = &3;
     ScrollbarPolicy = Automatic;
     Size = (100, 17);
@@ -427,31 +427,34 @@ Button.AddPalette {
 
 Button.RemovePalette {
     Position = (165, 120);
+    Renderer = &2;
     Size = (20, 20);
     Text = "-";
+    TextSize = 13;
+}
+
+Tabs.ColorModes {
+    AutoSize = 0;
+    Position = (0, 145);
+    Size = (&.w, 20);
     TextSize = 13;
 
     Renderer {
         BackgroundColor = #F5F5F5;
         BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorDown = #EBEBEB;
         BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorDown = black;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
+        BorderColor = black;
         Borders = (1, 1, 1, 1);
+        SelectedBackgroundColor = #006EFF;
+        SelectedBackgroundColorHover = #1E96FF;
+        SelectedTextColor = white;
         TextColor = #3C3C3C;
         TextColorDisabled = #7D7D7D;
-        TextColorDown = black;
         TextColorHover = black;
-        Texture = None;
-        TextureDisabled = None;
-        TextureDown = None;
-        TextureDownFocused = None;
-        TextureDownHover = None;
-        TextureFocused = None;
-        TextureHover = None;
+        TextureDisabledTab = None;
+        TextureSelectedTab = None;
+        TextureSelectedTabHover = None;
+        TextureTab = None;
+        TextureTabHover = None;
     }
 }

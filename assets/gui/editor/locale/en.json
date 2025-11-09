@@ -110,9 +110,18 @@
 	"animation.block.chip":            "Chip",
 	"animation.block.guarddmg":        "Guard damage",
 
+	"color.type0.name":                "RGB",
 	"color.type0.component1":          "Red",
 	"color.type0.component2":          "Green",
 	"color.type0.component3":          "Blue",
+	"color.type1.name":                "HSL",
+	"color.type1.component1":          "Hue",
+	"color.type1.component2":          "Saturation",
+	"color.type1.component3":          "Lightness",
+	"color.type2.name":                "HSV",
+	"color.type2.component1":          "Hue",
+	"color.type2.component2":          "Saturation",
+	"color.type2.component3":          "Value",
 	"color.hexcode":                   "Hex code",
 	"color.edit":                      "Edit color",
 

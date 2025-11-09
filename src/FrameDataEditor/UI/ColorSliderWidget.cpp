@@ -32,6 +32,14 @@ ColorSliderWidget::ColorSliderWidget(
 	this->_sprite.setPosition({0, 10});
 }
 
+void ColorSliderWidget::setColorSpace(ColorConversionCb colorConversion, ColorSpaceRanges colorSpace)
+{
+	this->_colorSpace = std::move(colorSpace);
+	this->_colorConversion = std::move(colorConversion);
+	this->_recreateTexture();
+	this->_setPointerPosition();
+}
+
 void ColorSliderWidget::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const
 {
 	auto &sfmlTarget = dynamic_cast<tgui::BackendRenderTargetSFML &>(target);

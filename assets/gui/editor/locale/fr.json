@@ -240,9 +240,18 @@
 	"animation.aflags.flag62":         "Flag 63",
 	"animation.aflags.flag63":         "Flag 64",
 
+	"color.type0.name":                "RVB",
 	"color.type0.component1":          "Rouge",
 	"color.type0.component2":          "Vert",
 	"color.type0.component3":          "Bleu",
+	"color.type1.name":                "TSL",
+	"color.type1.component1":          "Teinte",
+	"color.type1.component2":          "Saturation",
+	"color.type1.component3":          "Luminosité",
+	"color.type2.name":                "TSV",
+	"color.type2.component1":          "Teinte",
+	"color.type2.component2":          "Saturation",
+	"color.type2.component3":          "Valeur",
 	"color.hexcode":                   "Code hex",
 	"color.edit":                      "Modification de couleur",
 

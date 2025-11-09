@@ -25,16 +25,98 @@
 static ColorConversionCb colorConversions[] = {
 	[](unsigned r, unsigned g, unsigned b) {
 		return SpiralOfFate::Color(r, g, b, 255);
+	},
+	[](unsigned h, unsigned s1k, unsigned l1k) { // https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative
+		double s = s1k / 1000.;
+		double l = l1k / 1000.;
+		auto f = [h, s, l](unsigned n){
+			double k = std::fmod(n + h / 30., 12);
+			double a = s * std::min(l, 1 - l);
+
+			return l - a * std::max(-1., std::min(1., std::min(k - 3, 9 - k)));
+		};
+
+		return SpiralOfFate::Color(f(0) * 255, f(8) * 255, f(4) * 255, 255);
+	},
+	[](unsigned h, unsigned s1k, unsigned v1k) { // https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB_alternative
+		double s = s1k / 1000.;
+		double v = v1k / 1000.;
+		auto f = [h, s, v](unsigned n){
+			double k = std::fmod(n + h / 60., 6);
+
+			return v - v * s * std::max(0., std::min(k, std::min(4 - k, 1.)));
+		};
+
+		return SpiralOfFate::Color(f(5) * 255, f(3) * 255, f(1) * 255, 255);
 	}
 };
 static ReverseColorConversionCb colorConversionsReverse[] = {
 	[](const SpiralOfFate::Color &color) {
 		return WidgetColor{color.r, color.g, color.b};
-	}
+	},
+	[](const SpiralOfFate::Color &color) { // https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
+		double r = color.r / 255.;
+		double g = color.g / 255.;
+		double b = color.b / 255.;
+		double xmax = std::max(r, std::max(g, b));
+		double xmin = std::min(r, std::min(g, b));
+		double chroma = xmax - xmin;
+		double h;
+		double s;
+		double v = xmax;
+		double l = (xmax + xmin) / 2;
+
+		if (chroma == 0)
+			h = 0;
+		else if (xmax == r)
+			h = 60 * std::fmod((g - b) / (float)chroma, 6);
+		else if (xmax == g)
+			h = 60 * ((b - r) / (float)chroma + 2);
+		else if (xmax == b)
+			h = 60 * ((r - g) / (float)chroma + 4);
+		else
+			assert_not_reached();
+		h = std::fmod(h, 360);
+		if (l == 0 || l == 1)
+			s = 0;
+		else
+			s = (v - l) / std::min(l, 1 - l);
+		return WidgetColor{(unsigned)h, static_cast<unsigned>(1000 * s), static_cast<unsigned>(1000 * l)};
+	},
+	[](const SpiralOfFate::Color &color) { // https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
+		double r = color.r / 255.;
+		double g = color.g / 255.;
+		double b = color.b / 255.;
+		double xmax = std::max(r, std::max(g, b));
+		double xmin = std::min(r, std::min(g, b));
+		double chroma = xmax - xmin;
+		double h;
+		double s;
+		double v = xmax;
+
+		if (chroma == 0)
+			h = 0;
+		else if (xmax == r)
+			h = 60 * std::fmod((g - b) / (float)chroma, 6);
+		else if (xmax == g)
+			h = 60 * ((b - r) / (float)chroma + 2);
+		else if (xmax == b)
+			h = 60 * ((r - g) / (float)chroma + 4);
+		else
+			assert_not_reached();
+		h = std::fmod(h, 360);
+		if (v == 0)
+			s = 0;
+		else
+			s = chroma / v;
+		return WidgetColor{(unsigned)h, static_cast<unsigned>(1000 * s), static_cast<unsigned>(1000 * v)};
+	},
 };
 
 static ColorSpaceRanges colorSpaces[] = {
-	{std::pair{0U, 255U}, std::pair{0U, 255U}, std::pair{0U, 255U}},
+	{std::pair{0U, 255U}, std::pair{0U, 255U}, std::pair{0U, 255U}}, // RGB
+	{std::pair{0U, 359U}, std::pair{0U, 1000U},std::pair{0U, 1000U}},// HSL
+	{std::pair{0U, 359U}, std::pair{0U, 1000U},std::pair{0U, 1000U}},// HSV
 };
 
 
@@ -939,7 +1021,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		contentPanel->getVerticalScrollbar()->setValue(scroll);
 }
 
-void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
+void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 {
 	auto clearHit = container.get<tgui::Button>("ClearHit");
 	auto clearBlock = container.get<tgui::Button>("ClearBlock");
@@ -970,7 +1052,15 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 	auto preview = container.get<tgui::Label>("ColorPreview");
 	auto paletteList = container.get<tgui::ComboBox>("PaletteList");
 	auto colorPanel = container.get<tgui::ScrollablePanel>("AllColorPanel");
+	auto mode = container.get<tgui::Tabs>("ColorModes");
+	tgui::Container &sidePanel = ctrlPanel ? *ctrlPanel : container;
 
+	if (mode)
+		mode->onTabSelect.connect([this, &sidePanel](std::weak_ptr<tgui::Tabs> This){
+			this->_selectColorMethod = This.lock()->getSelectedIndex();
+			this->_reinitSidePanel(sidePanel);
+			this->_rePopulateColorData();
+		}, std::weak_ptr(mode));
 	if (colorPanel) {
 		float stepX = (colorPanel->getSize().x - 24) / 8.f;
 		float stepY = stepX - 8;
@@ -1076,22 +1166,23 @@ void SpiralOfFate::MainWindow::_placeUIHooks(const tgui::Container &container)
 		});
 
 	if (ctrl)
-		ctrl->onTabSelect.connect([this, ctrlPanel](std::weak_ptr<tgui::Tabs> This){
+		ctrl->onTabSelect.connect([this, &sidePanel](std::weak_ptr<tgui::Tabs> This){
 			auto selected = This.lock()->getSelectedIndex();
 
 			if (selected == this->_showingPalette)
 				return;
+
 			this->_showingPalette = selected;
-			ctrlPanel->loadWidgetsFromFile(
+			sidePanel.loadWidgetsFromFile(
 				selected == 0 ?
 				"assets/gui/editor/character/framedata.gui" :
 				"assets/gui/editor/palette/palette.gui"
 			);
-			this->_initSidePanel(*ctrlPanel);
-			this->_localizeWidgets(*ctrlPanel, true);
-			Utils::setRenderer(static_cast<tgui::Container::Ptr>(ctrlPanel));
-			this->_placeUIHooks(*ctrlPanel);
-			this->_populateData(*ctrlPanel);
+			this->_initSidePanel(sidePanel);
+			this->_localizeWidgets(sidePanel, true);
+			Utils::setRenderer(&sidePanel);
+			this->_placeUIHooks(sidePanel);
+			this->_populateData(sidePanel);
 			this->_preview->showingPalette = this->_showingPalette;
 		}, std::weak_ptr(ctrl));
 	if (action)
@@ -1410,6 +1501,12 @@ void SpiralOfFate::MainWindow::_rePopulateFrameData()
 		this->_populateFrameData(*key);
 }
 
+void SpiralOfFate::MainWindow::_rePopulateColorData()
+{
+	for (auto key: this->_containers)
+		this->_populateColorData(*key);
+}
+
 void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 {
 	auto action = container.get<tgui::EditBox>("ActionID");
@@ -1469,6 +1566,7 @@ void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &contain
 	if (this->_palettes.empty())
 		return;
 
+	auto mode = container.get<tgui::Tabs>("ColorModes");
 	auto plane = container.get<ColorPlaneWidget>("ColorPlane");
 	auto slider = container.get<ColorSliderWidget>("ColorSlider");
 	auto comp1 = container.get<tgui::EditBox>("ColorComponent1");
@@ -1485,6 +1583,23 @@ void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &contain
 	auto color = this->_palettes[this->_selectedPalette].colors[this->_selectedColor];
 	auto colorConv = colorConversionsReverse[this->_selectColorMethod](color);
 
+	if (plane && this->_colorChangeSource == 0)
+		colorConv = plane->getColor();
+	if (slider && this->_colorChangeSource == 1)
+		colorConv = slider->getColor();
+	if (comp1 && this->_colorChangeSource == 2)
+		colorConv[0] = std::stoul(comp1->getText().toStdString());
+	if (comp2 && this->_colorChangeSource == 3)
+		colorConv[1] = std::stoul(comp2->getText().toStdString());
+	if (comp3 && this->_colorChangeSource == 4)
+		colorConv[2] = std::stoul(comp3->getText().toStdString());
+	if (mode) {
+		mode->onTabSelect.setEnabled(false);
+		mode->removeAll();
+		for (size_t i = 0; i < std::size(colorConversions); i++)
+			mode->add(this->_editor.localize("color.type" + std::to_string(i) + ".name"), this->_selectColorMethod == i);
+		mode->onTabSelect.setEnabled(true);
+	}
 	if (colorPanel) {
 		float extra = this->getSize().y - this->getInnerSize().y;
 
@@ -1770,7 +1885,23 @@ bool SpiralOfFate::MainWindow::canHandleKeyPress(const tgui::Event::KeyEvent &ev
 	return ChildWindow::canHandleKeyPress(event);
 }
 
-void SpiralOfFate::MainWindow::_initSidePanel(tgui::Panel &panel)
+void SpiralOfFate::MainWindow::_reinitSidePanel(tgui::Container &panel)
+{
+	if (!this->_showingPalette)
+		return;
+
+	auto rect = panel.get<tgui::Panel>("ColorSpaceRectPanel");
+
+	if (rect) {
+		auto colorPlane = rect->get<ColorPlaneWidget>("ColorPlane");
+		auto colorSlider = rect->get<ColorSliderWidget>("ColorSlider");
+
+		colorPlane->setColorSpace(colorConversions[this->_selectColorMethod], colorSpaces[this->_selectColorMethod]);
+		colorSlider->setColorSpace(colorConversions[this->_selectColorMethod], colorSpaces[this->_selectColorMethod]);
+	}
+}
+
+void SpiralOfFate::MainWindow::_initSidePanel(tgui::Container &panel)
 {
 	if (!this->_showingPalette)
 		return;

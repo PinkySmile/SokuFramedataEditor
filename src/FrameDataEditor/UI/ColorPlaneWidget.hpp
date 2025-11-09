@@ -25,6 +25,7 @@ public:
 	void setComponent(unsigned char component, unsigned value);
 	WidgetColor getColor() const;
 	sf::Color getColorRGB() const;
+	void setColorSpace(ColorConversionCb colorConversion, ColorSpaceRanges colorSpace);
 
 	void mouseMoved(tgui::Vector2f pos) override;
 	void leftMouseButtonNoLongerDown() override;

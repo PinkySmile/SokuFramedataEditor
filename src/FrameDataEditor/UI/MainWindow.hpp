@@ -130,15 +130,17 @@ namespace SpiralOfFate
 		unsigned _selectedColor = 0;
 		nlohmann::json _characterData;
 
-		void _initSidePanel(tgui::Panel &panel);
+		void _initSidePanel(tgui::Container &panel);
+		void _reinitSidePanel(tgui::Container &panel);
 		void _createMoveListPopup(const std::function<void(unsigned)> &onConfirm, bool showNotAdded);
-		void _placeUIHooks(const tgui::Container &container);
+		void _placeUIHooks(tgui::Container &container);
 		void _createGenericPopup(const std::string &path);
 		LocalizedContainer<tgui::ChildWindow>::Ptr _createPopup(const std::string &path);
 		void _populateData(const tgui::Container &container);
 		void _populateFrameData(const tgui::Container &container);
 		void _populateColorData(const tgui::Container &container);
 		void _rePopulateData();
+		void _rePopulateColorData();
 		void _rePopulateFrameData();
 	};
 }

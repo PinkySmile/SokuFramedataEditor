@@ -34,6 +34,14 @@ ColorPlaneWidget::ColorPlaneWidget(
 	this->_crossSprite.setOrigin({this->_cross.getSize().x / 2.f, this->_cross.getSize().y / 2.f});
 }
 
+void ColorPlaneWidget::setColorSpace(ColorConversionCb colorConversion, ColorSpaceRanges colorSpace)
+{
+	this->_colorSpace = std::move(colorSpace);
+	this->_colorConversion = std::move(colorConversion);
+	this->_recreateTexture();
+	this->_setPointerPosition();
+}
+
 void ColorPlaneWidget::draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const
 {
 	auto &sfmlTarget = dynamic_cast<tgui::BackendRenderTargetSFML &>(target);
