@@ -21,6 +21,9 @@
 #include "../Operations/ColorEditionOperation.hpp"
 #include "../Operations/CreatePaletteOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
+#include "../Operations/PasteDataOperation.hpp"
+#include "../Operations/PasteAnimDataOperation.hpp"
+#include "../Operations/PasteBoxDataOperation.hpp"
 
 static ColorConversionCb colorConversions[] = {
 	[](unsigned r, unsigned g, unsigned b) {
@@ -666,6 +669,89 @@ void SpiralOfFate::MainWindow::undo()
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setHasRedo(true);
 	this->autoSave();
+}
+
+void SpiralOfFate::MainWindow::copyFrame()
+{
+	sf::Clipboard::setString(this->_object->getFrameData().toJson().dump(4));
+}
+
+void SpiralOfFate::MainWindow::pasteFrame()
+{
+	auto &data = this->_object->getFrameData();
+	auto oldPal = data.__paletteData;
+	auto oldPalette = data.__palette;
+	auto oldFolder = data.__folder;
+
+	try {
+		auto anim = SpiralOfFate::FrameData(
+			nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
+			this->_object->_folder
+		);
+
+		anim.__paletteData = oldPal;
+		anim.__palette = oldPalette;
+		anim.__folder = oldFolder;
+		this->applyOperation(new PasteDataOperation(
+			*this->_object,
+			this->_editor.localize("operation.paste"),
+			anim
+		));
+	} catch (std::exception &e) {
+		game->logger.error("Failed to deserialize frame" + std::string(e.what()));
+	}
+}
+
+void SpiralOfFate::MainWindow::pasteBoxData()
+{
+	auto &data = this->_object->getFrameData();
+	auto oldPal = data.__paletteData;
+	auto oldPalette = data.__palette;
+	auto oldFolder = data.__folder;
+
+	try {
+		auto anim = SpiralOfFate::FrameData(
+			nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
+			this->_object->_folder
+		);
+
+		anim.__paletteData = oldPal;
+		anim.__palette = oldPalette;
+		anim.__folder = oldFolder;
+		this->applyOperation(new PasteBoxDataOperation(
+			*this->_object,
+			this->_editor.localize("operation.paste_box"),
+			anim
+		));
+	} catch (std::exception &e) {
+		game->logger.error("Failed to deserialize frame" + std::string(e.what()));
+	}
+}
+
+void SpiralOfFate::MainWindow::pasteAnimData()
+{
+	auto &data = this->_object->getFrameData();
+	auto oldPal = data.__paletteData;
+	auto oldPalette = data.__palette;
+	auto oldFolder = data.__folder;
+
+	try {
+		auto anim = SpiralOfFate::FrameData(
+			nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
+			this->_object->_folder
+		);
+
+		anim.__paletteData = oldPal;
+		anim.__palette = oldPalette;
+		anim.__folder = oldFolder;
+		this->applyOperation(new PasteAnimDataOperation(
+			*this->_object,
+			this->_editor.localize("operation.paste_anim"),
+			anim
+		));
+	} catch (std::exception &e) {
+		game->logger.error("Failed to deserialize frame" + std::string(e.what()));
+	}
 }
 
 void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operation)
@@ -1474,6 +1560,12 @@ void SpiralOfFate::MainWindow::removeAnimationBlock()
 }
 
 void SpiralOfFate::MainWindow::removeAction()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::MainWindow::removeBox()
 {
 	// TODO: Not implemented
 	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);

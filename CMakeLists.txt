@@ -425,6 +425,12 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/CreatePaletteOperation.hpp
 			src/FrameDataEditor/Operations/RemovePaletteOperation.cpp
 			src/FrameDataEditor/Operations/RemovePaletteOperation.hpp
+			src/FrameDataEditor/Operations/PasteDataOperation.cpp
+			src/FrameDataEditor/Operations/PasteDataOperation.hpp
+			src/FrameDataEditor/Operations/PasteAnimDataOperation.cpp
+			src/FrameDataEditor/Operations/PasteAnimDataOperation.hpp
+			src/FrameDataEditor/Operations/PasteBoxDataOperation.cpp
+			src/FrameDataEditor/Operations/PasteBoxDataOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore png)
 	endif ()

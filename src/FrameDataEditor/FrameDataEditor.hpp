@@ -55,6 +55,10 @@ namespace SpiralOfFate
 
 		void _undo();
 		void _redo();
+		void _copy();
+		void _paste();
+		void _pasteBoxData();
+		void _pasteAnimData();
 
 		void _newFrame();
 		void _newEndFrame();
@@ -66,12 +70,14 @@ namespace SpiralOfFate
 		void _removeFrame();
 		void _removeAnimationBlock();
 		void _removeAction();
+		void _removeBox();
 
 		void _copyBoxesFromLastFrame();
 		void _copyBoxesFromNextFrame();
 		void _flattenThisMoveCollisionBoxes();
 		void _reloadTextures();
 
+		bool _isEditBoxSelected(const tgui::Container &container);
 		std::string _shortcutToString(const Shortcut &s) const;
 
 	public:

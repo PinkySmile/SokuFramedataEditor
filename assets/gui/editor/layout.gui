@@ -9,7 +9,7 @@ MenuBar.MainBar {
     }
 
     Menu {
-        Items = ["menu_item.edit.undo", "menu_item.edit.redo"];
+        Items = ["menu_item.edit.undo", "menu_item.edit.redo", "menu_item.edit.copy", "menu_item.edit.paste", "menu_item.edit.paste_boxdata", "menu_item.edit.paste_animdata"];
         Text = "menu_item.edit";
     }
 
@@ -19,7 +19,7 @@ MenuBar.MainBar {
     }
 
     Menu {
-        Items = ["menu_item.remove.action", "menu_item.remove.block", "menu_item.remove.frame"];
+        Items = ["menu_item.remove.action", "menu_item.remove.block", "menu_item.remove.frame", "menu_item.remove.box"];
         Text = "menu_item.remove";
     }
 

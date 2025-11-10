@@ -35,28 +35,33 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 
 	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
-	this->_shortcutsNames["menu_item.file.new"]           = { .code = sf::Keyboard::Key::N,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.file.load"]          = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.file.save"]          = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.file.save_as"]       = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.file.new"]            = { .code = sf::Keyboard::Key::N,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.load"]           = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.save"]           = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.file.save_as"]        = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	// this->_shortcutsNames["menu_item.file.settings"]      = { .code = sf::Keyboard::Key::LAlt, .alt = false, .control = false, .shift = false, .meta = false };
 	// this->_shortcutsNames["menu_item.file.shortcuts"]     = { .code = sf::Keyboard::Key::LAlt, .alt = false, .control = false, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.file.quit"]          = { .code = sf::Keyboard::Key::Q,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.undo"]          = { .code = sf::Keyboard::Key::Z,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.redo"]          = { .code = sf::Keyboard::Key::Y,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.frame"]          = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.frame_end"]      = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.new.block"]          = { .code = sf::Keyboard::Key::B,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.action"]         = { .code = sf::Keyboard::Key::A,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.hurt_box"]       = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.hit_box"]        = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.remove.frame"]       = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.remove.block"]       = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.remove.action"]      = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = true, .meta = true };
-	this->_shortcutsNames["menu_item.misc.copy_box_last"] = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.copy_box_next"] = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.flatten"]       = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.reload"]        = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true, .shift = true, .meta = false };
+	this->_shortcutsNames["menu_item.file.quit"]           = { .code = sf::Keyboard::Key::Q,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.undo"]           = { .code = sf::Keyboard::Key::Z,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.redo"]           = { .code = sf::Keyboard::Key::Y,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.copy"]           = { .code = sf::Keyboard::Key::C,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.paste"]          = { .code = sf::Keyboard::Key::V,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.edit.paste_boxdata"]  = { .code = sf::Keyboard::Key::V,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.edit.paste_animdata"] = { .code = sf::Keyboard::Key::V,      .alt = true,  .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.frame"]           = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.frame_end"]       = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.new.block"]           = { .code = sf::Keyboard::Key::B,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.action"]          = { .code = sf::Keyboard::Key::A,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.hurt_box"]        = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.new.hit_box"]         = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.remove.frame"]        = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_shortcutsNames["menu_item.remove.block"]        = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.remove.action"]       = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = true,  .meta = true  };
+	this->_shortcutsNames["menu_item.remove.box"]          = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.copy_box_last"]  = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.copy_box_next"]  = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.flatten"]        = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.reload"]         = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	this->_menuHierarchy = menu->getMenus();
 	this->setLocale(this->_locale);
 	Utils::setRenderer(game->gui);
@@ -490,8 +495,12 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.shortcuts" }, &FrameDataEditor::_editShortcuts);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.quit"      }, &FrameDataEditor::_quit);
 
-	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.undo"  }, &FrameDataEditor::_undo);
-	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.redo"  }, &FrameDataEditor::_redo);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.undo"           }, &FrameDataEditor::_undo);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.redo"           }, &FrameDataEditor::_redo);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.copy"           }, &FrameDataEditor::_copy);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.paste"          }, &FrameDataEditor::_paste);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.paste_boxdata"  }, &FrameDataEditor::_pasteBoxData);
+	this->_connectShortcut(menu, { "menu_item.edit", "menu_item.edit.paste_animdata" }, &FrameDataEditor::_pasteAnimData);
 
 	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.frame"     }, &FrameDataEditor::_newFrame);
 	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.frame_end" }, &FrameDataEditor::_newEndFrame);
@@ -503,6 +512,7 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.frame"  }, &FrameDataEditor::_removeFrame);
 	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.block"  }, &FrameDataEditor::_removeAnimationBlock);
 	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.action" }, &FrameDataEditor::_removeAction);
+	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.box"    }, &FrameDataEditor::_removeBox);
 
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_last" }, &FrameDataEditor::_copyBoxesFromLastFrame);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_next" }, &FrameDataEditor::_copyBoxesFromNextFrame);
@@ -761,6 +771,26 @@ void SpiralOfFate::FrameDataEditor::_redo()
 	this->_focusedWindow->redo();
 }
 
+void SpiralOfFate::FrameDataEditor::_copy()
+{
+	this->_focusedWindow->copyFrame();
+}
+
+void SpiralOfFate::FrameDataEditor::_paste()
+{
+	this->_focusedWindow->pasteFrame();
+}
+
+void SpiralOfFate::FrameDataEditor::_pasteBoxData()
+{
+	this->_focusedWindow->pasteBoxData();
+}
+
+void SpiralOfFate::FrameDataEditor::_pasteAnimData()
+{
+	this->_focusedWindow->pasteAnimData();
+}
+
 void SpiralOfFate::FrameDataEditor::_newFrame()
 {
 	this->_focusedWindow->newFrame();
@@ -806,6 +836,11 @@ void SpiralOfFate::FrameDataEditor::_removeAction()
 	this->_focusedWindow->removeAction();
 }
 
+void SpiralOfFate::FrameDataEditor::_removeBox()
+{
+	this->_focusedWindow->removeBox();
+}
+
 void SpiralOfFate::FrameDataEditor::_copyBoxesFromLastFrame()
 {
 	this->_focusedWindow->copyBoxesFromLastFrame();
@@ -844,6 +879,9 @@ void SpiralOfFate::FrameDataEditor::setHasUndo(bool hasUndo)
 
 bool SpiralOfFate::FrameDataEditor::canHandleKeyPress(const sf::Event::KeyPressed &event)
 {
+	if (this->_focusedWindow && this->_isEditBoxSelected(*this->_focusedWindow))
+		return false;
+
 	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
 
 	game->logger.debug("Pressed keys: " + this->_shortcutToString(s));
@@ -906,4 +944,18 @@ bool SpiralOfFate::FrameDataEditor::Shortcut::operator<(const SpiralOfFate::Fram
 	if (this->control != other.control)
 		return other.control;
 	return this->code < other.code;
+}
+
+bool SpiralOfFate::FrameDataEditor::_isEditBoxSelected(const tgui::Container &container)
+{
+	for (auto widget : container.getWidgets()) {
+		if (auto cont = widget->cast<tgui::Container>()) {
+			if (this->_isEditBoxSelected(*cont))
+				return true;
+		} else if (auto box = widget->cast<tgui::EditBox>()) {
+			if (box->isFocused())
+				return true;
+		}
+	}
+	return false;
 }

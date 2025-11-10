@@ -54,6 +54,10 @@ namespace SpiralOfFate
 		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void undo();
 		void redo();
+		void copyFrame();
+		void pasteFrame();
+		void pasteBoxData();
+		void pasteAnimData();
 		void save();
 		void save(const std::filesystem::path &path);
 		void setPath(const std::filesystem::path &path);
@@ -81,6 +85,7 @@ namespace SpiralOfFate
 		void removeFrame();
 		void removeAnimationBlock();
 		void removeAction();
+		void removeBox();
 
 		void copyBoxesFromLastFrame();
 		void copyBoxesFromNextFrame();
