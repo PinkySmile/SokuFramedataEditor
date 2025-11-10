@@ -1085,8 +1085,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				this->_object->_needGenerate = true;
 			});
 			button->onMouseLeave.connect([this]{
-				this->_object->_paletteIndex = this->_selectedColor;
-				this->_object->_needGenerate = true;
+				if (this->_selectedColor == 0)
+					this->_object->_paletteIndex = -1;
+				else {
+					this->_object->_paletteIndex = this->_selectedColor;
+					this->_object->_needGenerate = true;
+				}
 			});
 		}
 	}
