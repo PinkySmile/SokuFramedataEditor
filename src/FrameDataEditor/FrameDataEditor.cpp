@@ -472,11 +472,11 @@ void SpiralOfFate::FrameDataEditor::_connectShortcut(const tgui::MenuBar::Ptr &m
 
 	auto it = this->_shortcutsNames.find(hierarchy.back());
 
-	if (it != this->_shortcutsNames.end()) {
-		game->logger.debug(std::string(hierarchy.back()) + " shortcut is " + FrameDataEditor::_shortcutToString(it->second));
-		this->_shortcuts.emplace(it->second, callback);
-	}
 	tguiHierarchy.emplace_back(this->localizeShortcut(hierarchy.back()));
+	if (it != this->_shortcutsNames.end()) {
+		game->logger.debug(std::string(hierarchy.back()) + " shortcut is " + this->_shortcutToString(it->second));
+		this->_shortcuts.emplace(it->second, std::pair{tguiHierarchy, callback});
+	}
 	menu->connectMenuItem(tguiHierarchy, callback, this);
 }
 
@@ -547,13 +547,17 @@ void SpiralOfFate::FrameDataEditor::_updateMenuBar()
 		menu->setMenuEnabled(this->localize("menu_item.edit"), true);
 		menu->setMenuEnabled(this->localize("menu_item.misc"), true);
 		menu->setMenuEnabled(this->localize("menu_item.remove"), true);
-		menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.undo") }, this->_focusedWindow->hasUndoData());
-		menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localize("menu_item.edit.redo") }, this->_focusedWindow->hasRedoData());
+		menu->setMenuItemEnabled({ this->localize("menu_item.file"), this->localizeShortcut("menu_item.file.save") }, true);
+		menu->setMenuItemEnabled({ this->localize("menu_item.file"), this->localizeShortcut("menu_item.file.save_as") }, true);
+		menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.undo") }, this->_focusedWindow->hasUndoData());
+		menu->setMenuItemEnabled({ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.redo") }, this->_focusedWindow->hasRedoData());
 	} else {
 		menu->setMenuEnabled(this->localize("menu_item.new"), false);
 		menu->setMenuEnabled(this->localize("menu_item.edit"), false);
 		menu->setMenuEnabled(this->localize("menu_item.misc"), false);
 		menu->setMenuEnabled(this->localize("menu_item.remove"), false);
+		menu->setMenuItemEnabled({ this->localize("menu_item.file"), this->localizeShortcut("menu_item.file.save") }, false);
+		menu->setMenuItemEnabled({ this->localize("menu_item.file"), this->localizeShortcut("menu_item.file.save_as") }, false);
 	}
 }
 
@@ -627,9 +631,13 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 		try {
 			this->_openWindows.emplace_back(new MainWindow(path, *this));
 			this->_focusedWindow = this->_openWindows.back();
-			this->_focusedWindow->onMousePress.connect([this]{
+			this->_focusedWindow->onMousePress.connect([this](const std::weak_ptr<MainWindow> &This){
+				if (this->_focusedWindow != This.lock()) {
+					this->_focusedWindow = This.lock();
+					this->_updateMenuBar();
+				}
 				this->_focusedWindow->setFocused(true);
-			});
+			}, std::weak_ptr(this->_focusedWindow));
 			this->_focusedWindow->onFocus.connect([this](const std::weak_ptr<MainWindow> &This){
 				auto lock = This.lock();
 
@@ -644,6 +652,9 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 			}, std::weak_ptr(this->_focusedWindow));
 			this->_focusedWindow->onRealClose.connect([this](const std::weak_ptr<MainWindow> &This){
 				this->_openWindows.erase(std::remove(this->_openWindows.begin(), this->_openWindows.end(), This.lock()), this->_openWindows.end());
+				if (this->_focusedWindow == This.lock())
+					this->_focusedWindow = nullptr;
+				this->_updateMenuBar();
 			}, std::weak_ptr(this->_focusedWindow));
 			game->gui.add(this->_focusedWindow);
 			this->_focusedWindow->setFocused(true);
@@ -835,7 +846,8 @@ bool SpiralOfFate::FrameDataEditor::canHandleKeyPress(const sf::Event::KeyPresse
 {
 	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
 
-	game->logger.debug("Pressed keys: " + FrameDataEditor::_shortcutToString(s));
+	game->logger.debug("Pressed keys: " + this->_shortcutToString(s));
+	game->logger.debug("Has it? " + std::string(this->_shortcuts.contains(s) ? "true" : "false"));
 	return this->_shortcuts.contains(s);
 }
 
@@ -843,10 +855,27 @@ void SpiralOfFate::FrameDataEditor::keyPressed(const sf::Event::KeyPressed &even
 {
 	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
 	auto it = this->_shortcuts.find(s);
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
 	assert_exp(it != this->_shortcuts.end());
-	game->logger.debug("Execute shortcut: " + FrameDataEditor::_shortcutToString(s));
-	(this->*(it->second))();
+
+	std::string tmp = "Check ";
+	size_t i = 0;
+	bool ok = menu->getMenuItemEnabled(it->second.first);
+
+	for (auto &entry : it->second.first) {
+		if (i)
+			tmp += "->";
+		tmp += "\"";
+		tmp += entry.toStdString();
+		tmp += "\"";
+		i++;
+	}
+	game->logger.debug(tmp + " is " + (ok ? "enabled" : "disabled"));
+	if (menu->getMenuItemEnabled(it->second.first)) {
+		game->logger.debug("Execute shortcut: " + this->_shortcutToString(s));
+		(this->*(it->second.second))();
+	}
 }
 
 const std::map<std::string, std::string> &SpiralOfFate::FrameDataEditor::getLocalizationData() const

@@ -30,7 +30,7 @@ namespace SpiralOfFate
 		float _timer = 0;
 		sf::Clock _clock;
 		std::map<std::string, Shortcut> _shortcutsNames;
-		std::map<Shortcut, void (FrameDataEditor::*)()> _shortcuts;
+		std::map<Shortcut, std::pair<std::vector<tgui::String>, void (FrameDataEditor::*)()>> _shortcuts;
 		std::vector<tgui::MenuBar::GetMenusElement> _menuHierarchy;
 		std::map<std::string, std::string> _localization;
 		std::vector<std::shared_ptr<MainWindow>> _openWindows;
