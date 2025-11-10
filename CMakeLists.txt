@@ -378,6 +378,14 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/EditableObject.hpp
 			src/FrameDataEditor/FrameDataEditor.cpp
 			src/FrameDataEditor/FrameDataEditor.hpp
+			src/FrameDataEditor/PngLoader.cpp
+			src/FrameDataEditor/PngLoader.hpp
+
+			src/FrameDataEditor/UI/ColorPlaneWidget.cpp
+			src/FrameDataEditor/UI/ColorPlaneWidget.hpp
+			src/FrameDataEditor/UI/ColorSliderWidget.cpp
+			src/FrameDataEditor/UI/ColorSliderWidget.hpp
+			src/FrameDataEditor/UI/ColorWidgets.hpp
 			src/FrameDataEditor/UI/LocalizedContainer.hpp
 			src/FrameDataEditor/UI/MainWindow.cpp
 			src/FrameDataEditor/UI/MainWindow.hpp
@@ -385,52 +393,46 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/UI/PreviewWidget.hpp
 			src/FrameDataEditor/UI/SettingsWindow.cpp
 			src/FrameDataEditor/UI/SettingsWindow.hpp
-			src/FrameDataEditor/Operations/BasicDataOperation.hpp
-			src/FrameDataEditor/Operations/FlagOperation.hpp
+
 			src/FrameDataEditor/Operations/Operation.hpp
-			src/FrameDataEditor/Operations/SpriteChangeOperation.cpp
-			src/FrameDataEditor/Operations/SpriteChangeOperation.hpp
-			src/FrameDataEditor/Operations/SoundChangeOperation.cpp
-			src/FrameDataEditor/Operations/SoundChangeOperation.hpp
-			src/FrameDataEditor/Operations/ClearHitOperation.cpp
-			src/FrameDataEditor/Operations/ClearHitOperation.hpp
-			src/FrameDataEditor/Operations/ClearBlockOperation.cpp
-			src/FrameDataEditor/Operations/ClearBlockOperation.hpp
 			src/FrameDataEditor/Operations/DummyOperation.cpp
 			src/FrameDataEditor/Operations/DummyOperation.hpp
-			src/FrameDataEditor/Operations/CreateMoveOperation.cpp
-			src/FrameDataEditor/Operations/CreateMoveOperation.hpp
-			src/FrameDataEditor/Operations/CreateFrameOperation.cpp
-			src/FrameDataEditor/Operations/CreateFrameOperation.hpp
+			src/FrameDataEditor/Operations/FlagOperation.hpp
+			src/FrameDataEditor/Operations/BasicDataOperation.hpp
 			src/FrameDataEditor/Operations/BoxModificationOperation.cpp
 			src/FrameDataEditor/Operations/BoxModificationOperation.hpp
+			src/FrameDataEditor/Operations/ClearBlockOperation.cpp
+			src/FrameDataEditor/Operations/ClearBlockOperation.hpp
+			src/FrameDataEditor/Operations/ClearHitOperation.cpp
+			src/FrameDataEditor/Operations/ClearHitOperation.hpp
+			src/FrameDataEditor/Operations/ColorEditionOperation.cpp
+			src/FrameDataEditor/Operations/ColorEditionOperation.hpp
 			src/FrameDataEditor/Operations/CreateBlockOperation.cpp
 			src/FrameDataEditor/Operations/CreateBlockOperation.hpp
 			src/FrameDataEditor/Operations/CreateBoxOperation.cpp
 			src/FrameDataEditor/Operations/CreateBoxOperation.hpp
-			src/FrameDataEditor/Operations/RemoveFrameOperation.cpp
-			src/FrameDataEditor/Operations/RemoveFrameOperation.hpp
-			src/FrameDataEditor/Operations/RemoveBoxOperation.cpp
-			src/FrameDataEditor/Operations/RemoveBoxOperation.hpp
-			src/FrameDataEditor/UI/ColorPlaneWidget.cpp
-			src/FrameDataEditor/UI/ColorPlaneWidget.hpp
-			src/FrameDataEditor/UI/ColorWidgets.hpp
-			src/FrameDataEditor/UI/ColorSliderWidget.cpp
-			src/FrameDataEditor/UI/ColorSliderWidget.hpp
-			src/FrameDataEditor/PngLoader.cpp
-			src/FrameDataEditor/PngLoader.hpp
-			src/FrameDataEditor/Operations/ColorEditionOperation.cpp
-			src/FrameDataEditor/Operations/ColorEditionOperation.hpp
+			src/FrameDataEditor/Operations/CreateFrameOperation.cpp
+			src/FrameDataEditor/Operations/CreateFrameOperation.hpp
+			src/FrameDataEditor/Operations/CreateMoveOperation.cpp
+			src/FrameDataEditor/Operations/CreateMoveOperation.hpp
 			src/FrameDataEditor/Operations/CreatePaletteOperation.cpp
 			src/FrameDataEditor/Operations/CreatePaletteOperation.hpp
-			src/FrameDataEditor/Operations/RemovePaletteOperation.cpp
-			src/FrameDataEditor/Operations/RemovePaletteOperation.hpp
-			src/FrameDataEditor/Operations/PasteDataOperation.cpp
-			src/FrameDataEditor/Operations/PasteDataOperation.hpp
 			src/FrameDataEditor/Operations/PasteAnimDataOperation.cpp
 			src/FrameDataEditor/Operations/PasteAnimDataOperation.hpp
 			src/FrameDataEditor/Operations/PasteBoxDataOperation.cpp
 			src/FrameDataEditor/Operations/PasteBoxDataOperation.hpp
+			src/FrameDataEditor/Operations/PasteDataOperation.cpp
+			src/FrameDataEditor/Operations/PasteDataOperation.hpp
+			src/FrameDataEditor/Operations/RemoveBoxOperation.cpp
+			src/FrameDataEditor/Operations/RemoveBoxOperation.hpp
+			src/FrameDataEditor/Operations/RemoveFrameOperation.cpp
+			src/FrameDataEditor/Operations/RemoveFrameOperation.hpp
+			src/FrameDataEditor/Operations/RemovePaletteOperation.cpp
+			src/FrameDataEditor/Operations/RemovePaletteOperation.hpp
+			src/FrameDataEditor/Operations/SoundChangeOperation.cpp
+			src/FrameDataEditor/Operations/SoundChangeOperation.hpp
+			src/FrameDataEditor/Operations/SpriteChangeOperation.cpp
+			src/FrameDataEditor/Operations/SpriteChangeOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore png)
 	endif ()
