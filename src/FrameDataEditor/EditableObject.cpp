@@ -17,8 +17,15 @@ EditableObject::EditableObject(const std::string &frameData) :
 		this->_moves[pair.first] = pair.second;
 }
 
-void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes) const
+void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes)
 {
+	if (this->_generateCd)
+		this->_generateCd--;
+	else if (this->_needGenerate) {
+		this->_generateOverlaySprite();
+		this->_generateCd = 4;
+	}
+
 	sf::RectangleShape rect;
 	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
 	auto size = Vector2f{
@@ -123,6 +130,7 @@ void EditableObject::update()
 		data = &this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
 		this->resetState();
 		game->soundMgr.play(data->soundHandle);
+		this->_needGenerate = false;
 		this->_generateOverlaySprite();
 	}
 	this->_simulate(*data);
@@ -257,14 +265,14 @@ void EditableObject::_generateOverlaySprite()
 		if (y < 0)
 			y = 0;
 		else if ((unsigned)y >= img.height)
-			y = img.height - 1;
+			break;
 		for (unsigned x_off = 0; x_off < data.textureBounds.size.x; x_off++) {
 			int x = data.textureBounds.pos.x + x_off;
 
 			if (x < 0)
 				x = 0;
 			else if ((unsigned)x >= img.width)
-				x = img.width - 1;
+				break;
 
 			auto index = img.raw[y * img.paddedWidth + x];
 
@@ -302,8 +310,10 @@ void EditableObject::setMousePosition(const SpiralOfFate::Vector2f *pos)
 		return;
 	}
 	sPos += data.textureBounds.pos;
+	if (sPos.x < 0 || sPos.x >= img.width || sPos.y < 0 || sPos.y >= img.height)
+		return;
 	this->_paletteIndex = img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)];
-	this->_generateOverlaySprite();
+	this->_needGenerate = true;
 }
 
 SpiralOfFate::Vector2f EditableObject::_mousePosToImgPos(const SpiralOfFate::Vector2i &mouse)

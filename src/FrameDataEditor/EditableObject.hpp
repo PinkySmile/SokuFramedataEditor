@@ -10,11 +10,11 @@
 
 class EditableObject {
 public:
-	mutable SpiralOfFate::Sprite _sprite;
-	mutable SpiralOfFate::Sprite _spriteEffect;
-	mutable sf::Sprite _overlaySprite{this->_overlayTexture};
+	SpiralOfFate::Sprite _sprite;
+	SpiralOfFate::Sprite _spriteEffect;
+	sf::Sprite _overlaySprite{this->_overlayTexture};
 	sf::Texture _overlayTexture;
-	mutable std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
+	std::map<unsigned, std::vector<std::vector<SpiralOfFate::FrameData>>> _moves;
 	SpiralOfFate::Vector2f _position = {0, 0};
 	SpiralOfFate::Vector2f _speed = {0, 0};
 	SpiralOfFate::Vector2f _mousePos = {0, 0};
@@ -26,6 +26,8 @@ public:
 	float _rotation = 0;
 	std::string _folder;
 	bool _textureValid = false;
+	bool _needGenerate = false;
+	unsigned char _generateCd = 0;
 
 	SpiralOfFate::Vector2f _mousePosToImgPos(const SpiralOfFate::Vector2i &mouse);
 	void _generateOverlaySprite();
@@ -39,7 +41,7 @@ public:
 	~EditableObject() = default;
 	SpiralOfFate::FrameData &getFrameData();
 	const SpiralOfFate::FrameData &getFrameData() const;
-	void render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes) const;
+	void render(sf::RenderTarget &target, sf::RenderStates states, bool displaceBoxes);
 	void update();
 	void resetState();
 	void setMousePosition(const SpiralOfFate::Vector2f *pos);
