@@ -72,7 +72,7 @@ namespace SpiralOfFate
 		void _flattenThisMoveCollisionBoxes();
 		void _reloadTextures();
 
-		static std::string _shortcutToString(const Shortcut &s);
+		std::string _shortcutToString(const Shortcut &s) const;
 
 	public:
 		FrameDataEditor();
