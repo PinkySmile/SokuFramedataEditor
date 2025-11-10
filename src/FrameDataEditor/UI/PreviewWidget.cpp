@@ -272,7 +272,7 @@ void SpiralOfFate::PreviewWidget::_updateHover(const tgui::Vector2f &pos)
 		this->_object.setMousePosition(&p);
 		if (this->_selectedColor != 0 && this->_object._paletteIndex <= 0) {
 			this->_object._paletteIndex = this->_selectedColor;
-			this->_object._generateOverlaySprite();
+			this->_object._needGenerate = true;
 		}
 		return;
 	}

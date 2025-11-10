@@ -69,7 +69,6 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states, b
 		this->_overlaySprite.setPosition(result);
 		this->_overlaySprite.setScale(data.scale);
 		this->_overlaySprite.setTexture(this->_overlayTexture, true);
-		this->_overlaySprite.setTextureRect(data.textureBounds);
 		target.draw(this->_overlaySprite, states);
 	}
 
@@ -263,14 +262,14 @@ void EditableObject::_generateOverlaySprite()
 		int y = data.textureBounds.pos.y + y_off;
 
 		if (y < 0)
-			y = 0;
+			continue;
 		else if ((unsigned)y >= img.height)
 			break;
 		for (unsigned x_off = 0; x_off < data.textureBounds.size.x; x_off++) {
 			int x = data.textureBounds.pos.x + x_off;
 
 			if (x < 0)
-				x = 0;
+				continue;
 			else if ((unsigned)x >= img.width)
 				break;
 

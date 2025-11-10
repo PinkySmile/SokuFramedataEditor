@@ -1077,7 +1077,16 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 
 			button->onClick.connect([this, i, &container]{
 				this->_selectedColor = i;
+				this->_preview->setSelectedColor(i);
 				this->_populateColorData(container);
+			});
+			button->onMouseEnter.connect([this, i]{
+				this->_object->_paletteIndex = i;
+				this->_object->_needGenerate = true;
+			});
+			button->onMouseLeave.connect([this]{
+				this->_object->_paletteIndex = this->_selectedColor;
+				this->_object->_needGenerate = true;
 			});
 		}
 	}
