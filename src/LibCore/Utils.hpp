@@ -201,6 +201,7 @@ namespace SpiralOfFate::Utils
 		auto dialog = tgui::MessageBox::create(title, content, { "OK" });
 
 		// TODO: use variate
+		(void)variate;
 		openWindowWithFocus(gui, 0, 0, dialog);
 		dialog->onButtonPress.connect([](const std::weak_ptr<tgui::MessageBox> &d){
 			d.lock()->close();

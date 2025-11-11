@@ -73,6 +73,7 @@ void ColorPlaneWidget::_recreateTexture() const
 		static_cast<unsigned int>(std::ceil(size.y - 20))
 	};
 	sf::Image image{actualSize};
+	sf::Color color;
 	unsigned computed[3];
 	unsigned *components[3];
 
@@ -80,23 +81,18 @@ void ColorPlaneWidget::_recreateTexture() const
 	components[this->_components.second] = &computed[1];
 	components[this->_lastComponent] = &computed[2];
 	computed[2] = this->_color[2];
-	for (unsigned y = 0; y < actualSize.y; y++)
+	for (unsigned y = 0; y < actualSize.y; y++) {
+		auto &second = this->_colorSpace[this->_components.second];
+
+		computed[1] = second.first + (second.second - second.first) * y / actualSize.y;
 		for (unsigned x = 0; x < actualSize.x; x++) {
 			auto &first = this->_colorSpace[this->_components.first];
-			auto &second = this->_colorSpace[this->_components.second];
 
-			computed[0] = first.first  + (first.second  - first.first)  * x / actualSize.x;
-			computed[1] = second.first + (second.second - second.first) * y / actualSize.y;
-
-			// TODO: Optimize by caching last color and last line
-			sf::Color color = this->_colorConversion(
-				*components[0],
-				*components[1],
-				*components[2]
-			);
-
+			computed[0] = first.first + (first.second - first.first) * x / actualSize.x;
+			color = this->_colorConversion(*components[0], *components[1], *components[2]);
 			image.setPixel({x, y}, color);
 		}
+	}
 	assert_exp(this->_space.loadFromImage(image));
 	this->_sprite.setTexture(this->_space, true);
 }

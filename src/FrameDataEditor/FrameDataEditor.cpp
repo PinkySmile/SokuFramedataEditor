@@ -56,7 +56,6 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 
 	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
-	this->_shortcutsNames["menu_item.file.new"]            = { .code = sf::Keyboard::Key::N,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.load"]           = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.save"]           = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.save_as"]        = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
@@ -154,7 +153,7 @@ std::string SpiralOfFate::FrameDataEditor::_shortcutToString(const SpiralOfFate:
 	std::string result;
 	auto code = static_cast<int>(s.code);
 
-	if (code < 0 || code >= std::size(keyNames))
+	if (code < 0 || static_cast<std::size_t>(code) >= std::size(keyNames))
 		result = this->localize("key.unknown");
 	else
 		result = this->localize(std::string("key.") + keyNames[code]);
@@ -205,7 +204,6 @@ void SpiralOfFate::FrameDataEditor::_connectShortcut(const tgui::MenuBar::Ptr &m
 
 void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr &menu)
 {
-	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.new"       }, &FrameDataEditor::_newFramedata);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.load"      }, &FrameDataEditor::_loadFramedata);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.save"      }, &FrameDataEditor::_save);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.save_as"   }, &FrameDataEditor::_saveAs);
@@ -343,12 +341,6 @@ void SpiralOfFate::FrameDataEditor::setLocale(const std::string &name)
 std::string SpiralOfFate::FrameDataEditor::getLocale() const
 {
 	return this->_locale;
-}
-
-void SpiralOfFate::FrameDataEditor::_newFramedata()
-{
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
@@ -668,14 +660,14 @@ bool SpiralOfFate::FrameDataEditor::Shortcut::operator<(const SpiralOfFate::Fram
 
 bool SpiralOfFate::FrameDataEditor::_isEditBoxSelected(const tgui::Container &container)
 {
-	for (auto widget : container.getWidgets()) {
-		if (auto cont = widget->cast<tgui::Container>()) {
+	return std::ranges::any_of(container.getWidgets(), [this](const auto &widget){
+		if (auto cont = widget->template cast<tgui::Container>()) {
 			if (this->_isEditBoxSelected(*cont))
 				return true;
-		} else if (auto box = widget->cast<tgui::EditBox>()) {
+		} else if (auto box = widget->template cast<tgui::EditBox>()) {
 			if (box->isFocused())
 				return true;
 		}
-	}
-	return false;
+		return false;
+	});
 }

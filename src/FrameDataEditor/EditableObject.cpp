@@ -216,7 +216,7 @@ void EditableObject::_simulate(const SpiralOfFate::FrameData &data)
 	this->_speed += data.speed;
 	this->_position += this->_speed;
 	if (data.dFlag.airborne) {
-		// TODO::
+		// TODO:
 		this->_speed.x *= 0.985;
 		this->_speed.y *= 1;
 	} else

@@ -134,7 +134,6 @@
 	"key.alt":                         "Alt",
 
 	"menu_item.file":                  "Fichier",
-	"menu_item.file.new":              "Nouveau",
 	"menu_item.file.load":             "Ouvrir",
 	"menu_item.file.save":             "Enregister",
 	"menu_item.file.save_as":          "Enregister sous",
