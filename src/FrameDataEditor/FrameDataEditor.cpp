@@ -8,6 +8,27 @@
 #include "UI/LocalizedContainer.hpp"
 #include "UI/SettingsWindow.hpp"
 
+static const char *keyNames[] = {
+	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+	"num0", "num1", "num2", "num3", "num4", "num5", "num6", "num7", "num8", "num9",
+	"escape",
+	"lcontrol", "lshift", "lalt", "lsystem",
+	"rcontrol", "rshift", "ralt", "rsystem",
+	"menu",
+	"lbracket", "rbracket",
+	"semicolon", "comma", "period", "apostrophe", "slash", "backslash", "grave", "equal", "hyphen",
+	"space", "enter",
+	"backspace", "tab",
+	"pageup", "pagedown",
+	"end", "home",
+	"insert", "delete",
+	"add", "subtract", "multiply", "divide",
+	"left", "right", "up", "down",
+	"numpad0", "numpad1", "numpad2", "numpad3", "numpad4", "numpad5", "numpad6", "numpad7", "numpad8", "numpad9",
+	"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14", "f15",
+	"pause"
+};
+
 template<typename T>
 void localizeGui(T &container)
 {
@@ -131,316 +152,13 @@ std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
 std::string SpiralOfFate::FrameDataEditor::_shortcutToString(const SpiralOfFate::FrameDataEditor::Shortcut &s) const
 {
 	std::string result;
+	auto code = static_cast<int>(s.code);
 
-	// TODO: hardcoded string
-	switch (s.code) {
-	case sf::Keyboard::Key::A:
-		result = this->localize("key.a");
-		break;
-	case sf::Keyboard::Key::B:
-		result = this->localize("key.b");
-		break;
-	case sf::Keyboard::Key::C:
-		result = this->localize("key.c");
-		break;
-	case sf::Keyboard::Key::D:
-		result = this->localize("key.d");
-		break;
-	case sf::Keyboard::Key::E:
-		result = this->localize("key.e");
-		break;
-	case sf::Keyboard::Key::F:
-		result = this->localize("key.f");
-		break;
-	case sf::Keyboard::Key::G:
-		result = this->localize("key.g");
-		break;
-	case sf::Keyboard::Key::H:
-		result = this->localize("key.h");
-		break;
-	case sf::Keyboard::Key::I:
-		result = this->localize("key.i");
-		break;
-	case sf::Keyboard::Key::J:
-		result = this->localize("key.j");
-		break;
-	case sf::Keyboard::Key::K:
-		result = this->localize("key.k");
-		break;
-	case sf::Keyboard::Key::L:
-		result = this->localize("key.l");
-		break;
-	case sf::Keyboard::Key::M:
-		result = this->localize("key.m");
-		break;
-	case sf::Keyboard::Key::N:
-		result = this->localize("key.n");
-		break;
-	case sf::Keyboard::Key::O:
-		result = this->localize("key.o");
-		break;
-	case sf::Keyboard::Key::P:
-		result = this->localize("key.p");
-		break;
-	case sf::Keyboard::Key::Q:
-		result = this->localize("key.q");
-		break;
-	case sf::Keyboard::Key::R:
-		result = this->localize("key.r");
-		break;
-	case sf::Keyboard::Key::S:
-		result = this->localize("key.s");
-		break;
-	case sf::Keyboard::Key::T:
-		result = this->localize("key.t");
-		break;
-	case sf::Keyboard::Key::U:
-		result = this->localize("key.u");
-		break;
-	case sf::Keyboard::Key::V:
-		result = this->localize("key.v");
-		break;
-	case sf::Keyboard::Key::W:
-		result = this->localize("key.w");
-		break;
-	case sf::Keyboard::Key::X:
-		result = this->localize("key.x");
-		break;
-	case sf::Keyboard::Key::Y:
-		result = this->localize("key.y");
-		break;
-	case sf::Keyboard::Key::Z:
-		result = this->localize("key.z");
-		break;
-	case sf::Keyboard::Key::Num0:
-		result = this->localize("key.num0");
-		break;
-	case sf::Keyboard::Key::Num1:
-		result = this->localize("key.num1");
-		break;
-	case sf::Keyboard::Key::Num2:
-		result = this->localize("key.num2");
-		break;
-	case sf::Keyboard::Key::Num3:
-		result = this->localize("key.num3");
-		break;
-	case sf::Keyboard::Key::Num4:
-		result = this->localize("key.num4");
-		break;
-	case sf::Keyboard::Key::Num5:
-		result = this->localize("key.num5");
-		break;
-	case sf::Keyboard::Key::Num6:
-		result = this->localize("key.num6");
-		break;
-	case sf::Keyboard::Key::Num7:
-		result = this->localize("key.num7");
-		break;
-	case sf::Keyboard::Key::Num8:
-		result = this->localize("key.num8");
-		break;
-	case sf::Keyboard::Key::Num9:
-		result = this->localize("key.num9");
-		break;
-	case sf::Keyboard::Key::Escape:
-		result = this->localize("key.escape");
-		break;
-	case sf::Keyboard::Key::LControl:
-		result = this->localize("key.lcontrol");
-		break;
-	case sf::Keyboard::Key::LShift:
-		result = this->localize("key.lshift");
-		break;
-	case sf::Keyboard::Key::LAlt:
-		result = this->localize("key.lalt");
-		break;
-	case sf::Keyboard::Key::LSystem:
-		result = this->localize("key.lsystem");
-		break;
-	case sf::Keyboard::Key::RControl:
-		result = this->localize("key.rcontrol");
-		break;
-	case sf::Keyboard::Key::RShift:
-		result = this->localize("key.rshift");
-		break;
-	case sf::Keyboard::Key::RAlt:
-		result = this->localize("key.ralt");
-		break;
-	case sf::Keyboard::Key::RSystem:
-		result = this->localize("key.rsystem");
-		break;
-	case sf::Keyboard::Key::Menu:
-		result = this->localize("key.menu");
-		break;
-	case sf::Keyboard::Key::LBracket:
-		result = this->localize("key.lbracket");
-		break;
-	case sf::Keyboard::Key::RBracket:
-		result = this->localize("key.rbracket");
-		break;
-	case sf::Keyboard::Key::Semicolon:
-		result = this->localize("key.semicolon");
-		break;
-	case sf::Keyboard::Key::Comma:
-		result = this->localize("key.comma");
-		break;
-	case sf::Keyboard::Key::Period:
-		result = this->localize("key.period");
-		break;
-	case sf::Keyboard::Key::Apostrophe:
-		result = this->localize("key.apostrophe");
-		break;
-	case sf::Keyboard::Key::Slash:
-		result = this->localize("key.slash");
-		break;
-	case sf::Keyboard::Key::Backslash:
-		result = this->localize("key.backslash");
-		break;
-	case sf::Keyboard::Key::Grave:
-		result = this->localize("key.grave");
-		break;
-	case sf::Keyboard::Key::Equal:
-		result = this->localize("key.equal");
-		break;
-	case sf::Keyboard::Key::Hyphen:
-		result = this->localize("key.hyphen");
-		break;
-	case sf::Keyboard::Key::Space:
-		result = this->localize("key.space");
-		break;
-	case sf::Keyboard::Key::Enter:
-		result = this->localize("key.enter");
-		break;
-	case sf::Keyboard::Key::Backspace:
-		result = this->localize("key.backspace");
-		break;
-	case sf::Keyboard::Key::Tab:
-		result = this->localize("key.tab");
-		break;
-	case sf::Keyboard::Key::PageUp:
-		result = this->localize("key.pageup");
-		break;
-	case sf::Keyboard::Key::PageDown:
-		result = this->localize("key.pagedown");
-		break;
-	case sf::Keyboard::Key::End:
-		result = this->localize("key.end");
-		break;
-	case sf::Keyboard::Key::Home:
-		result = this->localize("key.home");
-		break;
-	case sf::Keyboard::Key::Insert:
-		result = this->localize("key.insert");
-		break;
-	case sf::Keyboard::Key::Delete:
-		result = this->localize("key.delete");
-		break;
-	case sf::Keyboard::Key::Add:
-		result = this->localize("key.add");
-		break;
-	case sf::Keyboard::Key::Subtract:
-		result = this->localize("key.subtract");
-		break;
-	case sf::Keyboard::Key::Multiply:
-		result = this->localize("key.multiply");
-		break;
-	case sf::Keyboard::Key::Divide:
-		result = this->localize("key.divide");
-		break;
-	case sf::Keyboard::Key::Left:
-		result = this->localize("key.left");
-		break;
-	case sf::Keyboard::Key::Right:
-		result = this->localize("key.right");
-		break;
-	case sf::Keyboard::Key::Up:
-		result = this->localize("key.up");
-		break;
-	case sf::Keyboard::Key::Down:
-		result = this->localize("key.down");
-		break;
-	case sf::Keyboard::Key::Numpad0:
-		result = this->localize("key.numpad0");
-		break;
-	case sf::Keyboard::Key::Numpad1:
-		result = this->localize("key.numpad1");
-		break;
-	case sf::Keyboard::Key::Numpad2:
-		result = this->localize("key.numpad2");
-		break;
-	case sf::Keyboard::Key::Numpad3:
-		result = this->localize("key.numpad3");
-		break;
-	case sf::Keyboard::Key::Numpad4:
-		result = this->localize("key.numpad4");
-		break;
-	case sf::Keyboard::Key::Numpad5:
-		result = this->localize("key.numpad5");
-		break;
-	case sf::Keyboard::Key::Numpad6:
-		result = this->localize("key.numpad6");
-		break;
-	case sf::Keyboard::Key::Numpad7:
-		result = this->localize("key.numpad7");
-		break;
-	case sf::Keyboard::Key::Numpad8:
-		result = this->localize("key.numpad8");
-		break;
-	case sf::Keyboard::Key::Numpad9:
-		result = this->localize("key.numpad9");
-		break;
-	case sf::Keyboard::Key::F1:
-		result = this->localize("key.f1");
-		break;
-	case sf::Keyboard::Key::F2:
-		result = this->localize("key.f2");
-		break;
-	case sf::Keyboard::Key::F3:
-		result = this->localize("key.f3");
-		break;
-	case sf::Keyboard::Key::F4:
-		result = this->localize("key.f4");
-		break;
-	case sf::Keyboard::Key::F5:
-		result = this->localize("key.f5");
-		break;
-	case sf::Keyboard::Key::F6:
-		result = this->localize("key.f6");
-		break;
-	case sf::Keyboard::Key::F7:
-		result = this->localize("key.f7");
-		break;
-	case sf::Keyboard::Key::F8:
-		result = this->localize("key.f8");
-		break;
-	case sf::Keyboard::Key::F9:
-		result = this->localize("key.f9");
-		break;
-	case sf::Keyboard::Key::F10:
-		result = this->localize("key.f10");
-		break;
-	case sf::Keyboard::Key::F11:
-		result = this->localize("key.f11");
-		break;
-	case sf::Keyboard::Key::F12:
-		result = this->localize("key.f12");
-		break;
-	case sf::Keyboard::Key::F13:
-		result = this->localize("key.f13");
-		break;
-	case sf::Keyboard::Key::F14:
-		result = this->localize("key.f14");
-		break;
-	case sf::Keyboard::Key::F15:
-		result = this->localize("key.f15");
-		break;
-	case sf::Keyboard::Key::Pause:
-		result = this->localize("key.pause");
-		break;
-	default:
+	if (code < 0 || code >= std::size(keyNames))
 		result = this->localize("key.unknown");
-		break;
-	}
+	else
+		result = this->localize(std::string("key.") + keyNames[code]);
+
 	if (s.alt && s.code != sf::Keyboard::Key::LAlt && s.code != sf::Keyboard::Key::RAlt)
 		result = this->localize("key.alt") + "+" + result;
 	if (s.shift && s.code != sf::Keyboard::Key::LShift && s.code != sf::Keyboard::Key::RShift)
@@ -635,8 +353,7 @@ void SpiralOfFate::FrameDataEditor::_newFramedata()
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
 {
-	// TODO: Hardcoded string
-	auto file = Utils::openFileDialog(game->gui, "Open Character", "assets/characters");
+	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_framedata"), "assets/characters");
 	auto load = [this](const std::filesystem::path &path){
 		try {
 			this->_openWindows.emplace_back(new MainWindow(path, *this));
@@ -690,8 +407,10 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 		return false;
 	};
 
-	// TODO: Hardcoded string
-	file->setFileTypeFilters({ {"Framedata file", {"*.json"}}, {"All files", {}} }, 0);
+	file->setFileTypeFilters({
+		{this->localize("file_type.framedata"), {"*.json"}},
+		{this->localize("file_type.all"), {}}
+	}, 0);
 	file->setMultiSelect(true);
 	file->onFileSelect.connect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
 		for (auto &p : arr) {
@@ -732,11 +451,12 @@ void SpiralOfFate::FrameDataEditor::_save()
 
 void SpiralOfFate::FrameDataEditor::_saveAs()
 {
-	// TODO: Hardcoded string
-	auto file = Utils::saveFileDialog(game->gui, "Save Framedata", "assets/characters");
+	auto file = Utils::saveFileDialog(game->gui, this->localize("message_box.title.save_framedata"), "assets/characters");
 
-	// TODO: Hardcoded string
-	file->setFileTypeFilters({ {"Framedata file", {"*.json"}}, {"All files", {}} }, 0);
+	file->setFileTypeFilters({
+		{this->localize("file_type.framedata"), {"*.json"}},
+		{this->localize("file_type.all"), {}}
+	}, 0);
 	file->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
 		this->_focusedWindow->save(arr[0].asString().toStdString());
 	});

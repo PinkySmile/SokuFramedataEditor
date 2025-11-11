@@ -560,8 +560,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 		}
 		this->_preview->setPalette(&this->_palettes.front().colors);
 	} else
-		// TODO: Hardcoded string
-		Utils::dispMsg(*this, "No palette found", "Warning: No palette is provided for this character", MB_ICONWARNING);
+		Utils::dispMsg(*this, this->_editor.localize("message_box.title.no_pal"), this->_editor.localize("message_box.no_pal"), MB_ICONWARNING);
 
 	auto panel = this->get<tgui::Panel>("AnimationPanel");
 	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
@@ -850,9 +849,8 @@ void SpiralOfFate::MainWindow::setPath(const std::filesystem::path &path)
 	pathBak += ".bak";
 	std::filesystem::rename(this->_pathBak, pathBak, err);
 	if (err)
-		// TODO: Hardcoded string
 		// FIXME: strerror only works on Linux (err.message()?)
-		game->logger.error("Cannot rename " + this->_pathBak.string() + " to " + pathBak.string() + ": " + strerror(errno));
+		game->logger.error(this->_editor.localize("error.rename", this->_pathBak.string(), pathBak.string(), strerror(errno)));
 	this->_path = path;
 	this->_pathBak = pathBak;
 	for (auto &pal : this->_palettes)
@@ -874,9 +872,12 @@ void SpiralOfFate::MainWindow::save()
 	std::ofstream stream{this->_path};
 
 	if (stream.fail()) {
-		// TODO: Hardcoded string
+		auto err = this->_editor.localize("error.open", this->_path.string(), strerror(errno));
+
 		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + this->_path.string() + ": " + strerror(errno), MB_ICONERROR);
+		// TODO: Somehow return the message box so the caller can open the save as dialog when OK is clicked
+		SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
+		game->logger.error(err);
 		return;
 	}
 	stream << j.dump(2);
@@ -886,9 +887,11 @@ void SpiralOfFate::MainWindow::save()
 		std::ofstream palStream{p};
 
 		if (palStream.fail()) {
-			// TODO: Hardcoded string
+			auto err = this->_editor.localize("error.open", p.string(), strerror(errno));
+
 			// FIXME: strerror only works on Linux (err.message()?)
-			SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + p.string() + ": " + strerror(errno), MB_ICONERROR);
+			SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
+			game->logger.error(err);
 			continue;
 		}
 
@@ -910,10 +913,14 @@ void SpiralOfFate::MainWindow::save()
 		this->_characterData["palettes"].push_back(pal.path);
 	if (!chrStream.fail())
 		chrStream << this->_characterData.dump(2);
-	else
-		// TODO: Hardcoded string
+	else {
+		auto err = this->_editor.localize("error.open", p.string(), strerror(errno));
+
 		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", "Cannot open " + p.string() + ": " + strerror(errno), MB_ICONERROR);
+		// FIXME: Isn't it confusing that we show an error box, but still somewhat ignore the error and proceed?
+		SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
+		game->logger.error(err);
+	}
 
 	this->_operationSaved = this->_operationIndex;
 	this->setTitle(this->_path.string());
@@ -1494,7 +1501,7 @@ void SpiralOfFate::MainWindow::newAction()
 	auto idBoxW  = std::weak_ptr(idBox);
 	auto windowW = std::weak_ptr(window);
 
-	window->setTitle(this->_editor.localize("create_action.title"));
+	window->setTitle(this->_editor.localize("message_box.title.create_action"));
 	create->setEnabled(false);
 	idBox->onTextChange.connect([createW, actionW, idBoxW, this](const tgui::String &t){
 		if (t.empty()) {
@@ -1977,7 +1984,7 @@ void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
 		if (this->_pendingTransaction) {
 			this->cancelTransaction();
 			this->_requireReload = true;
-			// FIXME: Special case for when you were dragging a box
+			// FIXME: Special case for when you are dragging a box.
 			//        Right now it will start a transaction that will never be removed
 			//        and starting a new one will crash because of the assertion
 			this->startTransaction();

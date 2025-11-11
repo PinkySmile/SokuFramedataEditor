@@ -26,7 +26,7 @@ Button.Create {
     Enabled = false;
     Position = (220 - w, 40);
     Renderer = &1;
-    Text = "create_action.create";
+    Text = "message_box.button.confirm";
     TextSize = 13;
 }
 

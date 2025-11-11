@@ -350,7 +350,6 @@ void SpiralOfFate::PreviewWidget::_handleBoxResize(const tgui::Vector2f &pos)
 	if (!this->_commited && diff.magnitude2() < 100)
 		return;
 
-	// TODO: Handle rotation
 	auto &data = this->_object.getFrameData();
 	float angle = this->displaceObject && this->_boxSelected <= data.hurtBoxes.size() + data.hitBoxes.size() ? this->_object._rotation : 0;
 	Vector2f bpos = this->_boxSaved.pos;
@@ -455,7 +454,6 @@ void SpiralOfFate::PreviewWidget::_handleBoxMove(const tgui::Vector2f &pos)
 	if (!this->_commited && diff.magnitude2() < 100)
 		return;
 
-	// TODO: Handle rotation
 	auto &data = this->_object.getFrameData();
 	float angle = this->displaceObject && this->_boxSelected <= data.hurtBoxes.size() + data.hitBoxes.size() ? this->_object._rotation : 0;
 	auto box = this->_boxSaved;
