@@ -5937,6 +5937,10 @@
             "x": 2.0,
             "y": 2.0
           },
+          "speed": {
+            "x": 4.0,
+            "y": 0.0
+          },
           "sprite": "sheet_tmp.png",
           "subobject": 13,
           "texture_bounds": {
@@ -5972,6 +5976,10 @@
             "x": 2.0,
             "y": 2.0
           },
+          "speed": {
+            "x": 4.0,
+            "y": 0.0
+          },
           "sprite": "sheet_tmp.png",
           "texture_bounds": {
             "height": 95,
@@ -6005,6 +6013,10 @@
           "scale": {
             "x": 2.0,
             "y": 2.0
+          },
+          "speed": {
+            "x": 4.0,
+            "y": 0.0
           },
           "sprite": "sheet_tmp.png",
           "texture_bounds": {

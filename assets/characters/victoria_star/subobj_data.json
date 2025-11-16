@@ -3220,7 +3220,7 @@
           "block_player_hit_stop": 14,
           "block_stun": 20,
           "counter_hit_speed": {
-            "x": 9.0,
+            "x": 16.0,
             "y": 10.0
           },
           "damage": 1600,
@@ -3242,7 +3242,7 @@
           "hit_player_hit_stop": 12,
           "hit_sound": "005.ogg",
           "hit_speed": {
-            "x": 6.0,
+            "x": 10.0,
             "y": 7.0
           },
           "hit_stun": 25,
@@ -3261,8 +3261,8 @@
             "y": 2.0
           },
           "speed": {
-            "x": 40.0,
-            "y": 11.0
+            "x": 30.0,
+            "y": 27.0
           },
           "sprite": "sheet_tmp.png",
           "texture_bounds": {
@@ -3301,8 +3301,8 @@
           "hit_player_hit_stop": 12,
           "hit_sound": "005.ogg",
           "hit_speed": {
-            "x": 6.0,
-            "y": 7.0
+            "x": 10.0,
+            "y": 16.0
           },
           "hit_stun": 25,
           "matter_limit": 30,
@@ -3320,8 +3320,8 @@
             "y": 2.0
           },
           "speed": {
-            "x": 40.0,
-            "y": 10.0
+            "x": 28.0,
+            "y": 18.0
           },
           "sprite": "sheet_tmp.png",
           "texture_bounds": {
@@ -3360,8 +3360,8 @@
           "hit_player_hit_stop": 12,
           "hit_sound": "005.ogg",
           "hit_speed": {
-            "x": 6.0,
-            "y": 7.0
+            "x": 10.0,
+            "y": 16.0
           },
           "hit_stun": 25,
           "matter_limit": 30,
@@ -3379,8 +3379,8 @@
             "y": 2.0
           },
           "speed": {
-            "x": 40.0,
-            "y": 0.0
+            "x": 25.0,
+            "y": 4.0
           },
           "sprite": "sheet_tmp.png",
           "texture_bounds": {
@@ -3420,8 +3420,8 @@
           "hit_player_hit_stop": 12,
           "hit_sound": "005.ogg",
           "hit_speed": {
-            "x": 6.0,
-            "y": 7.0
+            "x": 10.0,
+            "y": 16.0
           },
           "hit_stun": 25,
           "matter_limit": 30,
