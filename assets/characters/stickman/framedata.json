@@ -16566,7 +16566,7 @@
             "top": -141,
             "width": 47
           },
-          "defense_flag": 65536,
+          "defense_flag": 589824,
           "duration": 22,
           "hurt_boxes": [
             {
@@ -24658,8 +24658,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 2,
-          "hit_player_hit_stop": 2,
+          "hit_opponent_hit_stop": 6,
+          "hit_player_hit_stop": 6,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24757,8 +24757,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 2,
-          "hit_player_hit_stop": 2,
+          "hit_opponent_hit_stop": 6,
+          "hit_player_hit_stop": 6,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24855,8 +24855,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 2,
-          "hit_player_hit_stop": 2,
+          "hit_opponent_hit_stop": 6,
+          "hit_player_hit_stop": 6,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -24949,8 +24949,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 2,
-          "hit_player_hit_stop": 2,
+          "hit_opponent_hit_stop": 6,
+          "hit_player_hit_stop": 6,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 1.0,
@@ -25043,8 +25043,8 @@
               "width": 69
             }
           ],
-          "hit_opponent_hit_stop": 2,
-          "hit_player_hit_stop": 2,
+          "hit_opponent_hit_stop": 6,
+          "hit_player_hit_stop": 6,
           "hit_sound": "002.ogg",
           "hit_speed": {
             "x": 4.0,
@@ -29060,6 +29060,47 @@
             "left": 1399,
             "top": 710,
             "width": 29
+          }
+        }
+      ]
+    ]
+  },
+  {
+    "action": 1000,
+    "framedata": [
+      [
+        {
+          "collision_box": {
+            "height": 150,
+            "left": -19,
+            "top": -150,
+            "width": 39
+          },
+          "defense_flag": 8704,
+          "duration": 12,
+          "hurt_boxes": [
+            {
+              "height": 188,
+              "left": -23,
+              "top": -189,
+              "width": 45
+            }
+          ],
+          "offense_flag": 67108864,
+          "offset": {
+            "x": 2,
+            "y": -4
+          },
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sprite": "sheet.png",
+          "texture_bounds": {
+            "height": 9999,
+            "left": 0,
+            "top": 0,
+            "width": 9999
           }
         }
       ]
