@@ -4723,6 +4723,314 @@
     ]
   },
   {
+    "action": 103,
+    "framedata": [
+      [
+        {
+          "collision_box": {
+            "height": 142,
+            "left": -20,
+            "top": -143,
+            "width": 38
+          },
+          "defense_flag": 16384,
+          "duration": 6,
+          "hit_stun": 16,
+          "hurt_boxes": [
+            {
+              "height": 155,
+              "left": -30,
+              "top": -155,
+              "width": 104
+            }
+          ],
+          "offset": {
+            "x": 10,
+            "y": 0
+          },
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sprite": "sheet_tmp.png",
+          "subobject": 139,
+          "texture_bounds": {
+            "height": 70,
+            "left": 947,
+            "top": 682,
+            "width": 38
+          }
+        },
+        {
+          "block_opponent_hit_stop": 9,
+          "block_player_hit_stop": 9,
+          "block_stun": 13,
+          "collision_box": {
+            "height": 142,
+            "left": -20,
+            "top": -143,
+            "width": 38
+          },
+          "counter_hit_speed": {
+            "x": 10.0,
+            "y": 5.0
+          },
+          "damage": 1000,
+          "defense_flag": 16384,
+          "duration": 4,
+          "guard_damage": 150,
+          "hit_boxes": [
+            {
+              "height": 34,
+              "left": 30,
+              "top": -20,
+              "width": 118
+            }
+          ],
+          "hit_opponent_hit_stop": 9,
+          "hit_player_hit_stop": 9,
+          "hit_sound": "/suwako/001.ogg",
+          "hit_speed": {
+            "x": 5.0,
+            "y": 0.0
+          },
+          "hit_stun": 19,
+          "hurt_boxes": [
+            {
+              "height": 155,
+              "left": -30,
+              "top": -155,
+              "width": 104
+            }
+          ],
+          "neutral_limit": 40,
+          "offense_flag": 264256,
+          "offset": {
+            "x": 59,
+            "y": -12
+          },
+          "prorate": 80.0,
+          "push_block": 2,
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sound": "034.ogg",
+          "sprite": "sheet_tmp.png",
+          "subobject": 139,
+          "texture_bounds": {
+            "height": 75,
+            "left": 1152,
+            "top": 686,
+            "width": 89
+          },
+          "untech": 20,
+          "wrong_block_stun": 18
+        },
+        {
+          "block_opponent_hit_stop": 9,
+          "block_player_hit_stop": 9,
+          "block_stun": 13,
+          "collision_box": {
+            "height": 142,
+            "left": -20,
+            "top": -143,
+            "width": 38
+          },
+          "counter_hit_speed": {
+            "x": 10.0,
+            "y": 5.0
+          },
+          "damage": 1000,
+          "defense_flag": 16384,
+          "duration": 4,
+          "guard_damage": 150,
+          "hit_boxes": [
+            {
+              "height": 34,
+              "left": 30,
+              "top": -20,
+              "width": 212
+            }
+          ],
+          "hit_opponent_hit_stop": 9,
+          "hit_player_hit_stop": 9,
+          "hit_sound": "/suwako/001.ogg",
+          "hit_speed": {
+            "x": 5.0,
+            "y": 0.0
+          },
+          "hit_stun": 19,
+          "hurt_boxes": [
+            {
+              "height": 155,
+              "left": -30,
+              "top": -155,
+              "width": 104
+            }
+          ],
+          "neutral_limit": 40,
+          "offense_flag": 264256,
+          "offset": {
+            "x": 106,
+            "y": -12
+          },
+          "prorate": 80.0,
+          "push_block": 2,
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sprite": "sheet_tmp.png",
+          "subobject": 139,
+          "texture_bounds": {
+            "height": 76,
+            "left": 995,
+            "top": 767,
+            "width": 134
+          },
+          "untech": 20,
+          "wrong_block_stun": 18
+        },
+        {
+          "block_opponent_hit_stop": 9,
+          "block_player_hit_stop": 9,
+          "block_stun": 13,
+          "collision_box": {
+            "height": 142,
+            "left": -20,
+            "top": -143,
+            "width": 38
+          },
+          "counter_hit_speed": {
+            "x": 10.0,
+            "y": 5.0
+          },
+          "damage": 1000,
+          "defense_flag": 16384,
+          "duration": 4,
+          "guard_damage": 150,
+          "hit_boxes": [
+            {
+              "height": 34,
+              "left": 30,
+              "top": -20,
+              "width": 260
+            }
+          ],
+          "hit_opponent_hit_stop": 9,
+          "hit_player_hit_stop": 9,
+          "hit_sound": "/suwako/001.ogg",
+          "hit_speed": {
+            "x": 5.0,
+            "y": 0.0
+          },
+          "hit_stun": 19,
+          "hurt_boxes": [
+            {
+              "height": 155,
+              "left": -30,
+              "top": -155,
+              "width": 104
+            }
+          ],
+          "neutral_limit": 40,
+          "offense_flag": 264256,
+          "offset": {
+            "x": 132,
+            "y": -14
+          },
+          "prorate": 80.0,
+          "push_block": 2,
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sprite": "sheet_tmp.png",
+          "subobject": 139,
+          "texture_bounds": {
+            "height": 77,
+            "left": 986,
+            "top": 683,
+            "width": 160
+          },
+          "untech": 20,
+          "wrong_block_stun": 18
+        },
+        {
+          "collision_box": {
+            "height": 142,
+            "left": -20,
+            "top": -143,
+            "width": 38
+          },
+          "duration": 8,
+          "hurt_boxes": [
+            {
+              "height": 155,
+              "left": -30,
+              "top": -155,
+              "width": 104
+            }
+          ],
+          "offense_flag": 264192,
+          "offset": {
+            "x": 13,
+            "y": 0
+          },
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sprite": "sheet_tmp.png",
+          "subobject": 139,
+          "texture_bounds": {
+            "height": 70,
+            "left": 945,
+            "top": 770,
+            "width": 43
+          },
+          "wrong_block_stun": 0
+        },
+        {
+          "collision_box": {
+            "height": 142,
+            "left": -20,
+            "top": -143,
+            "width": 38
+          },
+          "duration": 8,
+          "hurt_boxes": [
+            {
+              "height": 155,
+              "left": -30,
+              "top": -155,
+              "width": 104
+            }
+          ],
+          "offense_flag": 264192,
+          "offset": {
+            "x": 13,
+            "y": 0
+          },
+          "scale": {
+            "x": 2.0,
+            "y": 2.0
+          },
+          "sprite": "sheet_tmp.png",
+          "subobject": 139,
+          "texture_bounds": {
+            "height": 70,
+            "left": 1142,
+            "top": 773,
+            "width": 43
+          },
+          "wrong_block_stun": 0
+        }
+      ]
+    ]
+  },
+  {
     "action": 107,
     "framedata": [
       [
