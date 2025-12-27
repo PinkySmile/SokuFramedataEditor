@@ -458,7 +458,7 @@ namespace SpiralOfFate
 		static_assert(sizeof(InputStruct) == 36, "InputStruct has wrong size");
 		static_assert(sizeof(Data) == 754, "Data has wrong size");
 		union SpecialInputs {
-			unsigned char _value[38] = {0};
+			unsigned char _value[38] = {};
 			struct {
 				unsigned char _22: 4;
 				unsigned char _44: 4;
@@ -549,7 +549,7 @@ namespace SpiralOfFate
 		std::array<std::pair<unsigned, std::shared_ptr<IObject>>, 4> _typeDebuffEffects;
 		std::vector<ReplayData> _replayData;
 		std::list<LastInput> _lastInputs;
-		std::unordered_map<unsigned, unsigned> _usedMoves;
+		std::map<unsigned, unsigned> _usedMoves;
 		std::array<std::pair<unsigned, std::shared_ptr<Object>>, 128> _subobjects;
 		std::array<unsigned, 4> _limit{0, 0, 0, 0};
 		InputStruct _inputBuffer = {0, 0, 0, 0, 0, 0, 0, 0, 0};
