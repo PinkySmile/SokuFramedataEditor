@@ -191,7 +191,7 @@ namespace SpiralOfFate
 
 	void Projectile::copyToBuffer(void *data) const
 	{
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Object::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		Object::copyToBuffer(data);
 		dat->animationCtr = this->_animationCtr;
@@ -205,7 +205,7 @@ namespace SpiralOfFate
 	{
 		Object::restoreFromBuffer(data);
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Object::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		this->_animationCtr = dat->animationCtr;
 		this->_disabled = dat->disabled;
@@ -238,8 +238,8 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data1 + length);
-		auto dat2 = reinterpret_cast<Data *>((uintptr_t)data2 + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data1) + length);
+		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Projectile @" + std::to_string(startOffset + length));
 		if (dat1->animationCtr != dat2->animationCtr)
@@ -322,7 +322,7 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("Projectile @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)

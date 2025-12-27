@@ -94,7 +94,7 @@ namespace SpiralOfFate
 
 	void VoidShadow::copyToBuffer(void *data) const
 	{
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Shadow::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Shadow::getBufferSize());
 
 		Shadow::copyToBuffer(data);
 		game->logger.verbose("Saving VoidShadow (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
@@ -105,7 +105,7 @@ namespace SpiralOfFate
 	{
 		Shadow::restoreFromBuffer(data);
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Shadow::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Shadow::getBufferSize());
 
 		this->_attacking = dat->_attacking;
 		game->logger.verbose("Restored VictoriaStar @" + Utils::toHex((uintptr_t)dat));
@@ -118,8 +118,8 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data1 + length);
-		auto dat2 = reinterpret_cast<Data *>((uintptr_t)data2 + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data1) + length);
+		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("VoidShadow @" + std::to_string(startOffset + length));
 		if (dat1->_attacking != dat2->_attacking)
@@ -134,7 +134,7 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("VoidShadow @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)

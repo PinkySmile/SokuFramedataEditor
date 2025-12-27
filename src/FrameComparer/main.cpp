@@ -2,9 +2,12 @@
 // Created by PinkySmile on 11/07/23.
 //
 
+#include <fcntl.h>
+#include <unistd.h>
 #include <Resources/Game.hpp>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include "Objects/StageObjects/Cloud.hpp"
 #include "Objects/StageObjects/StageObject.hpp"
 #include "Objects/Characters/VictoriaStar/VictoriaStar.hpp"
@@ -12,7 +15,7 @@
 
 using namespace SpiralOfFate;
 
-Character *createCharacter(std::string folder, int _class)
+Character *createCharacter(const std::string &folder, int _class)
 {
 	switch (_class) {
 	case 2:
@@ -40,6 +43,108 @@ Character *createCharacter(std::string folder, int _class)
 	}
 }
 
+#define BOLD_OFF 2
+#define D1_OFF 4
+#define D2_OFF 5
+#define PAIR_SIZE 7
+#define ADDR_SIZE 10
+
+char digits[] = "0123456789ABCDEF";
+
+void displayBeforeDiff(size_t index, size_t lastIndex, const char *buffer1, const char *buffer2, char *lineBuffer)
+{
+	size_t currentLine = index / 10;
+	size_t lastLine = lastIndex / 10;
+	char *line1Buffer = lineBuffer + ADDR_SIZE + 2;
+	char *line2Buffer = lineBuffer + ADDR_SIZE + 78;
+
+	if (lastLine != currentLine) {
+		char *ptr = lineBuffer + ADDR_SIZE - 2;
+		size_t i = currentLine;
+
+		*ptr = '0';
+		while (i != 0) {
+			ptr--;
+			*ptr = '0' + i % 10;
+			i /= 10;
+		}
+	}
+	for (size_t i = currentLine; i < index; i++) {
+		if (i <= lastIndex)
+			continue;
+
+		size_t slot = i % 10;
+		unsigned char c1 = buffer1[i];
+		unsigned char c2 = buffer2[i];
+
+		line1Buffer[slot * PAIR_SIZE + BOLD_OFF] = '0';
+		line1Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+		line1Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+		line2Buffer[slot * PAIR_SIZE + BOLD_OFF] = '0';
+		line2Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+		line2Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+	}
+}
+
+void displayAfterDiff(size_t index, size_t lastIndex, const char *buffer1, const char *buffer2, char *lineBuffer, bool last)
+{
+	size_t currentLine = index / 10;
+	size_t lastLine = lastIndex / 10;
+	char *line1Buffer = lineBuffer + ADDR_SIZE + 2;
+	char *line2Buffer = lineBuffer + ADDR_SIZE + 78;
+
+	for (size_t i = lastIndex + 1; i < index && i < lastLine + 10; i++) {
+		size_t slot = i % 10;
+		unsigned char c1 = buffer1[i];
+		unsigned char c2 = buffer2[i];
+
+		line1Buffer[slot* PAIR_SIZE + BOLD_OFF] = '0';
+		line1Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+		line1Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+		line2Buffer[slot* PAIR_SIZE + BOLD_OFF] = '0';
+		line2Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+		line2Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+	}
+	if (currentLine > lastLine || last)
+		game->logger.info(lineBuffer);
+	if (currentLine > lastLine && currentLine - lastLine > 10)
+		game->logger.info("| ....... | .. .. .. .. .. .. .. .. .. .. | .. .. .. .. .. .. .. .. .. .. |");
+}
+
+void displayDiff(size_t index, const char *buffer1, const char *buffer2, char *lineBuffer)
+{
+	size_t slot = index % 10;
+	char *line1Buffer = lineBuffer + ADDR_SIZE + 2;
+	char *line2Buffer = lineBuffer + ADDR_SIZE + 78;
+	unsigned char c1 = buffer1[index];
+	unsigned char c2 = buffer2[index];
+
+	line1Buffer[slot* PAIR_SIZE + BOLD_OFF] = '1';
+	line1Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+	line1Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+	line2Buffer[slot* PAIR_SIZE + BOLD_OFF] = '1';
+	line2Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+	line2Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+}
+
+void displayDiffs(const std::vector<size_t> &diffs, const char *buffer1, const char *buffer2, size_t size)
+{
+	size_t lastPos = -1;
+	char lineBuffer[] = "|         | \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00\033[0m | \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00\033[0m |";
+
+	game->logger.info("*---------*-------------------------------*-------------------------------*");
+	game->logger.info("| Address |            File 1             |             File 2            |");
+	game->logger.info("*---------*-------------------------------*-------------------------------*");
+	for (size_t diff : diffs) {
+		displayAfterDiff(diff, lastPos, buffer1, buffer2, lineBuffer, false);
+		displayBeforeDiff(diff, lastPos, buffer1, buffer2, lineBuffer);
+		displayDiff(diff, buffer1, buffer2, lineBuffer);
+		lastPos = diff;
+	}
+	displayAfterDiff(lastPos, size, buffer1, buffer2, lineBuffer, true);
+	game->logger.info("*---------*-------------------------------*-------------------------------*");
+}
+
 int main(int argc, char **argv)
 {
 #ifndef _DEBUG
@@ -61,7 +166,7 @@ int main(int argc, char **argv)
 		char *frame_file = argv[5];
 		char *frame_file2 = argv[6];
 
-		new Game("comparer.log");
+		new Game("assets/fonts/Retro Gaming.ttf", "settings.json", "comparer.log");
 	//	game->screen->setView(view);
 	//	game->logger.info("CharacterSelect scene created");
 	//	this->_entries.reserve(chrList.size());
@@ -94,7 +199,7 @@ int main(int argc, char **argv)
 		assert_exp(stagesJson.size() > stage);
 		assert_exp(stagesJson[stage]["platforms"].size() > platforms);
 
-		game->battleMgr.reset(new BattleManager{
+		game->battleMgr = std::make_unique<BattleManager>(
 			BattleManager::StageParams{
 				stagesJson[stage]["image"],
 				[&stagesJson, stage] () -> std::vector<Object *>{
@@ -123,7 +228,6 @@ int main(int argc, char **argv)
 								objects.push_back(new StageObject(obj));
 							}
 						}
-						std::cout << objects.size() << " objects" << std::endl;
 						return objects;
 					} catch (std::exception &e) {
 						game->logger.error("Error while loading objects: " + std::string(e.what()));
@@ -143,99 +247,40 @@ int main(int argc, char **argv)
 					return objects;
 				}
 			},
-			BattleManager::CharacterParams{
-				createCharacter(chr1_path, lJson["class"]),
-				0,
-				{
-					true,
-					lJson["hp"],
-					lJson["jump_count"],
-					lJson["air_dash_count"],
-					lJson["air_movements"],
-					lJson["mana_max"],
-					lJson["mana_start"],
-					lJson["mana_regen"],
-					lJson["guard_bar"],
-					lJson["guard_break_cooldown"],
-					lJson["overdrive_cooldown"],
-					lJson["ground_drag"],
-					{lJson["air_drag"]["x"], lJson["air_drag"]["y"]},
-					{lJson["gravity"]["x"], lJson["gravity"]["y"]},
-					{
-						lJson["airdrift"]["up"]["accel"],
-						lJson["airdrift"]["up"]["max"]
-					},
-					{
-						lJson["airdrift"]["down"]["accel"],
-						lJson["airdrift"]["down"]["max"]
-					},
-					{
-						lJson["airdrift"]["back"]["accel"],
-						lJson["airdrift"]["back"]["max"]
-					},
-					{
-						lJson["airdrift"]["front"]["accel"],
-						lJson["airdrift"]["front"]["max"]
-					},
-				}
-			},
-			BattleManager::CharacterParams{
-				createCharacter(chr2_path, rJson["class"]),
-				0,
-				{
-					false,
-					rJson["hp"],
-					rJson["jump_count"],
-					rJson["air_dash_count"],
-					rJson["air_movements"],
-					rJson["mana_max"],
-					rJson["mana_start"],
-					rJson["mana_regen"],
-					rJson["guard_bar"],
-					rJson["guard_break_cooldown"],
-					rJson["overdrive_cooldown"],
-					rJson["ground_drag"],
-					{rJson["air_drag"]["x"], rJson["air_drag"]["y"]},
-					{rJson["gravity"]["x"], rJson["gravity"]["y"]},
-					{
-						rJson["airdrift"]["up"]["accel"],
-						rJson["airdrift"]["up"]["max"]
-					},
-					{
-						rJson["airdrift"]["down"]["accel"],
-						rJson["airdrift"]["down"]["max"]
-					},
-					{
-						rJson["airdrift"]["back"]["accel"],
-						rJson["airdrift"]["back"]["max"]
-					},
-					{
-						rJson["airdrift"]["front"]["accel"],
-						rJson["airdrift"]["front"]["max"]
-					},
-				}
-			}
-		});
-		char buffer1[16384];
-		char buffer2[16384];
+			BattleManager::CharacterParams{ true,  createCharacter(chr1_path, lJson["class"]), 0, lJson },
+			BattleManager::CharacterParams{ false, createCharacter(chr2_path, rJson["class"]), 0, rJson }
+		);
 
-		memset(buffer1, 0, sizeof(buffer1));
-		stream.open(frame_file);
-		assert_msg(!stream.fail(), frame_file + std::string(": ") + strerror(errno));
-		stream.read(buffer1, sizeof(buffer1));
+		char buffer1[32 * 1024];
+		char buffer2[32 * 1024];
+		int fd = open(frame_file, O_RDONLY);
+		assert_msg(fd >= 0, frame_file + std::string(": ") + strerror(errno));
+		ssize_t size = read(fd, buffer1, sizeof(buffer1));
+		assert_msg(size >= 0, std::string("read(") + frame_file + "): " + strerror(errno));
+		close(fd);
 
-		auto size = stream.tellg();
-
-		stream.close();
 		if (frame_file2) {
-			stream.open(frame_file2);
-			assert_msg(!stream.fail(), frame_file2 + std::string(": ") + strerror(errno));
-			stream.read(buffer2, sizeof(buffer2));
-			stream.close();
-		}
-		if (frame_file2)
+			fd = open(frame_file2, O_RDONLY);
+			assert_msg(fd >= 0, frame_file2 + std::string(": ") + strerror(errno));
+			ssize_t size2 = read(fd, buffer2, sizeof(buffer2));
+			assert_msg(size2 >= 0, std::string("read(") + frame_file2 + "): " + strerror(errno));
+			close(fd);
+
+			if (size == size2) {
+				std::vector<size_t> diffs;
+
+				for (size_t i = 0; i < static_cast<size_t>(size); i++)
+					if (buffer1[i] != buffer2[i])
+						diffs.push_back(i);
+				if (diffs.empty()) {
+					game->logger.info("Files are identical");
+					return EXIT_SUCCESS;
+				}
+				displayDiffs(diffs, buffer1, buffer2, size);
+			} else
+				game->logger.info("Size mismatch: " + std::to_string(size) + " != " + std::to_string(size2));
 			game->battleMgr->logDifference(buffer1, buffer2);
-		else
+		} else
 			game->battleMgr->printContent(buffer1, size);
 		return EXIT_SUCCESS;
 #ifndef _DEBUG

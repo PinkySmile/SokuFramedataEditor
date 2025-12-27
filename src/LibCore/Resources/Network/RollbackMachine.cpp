@@ -17,16 +17,16 @@
 #define CHECKSUM_CHECK_INTERVAL 60
 #endif
 
-std::list<std::pair<size_t, std::vector<char>>> __frames;
+static std::list<std::pair<size_t, std::vector<char>>> g_framesList;
 
 namespace SpiralOfFate
 {
-	RollbackMachine::RollbackData::RollbackData(std::pair<IInput *, IInput *> inputs, std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> old)
+	RollbackMachine::RollbackData::RollbackData(const std::pair<IInput *, IInput *> &inputs, const std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> &old)
 	{
 		this->regenInputs(inputs, old);
 	}
 
-	RollbackMachine::RollbackData::RollbackData(RollbackMachine::RollbackData &other) :
+	RollbackMachine::RollbackData::RollbackData(const RollbackData &other) :
 		clock(other.clock),
 		left(other.left),
 		right(other.right),
@@ -41,7 +41,7 @@ namespace SpiralOfFate
 		delete[] this->data;
 	}
 
-	void RollbackMachine::RollbackData::regenInputs(std::pair<IInput *, IInput *> inputs, std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> old)
+	void RollbackMachine::RollbackData::regenInputs(const std::pair<IInput *, IInput *> &inputs, const std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> &old)
 	{
 		this->left.regenInputs(*inputs.first, old.first);
 		this->right.regenInputs(*inputs.second, old.second);
@@ -57,7 +57,7 @@ namespace SpiralOfFate
 		game->battleMgr->copyToBuffer(this->data);
 	}
 
-	void RollbackMachine::InputData::regenInputs(IInput &input, std::bitset<INPUT_NUMBER - 1> *old)
+	void RollbackMachine::InputData::regenInputs(IInput &input, const std::bitset<INPUT_NUMBER - 1> *old)
 	{
 		if (input.hasInputs()) {
 			input.update();
@@ -97,7 +97,7 @@ namespace SpiralOfFate
 				this->_opDiffTimes.pop_front();
 			this->_opDiffTimes.push_back(diff);
 			this->_totalOpAvgDiffTimes += diff;
-			this->_totalOpAvgDiffTimes /= (long long)this->_opDiffTimes.size();
+			this->_totalOpAvgDiffTimes /= static_cast<long long>(this->_opDiffTimes.size());
 			this->_opDiffTimesAverage.push_back(this->_totalOpAvgDiffTimes);
 		};
 		game->connection->onDesync = [](Connection::Remote &, unsigned frameId, unsigned, unsigned) {
@@ -115,7 +115,7 @@ namespace SpiralOfFate
 				game->logger.error("Cannot open " + path + " for writing: " + strerror(errno));
 				return;
 			}
-			for (auto &frame : __frames)
+			for (auto &frame : g_framesList)
 				if (frame.first == frameId) {
 					game->logger.info("Saving frame " + std::to_string(frameId) + ": Size " + std::to_string(frame.second.size()));
 					stream.write(frame.second.data(), frame.second.size());
@@ -132,7 +132,7 @@ namespace SpiralOfFate
 
 	RollbackMachine::~RollbackMachine()
 	{
-		__frames.clear();
+		g_framesList.clear();
 		if (!game->connection)
 			return;
 		game->connection->onInputReceived = nullptr;
@@ -257,13 +257,13 @@ namespace SpiralOfFate
 				this->_savedData.pop_front();
 				continue;
 			}
-			if (__frames.size() > 60)
-				__frames.pop_front();
-			__frames.emplace_back();
-			__frames.back().first = frameId;
-			__frames.back().second.resize(dat.dataSize);
-			memcpy(__frames.back().second.data(), dat.data, dat.dataSize);
-			game->connection->reportChecksum(_computeCheckSum((short *)dat.data, dat.dataSize / sizeof(short)), frameId);
+			if (g_framesList.size() > 60)
+				g_framesList.pop_front();
+			g_framesList.emplace_back();
+			g_framesList.back().first = frameId;
+			g_framesList.back().second.resize(dat.dataSize);
+			memcpy(g_framesList.back().second.data(), dat.data, dat.dataSize);
+			game->connection->reportChecksum(_computeCheckSum(reinterpret_cast<short *>(dat.data), dat.dataSize / sizeof(short)), frameId);
 			this->_savedData.pop_front();
 		}
 #endif

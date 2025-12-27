@@ -109,7 +109,7 @@ namespace SpiralOfFate
 
 	void VictoriaStar::copyToBuffer(void *data) const
 	{
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Character::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Character::getBufferSize());
 		size_t i;
 
 		Character::copyToBuffer(data);
@@ -130,7 +130,7 @@ namespace SpiralOfFate
 	{
 		Character::restoreFromBuffer(data);
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Character::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Character::getBufferSize());
 		size_t i;
 
 		this->_hitShadow = dat->_hitShadow;
@@ -154,8 +154,8 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data1 + length);
-		auto dat2 = reinterpret_cast<Data *>((uintptr_t)data2 + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data1) + length);
+		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("VictoriaStar @" + std::to_string(startOffset + length));
 		if (dat1->_hitShadow != dat2->_hitShadow)
@@ -520,7 +520,7 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("VictoriaStar @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)

@@ -594,7 +594,7 @@ namespace SpiralOfFate
 
 	void Object::copyToBuffer(void *data) const
 	{
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + this->_fdCache.getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + this->_fdCache.getBufferSize());
 
 		//TODO: The cache shouldn't need to be saved. There definitely is something wrong here...
 		this->_fdCache.copyToBuffer(data);
@@ -626,7 +626,7 @@ namespace SpiralOfFate
 		//TODO: The cache shouldn't need to be saved. There definitely is something wrong here...
 		this->_fdCache.restoreFromBuffer(data);
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + this->_fdCache.getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + this->_fdCache.getBufferSize());
 
 		this->_position = dat->_position;
 		this->_speed = dat->_speed;
@@ -682,8 +682,8 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data1 + length);
-		auto dat2 = reinterpret_cast<Data *>((uintptr_t)data2 + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data1) + length);
+		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Object @" + std::to_string(startOffset + length));
 		if (dat1->_position != dat2->_position)
@@ -767,7 +767,7 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("Object @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)

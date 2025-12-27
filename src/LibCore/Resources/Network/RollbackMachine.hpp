@@ -24,7 +24,7 @@ namespace SpiralOfFate
 
 			InputData() = default;
 
-			void regenInputs(IInput &input, std::bitset<INPUT_NUMBER - 1> *old);
+			void regenInputs(IInput &input, const std::bitset<INPUT_NUMBER - 1> *old);
 			void save(RollbackInput &input);
 		};
 
@@ -36,11 +36,11 @@ namespace SpiralOfFate
 			char *data = nullptr;
 
 			RollbackData() = default;
-			RollbackData(std::pair<IInput *, IInput *> inputs, std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> old);
-			RollbackData(RollbackData &);
+			RollbackData(const std::pair<IInput *, IInput *> &inputs, const std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> &old);
+			RollbackData(const RollbackData &);
 			~RollbackData();
 
-			void regenInputs(std::pair<IInput *, IInput *> inputs, std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> old);
+			void regenInputs(const std::pair<IInput *, IInput *> &inputs, const std::pair<std::bitset<INPUT_NUMBER - 1> *, std::bitset<INPUT_NUMBER - 1> *> &old);
 			void save(RollbackInput &left, RollbackInput &right);
 		};
 

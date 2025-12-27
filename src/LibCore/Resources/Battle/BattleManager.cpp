@@ -1372,7 +1372,7 @@ namespace SpiralOfFate
 		game->logger.info("BattleManager::leftHUDData.spiritLimit: " + std::to_string(dat1->_leftHUDData.spiritLimit));
 		game->logger.info("BattleManager::leftHUDData.totalDamage: " + std::to_string(dat1->_leftHUDData.totalDamage));
 		game->logger.info("BattleManager::leftHUDData.proration: " + std::to_string(dat1->_leftHUDData.proration));
-		game->logger.info("BattleManager::_leftHUDData.proration: " + std::to_string(dat1->_leftHUDData.score));
+		game->logger.info("BattleManager::leftHUDData.score: " + std::to_string(dat1->_leftHUDData.score));
 		game->logger.info("BattleManager::rightHUDData.comboCtr: " + std::to_string(dat1->_rightHUDData.comboCtr));
 		game->logger.info("BattleManager::rightHUDData.hitCtr: " + std::to_string(dat1->_rightHUDData.hitCtr));
 		game->logger.info("BattleManager::rightHUDData.neutralLimit: " + std::to_string(dat1->_rightHUDData.neutralLimit));

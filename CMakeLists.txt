@@ -313,6 +313,7 @@ add_library(
 	${ASSETS_SRCS}
 	${SCREEN_SRCS}
 	${NETWORK_SRCS}
+	src/LibCore/Objects/Utils.hpp
 )
 target_compile_definitions(SoFGVCore PRIVATE MYDLL_EXPORTS=1)
 if (WIN32)

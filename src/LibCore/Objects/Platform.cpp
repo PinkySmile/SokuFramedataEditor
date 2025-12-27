@@ -95,7 +95,7 @@ namespace SpiralOfFate
 
 	void Platform::copyToBuffer(void *data) const
 	{
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Object::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		Object::copyToBuffer(data);
 		game->logger.verbose("Saving Platform (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
@@ -108,7 +108,7 @@ namespace SpiralOfFate
 	{
 		Object::restoreFromBuffer(data);
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + Object::getBufferSize());
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		this->_width = dat->_width;
 		this->_cooldown = dat->_cooldown;
@@ -128,8 +128,8 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>((uintptr_t)data1 + length);
-		auto dat2 = reinterpret_cast<Data *>((uintptr_t)data2 + length);
+		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data1) + length);
+		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Platform @" + std::to_string(startOffset + length));
 		if (dat1->_width != dat2->_width)
@@ -153,7 +153,7 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat = reinterpret_cast<Data *>((uintptr_t)data + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("Platform @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)

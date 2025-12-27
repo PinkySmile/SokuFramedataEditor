@@ -190,7 +190,7 @@ namespace SpiralOfFate
 		if (this->_copy)
 			return;
 
-		auto dat = reinterpret_cast<HappyData *>((uintptr_t)data + Object::getBufferSize());
+		auto dat = reinterpret_cast<HappyData *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		dat->_attackFadeTime = this->_attackFadeTime;
 		dat->_attackAppearCtr = this->_attackAppearCtr;
@@ -214,7 +214,7 @@ namespace SpiralOfFate
 		if (this->_copy)
 			return;
 
-		auto dat = reinterpret_cast<HappyData *>((uintptr_t)data + Object::getBufferSize());
+		auto dat = reinterpret_cast<HappyData *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		this->_attackFadeTime = dat->_attackFadeTime;
 		this->_attackAppearCtr = dat->_attackAppearCtr;
@@ -242,8 +242,8 @@ namespace SpiralOfFate
 		if (this->_copy)
 			return length;
 
-		auto dat1 = reinterpret_cast<HappyData *>((uintptr_t)data1 + length);
-		auto dat2 = reinterpret_cast<HappyData *>((uintptr_t)data2 + length);
+		auto dat1 = reinterpret_cast<HappyData *>(reinterpret_cast<uintptr_t>(data1) + length);
+		auto dat2 = reinterpret_cast<HappyData *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		if (dat1->_attackPos.x != dat2->_attackPos.x)
 			game->logger.fatal(std::string(msgStart) + "Butterfly::_attackPos.x: " + std::to_string(dat1->_attackPos.x) + " vs " + std::to_string(dat2->_attackPos.x));
@@ -423,7 +423,7 @@ namespace SpiralOfFate
 		if (this->_copy)
 			return length;
 
-		auto dat1 = reinterpret_cast<HappyData *>((uintptr_t)data + length);
+		auto dat1 = reinterpret_cast<HappyData *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		if (startOffset + length + sizeof(HappyData) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
