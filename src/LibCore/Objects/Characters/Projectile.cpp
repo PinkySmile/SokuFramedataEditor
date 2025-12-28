@@ -4,12 +4,14 @@
 
 #include "Resources/Game.hpp"
 #include "Projectile.hpp"
+#include "Character.hpp"
+#include "Objects/CheckUtils.hpp"
 
 namespace SpiralOfFate
 {
 	Projectile::Projectile(
 		bool owner,
-		class Character *ownerObj,
+		Character *ownerObj,
 		unsigned id,
 		const nlohmann::json &json,
 		TypeSwitch typeSwitchFlags,
@@ -34,7 +36,7 @@ namespace SpiralOfFate
 		bool direction,
 		Vector2f pos,
 		bool owner,
-		class Character *ownerObj,
+		Character *ownerObj,
 		unsigned id,
 		const nlohmann::json &json,
 		TypeSwitch typeSwitchFlags,
@@ -194,11 +196,12 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		Object::copyToBuffer(data);
-		dat->animationCtr = this->_animationCtr;
-		dat->disabled = this->_disabled;
-		dat->nbHit = this->_nbHit;
-		dat->typeSwitchFlags = this->_typeSwitch;
-		dat->debuffDuration = this->_debuffDuration;
+		dat->_animationCtr = this->_animationCtr;
+		dat->_disabled = this->_disabled;
+		dat->_nbHit = this->_nbHit;
+		dat->_animType = this->_animType;
+		dat->_typeSwitchFlags = this->_typeSwitch;
+		dat->_debuffDuration = this->_debuffDuration;
 	}
 
 	void Projectile::restoreFromBuffer(void *data)
@@ -207,11 +210,12 @@ namespace SpiralOfFate
 
 		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
-		this->_animationCtr = dat->animationCtr;
-		this->_disabled = dat->disabled;
-		this->_nbHit = dat->nbHit;
-		this->_typeSwitch = dat->typeSwitchFlags;
-		this->_debuffDuration = dat->debuffDuration;
+		this->_animationCtr = dat->_animationCtr;
+		this->_disabled = dat->_disabled;
+		this->_nbHit = dat->_nbHit;
+		this->_animType = dat->_animType;
+		this->_typeSwitch = dat->_typeSwitchFlags;
+		this->_debuffDuration = dat->_debuffDuration;
 	}
 
 	void Projectile::_onMoveEnd(const FrameData &lastData)
@@ -242,16 +246,12 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Projectile @" + std::to_string(startOffset + length));
-		if (dat1->animationCtr != dat2->animationCtr)
-			game->logger.fatal(std::string(msgStart) + "Projectile::animationCtr: " + std::to_string(dat1->animationCtr) + " vs " + std::to_string(dat2->animationCtr));
-		if (dat1->disabled != dat2->disabled)
-			game->logger.fatal(std::string(msgStart) + "Projectile::disabled: " + std::to_string(dat1->disabled) + " vs " + std::to_string(dat2->disabled));
-		if (dat1->nbHit != dat2->nbHit)
-			game->logger.fatal(std::string(msgStart) + "Projectile::nbHit: " + std::to_string(dat1->nbHit) + " vs " + std::to_string(dat2->nbHit));
-		if (dat1->typeSwitchFlags != dat2->typeSwitchFlags)
-			game->logger.fatal(std::string(msgStart) + "Projectile::typeSwitchFlags: " + std::to_string(dat1->typeSwitchFlags) + " vs " + std::to_string(dat2->typeSwitchFlags));
-		if (dat1->debuffDuration != dat2->debuffDuration)
-			game->logger.fatal(std::string(msgStart) + "Projectile::debuffDuration: " + std::to_string(dat1->debuffDuration) + " vs " + std::to_string(dat2->debuffDuration));
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _animationCtr, std::to_string);
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _disabled, std::to_string);
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _nbHit, std::to_string);
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _animType, std::to_string);
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _typeSwitchFlags, std::to_string);
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _debuffDuration, std::to_string);
 		return length + sizeof(Data);
 	}
 
@@ -270,7 +270,6 @@ namespace SpiralOfFate
 			this->_actionBlock = this->_animData;
 			this->_animation = 0;
 			this->_newAnim = true;
-			return;
 		}
 	}
 
@@ -327,11 +326,12 @@ namespace SpiralOfFate
 		game->logger.info("Projectile @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "Projectile::animationCtr: " + std::to_string(dat1->animationCtr));
-		game->logger.info(std::string(msgStart) + "Projectile::disabled: " + std::to_string(dat1->disabled));
-		game->logger.info(std::string(msgStart) + "Projectile::nbHit: " + std::to_string(dat1->nbHit));
-		game->logger.info(std::string(msgStart) + "Projectile::typeSwitchFlags: " + std::to_string(dat1->typeSwitchFlags));
-		game->logger.info(std::string(msgStart) + "Projectile::debuffDuration: " + std::to_string(dat1->debuffDuration));
+		DISPLAY_FIELD("Projectile", dat1, _nbHit, std::to_string);
+		DISPLAY_FIELD("Projectile", dat1, _animationCtr, std::to_string);
+		DISPLAY_FIELD("Projectile", dat1, _debuffDuration, std::to_string);
+		DISPLAY_FIELD("Projectile", dat1, _disabled, std::to_string);
+		DISPLAY_FIELD("Projectile", dat1, _typeSwitchFlags, std::to_string);
+		DISPLAY_FIELD("Projectile", dat1, _animType, std::to_string);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

@@ -756,6 +756,8 @@ namespace SpiralOfFate
 		this->_rightCharacter->restoreFromBuffer((void *)ptr);
 		ptr += this->_rightCharacter->getBufferSize();
 
+		// TODO: Instead of delete and recreate all object,
+		//       hold onto them for a while
 		this->_iobjects.clear();
 		this->_iobjects.reserve(dat->_nbIObjects);
 		this->_objects.clear();

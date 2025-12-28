@@ -57,6 +57,7 @@ namespace SpiralOfFate
 	{
 		if (game->connection)
 			game->connection->onDesync = nullptr;
+		delete[] this->_error;
 	}
 
 	bool stepMode = false;

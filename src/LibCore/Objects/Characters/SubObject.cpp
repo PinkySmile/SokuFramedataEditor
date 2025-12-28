@@ -46,7 +46,7 @@ namespace SpiralOfFate
 		return Object::hits(other);
 	}
 
-	class Character *SubObject::getOwnerObj() const
+	Character *SubObject::getOwnerObj() const
 	{
 		return this->_ownerObj;
 	}

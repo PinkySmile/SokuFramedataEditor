@@ -6,7 +6,6 @@
 #define SOFGV_PROJECTILE_HPP
 
 
-#include "Character.hpp"
 #include "SubObject.hpp"
 
 namespace SpiralOfFate
@@ -23,7 +22,7 @@ namespace SpiralOfFate
 		};
 
 	private:
-		enum ProjectileAnimation {
+		enum ProjectileAnimation : unsigned char {
 			ANIMATION_DISAPPEAR,
 			ANIMATION_FADE,
 			ANIMATION_BLOCK
@@ -39,13 +38,15 @@ namespace SpiralOfFate
 
 #pragma pack(push, 1)
 		struct Data {
-			unsigned nbHit;
-			unsigned animationCtr;
-			unsigned debuffDuration;
-			bool disabled;
-			TypeSwitch typeSwitchFlags;
+			unsigned _nbHit;
+			unsigned _animationCtr;
+			unsigned _debuffDuration;
+			unsigned _animData;
+			bool _disabled;
+			TypeSwitch _typeSwitchFlags;
+			ProjectileAnimation _animType;
 		};
-		static_assert(sizeof(Data) == 14, "Data has wrong size");
+		static_assert(sizeof(Data) == 19, "Data has wrong size");
 #pragma pack(pop)
 
 		// Game State
@@ -53,18 +54,20 @@ namespace SpiralOfFate
 		unsigned _nbHit = 0;
 		unsigned _debuffDuration = 0;
 		bool _disabled = false;
-		TypeSwitch _typeSwitch = TYPESWITCH_NONE;
+		unsigned _animData = 0;
+		ProjectileAnimation _animType;
+		// Technically non-game state, but is required to be saved
+		// because the object is recreated from scratch
+		TypeSwitch _typeSwitch;
 
 		// Non-game state
-		unsigned _maxHit;
-		unsigned _endBlock;
-		ProjectileAnimationData _onHitDieAnim;
-		ProjectileAnimationData _onBlockDieAnim;
-		ProjectileAnimationData _onGetHitDieAnim;
-		ProjectileAnimationData _onOwnerHitDieAnim;
-		ProjectileAnimation _animType;
-		unsigned _animData;
-		bool _loop;
+		const unsigned _maxHit;
+		const unsigned _endBlock;
+		const ProjectileAnimationData _onHitDieAnim;
+		const ProjectileAnimationData _onBlockDieAnim;
+		const ProjectileAnimationData _onGetHitDieAnim;
+		const ProjectileAnimationData _onOwnerHitDieAnim;
+		const bool _loop;
 
 	protected:
 		void _onMoveEnd(const FrameData &lastData) override;

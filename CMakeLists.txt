@@ -309,11 +309,11 @@ add_library(
 	src/LibCore/Objects/ParticleGenerator.hpp
 	src/LibCore/Resources/ReplayData.hpp
 	src/LibCore/Objects/Characters/CharacterParams.hpp
+	src/LibCore/Objects/CheckUtils.hpp
 	${INPUT_SRCS}
 	${ASSETS_SRCS}
 	${SCREEN_SRCS}
 	${NETWORK_SRCS}
-	src/LibCore/Objects/Utils.hpp
 )
 target_compile_definitions(SoFGVCore PRIVATE MYDLL_EXPORTS=1)
 if (WIN32)
