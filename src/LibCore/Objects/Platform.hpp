@@ -21,6 +21,7 @@ namespace SpiralOfFate
 		static_assert(sizeof(Data) == 12, "Data has wrong size");
 #pragma pack(pop)
 
+		// FIXME: Is this field required to be saved?
 		float _width;
 		unsigned _cooldown = 0;
 		unsigned _deathTimer = 0;

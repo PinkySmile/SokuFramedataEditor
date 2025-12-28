@@ -3735,9 +3735,14 @@ namespace SpiralOfFate
 	void Character::copyToBuffer(void *data) const
 	{
 		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
+		size_t mySize =
+			sizeof(Data) +
+			sizeof(LastInput) * this->_lastInputs.size() +
+			sizeof(ReplayData) * this->_replayData.size() +
+			sizeof(unsigned) * 2 * this->_usedMoves.size();
 
 		Object::copyToBuffer(data);
-		game->logger.verbose("Saving Character (Data size: " + std::to_string(sizeof(Data) + sizeof(LastInput) * this->_lastInputs.size()) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
+		game->logger.verbose("Saving Character (Data size: " + std::to_string(mySize) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
 		dat->_hardKD = this->_hardKD;
 		dat->_guardBarTmp = this->_guardBarTmp;
 		dat->_limitEffects = this->_limitEffects;
@@ -3757,7 +3762,6 @@ namespace SpiralOfFate
 		dat->_projInvul = this->_projInvul;
 		dat->_ultimateUsed = this->_ultimateUsed;
 		dat->_normalTreeFlag = this->_normalTreeFlag;
-		dat->_nbReplayInputs = this->_replayData.size();
 		dat->_inputBuffer = this->_inputBuffer;
 		dat->_guardRegenCd = this->_guardRegenCd;
 		dat->_odCooldown = this->_odCooldown;
@@ -3783,8 +3787,6 @@ namespace SpiralOfFate
 		dat->_willWallSplat = this->_willWallSplat;
 		dat->_doubleGravity = this->_doubleGravity;
 		memcpy(dat->_specialInputs, this->_specialInputs._value, sizeof(dat->_specialInputs));
-		dat->_nbUsedMoves = this->_usedMoves.size();
-		dat->_nbLastInputs = this->_lastInputs.size();
 		for (size_t i = 0; i < this->_limit.size(); i++)
 			dat->_limit[i] = this->_limit[i];
 		for (size_t i = 0; i < this->_subobjects.size(); i++) {
@@ -3805,6 +3807,10 @@ namespace SpiralOfFate
 			else
 				dat->_typeDebuffEffects[i] = 0;
 		}
+
+		dat->_nbReplayInputs = this->_replayData.size();
+		dat->_nbUsedMoves = this->_usedMoves.size();
+		dat->_nbLastInputs = this->_lastInputs.size();
 
 		auto inputArray = reinterpret_cast<LastInput *>(&dat[1]);
 		size_t i = 0;
@@ -3900,9 +3906,18 @@ namespace SpiralOfFate
 
 		auto usedMoveArray = reinterpret_cast<unsigned *>(&replayData[dat->_nbReplayInputs]);
 		this->_usedMoves.clear();
-		for (size_t i = 0; i < dat->_nbUsedMoves; i++)
+		for (size_t i = 0; i < dat->_nbUsedMoves; i++) {
 			this->_usedMoves[usedMoveArray[0]] = usedMoveArray[1];
-		game->logger.verbose("Restored Character @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
+			usedMoveArray += 2;
+		}
+
+		size_t mySize =
+			sizeof(Data) +
+			sizeof(LastInput) * this->_lastInputs.size() +
+			sizeof(ReplayData) * this->_replayData.size() +
+			sizeof(unsigned) * 2 * this->_usedMoves.size();
+
+		game->logger.verbose("Restored Character (Data size: " + std::to_string(mySize) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
 	}
 
 	void Character::resolveSubObjects(const BattleManager &manager)
@@ -4347,26 +4362,26 @@ namespace SpiralOfFate
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _regen, std::to_string);
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _mana, std::to_string);
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _prorate, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _ultimateUsed, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _counter, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _jumpCanceled, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hadUltimate, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _atkDisabled, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _inputDisabled, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasJumped, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _restand, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _justGotCorner, std::to_string);
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _normalTreeFlag, std::to_string);
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _limitEffects, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _armorUsed, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hardKD, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _willGroundSlam, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _willWallSplat, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _doubleGravity, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasMatterInstall, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasSpiritInstall, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasVoidInstall, std::to_string);
-		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _installMoveStarted, std::to_string);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _ultimateUsed, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _counter, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _jumpCanceled, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hadUltimate, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _atkDisabled, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _inputDisabled, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasJumped, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _restand, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _justGotCorner, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _armorUsed, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hardKD, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _willGroundSlam, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _willWallSplat, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _doubleGravity, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasMatterInstall, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasSpiritInstall, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _hasVoidInstall, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _installMoveStarted, DISP_BOOL);
 
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _limit[LIMIT_NEUTRAL], std::to_string);
 		OBJECT_CHECK_FIELD("Character", "", dat1, dat2, _limit[LIMIT_VOID], std::to_string);
@@ -4746,142 +4761,183 @@ namespace SpiralOfFate
 		if (startOffset + len >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + len - dataSize) + " bytes bigger than input");
 		game->logger.info("Character @" + std::to_string(startOffset + length));
-		game->logger.info(std::string(msgStart) + "Character::_guardBarTmp: " + std::to_string(dat->_guardBarTmp));
-		game->logger.info(std::string(msgStart) + "Character::_hardKD: " + std::to_string(dat->_hardKD));
-		game->logger.info(std::string(msgStart) + "Character::_limitEffects: " + std::to_string(dat->_limitEffects));
-		game->logger.info(std::string(msgStart) + "Character::_neutralEffectTimer: " + std::to_string(dat->_neutralEffectTimer));
-		game->logger.info(std::string(msgStart) + "Character::_matterEffectTimer: " + std::to_string(dat->_matterEffectTimer));
-		game->logger.info(std::string(msgStart) + "Character::_spiritEffectTimer: " + std::to_string(dat->_spiritEffectTimer));
-		game->logger.info(std::string(msgStart) + "Character::_voidEffectTimer: " + std::to_string(dat->_voidEffectTimer));
-		game->logger.info(std::string(msgStart) + "Character::_jumpCanceled: " + std::to_string(dat->_jumpCanceled));
-		game->logger.info(std::string(msgStart) + "Character::_hadUltimate: " + std::to_string(dat->_hadUltimate));
-		game->logger.info(std::string(msgStart) + "Character::_grabInvul: " + std::to_string(dat->_grabInvul));
-		game->logger.info(std::string(msgStart) + "Character::_projInvul: " + std::to_string(dat->_projInvul));
-		game->logger.info(std::string(msgStart) + "Character::_ultimateUsed: " + std::to_string(dat->_ultimateUsed));
-		game->logger.info(std::string(msgStart) + "Character::_normalTreeFlag: " + std::to_string(dat->_normalTreeFlag));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::horizontalAxis: " + std::to_string(dat->_inputBuffer.horizontalAxis));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::verticalAxis: " + std::to_string(dat->_inputBuffer.verticalAxis));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::n: " + std::to_string(dat->_inputBuffer.n));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::m: " + std::to_string(dat->_inputBuffer.m));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::s: " + std::to_string(dat->_inputBuffer.s));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::v: " + std::to_string(dat->_inputBuffer.v));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::a: " + std::to_string(dat->_inputBuffer.a));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::d: " + std::to_string(dat->_inputBuffer.d));
-		game->logger.info(std::string(msgStart) + "Character::_inputBuffer::pause: " + std::to_string(dat->_inputBuffer.pause));
-		game->logger.info(std::string(msgStart) + "Character::_guardRegenCd: " + std::to_string(dat->_guardRegenCd));
-		game->logger.info(std::string(msgStart) + "Character::_odCooldown: " + std::to_string(dat->_odCooldown));
-		game->logger.info(std::string(msgStart) + "Character::_counter: " + std::to_string(dat->_counter));
-		game->logger.info(std::string(msgStart) + "Character::_blockStun: " + std::to_string(dat->_blockStun));
-		game->logger.info(std::string(msgStart) + "Character::_jumpsUsed: " + std::to_string(dat->_jumpsUsed));
-		game->logger.info(std::string(msgStart) + "Character::_airDashesUsed: " + std::to_string(dat->_airDashesUsed));
-		game->logger.info(std::string(msgStart) + "Character::_comboCtr: " + std::to_string(dat->_comboCtr));
-		game->logger.info(std::string(msgStart) + "Character::_totalDamage: " + std::to_string(dat->_totalDamage));
-		game->logger.info(std::string(msgStart) + "Character::_prorate: " + std::to_string(dat->_prorate));
-		game->logger.info(std::string(msgStart) + "Character::_atkDisabled: " + std::to_string(dat->_atkDisabled));
-		game->logger.info(std::string(msgStart) + "Character::_inputDisabled: " + std::to_string(dat->_inputDisabled));
-		game->logger.info(std::string(msgStart) + "Character::_hasJumped: " + std::to_string(dat->_hasJumped));
-		game->logger.info(std::string(msgStart) + "Character::_restand: " + std::to_string(dat->_restand));
-		game->logger.info(std::string(msgStart) + "Character::_justGotCorner: " + std::to_string(dat->_justGotCorner));
-		game->logger.info(std::string(msgStart) + "Character::_regen: " + std::to_string(dat->_regen));
-		game->logger.info(std::string(msgStart) + "Character::_mana: " + std::to_string(dat->_mana));
-		game->logger.info(std::string(msgStart) + "Character::_guardCooldown: " + std::to_string(dat->_guardCooldown));
-		game->logger.info(std::string(msgStart) + "Character::_guardBar: " + std::to_string(dat->_guardBar));
-		game->logger.info(std::string(msgStart) + "Character::_stallingFactor: " + std::to_string(dat->_stallingFactor));
-		game->logger.info(std::string(msgStart) + "Character::_willGroundSlam: " + std::to_string(dat->_willGroundSlam));
-		game->logger.info(std::string(msgStart) + "Character::_willWallSplat: " + std::to_string(dat->_willWallSplat));
-		game->logger.info(std::string(msgStart) + "Character::_doubleGravity: " + std::to_string(dat->_doubleGravity));
-		game->logger.info(std::string(msgStart) + "Character::_airMovementUsed: " + std::to_string(dat->_airMovementUsed));
-		game->logger.info(std::string(msgStart) + "Character::_hasMatterInstall: " + std::to_string(dat->_hasMatterInstall));
-		game->logger.info(std::string(msgStart) + "Character::_hasSpiritInstall: " + std::to_string(dat->_hasSpiritInstall));
-		game->logger.info(std::string(msgStart) + "Character::_hasVoidInstall: " + std::to_string(dat->_hasVoidInstall));
-		game->logger.info(std::string(msgStart) + "Character::_installMoveStarted: " + std::to_string(dat->_installMoveStarted));
 
-		char number[3];
-		auto *ptr = (SpecialInputs *)dat->_specialInputs;
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.horizontalAxis, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.verticalAxis, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.n, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.m, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.s, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.v, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.a, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.d, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _inputBuffer.pause, std::to_string);
 
-		for (unsigned i = 0; i < sizeof(dat->_specialInputs); i++) {
-			sprintf(number, "%02X", dat->_specialInputs[i]);
-			game->logger.info(std::string(msgStart) + "Character::_specialInputs[" + std::to_string(i) + "]: " + number);
+		DISPLAY_FIELD("Character", "", dat, _timeSinceIdle, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _guardBarTmp, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _grabInvul, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _projInvul, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _odCooldown, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _blockStun, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _jumpsUsed, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _airDashesUsed, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _airMovementUsed, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _comboCtr, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _totalDamage, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _guardCooldown, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _guardBar, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _guardRegenCd, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _nbLastInputs, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _nbReplayInputs, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _nbUsedMoves, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _neutralEffectTimer, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _matterEffectTimer, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _spiritEffectTimer, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _voidEffectTimer, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _stallingFactor, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _regen, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _mana, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _prorate, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _normalTreeFlag, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _limitEffects, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _ultimateUsed, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _counter, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _jumpCanceled, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _hadUltimate, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _atkDisabled, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _inputDisabled, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _hasJumped, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _restand, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _justGotCorner, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _armorUsed, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _hardKD, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _willGroundSlam, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _willWallSplat, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _doubleGravity, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _hasMatterInstall, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _hasSpiritInstall, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _hasVoidInstall, DISP_BOOL);
+		DISPLAY_FIELD("Character", "", dat, _installMoveStarted, DISP_BOOL);
+
+		DISPLAY_FIELD("Character", "", dat, _limit[LIMIT_NEUTRAL], std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _limit[LIMIT_VOID], std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _limit[LIMIT_MATTER], std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _limit[LIMIT_SPIRIT], std::to_string);
+
+		auto ptr = reinterpret_cast<SpecialInputs *>(dat->_specialInputs);
+
+		for (unsigned i = 0; i < sizeof(dat->_specialInputs); i++)
+			DISPLAY_FIELD_ARR("Character", "", dat, _specialInputs, i, HEX2);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _22, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _44, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _66, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _27, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _28, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _29, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _dn, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _dm, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _ds, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _dv, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c28n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c28m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c28s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c28v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c28d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c28a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c46n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c46m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c46s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c46v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c46d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c46a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c64n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c64m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c64s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c64v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c64d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _c64a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _236n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _236m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _236s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _236v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _236d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _236a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _214n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _214m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _214s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _214v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _214d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _214a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _623n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _623m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _623s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _623v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _623d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _623a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _421n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _421m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _421s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _421v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _421d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _421a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _426n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _426m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _426s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _426v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _426d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _426a, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624684n, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624684m, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624684s, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624684v, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624684d, std::to_string);
+		DISPLAY_FIELD("Character", "_specialInputs::", ptr, _624684a, std::to_string);
+
+		DISPLAY_FIELD("Character", "", dat, _nbReplayInputs, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _nbLastInputs, std::to_string);
+		DISPLAY_FIELD("Character", "", dat, _nbUsedMoves, std::to_string);
+
+		auto inputArray = reinterpret_cast<LastInput *>(&dat[1]);
+		for (size_t i = 0; i < dat->_nbLastInputs; i++) {
+			const LastInput &input = inputArray[i];
+
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, nbFrames, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, n, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, m, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, s, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, o, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, d, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, a, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, h, std::to_string);
+			DISPLAY_FIELD("Character", "_lastInputs[" + std::to_string(i) + "]::", &input, v, std::to_string);
 		}
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_22: " + std::to_string(ptr->_22));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_44: " + std::to_string(ptr->_44));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_66: " + std::to_string(ptr->_66));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_27: " + std::to_string(ptr->_27));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_28: " + std::to_string(ptr->_28));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_29: " + std::to_string(ptr->_29));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_dn: " + std::to_string(ptr->_dn));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_dm: " + std::to_string(ptr->_dm));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_ds: " + std::to_string(ptr->_ds));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_dv: " + std::to_string(ptr->_dv));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c28n: " + std::to_string(ptr->_c28n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c28m: " + std::to_string(ptr->_c28m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c28s: " + std::to_string(ptr->_c28s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c28v: " + std::to_string(ptr->_c28v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c28d: " + std::to_string(ptr->_c28d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c28a: " + std::to_string(ptr->_c28a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c46n: " + std::to_string(ptr->_c46n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c46m: " + std::to_string(ptr->_c46m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c46s: " + std::to_string(ptr->_c46s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c46v: " + std::to_string(ptr->_c46v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c46d: " + std::to_string(ptr->_c46d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c46a: " + std::to_string(ptr->_c46a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c64n: " + std::to_string(ptr->_c64n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c64m: " + std::to_string(ptr->_c64m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c64s: " + std::to_string(ptr->_c64s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c64v: " + std::to_string(ptr->_c64v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c64d: " + std::to_string(ptr->_c64d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_c64a: " + std::to_string(ptr->_c64a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_236n: " + std::to_string(ptr->_236n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_236m: " + std::to_string(ptr->_236m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_236s: " + std::to_string(ptr->_236s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_236v: " + std::to_string(ptr->_236v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_236d: " + std::to_string(ptr->_236d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_236a: " + std::to_string(ptr->_236a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_214n: " + std::to_string(ptr->_214n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_214m: " + std::to_string(ptr->_214m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_214s: " + std::to_string(ptr->_214s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_214v: " + std::to_string(ptr->_214v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_214d: " + std::to_string(ptr->_214d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_214a: " + std::to_string(ptr->_214a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_623n: " + std::to_string(ptr->_623n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_623m: " + std::to_string(ptr->_623m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_623s: " + std::to_string(ptr->_623s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_623v: " + std::to_string(ptr->_623v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_623d: " + std::to_string(ptr->_623d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_623a: " + std::to_string(ptr->_623a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_421n: " + std::to_string(ptr->_421n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_421m: " + std::to_string(ptr->_421m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_421s: " + std::to_string(ptr->_421s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_421v: " + std::to_string(ptr->_421v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_421d: " + std::to_string(ptr->_421d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_421a: " + std::to_string(ptr->_421a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624n: " + std::to_string(ptr->_624n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624m: " + std::to_string(ptr->_624m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624s: " + std::to_string(ptr->_624s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624v: " + std::to_string(ptr->_624v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624d: " + std::to_string(ptr->_624d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624a: " + std::to_string(ptr->_624a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_426n: " + std::to_string(ptr->_426n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_426m: " + std::to_string(ptr->_426m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_426s: " + std::to_string(ptr->_426s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_426v: " + std::to_string(ptr->_426v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_426d: " + std::to_string(ptr->_426d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_426a: " + std::to_string(ptr->_426a));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624684n: " + std::to_string(ptr->_624684n));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624684m: " + std::to_string(ptr->_624684m));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624684s: " + std::to_string(ptr->_624684s));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624684v: " + std::to_string(ptr->_624684v));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624684d: " + std::to_string(ptr->_624684d));
-		game->logger.info(std::string(msgStart) + "Character::_specialInputs::_624684a: " + std::to_string(ptr->_624684a));
 
-		game->logger.info(std::string(msgStart) + "Character::_limit[LIMIT_NEUTRAL]: " + std::to_string(dat->_limit[LIMIT_NEUTRAL]));
-		game->logger.info(std::string(msgStart) + "Character::_limit[LIMIT_VOID]: " + std::to_string(dat->_limit[LIMIT_VOID]));
-		game->logger.info(std::string(msgStart) + "Character::_limit[LIMIT_MATTER]: " + std::to_string(dat->_limit[LIMIT_MATTER]));
-		game->logger.info(std::string(msgStart) + "Character::_limit[LIMIT_SPIRIT]: " + std::to_string(dat->_limit[LIMIT_SPIRIT]));
+		auto replayData = reinterpret_cast<ReplayData *>(&inputArray[dat->_nbLastInputs]);
+		for (size_t i = 0; i < dat->_nbReplayInputs; i++) {
+			const ReplayData &rd = replayData[i];
 
-		game->logger.info(std::string(msgStart) + "Character::_nbReplayInputs: " + std::to_string(dat->_nbReplayInputs));
-		game->logger.info(std::string(msgStart) + "Character::_nbLastInputs: " + std::to_string(dat->_nbLastInputs));
-		game->logger.info(std::string(msgStart) + "Character::_nbUsedMoves: " + std::to_string(dat->_nbUsedMoves));
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, n, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, m, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, v, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, s, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, a, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, d, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, _h, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, _v, std::to_string);
+			DISPLAY_FIELD("Character", "_replayData[" + std::to_string(i) + "]::", &rd, time, std::to_string);
+		}
+
+		auto usedMoveArray = reinterpret_cast<unsigned *>(&replayData[dat->_nbReplayInputs]);
+		for (size_t i = 0; i < dat->_nbUsedMoves; i++) {
+			DISPLAY_FIELD_VAL("Character", usedMoveArray[0], "_usedMoves[" + std::to_string(i) + "]::moveId", std::to_string);
+			DISPLAY_FIELD_VAL("Character", usedMoveArray[1], "_usedMoves[" + std::to_string(i) + "]::count",  std::to_string);
+			usedMoveArray += 2;
+		}
 
 		if (startOffset + len >= dataSize) {
 			game->logger.fatal("Invalid input frame");
@@ -4927,14 +4983,14 @@ namespace SpiralOfFate
 				this->_forceStartMove(ACTION_GROUND_HIGH_HIT);
 				this->_actionBlock = 1;
 			}
-		} else if ((
+		} else if (
 			this->_action == ACTION_AIR_NEUTRAL_BLOCK ||
 			this->_action == ACTION_AIR_NEUTRAL_PARRY ||
 			this->_action == ACTION_AIR_MATTER_PARRY ||
 			this->_action == ACTION_AIR_VOID_PARRY ||
 			this->_action == ACTION_AIR_SPIRIT_PARRY ||
 			this->_action == ACTION_AIR_NEUTRAL_WRONG_BLOCK
-		)) {
+		) {
 			this->_blockStun = 0;
 			this->_forceStartMove(ACTION_IDLE);
 		} else if (

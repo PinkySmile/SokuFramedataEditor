@@ -11,6 +11,7 @@
 #include "Objects/Characters/VictoriaStar/Shadows/SpiritShadow.hpp"
 #include "Objects/Characters/VictoriaStar/Shadows/VoidShadow.hpp"
 #include "VictoriaProjectile.hpp"
+#include "Objects/CheckUtils.hpp"
 
 #define SCALE_POS_Y 610
 #define SCALE_MIDDLE_X 200
@@ -158,22 +159,14 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("VictoriaStar @" + std::to_string(startOffset + length));
-		if (dat1->_hitShadow != dat2->_hitShadow)
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_hitShadow: " + std::to_string(dat1->_hitShadow) + " vs " + std::to_string(dat2->_hitShadow));
-		if (dat1->_stacks != dat2->_stacks)
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_stacks: " + std::to_string(dat1->_stacks) + " vs " + std::to_string(dat2->_stacks));
-		if (dat1->_stacksTimer != dat2->_stacksTimer)
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_stacksTimer: " + std::to_string(dat1->_stacksTimer) + " vs " + std::to_string(dat2->_stacksTimer));
-		if (dat1->_flower != dat2->_flower)
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_flower: " + std::to_string(dat1->_flower) + " vs " + std::to_string(dat2->_flower));
-		if (dat1->_shadows[0] != dat2->_shadows[0])
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_shadows[0]: " + std::to_string(dat1->_shadows[0]) + " vs " + std::to_string(dat2->_shadows[0]));
-		if (dat1->_shadows[1] != dat2->_shadows[1])
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_shadows[1]: " + std::to_string(dat1->_shadows[1]) + " vs " + std::to_string(dat2->_shadows[1]));
-		if (dat1->_shadows[2] != dat2->_shadows[2])
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_shadows[0]: " + std::to_string(dat1->_shadows[2]) + " vs " + std::to_string(dat2->_shadows[0]));
-		if (dat1->_shadows[3] != dat2->_shadows[3])
-			game->logger.fatal(std::string(msgStart) + "VictoriaStar::_shadows[0]: " + std::to_string(dat1->_shadows[3]) + " vs " + std::to_string(dat2->_shadows[0]));
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _hitShadow, DISP_BOOL);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _stacks, std::to_string);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _stacksTimer, std::to_string);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _flower, std::to_string);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _shadows[0], std::to_string);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _shadows[1], std::to_string);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _shadows[2], std::to_string);
+		OBJECT_CHECK_FIELD("VictoriaStar", "", dat1, dat2, _shadows[3], std::to_string);
 		return length + sizeof(Data);
 	}
 
@@ -520,19 +513,19 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("VictoriaStar @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_hitShadow: " + std::to_string(dat1->_hitShadow));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_stacks: " + std::to_string(dat1->_stacks));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_stacksTimer: " + std::to_string(dat1->_stacksTimer));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_flower: " + std::to_string(dat1->_flower));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_shadows[0]: " + std::to_string(dat1->_shadows[0]));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_shadows[1]: " + std::to_string(dat1->_shadows[1]));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_shadows[2]: " + std::to_string(dat1->_shadows[2]));
-		game->logger.info(std::string(msgStart) + "VictoriaStar::_shadows[3]: " + std::to_string(dat1->_shadows[3]));
+		DISPLAY_FIELD("VictoriaStar", "", dat, _hitShadow, DISP_BOOL);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _stacks, std::to_string);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _stacksTimer, std::to_string);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _flower, std::to_string);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _shadows[0], std::to_string);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _shadows[1], std::to_string);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _shadows[2], std::to_string);
+		DISPLAY_FIELD("VictoriaStar", "", dat, _shadows[3], std::to_string);
 		return length + sizeof(Data);
 	}
 }

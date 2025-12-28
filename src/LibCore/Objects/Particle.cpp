@@ -5,6 +5,8 @@
 #include "Particle.hpp"
 
 #include <utility>
+
+#include "CheckUtils.hpp"
 #include "Objects/Characters/Character.hpp"
 #include "Resources/Game.hpp"
 
@@ -174,56 +176,39 @@ namespace SpiralOfFate
 
 	size_t Particle::printDifference(const char *msgStart, void *data1, void *data2, unsigned int startOffset) const
 	{
-		auto dat1 = reinterpret_cast<Data *>(data1);
-		auto dat2 = reinterpret_cast<Data *>(data2);
+		auto dat1 = static_cast<Data *>(data1);
+		auto dat2 = static_cast<Data *>(data2);
 
 		game->logger.info("Particle @" + std::to_string(startOffset));
-		if (dat1->_position.x != dat2->_position.x)
-			game->logger.fatal(std::string(msgStart) + "Particle::_position.x: " + std::to_string(dat1->_position.x) + " vs " + std::to_string(dat2->_position.x));
-		if (dat1->_position.y != dat2->_position.y)
-			game->logger.fatal(std::string(msgStart) + "Particle::_position.y: " + std::to_string(dat1->_position.y) + " vs " + std::to_string(dat2->_position.y));
-		if (dat1->_speed.x != dat2->_speed.x)
-			game->logger.fatal(std::string(msgStart) + "Particle::_speed.x: " + std::to_string(dat1->_speed.x) + " vs " + std::to_string(dat2->_speed.x));
-		if (dat1->_speed.y != dat2->_speed.y)
-			game->logger.fatal(std::string(msgStart) + "Particle::_speed.y: " + std::to_string(dat1->_speed.y) + " vs " + std::to_string(dat2->_speed.y));
-		if (dat1->_aliveTimer != dat2->_aliveTimer)
-			game->logger.fatal(std::string(msgStart) + "Particle::_aliveTimer: " + std::to_string(dat1->_aliveTimer) + " vs " + std::to_string(dat2->_aliveTimer));
-		if (dat1->_fadeTime != dat2->_fadeTime)
-			game->logger.fatal(std::string(msgStart) + "Particle::_fadeTime: " + std::to_string(dat1->_fadeTime) + " vs " + std::to_string(dat2->_fadeTime));
-		if (dat1->_maxFadeTime != dat2->_maxFadeTime)
-			game->logger.fatal(std::string(msgStart) + "Particle::_maxFadeTime: " + std::to_string(dat1->_maxFadeTime) + " vs " + std::to_string(dat2->_maxFadeTime));
-		if (dat1->_updateTimer != dat2->_updateTimer)
-			game->logger.fatal(std::string(msgStart) + "Particle::_updateTimer: " + std::to_string(dat1->_updateTimer) + " vs " + std::to_string(dat2->_updateTimer));
-		if (dat1->_currentColors != dat2->_currentColors)
-			game->logger.fatal(std::string(msgStart) + "Particle::_currentColors: " + std::to_string(dat1->_currentColors) + " vs " + std::to_string(dat2->_currentColors));
-		if (dat1->_scale != dat2->_scale)
-			game->logger.fatal(std::string(msgStart) + "Particle::_scale: " + std::to_string(dat1->_scale) + " vs " + std::to_string(dat2->_scale));
-		if (dat1->_mirror.x != dat2->_mirror.x)
-			game->logger.fatal(std::string(msgStart) + "Particle::_mirror.x: " + std::to_string(dat1->_mirror.x) + " vs " + std::to_string(dat2->_mirror.x));
-		if (dat1->_mirror.y != dat2->_mirror.y)
-			game->logger.fatal(std::string(msgStart) + "Particle::_mirror.y: " + std::to_string(dat1->_mirror.y) + " vs " + std::to_string(dat2->_mirror.y));
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _position, DISP_VEC);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _speed, DISP_VEC);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _mirror, DISP_VEC);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _aliveTimer, std::to_string);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _fadeTime, std::to_string);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _maxFadeTime, std::to_string);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _updateTimer, std::to_string);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _currentColors, std::to_string);
+		OBJECT_CHECK_FIELD("Particle", "", dat1, dat2, _scale, std::to_string);
 		return sizeof(Data);
 	}
 
 	size_t Particle::printContent(const char *msgStart, void *data, unsigned int startOffset, size_t dataSize) const
 	{
-		auto dat1 = reinterpret_cast<Data *>(data);
+		auto dat = static_cast<Data *>(data);
 
 		game->logger.info("Particle @" + std::to_string(startOffset));
 		if (startOffset + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "Particle::_position.x: " + std::to_string(dat1->_position.x));
-		game->logger.info(std::string(msgStart) + "Particle::_position.y: " + std::to_string(dat1->_position.y));
-		game->logger.info(std::string(msgStart) + "Particle::_speed.x: " + std::to_string(dat1->_speed.x));
-		game->logger.info(std::string(msgStart) + "Particle::_speed.y: " + std::to_string(dat1->_speed.y));
-		game->logger.info(std::string(msgStart) + "Particle::_mirror.x: " + std::to_string(dat1->_mirror.x));
-		game->logger.info(std::string(msgStart) + "Particle::_mirror.y: " + std::to_string(dat1->_mirror.y));
-		game->logger.info(std::string(msgStart) + "Particle::_aliveTimer: " + std::to_string(dat1->_aliveTimer));
-		game->logger.info(std::string(msgStart) + "Particle::_fadeTime: " + std::to_string(dat1->_fadeTime));
-		game->logger.info(std::string(msgStart) + "Particle::_maxFadeTime: " + std::to_string(dat1->_maxFadeTime));
-		game->logger.info(std::string(msgStart) + "Particle::_updateTimer: " + std::to_string(dat1->_updateTimer));
-		game->logger.info(std::string(msgStart) + "Particle::_currentColors: " + std::to_string(dat1->_currentColors));
-		game->logger.info(std::string(msgStart) + "Particle::_scale: " + std::to_string(dat1->_scale));
+
+		DISPLAY_FIELD("Particle", "", dat, _position, DISP_VEC);
+		DISPLAY_FIELD("Particle", "", dat, _speed, DISP_VEC);
+		DISPLAY_FIELD("Particle", "", dat, _mirror, DISP_VEC);
+		DISPLAY_FIELD("Particle", "", dat, _aliveTimer, std::to_string);
+		DISPLAY_FIELD("Particle", "", dat, _fadeTime, std::to_string);
+		DISPLAY_FIELD("Particle", "", dat, _maxFadeTime, std::to_string);
+		DISPLAY_FIELD("Particle", "", dat, _updateTimer, std::to_string);
+		DISPLAY_FIELD("Particle", "", dat, _currentColors, std::to_string);
+		DISPLAY_FIELD("Particle", "", dat, _scale, std::to_string);
 		if (startOffset + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

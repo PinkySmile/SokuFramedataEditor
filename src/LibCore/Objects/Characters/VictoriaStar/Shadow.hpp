@@ -15,9 +15,9 @@ namespace SpiralOfFate
 #pragma pack(push, 1)
 		struct Data {
 			unsigned _boxSize;
+			unsigned short _idleCounter;
 			bool _killedByOwner;
 			unsigned char _invincibleTime;
-			unsigned short _idleCounter;
 			std::pair<unsigned char, unsigned char> _loopInfo;
 		};
 		static_assert(sizeof(Data) == 10, "Data has wrong size");

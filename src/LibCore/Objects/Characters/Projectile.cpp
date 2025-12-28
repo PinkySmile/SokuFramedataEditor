@@ -247,7 +247,7 @@ namespace SpiralOfFate
 
 		game->logger.info("Projectile @" + std::to_string(startOffset + length));
 		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _animationCtr, std::to_string);
-		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _disabled, std::to_string);
+		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _disabled, DISP_BOOL);
 		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _nbHit, std::to_string);
 		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _animType, std::to_string);
 		OBJECT_CHECK_FIELD("Projectile", "", dat1, dat2, _typeSwitchFlags, std::to_string);
@@ -321,17 +321,17 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("Projectile @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		DISPLAY_FIELD("Projectile", dat1, _nbHit, std::to_string);
-		DISPLAY_FIELD("Projectile", dat1, _animationCtr, std::to_string);
-		DISPLAY_FIELD("Projectile", dat1, _debuffDuration, std::to_string);
-		DISPLAY_FIELD("Projectile", dat1, _disabled, std::to_string);
-		DISPLAY_FIELD("Projectile", dat1, _typeSwitchFlags, std::to_string);
-		DISPLAY_FIELD("Projectile", dat1, _animType, std::to_string);
+		DISPLAY_FIELD("Projectile", "", dat, _nbHit, std::to_string);
+		DISPLAY_FIELD("Projectile", "", dat, _animationCtr, std::to_string);
+		DISPLAY_FIELD("Projectile", "", dat, _debuffDuration, std::to_string);
+		DISPLAY_FIELD("Projectile", "", dat, _disabled, DISP_BOOL);
+		DISPLAY_FIELD("Projectile", "", dat, _typeSwitchFlags, std::to_string);
+		DISPLAY_FIELD("Projectile", "", dat, _animType, std::to_string);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

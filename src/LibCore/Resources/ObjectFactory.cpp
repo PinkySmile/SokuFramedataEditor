@@ -84,8 +84,8 @@ namespace SpiralOfFate
 	std::shared_ptr<IObject> ObjectFactory::createObject(BattleManager &mgr, void *data, const std::pair<Character *, Character *> players)
 	{
 		std::shared_ptr<IObject> obj;
-		auto ptr = (char *)data;
-		auto cl = *(unsigned char *)ptr;
+		auto ptr = static_cast<char *>(data);
+		auto cl = *reinterpret_cast<unsigned char *>(ptr);
 
 		ptr += sizeof(unsigned char);
 		switch (cl) {

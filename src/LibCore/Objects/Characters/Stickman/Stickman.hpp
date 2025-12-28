@@ -30,7 +30,6 @@ namespace SpiralOfFate
 	protected:
 		void _onMoveEnd(const FrameData &lastData) override;
 		void _computeFrameDataCache() override;
-		void _renderExtraEffects(const Vector2f &pos) const override;
 
 		void _forceStartMove(unsigned int action) override;
 

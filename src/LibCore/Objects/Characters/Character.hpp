@@ -433,6 +433,8 @@ namespace SpiralOfFate
 			float _regen;
 			float _mana;
 			float _prorate;
+			char _normalTreeFlag;
+			char _limitEffects;
 			bool _ultimateUsed;
 			bool _counter;
 			bool _jumpCanceled;
@@ -442,8 +444,6 @@ namespace SpiralOfFate
 			bool _hasJumped;
 			bool _restand;
 			bool _justGotCorner;
-			char _normalTreeFlag;
-			char _limitEffects;
 			bool _armorUsed;
 			bool _hardKD;
 			bool _willGroundSlam;

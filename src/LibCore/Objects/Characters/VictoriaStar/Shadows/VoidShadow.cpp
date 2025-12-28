@@ -6,6 +6,7 @@
 #include "Resources/Game.hpp"
 #include "Objects/Characters/VictoriaStar/VictoriaStar.hpp"
 #include "Utils.hpp"
+#include "Objects/CheckUtils.hpp"
 
 namespace SpiralOfFate
 {
@@ -122,8 +123,7 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("VoidShadow @" + std::to_string(startOffset + length));
-		if (dat1->_attacking != dat2->_attacking)
-			game->logger.fatal(std::string(msgStart) + "VoidShadow::_attacking: " + std::to_string(dat1->_attacking) + " vs " + std::to_string(dat2->_attacking));
+		OBJECT_CHECK_FIELD("VoidShadow", "", dat1, dat2, _attacking, DISP_BOOL);
 		return length + sizeof(Data);
 	}
 
@@ -134,12 +134,12 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("VoidShadow @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "VoidShadow::_attacking: " + std::to_string(dat1->_attacking));
+		DISPLAY_FIELD("VoidShadow", "", dat, _attacking, DISP_BOOL);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

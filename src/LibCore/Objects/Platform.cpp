@@ -4,6 +4,8 @@
 
 #include "Utils.hpp"
 #include "Platform.hpp"
+
+#include "CheckUtils.hpp"
 #include "Resources/Game.hpp"
 
 namespace SpiralOfFate
@@ -98,7 +100,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Object::getBufferSize());
 
 		Object::copyToBuffer(data);
-		game->logger.verbose("Saving Platform (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
+		game->logger.verbose("Saving Platform (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
 		dat->_width = this->_width;
 		dat->_cooldown = this->_cooldown;
 		dat->_deathTimer = this->_deathTimer;
@@ -113,7 +115,7 @@ namespace SpiralOfFate
 		this->_width = dat->_width;
 		this->_cooldown = dat->_cooldown;
 		this->_deathTimer = dat->_deathTimer;
-		game->logger.verbose("Restored Platform @" + Utils::toHex((uintptr_t)dat));
+		game->logger.verbose("Restored Platform @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
 	}
 
 	unsigned int Platform::getBufferSize() const
@@ -132,12 +134,9 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Platform @" + std::to_string(startOffset + length));
-		if (dat1->_width != dat2->_width)
-			game->logger.fatal(std::string(msgStart) + "Platform::_width: " + std::to_string(dat1->_width) + " vs " + std::to_string(dat2->_width));
-		if (dat1->_cooldown != dat2->_cooldown)
-			game->logger.fatal(std::string(msgStart) + "Platform::_cooldown: " + std::to_string(dat1->_cooldown) + " vs " + std::to_string(dat2->_cooldown));
-		if (dat1->_deathTimer != dat2->_deathTimer)
-			game->logger.fatal(std::string(msgStart) + "Platform::_deathTimer: " + std::to_string(dat1->_deathTimer) + " vs " + std::to_string(dat2->_deathTimer));
+		OBJECT_CHECK_FIELD("Platform", "", dat1, dat2, _width, std::to_string);
+		OBJECT_CHECK_FIELD("Platform", "", dat1, dat2, _cooldown, std::to_string);
+		OBJECT_CHECK_FIELD("Platform", "", dat1, dat2, _deathTimer, std::to_string);
 		return length + sizeof(Data);
 	}
 
@@ -158,9 +157,9 @@ namespace SpiralOfFate
 		game->logger.info("Platform @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "Platform::_width: " + std::to_string(dat->_width));
-		game->logger.info(std::string(msgStart) + "Platform::_cooldown: " + std::to_string(dat->_cooldown));
-		game->logger.info(std::string(msgStart) + "Platform::_deathTimer: " + std::to_string(dat->_deathTimer));
+		DISPLAY_FIELD("Platform", "", dat, _width, std::to_string);
+		DISPLAY_FIELD("Platform", "", dat, _cooldown, std::to_string);
+		DISPLAY_FIELD("Platform", "", dat, _deathTimer, std::to_string);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

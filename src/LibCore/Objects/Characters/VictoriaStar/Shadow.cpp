@@ -4,6 +4,8 @@
 
 #include "Utils.hpp"
 #include "Shadow.hpp"
+
+#include "Objects/CheckUtils.hpp"
 #include "Resources/Game.hpp"
 
 #define SHADOW_FULL_MATURE_TIME 1800
@@ -20,7 +22,7 @@ namespace SpiralOfFate
 		bool direction,
 		Vector2f pos,
 		bool owner,
-		class Character *ownerObj,
+		Character *ownerObj,
 		unsigned int id,
 		const sf::Color &tint,
 		unsigned activateBlock
@@ -132,16 +134,11 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Shadow @" + std::to_string(startOffset + length));
-		if (dat1->_invincibleTime != dat2->_invincibleTime)
-			game->logger.fatal(std::string(msgStart) + "Shadow::_invincibleTime: " + std::to_string(dat1->_invincibleTime) + " vs " + std::to_string(dat2->_invincibleTime));
-		if (dat1->_boxSize != dat2->_boxSize)
-			game->logger.fatal(std::string(msgStart) + "Shadow::_boxSize: " + std::to_string(dat1->_boxSize) + " vs " + std::to_string(dat2->_boxSize));
-		if (dat1->_loopInfo != dat2->_loopInfo)
-			game->logger.fatal(std::string(msgStart) + "Shadow::_loopInfo: {" + std::to_string(dat1->_loopInfo.first) + "," + std::to_string(dat1->_loopInfo.second) + "} vs {" + std::to_string(dat2->_loopInfo.first) + "," + std::to_string(dat2->_loopInfo.second) + "}");
-		if (dat1->_idleCounter != dat2->_idleCounter)
-			game->logger.fatal(std::string(msgStart) + "Shadow::_idleCounter: " + std::to_string(dat1->_idleCounter) + " vs " + std::to_string(dat2->_idleCounter));
-		if (dat1->_killedByOwner != dat2->_killedByOwner)
-			game->logger.fatal(std::string(msgStart) + "Shadow::_killedByOwner: " + (dat1->_killedByOwner ? "true" : "false") + " vs " + (dat2->_killedByOwner ? "true" : "false"));
+		OBJECT_CHECK_FIELD("Shadow", "", dat1, dat2, _loopInfo, DISP_PAIR);
+		OBJECT_CHECK_FIELD("Shadow", "", dat1, dat2, _invincibleTime, std::to_string);
+		OBJECT_CHECK_FIELD("Shadow", "", dat1, dat2, _boxSize, std::to_string);
+		OBJECT_CHECK_FIELD("Shadow", "", dat1, dat2, _idleCounter, std::to_string);
+		OBJECT_CHECK_FIELD("Shadow", "", dat1, dat2, _killedByOwner, DISP_BOOL);
 		return length + sizeof(Data);
 	}
 
@@ -219,16 +216,17 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("Shadow @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "Shadow::_invincibleTime: " + std::to_string(dat1->_invincibleTime));
-		game->logger.info(std::string(msgStart) + "Shadow::_boxSize: " + std::to_string(dat1->_boxSize));
-		game->logger.info(std::string(msgStart) + "Shadow::_loopInfo: {" + std::to_string(dat1->_loopInfo.first) + "," + std::to_string(dat1->_loopInfo.second) + "}");
-		game->logger.info(std::string(msgStart) + "Shadow::_idleCounter: " + std::to_string(dat1->_idleCounter));
-		game->logger.info(std::string(msgStart) + "Shadow::_killedByOwner: " + (dat1->_killedByOwner ? "true" : "false"));
+
+		DISPLAY_FIELD("Shadow", "", dat, _loopInfo, DISP_PAIR);
+		DISPLAY_FIELD("Shadow", "", dat, _invincibleTime, std::to_string);
+		DISPLAY_FIELD("Shadow", "", dat, _boxSize, std::to_string);
+		DISPLAY_FIELD("Shadow", "", dat, _idleCounter, std::to_string);
+		DISPLAY_FIELD("Shadow", "", dat, _killedByOwner, DISP_BOOL);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

@@ -3,6 +3,8 @@
 //
 
 #include "ParticleGenerator.hpp"
+
+#include "CheckUtils.hpp"
 #include "Resources/Game.hpp"
 
 namespace SpiralOfFate
@@ -165,38 +167,30 @@ namespace SpiralOfFate
 
 	size_t ParticleGenerator::printDifference(const char *msgStart, void *data1, void *data2, unsigned int startOffset) const
 	{
-		auto dat1 = reinterpret_cast<Data *>(data1);
-		auto dat2 = reinterpret_cast<Data *>(data2);
+		auto dat1 = static_cast<Data *>(data1);
+		auto dat2 = static_cast<Data *>(data2);
 
 		game->logger.info("ParticleGenerator @" + std::to_string(startOffset));
-		if (dat1->_position.x != dat2->_position.x)
-			game->logger.fatal(std::string(msgStart) + "ParticleGenerator::_position.x: " + std::to_string(dat1->_position.x) + " vs " + std::to_string(dat2->_position.x));
-		if (dat1->_position.y != dat2->_position.y)
-			game->logger.fatal(std::string(msgStart) + "ParticleGenerator::_position.y: " + std::to_string(dat1->_position.y) + " vs " + std::to_string(dat2->_position.y));
-		if (dat1->_aliveTimer != dat2->_aliveTimer)
-			game->logger.fatal(std::string(msgStart) + "ParticleGenerator::_aliveTimer: " + std::to_string(dat1->_aliveTimer) + " vs " + std::to_string(dat2->_aliveTimer));
-		if (dat1->_maxSpawnRate != dat2->_maxSpawnRate)
-			game->logger.fatal(std::string(msgStart) + "ParticleGenerator::_maxSpawnRate: " + std::to_string(dat1->_maxSpawnRate) + " vs " + std::to_string(dat2->_maxSpawnRate));
-		if (dat1->_nextSpawnCost != dat2->_nextSpawnCost)
-			game->logger.fatal(std::string(msgStart) + "ParticleGenerator::_nextSpawnCost: " + std::to_string(dat1->_nextSpawnCost) + " vs " + std::to_string(dat2->_nextSpawnCost));
-		if (dat1->_spawnCredit != dat2->_spawnCredit)
-			game->logger.fatal(std::string(msgStart) + "ParticleGenerator::_spawnCredit: " + std::to_string(dat1->_spawnCredit) + " vs " + std::to_string(dat2->_spawnCredit));
+		OBJECT_CHECK_FIELD("ParticleGenerator", "", dat1, dat2, _position, DISP_VEC);
+		OBJECT_CHECK_FIELD("ParticleGenerator", "", dat1, dat2, _aliveTimer, std::to_string);
+		OBJECT_CHECK_FIELD("ParticleGenerator", "", dat1, dat2, _maxSpawnRate, std::to_string);
+		OBJECT_CHECK_FIELD("ParticleGenerator", "", dat1, dat2, _nextSpawnCost, std::to_string);
+		OBJECT_CHECK_FIELD("ParticleGenerator", "", dat1, dat2, _spawnCredit, std::to_string);
 		return sizeof(Data);
 	}
 
 	size_t ParticleGenerator::printContent(const char *msgStart, void *data, unsigned int startOffset, size_t dataSize) const
 	{
-		auto dat1 = reinterpret_cast<Data *>(data);
+		auto dat = static_cast<Data *>(data);
 
 		game->logger.info("ParticleGenerator @" + std::to_string(startOffset));
 		if (startOffset + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "ParticleGenerator::_position.x: " + std::to_string(dat1->_position.x));
-		game->logger.info(std::string(msgStart) + "ParticleGenerator::_position.y: " + std::to_string(dat1->_position.y));
-		game->logger.info(std::string(msgStart) + "ParticleGenerator::_aliveTimer: " + std::to_string(dat1->_aliveTimer));
-		game->logger.info(std::string(msgStart) + "ParticleGenerator::_maxSpawnRate: " + std::to_string(dat1->_maxSpawnRate));
-		game->logger.info(std::string(msgStart) + "ParticleGenerator::_nextSpawnCost: " + std::to_string(dat1->_nextSpawnCost));
-		game->logger.info(std::string(msgStart) + "ParticleGenerator::_spawnCredit: " + std::to_string(dat1->_spawnCredit));
+		DISPLAY_FIELD("ParticleGenerator", "", dat, _position, DISP_VEC);
+		DISPLAY_FIELD("ParticleGenerator", "", dat, _aliveTimer, std::to_string);
+		DISPLAY_FIELD("ParticleGenerator", "", dat, _maxSpawnRate, std::to_string);
+		DISPLAY_FIELD("ParticleGenerator", "", dat, _nextSpawnCost, std::to_string);
+		DISPLAY_FIELD("ParticleGenerator", "", dat, _spawnCredit, std::to_string);
 		if (startOffset + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

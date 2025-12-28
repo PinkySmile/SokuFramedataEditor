@@ -21,11 +21,11 @@ namespace SpiralOfFate
 	private:
 #pragma pack(push, 1)
 		struct Data {
-			bool _hitShadow;
-			unsigned char _stacksTimer;
 			float _stacks;
 			unsigned _flower;
 			unsigned _shadows[4];
+			bool _hitShadow;
+			unsigned char _stacksTimer;
 		};
 		static_assert(sizeof(Data) == 26, "Data has wrong size");
 #pragma pack(pop)

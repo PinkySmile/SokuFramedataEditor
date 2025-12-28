@@ -4,6 +4,8 @@
 
 #include "Utils.hpp"
 #include "Object.hpp"
+
+#include "CheckUtils.hpp"
 #include "Resources/Game.hpp"
 #include "Logger.hpp"
 
@@ -686,46 +688,26 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Object @" + std::to_string(startOffset + length));
-		if (dat1->_position != dat2->_position)
-			game->logger.fatal(std::string(msgStart) + "Object::_position: (" + std::to_string(dat1->_position.x) + ", " + std::to_string(dat1->_position.y) + ") vs (" + std::to_string(dat2->_position.x) + ", " + std::to_string(dat2->_position.y) + ")");
-		if (dat1->_speed != dat2->_speed)
-			game->logger.fatal(std::string(msgStart) + "Object::_speed: (" + std::to_string(dat1->_speed.x) + ", " + std::to_string(dat1->_speed.y) + ") vs (" + std::to_string(dat2->_speed.x) + ", " + std::to_string(dat2->_speed.y) + ")");
-		if (dat1->_gravity != dat2->_gravity)
-			game->logger.fatal(std::string(msgStart) + "Object::_gravity: (" + std::to_string(dat1->_gravity.x) + ", " + std::to_string(dat1->_gravity.y) + ") vs (" + std::to_string(dat2->_gravity.x) + ", " + std::to_string(dat2->_gravity.y) + ")");
-		if (dat1->_action != dat2->_action)
-			game->logger.fatal(std::string(msgStart) + "Object::_action: " + std::to_string(dat1->_action) + " vs " + std::to_string(dat2->_action));
-		if (dat1->_hitStop != dat2->_hitStop)
-			game->logger.fatal(std::string(msgStart) + "Object::_hitStop: " + std::to_string(dat1->_hitStop) + " vs " + std::to_string(dat2->_hitStop));
-		if (dat1->_actionBlock != dat2->_actionBlock)
-			game->logger.fatal(std::string(msgStart) + "Object::_actionBlock: " + std::to_string(dat1->_actionBlock) + " vs " + std::to_string(dat2->_actionBlock));
-		if (dat1->_animation != dat2->_animation)
-			game->logger.fatal(std::string(msgStart) + "Object::_animation: " + std::to_string(dat1->_animation) + " vs " + std::to_string(dat2->_animation));
-		if (dat1->_animationCtr != dat2->_animationCtr)
-			game->logger.fatal(std::string(msgStart) + "Object::_animationCtr: " + std::to_string(dat1->_animationCtr) + " vs " + std::to_string(dat2->_animationCtr));
-		if (dat1->_hp != dat2->_hp)
-			game->logger.fatal(std::string(msgStart) + "Object::_hp: " + std::to_string(dat1->_hp) + " vs " + std::to_string(dat2->_hp));
-		if (dat1->_rotation != dat2->_rotation)
-			game->logger.fatal(std::string(msgStart) + "Object::_rotation: " + std::to_string(dat1->_rotation) + " vs " + std::to_string(dat2->_rotation));
-		if (dat1->_team != dat2->_team)
-			game->logger.fatal(std::string(msgStart) + "Object::_team: " + std::to_string(dat1->_team) + " vs " + std::to_string(dat2->_team));
-		if (dat1->_dead != dat2->_dead)
-			game->logger.fatal(std::string(msgStart) + "Object::_dead: " + std::to_string(dat1->_dead) + " vs " + std::to_string(dat2->_dead));
-		if (dat1->_hasHit != dat2->_hasHit)
-			game->logger.fatal(std::string(msgStart) + "Object::_hasHit: " + std::to_string(dat1->_hasHit) + " vs " + std::to_string(dat2->_hasHit));
-		if (dat1->_direction != dat2->_direction)
-			game->logger.fatal(std::string(msgStart) + "Object::_direction: " + std::to_string(dat1->_direction) + " vs " + std::to_string(dat2->_direction));
-		if (dat1->_cornerPriority != dat2->_cornerPriority)
-			game->logger.fatal(std::string(msgStart) + "Object::_cornerPriority: " + std::to_string(dat1->_cornerPriority) + " vs " + std::to_string(dat2->_cornerPriority));
-		if (dat1->_dir != dat2->_dir)
-			game->logger.fatal(std::string(msgStart) + "Object::_dir: " + std::to_string(dat1->_dir) + " vs " + std::to_string(dat2->_dir));
-		if (dat1->_newAnim != dat2->_newAnim)
-			game->logger.fatal(std::string(msgStart) + "Object::_newAnim: " + std::to_string(dat1->_newAnim) + " vs " + std::to_string(dat2->_newAnim));
-		if (dat1->_fadeTimer != dat2->_fadeTimer)
-			game->logger.fatal(std::string(msgStart) + "Object::_fadeTimer: " + std::to_string(dat1->_fadeTimer) + " vs " + std::to_string(dat2->_fadeTimer));
-		if (dat1->_fadeTimerMax != dat2->_fadeTimerMax)
-			game->logger.fatal(std::string(msgStart) + "Object::_fadeTimerMax: " + std::to_string(dat1->_fadeTimerMax) + " vs " + std::to_string(dat2->_fadeTimerMax));
-		if (dat1->_fadeDir != dat2->_fadeDir)
-			game->logger.fatal(std::string(msgStart) + "Object::_fadeDir: " + std::to_string(dat1->_fadeDir) + " vs " + std::to_string(dat2->_fadeDir));
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _position, DISP_VEC);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _speed, DISP_VEC);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _gravity, DISP_VEC);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _rotation, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _dir, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _team, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _fadeTimer, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _fadeTimerMax, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _action, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _actionBlock, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _animation, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _animationCtr, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _hp, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _hitStop, std::to_string);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _fadeDir, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _dead, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _hasHit, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _direction, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _newAnim, DISP_BOOL);
+		OBJECT_CHECK_FIELD("Object", "", dat1, dat2, _cornerPriority, std::to_string);
 		return sizeof(Data) + length;
 	}
 
@@ -772,26 +754,26 @@ namespace SpiralOfFate
 		game->logger.info("Object @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "Object::_position: (" + std::to_string(dat->_position.x) + ", " + std::to_string(dat->_position.y) + ")");
-		game->logger.info(std::string(msgStart) + "Object::_speed: (" + std::to_string(dat->_speed.x) + ", " + std::to_string(dat->_speed.y) + ")");
-		game->logger.info(std::string(msgStart) + "Object::_gravity: (" + std::to_string(dat->_gravity.x) + ", " + std::to_string(dat->_gravity.y) + ")");
-		game->logger.info(std::string(msgStart) + "Object::_action: " + std::to_string(dat->_action));
-		game->logger.info(std::string(msgStart) + "Object::_hitStop: " + std::to_string(dat->_hitStop));
-		game->logger.info(std::string(msgStart) + "Object::_actionBlock: " + std::to_string(dat->_actionBlock));
-		game->logger.info(std::string(msgStart) + "Object::_animation: " + std::to_string(dat->_animation));
-		game->logger.info(std::string(msgStart) + "Object::_animationCtr: " + std::to_string(dat->_animationCtr));
-		game->logger.info(std::string(msgStart) + "Object::_hp: " + std::to_string(dat->_hp));
-		game->logger.info(std::string(msgStart) + "Object::_rotation: " + std::to_string(dat->_rotation));
-		game->logger.info(std::string(msgStart) + "Object::_team: " + std::to_string(dat->_team));
-		game->logger.info(std::string(msgStart) + "Object::_dead: " + std::to_string(dat->_dead));
-		game->logger.info(std::string(msgStart) + "Object::_hasHit: " + std::to_string(dat->_hasHit));
-		game->logger.info(std::string(msgStart) + "Object::_direction: " + std::to_string(dat->_direction));
-		game->logger.info(std::string(msgStart) + "Object::_cornerPriority: " + std::to_string(dat->_cornerPriority));
-		game->logger.info(std::string(msgStart) + "Object::_dir: " + std::to_string(dat->_dir));
-		game->logger.info(std::string(msgStart) + "Object::_newAnim: " + std::to_string(dat->_newAnim));
-		game->logger.info(std::string(msgStart) + "Object::_fadeTimer: " + std::to_string(dat->_fadeTimer));
-		game->logger.info(std::string(msgStart) + "Object::_fadeTimerMax: " + std::to_string(dat->_fadeTimerMax));
-		game->logger.info(std::string(msgStart) + "Object::_fadeDir: " + std::to_string(dat->_fadeDir));
+		DISPLAY_FIELD("Object", "", dat, _position, DISP_VEC);
+		DISPLAY_FIELD("Object", "", dat, _speed, DISP_VEC);
+		DISPLAY_FIELD("Object", "", dat, _gravity, DISP_VEC);
+		DISPLAY_FIELD("Object", "", dat, _rotation, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _dir, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _team, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _fadeTimer, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _fadeTimerMax, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _action, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _actionBlock, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _animation, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _animationCtr, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _hp, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _hitStop, std::to_string);
+		DISPLAY_FIELD("Object", "", dat, _fadeDir, DISP_BOOL);
+		DISPLAY_FIELD("Object", "", dat, _dead, DISP_BOOL);
+		DISPLAY_FIELD("Object", "", dat, _hasHit, DISP_BOOL);
+		DISPLAY_FIELD("Object", "", dat, _direction, DISP_BOOL);
+		DISPLAY_FIELD("Object", "", dat, _newAnim, DISP_BOOL);
+		DISPLAY_FIELD("Object", "", dat, _cornerPriority, std::to_string);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

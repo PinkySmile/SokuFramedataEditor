@@ -103,7 +103,7 @@ namespace SpiralOfFate
 		static_assert(sizeof(HUDDataPacked) == 50, "HUDDataPacket has wrong size");
 
 		struct Data {
-			uint64_t random;
+			uint64_t _random;
 			unsigned _currentFrame;
 			unsigned _lastObjectId;
 			unsigned _currentRound;

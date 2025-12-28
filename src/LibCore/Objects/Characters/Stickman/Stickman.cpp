@@ -8,6 +8,7 @@
 #include "Objects/Characters/CharacterParams.hpp"
 #include "Objects/Characters/Projectile.hpp"
 #include "Utils.hpp"
+#include "Objects/CheckUtils.hpp"
 
 #define SPECIAL_INSTALL_COST 300
 
@@ -117,7 +118,7 @@ namespace SpiralOfFate
 		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + Character::getBufferSize());
 
 		Character::copyToBuffer(data);
-		game->logger.verbose("Saving Stickman (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
+		game->logger.verbose("Saving Stickman (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
 		dat->_time = this->_time;
 		dat->_oldAction = this->_oldAction;
 		dat->_hasBuff = this->_hasBuff;
@@ -132,7 +133,7 @@ namespace SpiralOfFate
 		this->_time = dat->_time;
 		this->_oldAction = dat->_oldAction;
 		this->_hasBuff = dat->_hasBuff;
-		game->logger.verbose("Restored Stickman @" + Utils::toHex((uintptr_t)dat));
+		game->logger.verbose("Restored Stickman (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
 	}
 
 	void Stickman::onMatchEnd()
@@ -172,20 +173,10 @@ namespace SpiralOfFate
 		auto dat2 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data2) + length);
 
 		game->logger.info("Stickman @" + std::to_string(startOffset + length));
-		if (dat1->_time != dat2->_time)
-			game->logger.fatal(std::string(msgStart) + "Stickman::_time: " + std::to_string(dat1->_time) + " vs " + std::to_string(dat2->_time));
-		if (dat1->_oldAction != dat2->_oldAction)
-			game->logger.fatal(std::string(msgStart) + "Stickman::_oldAction: " + std::to_string(dat1->_oldAction) + " vs " + std::to_string(dat2->_oldAction));
-		if (dat1->_hasBuff != dat2->_hasBuff)
-			game->logger.fatal(std::string(msgStart) + "Stickman::_hasBuff: " + std::to_string(dat1->_hasBuff) + " vs " + std::to_string(dat2->_hasBuff));
+		OBJECT_CHECK_FIELD("Stickman", "", dat1, dat2, _time, std::to_string);
+		OBJECT_CHECK_FIELD("Stickman", "", dat1, dat2, _oldAction, std::to_string);
+		OBJECT_CHECK_FIELD("Stickman", "", dat1, dat2, _hasBuff, DISP_BOOL);
 		return length + sizeof(Data);
-	}
-
-	void Stickman::_renderExtraEffects(const Vector2f &pos) const
-	{
-		Character::_renderExtraEffects(pos);
-		//if (this->_hasBuff && this->_installMoveStarted)
-		//	this->_renderInstallEffect(this->_neutralEffect);
 	}
 
 	void Stickman::_computeFrameDataCache()
@@ -211,14 +202,14 @@ namespace SpiralOfFate
 		if (length == 0)
 			return 0;
 
-		auto dat1 = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
+		auto dat = reinterpret_cast<Data *>(reinterpret_cast<uintptr_t>(data) + length);
 
 		game->logger.info("Stickman @" + std::to_string(startOffset + length));
 		if (startOffset + length + sizeof(Data) >= dataSize)
 			game->logger.warn("Object is " + std::to_string(startOffset + length + sizeof(Data) - dataSize) + " bytes bigger than input");
-		game->logger.info(std::string(msgStart) + "Stickman::_hasBuff: " + std::to_string(dat1->_hasBuff));
-		game->logger.info(std::string(msgStart) + "Stickman::_time: " + std::to_string(dat1->_time));
-		game->logger.info(std::string(msgStart) + "Stickman::_oldAction: " + std::to_string(dat1->_oldAction));
+		DISPLAY_FIELD("Stickman", "", dat, _time, std::to_string);
+		DISPLAY_FIELD("Stickman", "", dat, _oldAction, std::to_string);
+		DISPLAY_FIELD("Stickman", "", dat, _hasBuff, DISP_BOOL);
 		if (startOffset + length + sizeof(Data) >= dataSize) {
 			game->logger.fatal("Invalid input frame");
 			return 0;

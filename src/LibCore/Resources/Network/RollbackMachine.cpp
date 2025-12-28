@@ -273,6 +273,109 @@ namespace SpiralOfFate
 		return result ? UPDATESTATUS_OK : UPDATESTATUS_GAME_ENDED;
 	}
 
+
+#define BOLD_OFF 2
+#define D1_OFF 4
+#define D2_OFF 5
+#define PAIR_SIZE 7
+#define ADDR_SIZE 10
+
+	char digits[] = "0123456789ABCDEF";
+
+	void displayBeforeDiff(size_t index, size_t lastIndex, const char *buffer1, const char *buffer2, char *lineBuffer)
+	{
+		size_t currentLine = index / 10;
+		size_t lastLine = lastIndex / 10;
+		char *line1Buffer = lineBuffer + ADDR_SIZE + 2;
+		char *line2Buffer = lineBuffer + ADDR_SIZE + 78;
+
+		if (lastLine != currentLine) {
+			char *ptr = lineBuffer + ADDR_SIZE - 2;
+			size_t i = currentLine;
+
+			*ptr = '0';
+			while (i != 0) {
+				ptr--;
+				*ptr = '0' + i % 10;
+				i /= 10;
+			}
+		}
+		for (size_t i = currentLine; i < index; i++) {
+			if (i <= lastIndex)
+				continue;
+
+			size_t slot = i % 10;
+			unsigned char c1 = buffer1[i];
+			unsigned char c2 = buffer2[i];
+
+			line1Buffer[slot * PAIR_SIZE + BOLD_OFF] = '0';
+			line1Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+			line1Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+			line2Buffer[slot * PAIR_SIZE + BOLD_OFF] = '0';
+			line2Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+			line2Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+		}
+	}
+
+	void displayAfterDiff(size_t index, size_t lastIndex, const char *buffer1, const char *buffer2, char *lineBuffer, bool last)
+	{
+		size_t currentLine = index / 10;
+		size_t lastLine = lastIndex / 10;
+		char *line1Buffer = lineBuffer + ADDR_SIZE + 2;
+		char *line2Buffer = lineBuffer + ADDR_SIZE + 78;
+
+		for (size_t i = lastIndex + 1; i < index && i < lastLine + 10; i++) {
+			size_t slot = i % 10;
+			unsigned char c1 = buffer1[i];
+			unsigned char c2 = buffer2[i];
+
+			line1Buffer[slot* PAIR_SIZE + BOLD_OFF] = '0';
+			line1Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+			line1Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+			line2Buffer[slot* PAIR_SIZE + BOLD_OFF] = '0';
+			line2Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+			line2Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+		}
+		if (currentLine > lastLine || last)
+			game->logger.fatal(lineBuffer);
+		if (currentLine > lastLine && currentLine - lastLine > 10)
+			game->logger.fatal("| ....... | .. .. .. .. .. .. .. .. .. .. | .. .. .. .. .. .. .. .. .. .. |");
+	}
+
+	void displayDiff(size_t index, const char *buffer1, const char *buffer2, char *lineBuffer)
+	{
+		size_t slot = index % 10;
+		char *line1Buffer = lineBuffer + ADDR_SIZE + 2;
+		char *line2Buffer = lineBuffer + ADDR_SIZE + 78;
+		unsigned char c1 = buffer1[index];
+		unsigned char c2 = buffer2[index];
+
+		line1Buffer[slot* PAIR_SIZE + BOLD_OFF] = '1';
+		line1Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+		line1Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+		line2Buffer[slot* PAIR_SIZE + BOLD_OFF] = '1';
+		line2Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+		line2Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+	}
+
+	void displayDiffs(const std::vector<size_t> &diffs, const char *buffer1, const char *buffer2, size_t size)
+	{
+		size_t lastPos = -1;
+		char lineBuffer[] = "|         | \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00\033[0m | \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00 \033[0m00\033[0m |";
+
+		game->logger.fatal("*---------*-------------------------------*-------------------------------*");
+		game->logger.fatal("| Address |            File 1             |             File 2            |");
+		game->logger.fatal("*---------*-------------------------------*-------------------------------*");
+		for (size_t diff : diffs) {
+			displayAfterDiff(diff, lastPos, buffer1, buffer2, lineBuffer, false);
+			displayBeforeDiff(diff, lastPos, buffer1, buffer2, lineBuffer);
+			displayDiff(diff, buffer1, buffer2, lineBuffer);
+			lastPos = diff;
+		}
+		displayAfterDiff(lastPos, size, buffer1, buffer2, lineBuffer, true);
+		game->logger.fatal("*---------*-------------------------------*-------------------------------*");
+	}
+
 #define DATA_BEFORE 256
 #define DATA_AFTER 256
 #define EXTRA_SIZE (DATA_AFTER + DATA_BEFORE)
@@ -328,7 +431,7 @@ namespace SpiralOfFate
 		game->battleMgr->copyToBuffer(&*dataAfter + DATA_BEFORE);
 		assert_eq(memcmp(&*dataAfter + dataSizeAfter + DATA_AFTER, garbageAfter, DATA_AFTER), 0);
 		assert_eq(memcmp(&*dataAfter, garbageBefore, DATA_BEFORE), 0);
-		checksum1 = _computeCheckSum((short *)(&*dataAfter + DATA_BEFORE), dataSizeAfter / sizeof(short));
+		checksum1 = _computeCheckSum(reinterpret_cast<short *>(&*dataAfter + DATA_BEFORE), dataSizeAfter / sizeof(short));
 
 		game->battleMgr->restoreFromBuffer(&*dataBefore + DATA_BEFORE);
 		this->inputLeft->_keyDuration = lDur;
@@ -344,19 +447,27 @@ namespace SpiralOfFate
 		game->battleMgr->copyToBuffer(&*dataAfter2 + DATA_BEFORE);
 		assert_eq(memcmp(&*dataAfter2 + dataSizeAfter2 + DATA_AFTER, garbageAfter, DATA_AFTER), 0);
 		assert_eq(memcmp(&*dataAfter2, garbageBefore, DATA_BEFORE), 0);
-		checksum2 = _computeCheckSum((short *)(&*dataAfter2 + DATA_BEFORE), dataSizeAfter2 / sizeof(short));
+		checksum2 = _computeCheckSum(reinterpret_cast<short *>(&*dataAfter2 + DATA_BEFORE), dataSizeAfter2 / sizeof(short));
 
 		if (checksum1 != checksum2) {
+			std::vector<size_t> diffs;
+			auto ptr1 = reinterpret_cast<char *>(&*dataAfter);
+			auto ptr2 = reinterpret_cast<char *>(&*dataAfter2);
+
 			game->logger.fatal("RollbackMachine::debugRollback: Checksum mismatch");
 			game->logger.fatal("Old checksum: 0x" + Utils::toHex(checksum1) + " vs new checksum: 0x" + Utils::toHex(checksum2));
 			if (dataSizeAfter != dataSizeAfter2)
 				game->logger.fatal("Old data size: " + std::to_string(dataSizeAfter) + " vs new data size: " + std::to_string(dataSizeAfter2));
 			else for (size_t i = DATA_BEFORE; i < dataSizeAfter; i++)
-				if (((char *)&*dataAfter)[i] != ((char *)&*dataAfter2)[i])
+				if (ptr1[i] != ptr2[i]) {
 					game->logger.fatal(
 						"Old data at index " + std::to_string(i - DATA_BEFORE) + ": 0x" + Utils::toHex((&*dataAfter)[i]) + " vs "
 						"New data at index " + std::to_string(i - DATA_BEFORE) + ": 0x" + Utils::toHex((&*dataAfter2)[i])
 					);
+					diffs.push_back(i);
+				}
+
+			displayDiffs(diffs, ptr1, ptr2, dataSizeAfter + DATA_AFTER);
 			game->battleMgr->logDifference(&*dataAfter + DATA_BEFORE, &*dataAfter2 + DATA_BEFORE);
 			throw AssertionFailedExceptionMsg(
 				"checksum1 == checksum2",

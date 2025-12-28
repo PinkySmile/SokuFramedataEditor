@@ -2,12 +2,14 @@
 // Created by PinkySmile on 18/09/2021.
 //
 
+#include <memory>
 #include <sstream>
 #include "BattleManager.hpp"
 #include "Logger.hpp"
 #include "Resources/Game.hpp"
 #include "Objects/Characters/SubObject.hpp"
 #include "Utils.hpp"
+#include "Objects/CheckUtils.hpp"
 
 #define INPUT_DISPLAY_SIZE 24
 #define LIMIT_SPRITE_VOID 0
@@ -690,11 +692,11 @@ namespace SpiralOfFate
 
 	void BattleManager::copyToBuffer(void *data) const
 	{
-		auto dat = reinterpret_cast<Data *>(data);
-		char *ptr = (char *)data + sizeof(Data);
+		auto dat = static_cast<Data *>(data);
+		char *ptr = static_cast<char *>(data) + sizeof(Data);
 
-		game->logger.verbose("Saving BattleManager (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex((uintptr_t)dat));
-		dat->random = game->battleRandom.ser.invoke_count;
+		game->logger.verbose("Saving BattleManager (Data size: " + std::to_string(sizeof(Data)) + ") @" + Utils::toHex(reinterpret_cast<uintptr_t>(dat)));
+		dat->_random = game->battleRandom.ser.invoke_count;
 		dat->_limitAnimTimer = this->_limitAnimTimer;
 		dat->_ended = this->_ended;
 		dat->_lastObjectId = this->_lastObjectId;
@@ -707,18 +709,18 @@ namespace SpiralOfFate
 		dat->_nbIObjects = this->_iobjects.size();
 		dat->_nbStageObjects = this->_stageObjects.size();
 		dat->_currentFrame = this->_currentFrame;
-		this->_leftCharacter->copyToBuffer((void *)ptr);
+		this->_leftCharacter->copyToBuffer(ptr);
 		ptr += this->_leftCharacter->getBufferSize();
-		this->_rightCharacter->copyToBuffer((void *)ptr);
+		this->_rightCharacter->copyToBuffer(ptr);
 		ptr += this->_rightCharacter->getBufferSize();
 		for (auto &object : this->_objects) {
-			*(unsigned *)ptr = object.first;
+			*reinterpret_cast<unsigned *>(ptr) = object.first;
 			ptr += sizeof(unsigned);
 			game->objFactory.saveObject(ptr, *object.second);
 			ptr += game->objFactory.getObjectSize(*object.second);
 		}
 		for (auto &object : this->_iobjects) {
-			*(unsigned *)ptr = object.first;
+			*reinterpret_cast<unsigned *>(ptr) = object.first;
 			ptr += sizeof(unsigned);
 			game->objFactory.saveObject(ptr, *object.second);
 			ptr += game->objFactory.getObjectSize(*object.second);
@@ -735,11 +737,11 @@ namespace SpiralOfFate
 
 	void BattleManager::restoreFromBuffer(void *data)
 	{
-		auto dat = reinterpret_cast<Data *>(data);
-		char *ptr = (char *)data + sizeof(Data);
+		auto dat = static_cast<Data *>(data);
+		char *ptr = static_cast<char *>(data) + sizeof(Data);
 
-		if (dat->random != game->battleRandom.ser.invoke_count)
-			game->battleRandom.rollback(dat->random);
+		if (dat->_random != game->battleRandom.ser.invoke_count)
+			game->battleRandom.rollback(dat->_random);
 		this->_limitAnimTimer = dat->_limitAnimTimer;
 		this->_ended = dat->_ended;
 		this->_currentFrame = dat->_currentFrame;
@@ -751,9 +753,9 @@ namespace SpiralOfFate
 		this->_roundEndTimer = dat->_roundEndTimer;
 		this->_leftCharacter->_removeSubobjects();
 		this->_rightCharacter->_removeSubobjects();
-		this->_leftCharacter->restoreFromBuffer((void *)ptr);
+		this->_leftCharacter->restoreFromBuffer(ptr);
 		ptr += this->_leftCharacter->getBufferSize();
-		this->_rightCharacter->restoreFromBuffer((void *)ptr);
+		this->_rightCharacter->restoreFromBuffer(ptr);
 		ptr += this->_rightCharacter->getBufferSize();
 
 		// TODO: Instead of delete and recreate all object,
@@ -764,7 +766,7 @@ namespace SpiralOfFate
 		this->_objects.reserve(dat->_nbObjects);
 		this->_platforms.erase(this->_platforms.begin() + this->_nbPlatform, this->_platforms.end());
 		for (size_t i = 0; i < dat->_nbObjects; i++) {
-			auto id = *(unsigned *)ptr;
+			auto id = *reinterpret_cast<unsigned *>(ptr);
 
 			ptr += sizeof(unsigned);
 			auto obj = game->objFactory.createObject<Object>(*this, ptr, {&*this->_leftCharacter, &*this->_rightCharacter});
@@ -772,7 +774,7 @@ namespace SpiralOfFate
 			this->_objects.emplace_back(id, obj);
 		}
 		for (size_t i = 0; i < dat->_nbIObjects; i++) {
-			auto id = *(unsigned *)ptr;
+			auto id = *reinterpret_cast<unsigned *>(ptr);
 
 			ptr += sizeof(unsigned);
 			auto obj = game->objFactory.createObject(*this, ptr, {&*this->_leftCharacter, &*this->_rightCharacter});
@@ -781,11 +783,11 @@ namespace SpiralOfFate
 		}
 		assert_exp(dat->_nbStageObjects == this->_stageObjects.size());
 		for (const auto &stageObject : this->_stageObjects) {
-			stageObject->restoreFromBuffer((void *)ptr);
+			stageObject->restoreFromBuffer(ptr);
 			ptr += stageObject->getBufferSize();
 		}
 		for (size_t i = 0; i < this->_nbPlatform; i++) {
-			this->_platforms[i]->restoreFromBuffer((void *)ptr);
+			this->_platforms[i]->restoreFromBuffer(ptr);
 			ptr += this->_platforms[i]->getBufferSize();
 		}
 		this->_leftCharacter->resolveSubObjects(*this);
@@ -1041,78 +1043,60 @@ namespace SpiralOfFate
 
 	void BattleManager::logDifference(void *data1, void *data2)
 	{
-		auto dat1 = reinterpret_cast<Data *>(data1);
-		auto dat2 = reinterpret_cast<Data *>(data2);
-		char *ptr1 = (char *)data1 + sizeof(Data);
-		char *ptr2 = (char *)data2 + sizeof(Data);
+		std::string msgStart;
+		auto dat1 = static_cast<Data *>(data1);
+		auto dat2 = static_cast<Data *>(data2);
+		char *ptr1 = static_cast<char *>(data1) + sizeof(Data);
+		char *ptr2 = static_cast<char *>(data2) + sizeof(Data);
 
-		if (dat1->random != dat2->random)
-			game->logger.fatal("BattleManager::random differs: " + std::to_string(dat1->random) + " vs " + std::to_string(dat2->random));
-		if (dat1->_currentFrame != dat2->_currentFrame)
-			game->logger.fatal("BattleManager::_currentFrame differs: " + std::to_string(dat1->_currentFrame) + " vs " + std::to_string(dat2->_currentFrame));
-		if (dat1->_ended != dat2->_ended)
-			game->logger.fatal("BattleManager::ended differs: " + std::to_string(dat1->_ended) + " vs " + std::to_string(dat2->_ended));
-		if (dat1->_lastObjectId != dat2->_lastObjectId)
-			game->logger.fatal("BattleManager::lastObjectId differs: " + std::to_string(dat1->_lastObjectId) + " vs " + std::to_string(dat2->_lastObjectId));
-		if (dat1->_leftHUDData.comboCtr != dat2->_leftHUDData.comboCtr)
-			game->logger.fatal("BattleManager::leftHUDData.comboCtr differs: " + std::to_string(dat1->_leftHUDData.comboCtr) + " vs " + std::to_string(dat2->_leftHUDData.comboCtr));
-		if (dat1->_leftHUDData.hitCtr != dat2->_leftHUDData.hitCtr)
-			game->logger.fatal("BattleManager::leftHUDData.hitCtr differs: " + std::to_string(dat1->_leftHUDData.hitCtr) + " vs " + std::to_string(dat2->_leftHUDData.hitCtr));
-		if (dat1->_leftHUDData.neutralLimit != dat2->_leftHUDData.neutralLimit)
-			game->logger.fatal("BattleManager::leftHUDData.neutralLimit differs: " + std::to_string(dat1->_leftHUDData.neutralLimit) + " vs " + std::to_string(dat2->_leftHUDData.neutralLimit));
-		if (dat1->_leftHUDData.voidLimit != dat2->_leftHUDData.voidLimit)
-			game->logger.fatal("BattleManager::leftHUDData.voidLimit differs: " + std::to_string(dat1->_leftHUDData.voidLimit) + " vs " + std::to_string(dat2->_leftHUDData.voidLimit));
-		if (dat1->_leftHUDData.matterLimit != dat2->_leftHUDData.matterLimit)
-			game->logger.fatal("BattleManager::leftHUDData.matterLimit differs: " + std::to_string(dat1->_leftHUDData.matterLimit) + " vs " + std::to_string(dat2->_leftHUDData.matterLimit));
-		if (dat1->_leftHUDData.spiritLimit != dat2->_leftHUDData.spiritLimit)
-			game->logger.fatal("BattleManager::leftHUDData.spiritLimit differs: " + std::to_string(dat1->_leftHUDData.spiritLimit) + " vs " + std::to_string(dat2->_leftHUDData.spiritLimit));
-		if (dat1->_leftHUDData.totalDamage != dat2->_leftHUDData.totalDamage)
-			game->logger.fatal("BattleManager::leftHUDData.totalDamage differs: " + std::to_string(dat1->_leftHUDData.totalDamage) + " vs " + std::to_string(dat2->_leftHUDData.totalDamage));
-		if (dat1->_leftHUDData.proration != dat2->_leftHUDData.proration)
-			game->logger.fatal("BattleManager::leftHUDData.proration differs: " + std::to_string(dat1->_leftHUDData.proration) + " vs " + std::to_string(dat2->_leftHUDData.proration));
-		if (dat1->_leftHUDData.score != dat2->_leftHUDData.score)
-			game->logger.fatal("BattleManager::_leftHUDData.proration differs: " + std::to_string(dat1->_leftHUDData.score) + " vs " + std::to_string(dat2->_leftHUDData.score));
-		if (dat1->_rightHUDData.comboCtr != dat2->_rightHUDData.comboCtr)
-			game->logger.fatal("BattleManager::rightHUDData.comboCtr differs: " + std::to_string(dat1->_rightHUDData.comboCtr) + " vs " + std::to_string(dat2->_rightHUDData.comboCtr));
-		if (dat1->_rightHUDData.hitCtr != dat2->_rightHUDData.hitCtr)
-			game->logger.fatal("BattleManager::rightHUDData.hitCtr differs: " + std::to_string(dat1->_rightHUDData.hitCtr) + " vs " + std::to_string(dat2->_rightHUDData.hitCtr));
-		if (dat1->_rightHUDData.neutralLimit != dat2->_rightHUDData.neutralLimit)
-			game->logger.fatal("BattleManager::rightHUDData.neutralLimit differs: " + std::to_string(dat1->_rightHUDData.neutralLimit) + " vs " + std::to_string(dat2->_rightHUDData.neutralLimit));
-		if (dat1->_rightHUDData.voidLimit != dat2->_rightHUDData.voidLimit)
-			game->logger.fatal("BattleManager::rightHUDData.voidLimit differs: " + std::to_string(dat1->_rightHUDData.voidLimit) + " vs " + std::to_string(dat2->_rightHUDData.voidLimit));
-		if (dat1->_rightHUDData.spiritLimit != dat2->_rightHUDData.spiritLimit)
-			game->logger.fatal("BattleManager::rightHUDData.spiritLimit differs: " + std::to_string(dat1->_rightHUDData.spiritLimit) + " vs " + std::to_string(dat2->_rightHUDData.spiritLimit));
-		if (dat1->_rightHUDData.matterLimit != dat2->_rightHUDData.matterLimit)
-			game->logger.fatal("BattleManager::rightHUDData.matterLimit differs: " + std::to_string(dat1->_rightHUDData.matterLimit) + " vs " + std::to_string(dat2->_rightHUDData.matterLimit));
-		if (dat1->_rightHUDData.totalDamage != dat2->_rightHUDData.totalDamage)
-			game->logger.fatal("BattleManager::rightHUDData.totalDamage differs: " + std::to_string(dat1->_rightHUDData.totalDamage) + " vs " + std::to_string(dat2->_rightHUDData.totalDamage));
-		if (dat1->_rightHUDData.proration != dat2->_rightHUDData.proration)
-			game->logger.fatal("BattleManager::rightHUDData.proration differs: " + std::to_string(dat1->_rightHUDData.proration) + " vs " + std::to_string(dat2->_rightHUDData.proration));
-		if (dat1->_rightHUDData.score != dat2->_rightHUDData.score)
-			game->logger.fatal("BattleManager::rightHUDData.score differs: " + std::to_string(dat1->_rightHUDData.score) + " vs " + std::to_string(dat2->_rightHUDData.score));
-		if (dat1->_currentRound != dat2->_currentRound)
-			game->logger.fatal("BattleManager::currentRound differs: " + std::to_string(dat1->_currentRound) + " vs " + std::to_string(dat2->_currentRound));
-		if (dat1->_roundStartTimer != dat2->_roundStartTimer)
-			game->logger.fatal("BattleManager::roundStartTimer differs: " + std::to_string(dat1->_roundStartTimer) + " vs " + std::to_string(dat2->_roundStartTimer));
-		if (dat1->_roundEndTimer != dat2->_roundEndTimer)
-			game->logger.fatal("BattleManager::roundEndTimer differs: " + std::to_string(dat1->_roundEndTimer) + " vs " + std::to_string(dat2->_roundEndTimer));
-		if (dat1->_limitAnimTimer != dat2->_limitAnimTimer)
-			game->logger.fatal("BattleManager::limitAnimTimer differs: " + std::to_string(dat1->_limitAnimTimer) + " vs " + std::to_string(dat2->_limitAnimTimer));
-		if (dat1->_nbObjects != dat2->_nbObjects)
-			game->logger.fatal("BattleManager::nbObjects differs: " + std::to_string(dat1->_nbObjects) + " vs " + std::to_string(dat2->_nbObjects));
-		if (dat1->_nbIObjects != dat2->_nbIObjects)
-			game->logger.fatal("BattleManager::nbIObjects differs: " + std::to_string(dat1->_nbIObjects) + " vs " + std::to_string(dat2->_nbIObjects));
-		if (dat1->_nbStageObjects != dat2->_nbStageObjects)
-			game->logger.fatal("BattleManager::nbStageObjects differs: " + std::to_string(dat1->_nbStageObjects) + " vs " + std::to_string(dat2->_nbStageObjects));
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _random, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _currentFrame, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _lastObjectId, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _currentRound, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _roundEndTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _nbObjects, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _nbIObjects, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _nbStageObjects, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _roundStartTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.comboCtr, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.hitCtr, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.neutralLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.voidLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.spiritLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.matterLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.totalDamage, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.guardCrossTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.overdriveCrossTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.lifeBarEffect, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.penaltyTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.proration, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.counter, DISP_BOOL);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _leftHUDData.score, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.comboCtr, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.hitCtr, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.neutralLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.voidLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.spiritLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.matterLimit, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.totalDamage, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.guardCrossTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.overdriveCrossTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.lifeBarEffect, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.penaltyTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.proration, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.counter, DISP_BOOL);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _rightHUDData.score, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _limitAnimTimer, std::to_string);
+		OBJECT_CHECK_FIELD("BattleManager", "", dat1, dat2, _ended, DISP_BOOL);
 
-		auto length = this->_leftCharacter->printDifference("Player1: ", (void *)ptr1, (void *)ptr2, sizeof(Data));
+		auto length = this->_leftCharacter->printDifference("Player1: ", ptr1, ptr2, sizeof(Data));
 
 		if (!length)
 			return;
 		ptr1 += length;
 		ptr2 += length;
 
-		length = this->_rightCharacter->printDifference("Player2: ", (void *)ptr1, (void *)ptr2, (ptrdiff_t)ptr1 - (ptrdiff_t)data1);
+		length = this->_rightCharacter->printDifference("Player2: ", ptr1, ptr2, reinterpret_cast<ptrdiff_t>(ptr1) - reinterpret_cast<ptrdiff_t>(data1));
 		if (!length)
 			return;
 		ptr1 += length;
@@ -1123,16 +1107,16 @@ namespace SpiralOfFate
 
 		for (size_t i = 0; i < dat1->_nbObjects; i++) {
 			std::shared_ptr<Object> obj;
-			auto id1 = *(unsigned *)ptr1;
-			auto id2 = *(unsigned *)ptr2;
+			auto id1 = *reinterpret_cast<unsigned *>(ptr1);
+			auto id2 = *reinterpret_cast<unsigned *>(ptr2);
 
 			if (id1 != id2)
 				game->logger.fatal("BattleManager::object[" + std::to_string(i) + "]::objectId differs: " + std::to_string(id1) + " vs " + std::to_string(id2));
 			ptr1 += sizeof(unsigned);
 			ptr2 += sizeof(unsigned);
 
-			auto cl1 = *(unsigned char *)ptr1;
-			auto cl2 = *(unsigned char *)ptr2;
+			auto cl1 = *reinterpret_cast<unsigned char *>(ptr1);
+			auto cl2 = *reinterpret_cast<unsigned char *>(ptr2);
 
 			if (cl1 != cl2) {
 				game->logger.fatal("BattleManager::object[" + std::to_string(i) + "]::class differs: " + std::to_string(cl1) + " vs " + std::to_string(cl2));
@@ -1143,22 +1127,22 @@ namespace SpiralOfFate
 
 			switch (cl1) {
 			case 0:
-				obj.reset(new Object());
+				obj = std::make_shared<Object>();
 				break;
 			case 1:
-				obj.reset(new Character());
+				obj = std::make_shared<Character>();
 				break;
 			case 2: {
-				auto owner1 = *(bool *)ptr1;
-				auto owner2 = *(bool *)ptr2;
+				auto owner1 = *reinterpret_cast<bool *>(ptr1);
+				auto owner2 = *reinterpret_cast<bool *>(ptr2);
 
 				if (owner1 != owner2)
 					game->logger.fatal("BattleManager::object[" + std::to_string(i) + "]::owner differs: " + std::to_string(owner1) + " vs " + std::to_string(owner2));
 				ptr1 += sizeof(bool);
 				ptr2 += sizeof(bool);
 
-				auto subobjid1 = *(unsigned *)ptr1;
-				auto subobjid2 = *(unsigned *)ptr2;
+				auto subobjid1 = *reinterpret_cast<unsigned *>(ptr1);
+				auto subobjid2 = *reinterpret_cast<unsigned *>(ptr2);
 
 				if (subobjid1 != subobjid2)
 					game->logger.fatal("BattleManager::object[" + std::to_string(i) + "]::subobjectId differs: " + std::to_string(subobjid1) + " vs " + std::to_string(subobjid2));
@@ -1186,16 +1170,16 @@ namespace SpiralOfFate
 
 		for (size_t i = 0; i < dat1->_nbIObjects; i++) {
 			std::shared_ptr<IObject> obj;
-			auto id1 = *(unsigned *)ptr1;
-			auto id2 = *(unsigned *)ptr2;
+			auto id1 = *reinterpret_cast<unsigned *>(ptr1);
+			auto id2 = *reinterpret_cast<unsigned *>(ptr2);
 
 			if (id1 != id2)
 				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::objectId differs: " + std::to_string(id1) + " vs " + std::to_string(id2));
 			ptr1 += sizeof(unsigned);
 			ptr2 += sizeof(unsigned);
 
-			auto cl1 = *(unsigned char *)ptr1;
-			auto cl2 = *(unsigned char *)ptr2;
+			auto cl1 = *reinterpret_cast<unsigned char *>(ptr1);
+			auto cl2 = *reinterpret_cast<unsigned char *>(ptr2);
 
 			if (cl1 != cl2) {
 				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::class differs: " + std::to_string(cl1) + " vs " + std::to_string(cl2));
@@ -1206,29 +1190,29 @@ namespace SpiralOfFate
 
 			switch (cl1) {
 			case 10: {
-				auto owner1 = *(unsigned char *) ptr1;
-				auto owner2 = *(unsigned char *) ptr2;
+				auto owner1 = *reinterpret_cast<unsigned char *>(ptr1);
+				auto owner2 = *reinterpret_cast<unsigned char *>(ptr2);
 				if (owner1 != owner2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::owner differs: " + std::to_string(owner1) + " vs " + std::to_string(owner2));
 				ptr1 += sizeof(unsigned char);
 				ptr2 += sizeof(unsigned char);
 
-				auto target1 = *(unsigned char *) ptr1;
-				auto target2 = *(unsigned char *) ptr2;
+				auto target1 = *reinterpret_cast<unsigned char *>(ptr1);
+				auto target2 = *reinterpret_cast<unsigned char *>(ptr2);
 				if (target1 != target2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::target differs: " + std::to_string(target1) + " vs " + std::to_string(target2));
 				ptr1 += sizeof(unsigned char);
 				ptr2 += sizeof(unsigned char);
 
-				auto spawner1 = *(unsigned char *) ptr1;
-				auto spawner2 = *(unsigned char *) ptr2;
+				auto spawner1 = *reinterpret_cast<unsigned char *>(ptr1);
+				auto spawner2 = *reinterpret_cast<unsigned char *>(ptr2);
 				if (spawner1 != spawner2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::spawner differs: " + std::to_string(spawner1) + " vs " + std::to_string(spawner2));
 				ptr1 += sizeof(unsigned char);
 				ptr2 += sizeof(unsigned char);
 
-				auto index1 = *(unsigned *) ptr1;
-				auto index2 = *(unsigned *) ptr2;
+				auto index1 = *reinterpret_cast<unsigned *>(ptr1);
+				auto index2 = *reinterpret_cast<unsigned *>(ptr2);
 				if (index1 != index2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::index differs: " + std::to_string(index1) + " vs " + std::to_string(index2));
 				ptr1 += sizeof(unsigned);
@@ -1255,29 +1239,29 @@ namespace SpiralOfFate
 				break;
 			}
 			case 11: {
-				auto owner1 = *(unsigned char *) ptr1;
-				auto owner2 = *(unsigned char *) ptr2;
+				auto owner1 = *reinterpret_cast<unsigned char *>(ptr1);
+				auto owner2 = *reinterpret_cast<unsigned char *>(ptr2);
 				if (owner1 != owner2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::owner differs: " + std::to_string(owner1) + " vs " + std::to_string(owner2));
 				ptr1 += sizeof(unsigned char);
 				ptr2 += sizeof(unsigned char);
 
-				auto spawner1 = *(unsigned char *) ptr1;
-				auto spawner2 = *(unsigned char *) ptr2;
+				auto spawner1 = *reinterpret_cast<unsigned char *>(ptr1);
+				auto spawner2 = *reinterpret_cast<unsigned char *>(ptr2);
 				if (spawner1 != spawner2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::spawner differs: " + std::to_string(spawner1) + " vs " + std::to_string(spawner2));
 				ptr1 += sizeof(unsigned char);
 				ptr2 += sizeof(unsigned char);
 
-				auto genIndex1 = *(unsigned *) ptr1;
-				auto genIndex2 = *(unsigned *) ptr2;
+				auto genIndex1 = *reinterpret_cast<unsigned *>(ptr1);
+				auto genIndex2 = *reinterpret_cast<unsigned *>(ptr2);
 				if (genIndex1 != genIndex2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::genIndex differs: " + std::to_string(genIndex1) + " vs " + std::to_string(genIndex2));
 				ptr1 += sizeof(unsigned);
 				ptr2 += sizeof(unsigned);
 
-				auto index1 = *(unsigned *) ptr1;
-				auto index2 = *(unsigned *) ptr2;
+				auto index1 = *reinterpret_cast<unsigned *>(ptr1);
+				auto index2 = *reinterpret_cast<unsigned *>(ptr2);
 				if (index1 != index2)
 					game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::index differs: " + std::to_string(index1) + " vs " + std::to_string(index2));
 				ptr1 += sizeof(unsigned);
@@ -1350,99 +1334,111 @@ namespace SpiralOfFate
 
 	unsigned BattleManager::getFrame(void *data)
 	{
-		return reinterpret_cast<Data *>(data)->_currentFrame;
+		return static_cast<Data *>(data)->_currentFrame;
 	}
 
 	void BattleManager::printContent(void *data, size_t size)
 	{
-		auto dat1 = reinterpret_cast<Data *>(data);
-		char *ptr1 = (char *)data + sizeof(Data);
+		auto dat = static_cast<Data *>(data);
+		char *ptr = static_cast<char *>(data) + sizeof(Data);
+		std::string msgStart;
 
-		assert_not_reached();
 		if (sizeof(Data) >= size)
 			game->logger.warn("Manager is " + std::to_string(sizeof(Data) - size) + " bytes bigger than input");
-		game->logger.info("BattleManager::random: " + std::to_string(dat1->random));
-		game->logger.info("BattleManager::_currentFrame: " + std::to_string(dat1->_currentFrame));
-		game->logger.info("BattleManager::_limitAnimTimer: " + std::to_string(dat1->_limitAnimTimer));
-		game->logger.info("BattleManager::ended: " + std::to_string(dat1->_ended));
-		game->logger.info("BattleManager::lastObjectId: " + std::to_string(dat1->_lastObjectId));
-		game->logger.info("BattleManager::leftHUDData.comboCtr: " + std::to_string(dat1->_leftHUDData.comboCtr));
-		game->logger.info("BattleManager::leftHUDData.hitCtr: " + std::to_string(dat1->_leftHUDData.hitCtr));
-		game->logger.info("BattleManager::leftHUDData.neutralLimit: " + std::to_string(dat1->_leftHUDData.neutralLimit));
-		game->logger.info("BattleManager::leftHUDData.voidLimit: " + std::to_string(dat1->_leftHUDData.voidLimit));
-		game->logger.info("BattleManager::leftHUDData.matterLimit: " + std::to_string(dat1->_leftHUDData.matterLimit));
-		game->logger.info("BattleManager::leftHUDData.spiritLimit: " + std::to_string(dat1->_leftHUDData.spiritLimit));
-		game->logger.info("BattleManager::leftHUDData.totalDamage: " + std::to_string(dat1->_leftHUDData.totalDamage));
-		game->logger.info("BattleManager::leftHUDData.proration: " + std::to_string(dat1->_leftHUDData.proration));
-		game->logger.info("BattleManager::leftHUDData.score: " + std::to_string(dat1->_leftHUDData.score));
-		game->logger.info("BattleManager::rightHUDData.comboCtr: " + std::to_string(dat1->_rightHUDData.comboCtr));
-		game->logger.info("BattleManager::rightHUDData.hitCtr: " + std::to_string(dat1->_rightHUDData.hitCtr));
-		game->logger.info("BattleManager::rightHUDData.neutralLimit: " + std::to_string(dat1->_rightHUDData.neutralLimit));
-		game->logger.info("BattleManager::rightHUDData.voidLimit: " + std::to_string(dat1->_rightHUDData.voidLimit));
-		game->logger.info("BattleManager::rightHUDData.spiritLimit: " + std::to_string(dat1->_rightHUDData.spiritLimit));
-		game->logger.info("BattleManager::rightHUDData.matterLimit: " + std::to_string(dat1->_rightHUDData.matterLimit));
-		game->logger.info("BattleManager::rightHUDData.totalDamage: " + std::to_string(dat1->_rightHUDData.totalDamage));
-		game->logger.info("BattleManager::rightHUDData.proration: " + std::to_string(dat1->_rightHUDData.proration));
-		game->logger.info("BattleManager::rightHUDData.score: " + std::to_string(dat1->_rightHUDData.score));
-		game->logger.info("BattleManager::currentRound: " + std::to_string(dat1->_currentRound));
-		game->logger.info("BattleManager::roundStartTimer: " + std::to_string(dat1->_roundStartTimer));
-		game->logger.info("BattleManager::roundEndTimer: " + std::to_string(dat1->_roundEndTimer));
-		game->logger.info("BattleManager::nbObjects: " + std::to_string(dat1->_nbObjects));
+		DISPLAY_FIELD("BattleManager", "", dat, _random, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _currentFrame, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _lastObjectId, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _currentRound, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _roundEndTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _nbObjects, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _nbIObjects, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _nbStageObjects, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _roundStartTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.comboCtr, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.hitCtr, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.neutralLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.voidLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.spiritLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.matterLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.totalDamage, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.guardCrossTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.overdriveCrossTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.lifeBarEffect, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.penaltyTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.proration, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.counter, DISP_BOOL);
+		DISPLAY_FIELD("BattleManager", "", dat, _leftHUDData.score, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.comboCtr, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.hitCtr, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.neutralLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.voidLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.spiritLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.matterLimit, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.totalDamage, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.guardCrossTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.overdriveCrossTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.lifeBarEffect, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.penaltyTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.proration, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.counter, DISP_BOOL);
+		DISPLAY_FIELD("BattleManager", "", dat, _rightHUDData.score, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _limitAnimTimer, std::to_string);
+		DISPLAY_FIELD("BattleManager", "", dat, _ended, DISP_BOOL);
 		if (sizeof(Data) >= size) {
 			game->logger.fatal("Invalid input frame");
 			return;
 		}
 
-		auto length = this->_leftCharacter->printContent("Player1: ", (void *)ptr1, sizeof(Data), size);
+		auto length = this->_leftCharacter->printContent("Player1: ", ptr, sizeof(Data), size);
 
 		if (!length)
 			return;
-		ptr1 += length;
+		ptr += length;
 
-		length = this->_rightCharacter->printContent("Player2: ", (void *)ptr1, (ptrdiff_t)ptr1 - (ptrdiff_t)data, size);
+		length = this->_rightCharacter->printContent("Player2: ", ptr, reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data), size);
 		if (!length)
 			return;
-		ptr1 += length;
+		ptr += length;
 
-		for (size_t i = 0; i < dat1->_nbObjects; i++) {
+		for (size_t i = 0; i < dat->_nbObjects; i++) {
 			std::shared_ptr<Object> obj;
-			auto id1 = *(unsigned *)ptr1;
+			auto id1 = *reinterpret_cast<unsigned *>(ptr);
 
-			if ((ptrdiff_t)ptr1 - (ptrdiff_t)data + sizeof(unsigned) + sizeof(unsigned char) >= size)
-				game->logger.warn("Next object header is " + std::to_string((ptrdiff_t)ptr1 - (ptrdiff_t)data + sizeof(unsigned) + sizeof(unsigned char) - size) + " bytes bigger than input");
+			if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(unsigned char) >= size)
+				game->logger.warn("Next object header is " + std::to_string(reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(unsigned char) - size) + " bytes bigger than input");
 			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::objectId: " + std::to_string(id1));
-			ptr1 += sizeof(unsigned);
+			ptr += sizeof(unsigned);
 
-			auto cl1 = *(unsigned char *)ptr1;
+			auto cl1 = *reinterpret_cast<unsigned char *>(ptr);
 
 			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::class: " + std::to_string(cl1));
-			ptr1 += sizeof(unsigned char);
+			ptr += sizeof(unsigned char);
 
-			if ((ptrdiff_t)ptr1 - (ptrdiff_t)data >= (ssize_t)size) {
+			if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) >= static_cast<ssize_t>(size)) {
 				game->logger.fatal("Invalid input frame");
 				return;
 			}
 			switch (cl1) {
 			case 0:
-				obj.reset(new Object());
+				obj = std::make_shared<Object>();
 				break;
 			case 1:
-				obj.reset(new Character());
+				obj = std::make_shared<Character>();
 				break;
 			case 2: {
-				if ((ptrdiff_t)ptr1 - (ptrdiff_t)data + sizeof(unsigned) + sizeof(bool) >= size)
-					game->logger.warn("Next object header is " + std::to_string((ptrdiff_t)ptr1 - (ptrdiff_t)data + sizeof(unsigned) + sizeof(bool) - size) + " bytes bigger than input");
+				if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(bool) >= size)
+					game->logger.warn("Next object header is " + std::to_string(reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(bool) - size) + " bytes bigger than input");
 
-				auto owner1 = *(bool *)ptr1;
+				auto owner1 = *reinterpret_cast<bool *>(ptr);
 
 				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::owner: " + std::to_string(owner1));
-				ptr1 += sizeof(bool);
+				ptr += sizeof(bool);
 
-				auto subobjid1 = *(unsigned *)ptr1;
+				auto subobjid1 = *reinterpret_cast<unsigned *>(ptr);
 
 				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::subobjectId: " + std::to_string(subobjid1));
-				ptr1 += sizeof(unsigned);
-				if ((ptrdiff_t)ptr1 - (ptrdiff_t)data >= (ssize_t)size) {
+				ptr += sizeof(unsigned);
+				if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) >= static_cast<ssize_t>(size)) {
 					game->logger.fatal("Invalid input frame");
 					return;
 				}
@@ -1454,16 +1450,16 @@ namespace SpiralOfFate
 				return;
 			}
 
-			length = obj->printContent(("BattleManager::object[" + std::to_string(i) + "]: ").c_str(), (void *)ptr1, (ptrdiff_t)ptr1 - (ptrdiff_t)data, size);
+			length = obj->printContent(("BattleManager::object[" + std::to_string(i) + "]: ").c_str(), ptr, reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data), size);
 			if (length == 0)
 				return;
-			ptr1 += length;
+			ptr += length;
 		}
 		for (size_t i = 0; i < this->_nbPlatform; i++) {
-			length = this->_platforms[i]->printContent(("BattleManager::platform[" + std::to_string(i) + "]: ").c_str(), (void *)ptr1, (ptrdiff_t)ptr1 - (ptrdiff_t)data, size);
+			length = this->_platforms[i]->printContent(("BattleManager::platform[" + std::to_string(i) + "]: ").c_str(), ptr, reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data), size);
 			if (length == 0)
 				return;
-			ptr1 += length;
+			ptr += length;
 		}
 	}
 
