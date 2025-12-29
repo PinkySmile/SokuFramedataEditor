@@ -38,6 +38,7 @@ namespace SpiralOfFate
 		unsigned _boxSelected = 0;
 		unsigned _cornerHovered = 0;
 		unsigned _cornerSelected = 0;
+		bool _forced = false;
 
 		void _handleBoxResize(const tgui::Vector2f &pos);
 		void _handleBoxMove(const tgui::Vector2f &pos);
@@ -63,6 +64,7 @@ namespace SpiralOfFate
 		PreviewWidget(const FrameDataEditor &editor, MainWindow &main, EditableObject &object);
 		~PreviewWidget() override = default;
 
+		void setSelectedBox(BoxType type, unsigned index);
 		std::pair<BoxType, unsigned> getSelectedBox();
 		Box *getSelectedBoxRef();
 		void frameChanged();
@@ -72,8 +74,6 @@ namespace SpiralOfFate
 		void mouseMoved(tgui::Vector2f pos) override;
 		void draw(tgui::BackendRenderTarget &target, tgui::RenderStates states) const override;
 		void mouseNoLongerOnWidget() override;
-		void keyPressed(const tgui::Event::KeyEvent &event) override;
-		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
 		void setSelectedColor(unsigned char index);
 		unsigned char getSelectedColor() const;
 		void setPalette(const std::array<Color, 256> *palette);

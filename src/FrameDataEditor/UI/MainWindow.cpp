@@ -4,6 +4,8 @@
 
 #include <TGUI/RendererDefines.hpp>
 #include "MainWindow.hpp"
+#include "ColorPlaneWidget.hpp"
+#include "ColorSliderWidget.hpp"
 #include "../Operations/DummyOperation.hpp"
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
@@ -16,11 +18,10 @@
 #include "../Operations/CreateBlockOperation.hpp"
 #include "../Operations/CreateBoxOperation.hpp"
 #include "../Operations/RemoveFrameOperation.hpp"
-#include "ColorPlaneWidget.hpp"
-#include "ColorSliderWidget.hpp"
 #include "../Operations/ColorEditionOperation.hpp"
 #include "../Operations/CreatePaletteOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
+#include "../Operations/RemoveBoxOperation.hpp"
 #include "../Operations/PasteDataOperation.hpp"
 #include "../Operations/PasteAnimDataOperation.hpp"
 #include "../Operations/PasteBoxDataOperation.hpp"
@@ -1574,8 +1575,15 @@ void SpiralOfFate::MainWindow::removeAction()
 
 void SpiralOfFate::MainWindow::removeBox()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	auto b = this->_preview->getSelectedBox();
+
+	if (b.first == BOXTYPE_NONE) return;
+	this->applyOperation(new RemoveBoxOperation(
+		*this->_object,
+		this->_editor.localize("operation.remove_frame"),
+		b.first, b.second,
+		[this](BoxType t, unsigned i) { this->_preview->setSelectedBox(t, i); }
+	));
 }
 
 void SpiralOfFate::MainWindow::copyBoxesFromLastFrame()

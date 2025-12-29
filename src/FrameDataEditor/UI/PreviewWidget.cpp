@@ -5,6 +5,9 @@
 #include <TGUI/Backend/Renderer/SFML-Graphics/BackendRenderTargetSFML.hpp>
 #include "MainWindow.hpp"
 #include "PreviewWidget.hpp"
+
+#include <ranges>
+
 #include "../Operations/DummyOperation.hpp"
 #include "../Operations/BoxModificationOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
@@ -37,6 +40,29 @@ std::pair<SpiralOfFate::BoxType, unsigned int> SpiralOfFate::PreviewWidget::getS
 	return {BOXTYPE_COLLISIONBOX, 0};
 }
 
+void SpiralOfFate::PreviewWidget::setSelectedBox(BoxType type, unsigned index)
+{
+	auto &data = this->_object.getFrameData();
+
+	// TODO:
+	this->_forced = true;
+	switch (type) {
+	case BOXTYPE_NONE:
+		this->_boxSelected = 0;
+		break;
+	case BOXTYPE_HURTBOX:
+		this->_boxSelected = index + 1;
+		break;
+	case BOXTYPE_HITBOX:
+		this->_boxSelected = index + 1 + data.hurtBoxes.size();
+		break;
+	case BOXTYPE_COLLISIONBOX:
+		this->_boxSelected = 1 + data.hurtBoxes.size() + data.hitBoxes.size();
+		break;
+	}
+	this->onBoxSelect.emit(this, type, index);
+}
+
 SpiralOfFate::Box *SpiralOfFate::PreviewWidget::getSelectedBoxRef()
 {
 	if (this->_boxSelected == 0)
@@ -51,7 +77,7 @@ SpiralOfFate::Box *SpiralOfFate::PreviewWidget::getSelectedBoxRef()
 	return data.collisionBox;
 }
 
-void SpiralOfFate::PreviewWidget::_drawBox(const SpiralOfFate::Rectangle &box, const SpiralOfFate::Color &color, sf::RenderStates &states, bool hovered, bool selected) const
+void SpiralOfFate::PreviewWidget::_drawBox(const Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const
 {
 	sf::VertexArray arr{ sf::PrimitiveType::TriangleFan, 4 };
 	sf::VertexArray arr2{ sf::PrimitiveType::LineStrip, 5 };
@@ -73,7 +99,7 @@ void SpiralOfFate::PreviewWidget::_drawBox(const SpiralOfFate::Rectangle &box, c
 	game->screen->draw(arr2, states);
 }
 
-void SpiralOfFate::PreviewWidget::_drawBoxBorder(const SpiralOfFate::Rectangle &box, sf::RenderStates &states, bool rotate) const
+void SpiralOfFate::PreviewWidget::_drawBoxBorder(const Rectangle &box, sf::RenderStates &states, bool rotate) const
 {
 	sf::RectangleShape rect;
 
@@ -526,6 +552,11 @@ bool SpiralOfFate::PreviewWidget::scrolled(float delta, tgui::Vector2f pos, bool
 
 void SpiralOfFate::PreviewWidget::frameChanged()
 {
+	if (this->_forced) {
+		// TODO:
+		this->_forced = false;
+		return;
+	}
 	this->_boxCounter = 0;
 	this->_boxHovered = 0;
 	this->_boxSelected = 0;
@@ -605,24 +636,6 @@ void SpiralOfFate::PreviewWidget::mouseNoLongerOnWidget()
 	Widget::mouseNoLongerOnWidget();
 }
 
-void SpiralOfFate::PreviewWidget::keyPressed(const tgui::Event::KeyEvent &event)
-{
-	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Delete && this->_boxSelected)
-		this->_main.applyOperation(new RemoveBoxOperation(
-			this->_object,
-			this->_editor.localize("operation.resize_box"),
-			this->_boxSelected, this->_boxSelected
-		));
-	Widget::keyPressed(event);
-}
-
-bool SpiralOfFate::PreviewWidget::canHandleKeyPress(const tgui::Event::KeyEvent &event)
-{
-	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Delete && this->_boxSelected)
-		return true;
-	return Widget::canHandleKeyPress(event);
-}
-
 void SpiralOfFate::PreviewWidget::leftMouseButtonNoLongerDown()
 {
 	this->_cornerSelected = 0;
@@ -646,7 +659,7 @@ unsigned char SpiralOfFate::PreviewWidget::getSelectedColor() const
 
 void SpiralOfFate::PreviewWidget::setPalette(const std::array<Color, 256> *palette)
 {
-	for (auto &[aid, moves] : this->_object._moves)
+	for (auto &moves : this->_object._moves | std::views::values)
 		for (auto &block : moves)
 			for (auto &data : block) {
 				data.__paletteData = palette;
@@ -656,7 +669,7 @@ void SpiralOfFate::PreviewWidget::setPalette(const std::array<Color, 256> *palet
 
 void SpiralOfFate::PreviewWidget::invalidatePalette()
 {
-	for (auto &[aid, moves] : this->_object._moves)
+	for (auto &moves : this->_object._moves | std::views::values)
 		for (auto &block : moves)
 			for (auto &data : block)
 				data.__requireReload = true;

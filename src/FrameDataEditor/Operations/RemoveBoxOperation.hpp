@@ -6,28 +6,30 @@
 #define SOFGV_REMOVEBOXOPERATION_HPP
 
 
+#include <functional>
+#include "BoxModificationOperation.hpp"
 #include "Operation.hpp"
 #include "../EditableObject.hpp"
 
 namespace SpiralOfFate
 {
+	typedef std::function<void(BoxType type, unsigned boxIndex)> RemoveBoxApply;
 	class RemoveBoxOperation : public Operation {
 	protected:
 		EditableObject &_obj;
+		RemoveBoxApply _onApply;
 		unsigned _action;
 		unsigned _actionBlock;
 		unsigned _animation;
 		unsigned _boxIndex;
-		bool _isCollisionBox;
-		bool _isHurtBox;
-		unsigned &_boxIndexPtr;
+		BoxType _type;
 		Box _oldValue;
 		std::string _fieldName;
 
 		Box &_getBox();
 
 	public:
-		RemoveBoxOperation(EditableObject &obj, const std::string &&name, unsigned boxIndex, unsigned &boxIndexPtr);
+		RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, RemoveBoxApply onApply);
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;
