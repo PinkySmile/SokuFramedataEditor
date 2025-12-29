@@ -338,6 +338,13 @@ else ()
 	)
 endif ()
 
+add_executable(
+	SoFGV_bench
+	${GICON}
+	src/LibCore/benchmark_state_ser.cpp
+)
+target_link_libraries(SoFGV_bench SoFGVCore ${EXTRA_LINK_LIBRARIES})
+
 message("${GICON}")
 add_executable(
 	SoFGV

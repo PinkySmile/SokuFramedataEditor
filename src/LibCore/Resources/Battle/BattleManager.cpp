@@ -1401,24 +1401,21 @@ namespace SpiralOfFate
 		ptr += length;
 
 		for (size_t i = 0; i < dat->_nbObjects; i++) {
-			std::shared_ptr<Object> obj;
-			auto id1 = *reinterpret_cast<unsigned *>(ptr);
-
 			if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(unsigned char) >= size)
 				game->logger.warn("Next object header is " + std::to_string(reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(unsigned char) - size) + " bytes bigger than input");
-			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::objectId: " + std::to_string(id1));
+
+			std::shared_ptr<Object> obj;
+			auto id = *reinterpret_cast<unsigned *>(ptr);
+
+			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::objectId: " + std::to_string(id));
 			ptr += sizeof(unsigned);
 
-			auto cl1 = *reinterpret_cast<unsigned char *>(ptr);
+			auto cl = *reinterpret_cast<unsigned char *>(ptr);
 
-			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::class: " + std::to_string(cl1));
+			game->logger.info("BattleManager::object[" + std::to_string(i) + "]::class: " + std::to_string(cl));
 			ptr += sizeof(unsigned char);
 
-			if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) >= static_cast<ssize_t>(size)) {
-				game->logger.fatal("Invalid input frame");
-				return;
-			}
-			switch (cl1) {
+			switch (cl) {
 			case 0:
 				obj = std::make_shared<Object>();
 				break;
@@ -1426,31 +1423,133 @@ namespace SpiralOfFate
 				obj = std::make_shared<Character>();
 				break;
 			case 2: {
-				if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(bool) >= size)
-					game->logger.warn("Next object header is " + std::to_string(reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(bool) - size) + " bytes bigger than input");
+				auto owner = *reinterpret_cast<bool *>(ptr);
 
-				auto owner1 = *reinterpret_cast<bool *>(ptr);
-
-				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::owner: " + std::to_string(owner1));
+				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::owner: " + std::to_string(owner));
 				ptr += sizeof(bool);
 
-				auto subobjid1 = *reinterpret_cast<unsigned *>(ptr);
+				auto subobjid = *reinterpret_cast<unsigned *>(ptr);
 
-				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::subobjectId: " + std::to_string(subobjid1));
+				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::subobjectId: " + std::to_string(subobjid));
 				ptr += sizeof(unsigned);
-				if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) >= static_cast<ssize_t>(size)) {
-					game->logger.fatal("Invalid input frame");
-					return;
-				}
-				obj = (owner1 ? this->_rightCharacter : this->_leftCharacter)->_spawnSubObject(*this,subobjid1, false).second;
+				obj = (owner ? this->_rightCharacter : this->_leftCharacter)->_spawnSubObject(*this, subobjid, false).second;
 				break;
 			}
 			default:
-				game->logger.fatal("BattleManager::object[" + std::to_string(i) + "]::class invalid: " + std::to_string(cl1));
+				game->logger.info("BattleManager::object[" + std::to_string(i) + "]::class invalid: " + std::to_string(cl));
 				return;
 			}
 
 			length = obj->printContent(("BattleManager::object[" + std::to_string(i) + "]: ").c_str(), ptr, reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data), size);
+			if (length == 0)
+				return;
+			ptr += length;
+		}
+
+		for (size_t i = 0; i < dat->_nbIObjects; i++) {
+			if (reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(unsigned char) >= size)
+				game->logger.warn("Next object header is " + std::to_string(reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data) + sizeof(unsigned) + sizeof(unsigned char) - size) + " bytes bigger than input");
+
+			std::shared_ptr<IObject> obj;
+			auto id = *reinterpret_cast<unsigned *>(ptr);
+
+			game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::objectId: " + std::to_string(id));
+			ptr += sizeof(unsigned);
+
+			auto cl = *reinterpret_cast<unsigned char *>(ptr);
+
+			game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::class: " + std::to_string(cl));
+			ptr += sizeof(unsigned char);
+
+			switch (cl) {
+			case 10: {
+				auto owner = *reinterpret_cast<unsigned char *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::owner: " + std::to_string(owner));
+				ptr += sizeof(unsigned char);
+
+				auto target = *reinterpret_cast<unsigned char *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::target: " + std::to_string(target));
+				ptr += sizeof(unsigned char);
+
+				auto spawner = *reinterpret_cast<unsigned char *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::spawner: " + std::to_string(spawner));
+				ptr += sizeof(unsigned char);
+
+				auto index = *reinterpret_cast<unsigned *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::index: " + std::to_string(index));
+				ptr += sizeof(unsigned);
+
+				auto &genDat1 = (
+					spawner == 2 ?
+					this->_systemParticles :
+					(
+						spawner == 1 ?
+						this->_rightCharacter :
+						this->_leftCharacter
+					)->_generators
+				)[index];
+
+				obj = std::make_shared<ParticleGenerator>(
+					ParticleGenerator::Source{spawner, index},
+					genDat1,
+					*(owner ? this->_rightCharacter : this->_leftCharacter),
+					*(target ? this->_rightCharacter : this->_leftCharacter)
+				);
+				break;
+			}
+			case 11: {
+				auto owner = *reinterpret_cast<unsigned char *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::owner: " + std::to_string(owner));
+				ptr += sizeof(unsigned char);
+
+				auto spawner = *reinterpret_cast<unsigned char *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::spawner: " + std::to_string(spawner));
+				ptr += sizeof(unsigned char);
+
+				auto genIndex = *reinterpret_cast<unsigned *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::genIndex: " + std::to_string(genIndex));
+				ptr += sizeof(unsigned);
+
+				auto index = *reinterpret_cast<unsigned *>(ptr);
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::index: " + std::to_string(index));
+				ptr += sizeof(unsigned);
+
+				auto &genDat1 = (
+					spawner == 2 ?
+					this->_systemParticles :
+					(
+						spawner == 1 ?
+						this->_rightCharacter :
+						this->_leftCharacter
+					)->_generators
+				)[genIndex];
+
+				obj = std::make_shared<Particle>(
+					Particle::Source{spawner, genIndex, index},
+					genDat1.particles[index],
+					*(owner ? this->_rightCharacter : this->_leftCharacter),
+					genDat1.sprite,
+					Vector2f{0, 0}
+				);
+				break;
+			}
+			default:
+				game->logger.fatal("BattleManager::iobject[" + std::to_string(i) + "]::class invalid: " + std::to_string(cl));
+				return;
+			}
+
+			length = obj->printContent(("BattleManager::iobject[" + std::to_string(i) + "]: ").c_str(), ptr, reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data), size);
+			if (length == 0)
+				return;
+			ptr += length;
+		}
+
+		if (dat->_nbStageObjects != this->_stageObjects.size()) {
+			game->logger.fatal("BattleManager::_nbStageObjects invalid: " + std::to_string(dat->_nbStageObjects) + " != " + std::to_string(this->_stageObjects.size()));
+			return;
+		}
+		for (size_t i = 0; i < this->_stageObjects.size(); i++) {
+			length = this->_stageObjects[i]->printContent(("BattleManager::stageObjects[" + std::to_string(i) + "]: ").c_str(), ptr, reinterpret_cast<ptrdiff_t>(ptr) - reinterpret_cast<ptrdiff_t>(data), size);
 			if (length == 0)
 				return;
 			ptr += length;

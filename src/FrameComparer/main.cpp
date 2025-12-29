@@ -98,12 +98,12 @@ void displayAfterDiff(size_t index, size_t lastIndex, const char *buffer1, const
 		unsigned char c1 = buffer1[i];
 		unsigned char c2 = buffer2[i];
 
-		line1Buffer[slot* PAIR_SIZE + BOLD_OFF] = '0';
-		line1Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
-		line1Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
-		line2Buffer[slot* PAIR_SIZE + BOLD_OFF] = '0';
-		line2Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
-		line2Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+		line1Buffer[slot * PAIR_SIZE + BOLD_OFF] = '0';
+		line1Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+		line1Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+		line2Buffer[slot * PAIR_SIZE + BOLD_OFF] = '0';
+		line2Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+		line2Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
 	}
 	if (currentLine > lastLine || last)
 		game->logger.info(lineBuffer);
@@ -119,12 +119,12 @@ void displayDiff(size_t index, const char *buffer1, const char *buffer2, char *l
 	unsigned char c1 = buffer1[index];
 	unsigned char c2 = buffer2[index];
 
-	line1Buffer[slot* PAIR_SIZE + BOLD_OFF] = '1';
-	line1Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
-	line1Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
-	line2Buffer[slot* PAIR_SIZE + BOLD_OFF] = '1';
-	line2Buffer[slot* PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
-	line2Buffer[slot* PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
+	line1Buffer[slot * PAIR_SIZE + BOLD_OFF] = '1';
+	line1Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c1 >> 4];
+	line1Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c1 & 0xF];
+	line2Buffer[slot * PAIR_SIZE + BOLD_OFF] = '1';
+	line2Buffer[slot * PAIR_SIZE + D1_OFF] = digits[c2 >> 4];
+	line2Buffer[slot * PAIR_SIZE + D2_OFF] = digits[c2 & 0xF];
 }
 
 void displayDiffs(const std::vector<size_t> &diffs, const char *buffer1, const char *buffer2, size_t size)
