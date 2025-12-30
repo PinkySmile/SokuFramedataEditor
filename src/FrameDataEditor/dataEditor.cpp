@@ -8,23 +8,27 @@ FrameDataEditor *editor;
 void run()
 {
 	while (game->screen->isOpen()) {
-		editor->update();
-		game->screen->clear(sf::Color{0x40, 0x40, 0x40, 0xFF});
-		editor->render();
-		game->gui.draw();
-		game->screen->display();
-		while (auto event = game->screen->pollEvent()) {
-			if (event->is<EVENT_WINDOW_CLOSED>() && editor->closeAll())
-				game->screen->close();
-			if (auto key = event->getIf<sf::Event::KeyPressed>()) {
-				if (editor->canHandleKeyPress(*key)) {
-					editor->keyPressed(*key);
-					continue;
+		try {
+			editor->update();
+			game->screen->clear(sf::Color{0x40, 0x40, 0x40, 0xFF});
+			editor->render();
+			game->gui.draw();
+			game->screen->display();
+			while (auto event = game->screen->pollEvent()) {
+				if (event->is<EVENT_WINDOW_CLOSED>() && editor->closeAll())
+					game->screen->close();
+				if (auto key = event->getIf<sf::Event::KeyPressed>()) {
+					if (editor->canHandleKeyPress(*key)) {
+						editor->keyPressed(*key);
+						continue;
+					}
 				}
+				if (auto mouse = event->getIf<sf::Event::MouseMoved>())
+					editor->mouseMovedAbsolute(tgui::Vector2f(mouse->position.x, mouse->position.y));
+				game->gui.handleEvent(*event);
 			}
-			if (auto mouse = event->getIf<sf::Event::MouseMoved>())
-				editor->mouseMovedAbsolute(tgui::Vector2f(mouse->position.x, mouse->position.y));
-			game->gui.handleEvent(*event);
+		} catch (std::exception &e) {
+			Utils::dispMsg(game->gui, "Error", std::string("Uncaught exception in main loop: ") + e.what(), MB_ICONERROR);
 		}
 	}
 }

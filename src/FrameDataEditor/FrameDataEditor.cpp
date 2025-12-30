@@ -143,9 +143,10 @@ std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
 {
 	auto it = this->_localization.find(s);
 
-	if (it == this->_localization.end())
-		return s;
-	return it->second;
+	if (it != this->_localization.end())
+		return it->second;
+	game->logger.warn("Missing translation for " + s);
+	return s;
 }
 
 std::string SpiralOfFate::FrameDataEditor::_shortcutToString(const SpiralOfFate::FrameDataEditor::Shortcut &s) const
@@ -350,13 +351,6 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 		try {
 			this->_openWindows.emplace_back(new MainWindow(path, *this));
 			this->_focusedWindow = this->_openWindows.back();
-			this->_focusedWindow->onMousePress.connect([this](const std::weak_ptr<MainWindow> &This){
-				if (this->_focusedWindow != This.lock()) {
-					this->_focusedWindow = This.lock();
-					this->_updateMenuBar();
-				}
-				this->_focusedWindow->setFocused(true);
-			}, std::weak_ptr(this->_focusedWindow));
 			this->_focusedWindow->onFocus.connect([this](const std::weak_ptr<MainWindow> &This){
 				auto lock = This.lock();
 
@@ -365,8 +359,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 						this->_focusedWindow->setFocused(false);
 					this->_focusedWindow = lock;
 					this->_updateMenuBar();
-					this->setHasRedo(this->_focusedWindow->hasRedoData());
-					this->setHasUndo(this->_focusedWindow->hasUndoData());
+					this->_focusedWindow->refreshMenuItems();
 				}
 			}, std::weak_ptr(this->_focusedWindow));
 			this->_focusedWindow->onRealClose.connect([this](const std::weak_ptr<MainWindow> &This){
@@ -378,8 +371,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 			game->gui.add(this->_focusedWindow);
 			this->_focusedWindow->setFocused(true);
 			this->_updateMenuBar();
-			this->setHasRedo(false);
-			this->setHasUndo(false);
+			this->_focusedWindow->refreshMenuItems();
 			return true;
 		} catch (_AssertionFailedException &e) { // TODO: Very dirty
 			Utils::dispMsg(
@@ -586,6 +578,38 @@ void SpiralOfFate::FrameDataEditor::setHasUndo(bool hasUndo)
 	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
 		{ this->localize("menu_item.edit"), this->localizeShortcut("menu_item.edit.undo") },
 		hasUndo
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setCanDelBoxes(bool canDel)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.remove"), this->localizeShortcut("menu_item.remove.box") },
+		canDel
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setCanDelFrame(bool canDel)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.remove"), this->localizeShortcut("menu_item.remove.frame") },
+		canDel
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setCanDelBlock(bool canDel)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.remove"), this->localizeShortcut("menu_item.remove.block") },
+		canDel
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setCanDelAction(bool canDel)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.remove"), this->localizeShortcut("menu_item.remove.action") },
+		canDel
 	);
 }
 

@@ -167,6 +167,10 @@
 
 	"operation.move_box":              "Move box",
 	"operation.resize_box":            "Rescale box",
+	"operation.remove_box":            "Delete a box",
+	"operation.remove_frame":          "Delete a frame",
+	"operation.remove_block":          "Delete a block",
+	"operation.remove_action":         "Delete an action",
 	"operation.create_hitbox":         "Create hitbox",
 	"operation.create_hurtbox":        "Create hurtbox",
 	"operation.create_frame":          "Create frame",

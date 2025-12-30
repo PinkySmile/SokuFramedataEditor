@@ -37,8 +37,8 @@ void SpiralOfFate::CreateBlockOperation::undo()
 
 	auto &arr = this->_obj._moves[this->_action];
 
-	if (arr.size() == this->_obj._animation)
-		this->_obj._animation = arr.size() - 1;
+	if (arr.size() == this->_obj._actionBlock)
+		this->_obj._actionBlock = arr.size() - 1;
 	arr.erase(arr.begin() + this->_id);
 }
 

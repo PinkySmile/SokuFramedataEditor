@@ -27,12 +27,12 @@ void SpiralOfFate::CreateMoveOperation::apply()
 
 void SpiralOfFate::CreateMoveOperation::undo()
 {
+	this->_obj._moves.erase(this->_id);
 	if (this->_obj._action == this->_id) {
 		this->_obj._action = this->_obj._moves.begin()->first;
 		this->_obj._actionBlock = 0;
 		this->_obj._animation = 0;
 	}
-	this->_obj._moves.erase(this->_id);
 }
 
 bool SpiralOfFate::CreateMoveOperation::hasModification() const

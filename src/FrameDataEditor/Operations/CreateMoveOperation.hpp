@@ -19,7 +19,7 @@ namespace SpiralOfFate
 		std::vector<std::vector<FrameData>> _newData;
 
 	public:
-		CreateMoveOperation(EditableObject &obj, const std::string &&name, unsigned id, const std::vector<std::vector<SpiralOfFate::FrameData>> &newData);
+		CreateMoveOperation(EditableObject &obj, const std::string &&name, unsigned id, const std::vector<std::vector<FrameData>> &newData);
 		void apply() override;
 		void undo() override;
 		bool hasModification() const override;

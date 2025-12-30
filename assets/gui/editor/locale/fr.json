@@ -167,6 +167,10 @@
 
 	"operation.move_box":              "Déplacer une boîte",
 	"operation.resize_box":            "Redimentionner une boîte",
+	"operation.remove_box":            "Supprimer une boîte",
+	"operation.remove_frame":          "Supprimer une frame",
+	"operation.remove_block":          "Supprimer un block d'animation",
+	"operation.remove_action":         "Supprimer une action",
 	"operation.create_hitbox":         "Créer une hitbox",
 	"operation.create_hurtbox":        "Créer une hurtbox",
 	"operation.create_frame":          "Créer une frame",

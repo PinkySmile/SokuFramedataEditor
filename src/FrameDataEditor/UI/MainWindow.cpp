@@ -17,11 +17,13 @@
 #include "../Operations/CreateFrameOperation.hpp"
 #include "../Operations/CreateBlockOperation.hpp"
 #include "../Operations/CreateBoxOperation.hpp"
-#include "../Operations/RemoveFrameOperation.hpp"
 #include "../Operations/ColorEditionOperation.hpp"
 #include "../Operations/CreatePaletteOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
+#include "../Operations/RemoveFrameOperation.hpp"
+#include "../Operations/RemoveBlockOperation.hpp"
+#include "../Operations/RemoveMoveOperation.hpp"
 #include "../Operations/PasteDataOperation.hpp"
 #include "../Operations/PasteAnimDataOperation.hpp"
 #include "../Operations/PasteBoxDataOperation.hpp"
@@ -509,9 +511,11 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
 	this->_preview->onBoxSelect.connect([this]{
+		this->_editor.setCanDelBoxes(true);
 		this->_rePopulateFrameData();
 	});
 	this->_preview->onBoxUnselect.connect([this]{
+		this->_editor.setCanDelBoxes(false);
 		this->_rePopulateFrameData();
 	});
 	this->_pathBak += ".bak";
@@ -633,12 +637,23 @@ bool SpiralOfFate::MainWindow::hasRedoData() const noexcept
 	return this->_operationQueue.size() != this->_operationIndex;
 }
 
+void SpiralOfFate::MainWindow::refreshMenuItems() const
+{
+	this->_editor.setHasRedo(this->hasRedoData());
+	this->_editor.setHasUndo(this->hasUndoData());
+	this->_editor.setCanDelBoxes(this->_preview->getSelectedBox().first != BOXTYPE_NONE);
+	this->_editor.setCanDelFrame(this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() > 1);
+	this->_editor.setCanDelBlock(this->_object->_moves[this->_object->_action].size() > 1);
+	this->_editor.setCanDelAction(this->_object->_moves.size() > 1);
+}
+
 void SpiralOfFate::MainWindow::redo()
 {
-	if (this->_pendingTransaction)
+	assert_exp(this->_pendingTransaction || this->_operationIndex < this->_operationQueue.size());
+	if (this->_pendingTransaction) {
 		this->commitTransaction();
-	if (this->_operationIndex == this->_operationQueue.size())
 		return;
+	}
 
 	auto wasModified = this->isModified();
 
@@ -654,13 +669,11 @@ void SpiralOfFate::MainWindow::redo()
 
 void SpiralOfFate::MainWindow::undo()
 {
+	assert_exp(this->_pendingTransaction || this->_operationIndex > 0);
 	if (this->_pendingTransaction) {
 		this->cancelTransaction();
 		return;
 	}
-	if (this->_operationIndex == 0)
-		return;
-
 	this->_operationIndex--;
 	this->_operationQueue[this->_operationIndex]->undo();
 	this->_requireReload = true;
@@ -804,6 +817,7 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(nullptr);
 	this->_operationQueue.back().swap(this->_pendingTransaction);
+	this->_requireReload = true;
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
@@ -826,6 +840,7 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
 	this->_operationQueue.back()->apply();
+	this->_requireReload = true;
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
@@ -1563,24 +1578,32 @@ void SpiralOfFate::MainWindow::removeFrame()
 
 void SpiralOfFate::MainWindow::removeAnimationBlock()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	assert_exp(this->_object->_moves[this->_object->_action].size() > 1);
+	this->applyOperation(new RemoveBlockOperation(
+		*this->_object,
+		this->_editor.localize("operation.remove_block"),
+		this->_object->_actionBlock
+	));
 }
 
 void SpiralOfFate::MainWindow::removeAction()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	assert_exp(this->_object->_moves.size() > 1);
+	this->applyOperation(new RemoveMoveOperation(
+		*this->_object,
+		this->_editor.localize("operation.remove_action"),
+		this->_object->_action
+	));
 }
 
 void SpiralOfFate::MainWindow::removeBox()
 {
 	auto b = this->_preview->getSelectedBox();
 
-	if (b.first == BOXTYPE_NONE) return;
+	assert_exp(b.first != BOXTYPE_NONE);
 	this->applyOperation(new RemoveBoxOperation(
 		*this->_object,
-		this->_editor.localize("operation.remove_frame"),
+		this->_editor.localize("operation.remove_box"),
 		b.first, b.second,
 		[this](BoxType t, unsigned i) { this->_preview->setSelectedBox(t, i); }
 	));
@@ -1852,6 +1875,7 @@ void SpiralOfFate::MainWindow::tick()
 	if (this->_requireReload) {
 		this->_rePopulateData();
 		this->_preview->invalidatePalette();
+		this->refreshMenuItems();
 		this->_requireReload = false;
 	}
 	this->_timer++;

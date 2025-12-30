@@ -45,7 +45,6 @@ namespace SpiralOfFate
 		void _loadSettings();
 		void _tickAnimation();
 
-		void _newFramedata();
 		void _loadFramedata();
 		void _save();
 		void _saveAs();
@@ -117,7 +116,11 @@ namespace SpiralOfFate
 		bool closeAll();
 
 		void setHasRedo(bool hasRedo);
-		void setHasUndo(bool hasRedo);
+		void setHasUndo(bool hasUndo);
+		void setCanDelBoxes(bool canDel);
+		void setCanDelFrame(bool canDel);
+		void setCanDelBlock(bool canDel);
+		void setCanDelAction(bool canDel);
 
 		void keyPressed(const sf::Event::KeyPressed &event);
 		bool canHandleKeyPress(const sf::Event::KeyPressed &event);

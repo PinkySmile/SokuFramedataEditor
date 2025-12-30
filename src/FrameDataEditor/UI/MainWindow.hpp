@@ -70,6 +70,7 @@ namespace SpiralOfFate
 		bool isModified() const noexcept;
 		bool hasUndoData() const noexcept;
 		bool hasRedoData() const noexcept;
+		void refreshMenuItems() const;
 		void tick();
 		void refreshInterface();
 		void keyPressed(const tgui::Event::KeyEvent &event) override;
