@@ -1629,8 +1629,7 @@ void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
 
 void SpiralOfFate::MainWindow::reloadTextures()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	game->textureMgr.reloadEverything();
 }
 
 void SpiralOfFate::MainWindow::_rePopulateData()

@@ -20,6 +20,7 @@ namespace SpiralOfFate
 		struct AllocatedTexture {
 			unsigned index;
 			unsigned count;
+			std::string path;
 			std::optional<std::array<Color, 256>> palette;
 			std::optional<std::array<unsigned char, 768>> paletteData;
 		};
@@ -32,7 +33,11 @@ namespace SpiralOfFate
 		std::unordered_map<std::string, AllocatedTexture> _allocatedTextures;
 		std::unordered_map<std::string, std::string> _overrideList;
 
-		void _reload(const std::string &path, unsigned id);
+		unsigned _loadEmpty(AllocatedTexture &tex, unsigned currentIndex);
+		unsigned _load(const std::string &path, AllocatedTexture &tex, unsigned currentIndex);
+		unsigned _loadRegular(const std::string &path, AllocatedTexture &tex, unsigned currentIndex);
+		unsigned _loadPaletted(const std::string &path, AllocatedTexture &tex, const std::string &palette, unsigned currentIndex);
+		unsigned _loadPaletted(const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned currentIndex);
 	public:
 		TextureManager();
 

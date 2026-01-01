@@ -513,8 +513,10 @@ namespace SpiralOfFate
 
 	void FrameData::checkReloadTexture()
 	{
-		if (this->__requireReload)
+		if (this->__requireReload) {
+			puts("RELOAD");
 			this->reloadTexture();
+		}
 		this->__requireReload = false;
 	}
 
