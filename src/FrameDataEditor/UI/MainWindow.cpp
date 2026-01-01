@@ -639,12 +639,18 @@ bool SpiralOfFate::MainWindow::hasRedoData() const noexcept
 
 void SpiralOfFate::MainWindow::refreshMenuItems() const
 {
+	auto &mov = this->_object->_moves;
+	auto &act = mov[this->_object->_action];
+	auto &blk = act[this->_object->_actionBlock];
+
 	this->_editor.setHasRedo(this->hasRedoData());
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setCanDelBoxes(this->_preview->getSelectedBox().first != BOXTYPE_NONE);
-	this->_editor.setCanDelFrame(this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() > 1);
-	this->_editor.setCanDelBlock(this->_object->_moves[this->_object->_action].size() > 1);
-	this->_editor.setCanDelAction(this->_object->_moves.size() > 1);
+	this->_editor.setCanDelAction(mov.size() > 1);
+	this->_editor.setCanDelBlock(act.size() > 1);
+	this->_editor.setCanDelFrame(blk.size() > 1);
+	this->_editor.setCanCopyLast(this->_object->_animation > 0);
+	this->_editor.setCanCopyNext(this->_object->_animation < blk.size() - 1);
 }
 
 void SpiralOfFate::MainWindow::redo()
@@ -1378,6 +1384,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_object->resetState();
 			this->_preview->frameChanged();
 			this->_rePopulateFrameData();
+			this->_editor.setCanCopyLast(this->_object->_animation > 0);
+			this->_editor.setCanCopyNext(this->_object->_animation < this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() - 1);
 		});
 	if (frameSpin)
 		frameSpin->onValueChange.connect([this](float value){
@@ -1386,6 +1394,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_object->resetState();
 			this->_preview->frameChanged();
 			this->_rePopulateFrameData();
+			this->_editor.setCanCopyLast(this->_object->_animation > 0);
+			this->_editor.setCanCopyNext(this->_object->_animation < this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() - 1);
 		});
 	if (blockSpin)
 		blockSpin->onValueChange.connect([this](float value){
@@ -1611,14 +1621,26 @@ void SpiralOfFate::MainWindow::removeBox()
 
 void SpiralOfFate::MainWindow::copyBoxesFromLastFrame()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+
+	assert_exp(this->_object->_animation > 0);
+	this->applyOperation(new PasteBoxDataOperation(
+		*this->_object,
+		this->_editor.localize("operation.copy_box_last"),
+		blk[this->_object->_animation - 1]
+	));
 }
 
 void SpiralOfFate::MainWindow::copyBoxesFromNextFrame()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+
+	assert_exp(this->_object->_animation < blk.size() - 1);
+	this->applyOperation(new PasteBoxDataOperation(
+		*this->_object,
+		this->_editor.localize("operation.copy_box_last"),
+		blk[this->_object->_animation + 1]
+	));
 }
 
 void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
@@ -1892,6 +1914,8 @@ void SpiralOfFate::MainWindow::tick()
 		this->_preview->frameChanged();
 		for (auto key : this->_containers)
 			this->_populateFrameData(*key);
+		this->_editor.setCanCopyLast(this->_object->_animation > 0);
+		this->_editor.setCanCopyNext(this->_object->_animation < this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() - 1);
 	}
 }
 

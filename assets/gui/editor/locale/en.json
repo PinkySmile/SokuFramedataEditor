@@ -180,6 +180,9 @@
 	"operation.paste":                 "Paste",
 	"operation.paste_anim":            "Paste animation",
 	"operation.paste_box":             "Paste boxes",
+	"operation.copy_box_last":         "Copy boxes",
+	"operation.copy_box_next":         "Copy boxes",
+	"operation.flatten":               "Flatten boxes",
 
 	"color.type0.name":                "RGB",
 	"color.type0.component1":          "Red",

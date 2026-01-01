@@ -20,7 +20,7 @@ SpiralOfFate::BoxModificationOperation::BoxModificationOperation(
 	const std::string &&name,
 	BoxType type,
 	unsigned int boxIndex,
-	SpiralOfFate::Box newValue
+	Box newValue
 ) :
 	_obj(obj),
 	_action(obj._action),

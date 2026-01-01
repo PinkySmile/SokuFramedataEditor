@@ -79,7 +79,7 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 	this->_shortcutsNames["menu_item.remove.action"]       = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = true,  .meta = true  };
 	this->_shortcutsNames["menu_item.remove.box"]          = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.misc.copy_box_last"]  = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.copy_box_next"]  = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.copy_box_next"]  = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	this->_shortcutsNames["menu_item.misc.flatten"]        = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.misc.reload"]         = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	this->_menuHierarchy = menu->getMenus();
@@ -610,6 +610,22 @@ void SpiralOfFate::FrameDataEditor::setCanDelAction(bool canDel)
 	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
 		{ this->localize("menu_item.remove"), this->localizeShortcut("menu_item.remove.action") },
 		canDel
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setCanCopyLast(bool canCopy)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.misc"), this->localizeShortcut("menu_item.misc.copy_box_last") },
+		canCopy
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setCanCopyNext(bool canCopy)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.misc"), this->localizeShortcut("menu_item.misc.copy_box_next") },
+		canCopy
 	);
 }
 
