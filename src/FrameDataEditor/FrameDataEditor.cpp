@@ -272,6 +272,7 @@ void SpiralOfFate::FrameDataEditor::_updateMenuBar()
 	if (this->_focusedWindow) {
 		menu->setMenuEnabled(this->localize("menu_item.new"), true);
 		menu->setMenuEnabled(this->localize("menu_item.edit"), true);
+		menu->setMenuEnabled(this->localize("menu_item.navigate"), true);
 		menu->setMenuEnabled(this->localize("menu_item.misc"), true);
 		menu->setMenuEnabled(this->localize("menu_item.remove"), true);
 		menu->setMenuItemEnabled({ this->localize("menu_item.file"), this->localizeShortcut("menu_item.file.save") }, true);
@@ -281,6 +282,7 @@ void SpiralOfFate::FrameDataEditor::_updateMenuBar()
 	} else {
 		menu->setMenuEnabled(this->localize("menu_item.new"), false);
 		menu->setMenuEnabled(this->localize("menu_item.edit"), false);
+		menu->setMenuEnabled(this->localize("menu_item.navigate"), false);
 		menu->setMenuEnabled(this->localize("menu_item.misc"), false);
 		menu->setMenuEnabled(this->localize("menu_item.remove"), false);
 		menu->setMenuItemEnabled({ this->localize("menu_item.file"), this->localizeShortcut("menu_item.file.save") }, false);
@@ -626,6 +628,54 @@ void SpiralOfFate::FrameDataEditor::setCanCopyNext(bool canCopy)
 	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
 		{ this->localize("menu_item.misc"), this->localizeShortcut("menu_item.misc.copy_box_next") },
 		canCopy
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasLastFrame(bool hasIt)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.navigate"), this->localizeShortcut("menu_item.navigate.previous_frame") },
+		hasIt
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasNextFrame(bool hasIt)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.navigate"), this->localizeShortcut("menu_item.navigate.next_frame") },
+		hasIt
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasLastBlock(bool hasIt)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.navigate"), this->localizeShortcut("menu_item.navigate.previous_block") },
+		hasIt
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasNextBlock(bool hasIt)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.navigate"), this->localizeShortcut("menu_item.navigate.next_block") },
+		hasIt
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasLastAction(bool hasIt)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.navigate"), this->localizeShortcut("menu_item.navigate.previous_action") },
+		hasIt
+	);
+}
+
+void SpiralOfFate::FrameDataEditor::setHasNextAction(bool hasIt)
+{
+	game->gui.get<tgui::MenuBar>("MainBar")->setMenuItemEnabled(
+		{ this->localize("menu_item.navigate"), this->localizeShortcut("menu_item.navigate.next_action") },
+		hasIt
 	);
 }
 

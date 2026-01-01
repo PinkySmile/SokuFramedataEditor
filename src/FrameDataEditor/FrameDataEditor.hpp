@@ -123,6 +123,12 @@ namespace SpiralOfFate
 		void setCanDelAction(bool canDel);
 		void setCanCopyLast(bool canCopy);
 		void setCanCopyNext(bool canCopy);
+		void setHasLastFrame(bool hasIt);
+		void setHasNextFrame(bool hasIt);
+		void setHasLastBlock(bool hasIt);
+		void setHasNextBlock(bool hasIt);
+		void setHasLastAction(bool hasIt);
+		void setHasNextAction(bool hasIt);
 
 		void keyPressed(const sf::Event::KeyPressed &event);
 		bool canHandleKeyPress(const sf::Event::KeyPressed &event);
