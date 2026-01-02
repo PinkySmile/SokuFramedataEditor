@@ -1367,8 +1367,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		generalEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
 	if (actionSelect)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this, [this](unsigned move){
-			auto &act = this->_object->_moves[this->_object->_action];
-			auto &blk = act[this->_object->_actionBlock];
+			auto &act = this->_object->_moves[move];
+			auto &blk = act.front();
 
 			this->_object->_action = move;
 			this->_object->_actionBlock = 0;
@@ -1425,7 +1425,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	if (blockSpin)
 		blockSpin->onValueChange.connect([this](float value){
 			auto &act = this->_object->_moves[this->_object->_action];
-			auto &blk = act[this->_object->_actionBlock];
+			auto &blk = act[value];
 
 			this->_object->_actionBlock = value;
 			this->_object->_animation = 0;
@@ -2058,17 +2058,17 @@ void SpiralOfFate::MainWindow::_updateTextureTitleBar()
 
 SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getSharedRenderer()
 {
-	return aurora::downcast<SpiralOfFate::MainWindow::Renderer*>(Widget::getSharedRenderer());
+	return aurora::downcast<Renderer *>(Widget::getSharedRenderer());
 }
 
 const SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getSharedRenderer() const
 {
-	return aurora::downcast<const SpiralOfFate::MainWindow::Renderer*>(Widget::getSharedRenderer());
+	return aurora::downcast<const Renderer *>(Widget::getSharedRenderer());
 }
 
 SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getRenderer()
 {
-	return aurora::downcast<SpiralOfFate::MainWindow::Renderer*>(Widget::getRenderer());
+	return aurora::downcast<Renderer *>(Widget::getRenderer());
 }
 
 void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
@@ -2091,6 +2091,123 @@ bool SpiralOfFate::MainWindow::canHandleKeyPress(const tgui::Event::KeyEvent &ev
 	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Escape)
 		return true;
 	return ChildWindow::canHandleKeyPress(event);
+}
+
+void SpiralOfFate::MainWindow::navToNextFrame()
+{
+	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+
+	assert_exp(this->_object->_animation < blk.size() - 1);
+	this->_object->_animation++;
+
+	this->_paused = true;
+	this->_object->resetState();
+	this->_preview->frameChanged();
+	this->_rePopulateFrameData();
+	this->_editor.setCanCopyLast(this->_object->_animation > 0);
+	this->_editor.setCanCopyNext(this->_object->_animation < blk.size() - 1);
+	this->_editor.setHasLastFrame(this->_object->_animation > 0);
+	this->_editor.setHasNextFrame(this->_object->_animation < blk.size() - 1);
+}
+
+void SpiralOfFate::MainWindow::navToPrevFrame()
+{
+	assert_exp(this->_object->_animation > 0);
+	this->_object->_animation--;
+
+	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+
+	this->_paused = true;
+	this->_object->resetState();
+	this->_preview->frameChanged();
+	this->_rePopulateFrameData();
+	this->_editor.setCanCopyLast(this->_object->_animation > 0);
+	this->_editor.setCanCopyNext(this->_object->_animation < blk.size() - 1);
+	this->_editor.setHasLastFrame(this->_object->_animation > 0);
+	this->_editor.setHasNextFrame(this->_object->_animation < blk.size() - 1);
+}
+
+void SpiralOfFate::MainWindow::navToNextBlock()
+{
+	auto &act = this->_object->_moves[this->_object->_action];
+
+	assert_exp(this->_object->_actionBlock < act.size() - 1);
+	this->_object->_actionBlock++;
+
+	auto &blk = act[this->_object->_actionBlock];
+
+	this->_object->_animation = 0;
+	this->_requireReload = true;
+	this->_editor.setHasLastBlock(this->_object->_actionBlock > 0);
+	this->_editor.setHasNextBlock(this->_object->_actionBlock < act.size() - 1);
+	this->_editor.setHasLastFrame(false);
+	this->_editor.setHasNextFrame(blk.size() != 1);
+	this->_editor.setCanCopyLast(false);
+	this->_editor.setCanCopyNext(blk.size() != 1);
+}
+
+void SpiralOfFate::MainWindow::navToPrevBlock()
+{
+	assert_exp(this->_object->_actionBlock > 0);
+	this->_object->_actionBlock--;
+
+	auto &act = this->_object->_moves[this->_object->_action];
+	auto &blk = act[this->_object->_actionBlock];
+
+	this->_object->_animation = 0;
+	this->_requireReload = true;
+	this->_editor.setHasLastBlock(this->_object->_actionBlock > 0);
+	this->_editor.setHasNextBlock(this->_object->_actionBlock < act.size() - 1);
+	this->_editor.setHasLastFrame(false);
+	this->_editor.setHasNextFrame(blk.size() != 1);
+	this->_editor.setCanCopyLast(false);
+	this->_editor.setCanCopyNext(blk.size() != 1);
+}
+
+void SpiralOfFate::MainWindow::navToNextAction()
+{
+	auto it = std::next(this->_object->_moves.find(this->_object->_action));
+	assert_exp(it != this->_object->_moves.end());
+	auto move = it->first;
+	auto &act = this->_object->_moves[move];
+	auto &blk = act.front();
+
+	this->_object->_action = move;
+	this->_object->_actionBlock = 0;
+	this->_object->_animation = 0;
+	this->_object->_animationCtr = 0;
+	this->_requireReload = true;
+	this->_editor.setHasLastAction(this->_object->_moves.find(move) != this->_object->_moves.begin());
+	this->_editor.setHasNextAction(std::next(this->_object->_moves.find(move)) != this->_object->_moves.end());
+	this->_editor.setHasLastBlock(false);
+	this->_editor.setHasNextBlock(act.size() != 1);
+	this->_editor.setHasLastFrame(false);
+	this->_editor.setHasNextFrame(blk.size() != 1);
+	this->_editor.setCanCopyLast(false);
+	this->_editor.setCanCopyNext(blk.size() != 1);
+}
+
+void SpiralOfFate::MainWindow::navToPrevAction()
+{
+	auto it = this->_object->_moves.find(this->_object->_action);
+	assert_exp(it != this->_object->_moves.begin());
+	auto move = std::prev(it)->first;
+	auto &act = this->_object->_moves[move];
+	auto &blk = act.front();
+
+	this->_object->_action = move;
+	this->_object->_actionBlock = 0;
+	this->_object->_animation = 0;
+	this->_object->_animationCtr = 0;
+	this->_requireReload = true;
+	this->_editor.setHasLastAction(this->_object->_moves.find(move) != this->_object->_moves.begin());
+	this->_editor.setHasNextAction(std::next(this->_object->_moves.find(move)) != this->_object->_moves.end());
+	this->_editor.setHasLastBlock(false);
+	this->_editor.setHasNextBlock(act.size() != 1);
+	this->_editor.setHasLastFrame(false);
+	this->_editor.setHasNextFrame(blk.size() != 1);
+	this->_editor.setCanCopyLast(false);
+	this->_editor.setCanCopyNext(blk.size() != 1);
 }
 
 void SpiralOfFate::MainWindow::_reinitSidePanel(tgui::Container &panel)

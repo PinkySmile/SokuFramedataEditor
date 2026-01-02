@@ -76,6 +76,13 @@ namespace SpiralOfFate
 		void keyPressed(const tgui::Event::KeyEvent &event) override;
 		bool canHandleKeyPress(const tgui::Event::KeyEvent &event) override;
 
+		void navToNextFrame();
+		void navToPrevFrame();
+		void navToNextBlock();
+		void navToPrevBlock();
+		void navToNextAction();
+		void navToPrevAction();
+
 		void newFrame();
 		void newEndFrame();
 		void newAnimationBlock();

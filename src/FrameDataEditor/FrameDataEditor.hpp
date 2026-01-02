@@ -52,6 +52,13 @@ namespace SpiralOfFate
 		void _editShortcuts();
 		void _quit();
 
+		void _navToNextFrame();
+		void _navToPrevFrame();
+		void _navToNextBlock();
+		void _navToPrevBlock();
+		void _navToNextAction();
+		void _navToPrevAction();
+
 		void _undo();
 		void _redo();
 		void _copy();
