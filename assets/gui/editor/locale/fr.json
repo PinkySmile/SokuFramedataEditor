@@ -22,11 +22,14 @@
 	"message_box.button.ok":              "OK",
 	"message_box.button.confirm":         "Confirmer",
 
-	"file_type.framedata":                "Fichier framedata",
-	"file_type.all":                      "Tous les fichiers",
+	"shortcuts.none":                     "Aucun",
+	"shortcuts.press":                    "Appuyez sur une touche",
 
 	"error.rename":                       "Impossible de renommer %1 en %2: %3",
 	"error.open":                         "Erreur lors de l'ouverture de %1: %2",
+
+	"file_type.framedata":                "Fichier framedata",
+	"file_type.all":                      "Tous les fichiers",
 
 	"key.unknown":                        "Inconnu",
 	"key.a":                              "A",
@@ -216,6 +219,7 @@
 	"settings.save":                      "Sauvegarder",
 	"settings.cancel":                    "Annuler",
 	"settings.title":                     "Paramètres",
+	"settings.shortcuts":                 "Éditeur de raccourcis",
 	"settings.theme":                     "Thème graphique",
 	"settings.locale":                    "Langue",
 	"settings.locale.":                   "Langue du système",

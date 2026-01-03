@@ -22,6 +22,9 @@
 	"message_box.button.ok":              "OK",
 	"message_box.button.confirm":         "Confirm",
 
+	"shortcuts.none":                     "None",
+	"shortcuts.press":                    "Press a key",
+
 	"error.rename":                       "Cannot rename %1 to %2: %3",
 	"error.open":                         "Cannot open %1: %2",
 
@@ -216,6 +219,7 @@
 	"settings.save":                      "Save",
 	"settings.cancel":                    "Cancel",
 	"settings.title":                     "Settings",
+	"settings.shortcuts":                 "Shortcuts editor",
 	"settings.theme":                     "Graphical theme",
 	"settings.locale":                    "Language",
 	"settings.locale.":                   "System language",

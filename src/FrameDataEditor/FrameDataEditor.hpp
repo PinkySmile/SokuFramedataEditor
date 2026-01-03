@@ -13,10 +13,10 @@ namespace SpiralOfFate
 {
 	class MainWindow;
 
-	class FrameDataEditor {
-	private:
-		std::string _locale;
+	extern const char *keyNames[101];
 
+	class FrameDataEditor {
+	public:
 		struct Shortcut {
 			sf::Keyboard::Key code;
 			bool alt;
@@ -27,9 +27,32 @@ namespace SpiralOfFate
 			bool operator<(const Shortcut &other) const;
 		};
 
+	private:
+		std::string _locale;
+
+		static void to_json(nlohmann::json &j, const Shortcut &s) {
+			j = {
+				{ "code",    s.code },
+				{ "alt",     s.alt },
+				{ "control", s.control },
+				{ "shift",   s.shift },
+				{ "meta",    s.meta },
+			};
+		}
+
+		static void from_json(const nlohmann::json &j, Shortcut &s) {
+			j.at("code").get_to(s.code);
+			j.at("alt").get_to(s.alt);
+			j.at("control").get_to(s.control);
+			j.at("shift").get_to(s.shift);
+			j.at("meta").get_to(s.meta);
+		}
+
 		float _timer = 0;
 		sf::Clock _clock;
+		std::shared_ptr<class ShortcutsWindow> _shortcutWindow;
 		std::map<std::string, Shortcut> _shortcutsNames;
+		std::vector<std::pair<std::string, std::string>> _shortcutData;
 		std::map<Shortcut, std::pair<std::vector<tgui::String>, void (FrameDataEditor::*)()>> _shortcuts;
 		std::vector<tgui::MenuBar::GetMenusElement> _menuHierarchy;
 		std::map<std::string, std::string> _localization;
@@ -84,16 +107,19 @@ namespace SpiralOfFate
 		void _reloadTextures();
 
 		bool _isEditBoxSelected(const tgui::Container &container);
-		std::string _shortcutToString(const Shortcut &s) const;
 
 	public:
 		FrameDataEditor();
 		~FrameDataEditor();
 
+		std::string shortcutToString(const Shortcut &s) const;
 		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void setLocale(const std::string &name);
 		std::string getLocale() const;
 		void saveSettings();
+		void setShortcuts(const std::map<std::string, Shortcut> &shortcuts);
+		std::map<std::string, Shortcut> getShortcuts() const;
+		std::vector<std::pair<std::string, std::string>> getShortcutsNames() const;
 
 		const std::map<std::string, std::string> &getLocalizationData() const;
 		bool hasLocalization(const std::string &s) const;
@@ -138,6 +164,7 @@ namespace SpiralOfFate
 		void setHasNextAction(bool hasIt);
 
 		void keyPressed(const sf::Event::KeyPressed &event);
+		void keyReleased(const sf::Event::KeyReleased &event);
 		bool canHandleKeyPress(const sf::Event::KeyPressed &event);
 	};
 }
