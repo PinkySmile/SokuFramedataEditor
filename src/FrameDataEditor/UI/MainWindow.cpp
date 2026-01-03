@@ -1148,6 +1148,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	auto clearBlock = container.get<tgui::Button>("ClearBlock");
 	auto action = container.get<tgui::EditBox>("ActionID");
 	auto actionSelect = container.get<tgui::Button>("ActionSelect");
+	auto prevAction = container.get<tgui::Button>("PrevAction");
+	auto nextAction = container.get<tgui::Button>("NextAction");
 	auto play = container.get<tgui::Button>("Play");
 	auto step = container.get<tgui::Button>("Step");
 	auto frame = container.get<tgui::Slider>("Frame");
@@ -1384,6 +1386,10 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_editor.setCanCopyLast(false);
 			this->_editor.setCanCopyNext(blk.size() != 1);
 		}, false);
+	if (prevAction)
+		prevAction->onClick.connect(&MainWindow::navToPrevAction, this);
+	if (nextAction)
+		nextAction->onClick.connect(&MainWindow::navToNextAction, this);
 	if (play)
 		play->onPress.connect([this]{
 			this->_paused = false;
@@ -1713,6 +1719,8 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 {
 	auto action = container.get<tgui::EditBox>("ActionID");
 	auto actionSelect = container.get<tgui::Button>("ActionSelect");
+	auto prevAction = container.get<tgui::Button>("PrevAction");
+	auto nextAction = container.get<tgui::Button>("NextAction");
 	auto block = container.get<tgui::Label>("BlockLabel");
 	auto blockSpin = container.get<tgui::SpinButton>("BlockSpin");
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
@@ -1722,7 +1730,31 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 	if (action)
 		action->setText(std::to_string(this->_object->_action));
 	if (actionSelect)
-		actionSelect->setText(this->_localizeActionName(this->_object->_action));
+		actionSelect->setText(this->_localizeActionName(this->_object->_action) + " (" + std::to_string(this->_object->_action) + ")");
+	if (prevAction) {
+		auto it = this->_object->_moves.find(this->_object->_action);
+
+		if (it != this->_object->_moves.begin()) {
+			auto prev = std::prev(it)->first;
+
+			prevAction->setText(this->_localizeActionName(prev) + " (" + std::to_string(prev) + ")");
+			prevAction->setEnabled(true);
+		} else {
+			prevAction->setText(this->_editor.localize("animation.no_prev_action"));
+			prevAction->setEnabled(false);
+		}
+	}
+	if (nextAction) {
+		auto next = std::next(this->_object->_moves.find(this->_object->_action));
+
+		if (next != this->_object->_moves.end()) {
+			nextAction->setText(this->_localizeActionName(next->first) + " (" + std::to_string(next->first) + ")");
+			nextAction->setEnabled(true);
+		} else {
+			nextAction->setText(this->_editor.localize("animation.no_next_action"));
+			nextAction->setEnabled(false);
+		}
+	}
 	if (block)
 		block->setText(this->_editor.localize(
 			block->getUserData<std::string>(),

@@ -52,10 +52,6 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 {
 	game->gui.loadWidgetsFromFile("assets/gui/editor/layout.gui");
 	this->_clock.stop();
-	this->_loadSettings();
-
-	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
-
 	this->_shortcutsNames["menu_item.file.load"]                = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.save"]                = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.save_as"]             = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
@@ -90,6 +86,10 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 	this->_shortcutsNames["menu_item.misc.copy_box_next"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	this->_shortcutsNames["menu_item.misc.flatten"]             = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.misc.reload"]              = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	this->_loadSettings();
+
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
+
 	this->_menuHierarchy = menu->getMenus();
 	this->setLocale(this->_locale);
 	Utils::setRenderer(game->gui);
@@ -144,7 +144,7 @@ void SpiralOfFate::FrameDataEditor::saveSettings()
 
 bool SpiralOfFate::FrameDataEditor::hasLocalization(const std::string &s) const
 {
-	return this->_localization.count(s) != 0;
+	return this->_localization.contains(s);
 }
 
 std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
@@ -157,7 +157,7 @@ std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
 	return s;
 }
 
-std::string SpiralOfFate::FrameDataEditor::_shortcutToString(const SpiralOfFate::FrameDataEditor::Shortcut &s) const
+std::string SpiralOfFate::FrameDataEditor::_shortcutToString(const Shortcut &s) const
 {
 	std::string result;
 	auto code = static_cast<int>(s.code);
