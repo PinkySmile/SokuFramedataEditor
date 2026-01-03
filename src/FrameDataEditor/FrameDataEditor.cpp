@@ -125,6 +125,7 @@ void SpiralOfFate::FrameDataEditor::_loadSettings()
 		if (json.contains("locale") && json["locale"].is_string())
 			this->_locale = json["locale"];
 		if (json.contains("shortcuts") && json["shortcuts"].is_object()) {
+			this->_shortcutsNames.clear();
 			for (const auto &[name, shortcut] : json["shortcuts"].items())
 				from_json(shortcut, this->_shortcutsNames[name]);
 		}
