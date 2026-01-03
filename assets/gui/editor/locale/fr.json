@@ -7,12 +7,14 @@
 	"message_box.title.save_framedata":   "Sauvegarder framedata",
 	"message_box.title.no_pal":           "Aucune palette configurée",
 	"message_box.title.save_err":         "Erreur lors de la sauvegarde",
+	"message_box.title.already_exists":   "Existe déjà",
 
 	"message_box.not_saved":              "Un ou plusieurs fichier(s) ont des changements non sauvegardés.",
 	"message_box.backup_exists":          "Des données de restauration sont présentes pour le fichier %1.\nVoulez-vous les charger ? Si non, elles seront supprimées.",
 	"message_box.internal_error":         "Erreur interne: %1: %2",
 	"message_box.invalid_file":           "Fichier invalide: %1",
 	"message_box.no_pal":                 "Attention: Ce personnage n'a pas de palettes",
+	"message_box.action_exists":          "Cette action existe déjà. Supprimez la si vous souhaitez la remplacer.",
 
 	"message_box.button.yes":             "Oui",
 	"message_box.button.no":              "Non",

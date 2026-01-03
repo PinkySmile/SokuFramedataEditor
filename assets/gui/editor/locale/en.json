@@ -7,12 +7,14 @@
 	"message_box.title.save_framedata":   "Save framedata",
 	"message_box.title.no_pal":           "No palette found",
 	"message_box.title.save_err":         "Saving failed",
+	"message_box.title.already_exists":   "Already exists",
 
 	"message_box.not_saved":              "At least one file has unsaved changes.",
 	"message_box.backup_exists":          "Some backup data has been found for %1.\nDo you want to load them ? If not, they will get deleted.",
 	"message_box.internal_error":         "Internal error: %1: %2",
 	"message_box.invalid_file":           "Invalid file: %1",
 	"message_box.no_pal":                 "Warning: No palette is provided for this character",
+	"message_box.action_exists":          "This action already exist. Delete it first if you want to replace it.",
 
 	"message_box.button.yes":             "Yes",
 	"message_box.button.no":              "No",

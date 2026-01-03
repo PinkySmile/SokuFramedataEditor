@@ -584,8 +584,6 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	this->setCloseBehavior(CloseBehavior::None);
 	this->onClose.connect([this]{
 		// TODO: Check if it needs to be saved
-		std::error_code err;
-
 		std::filesystem::remove(this->_pathBak);
 		this->m_parent->remove(this->shared_from_this());
 		this->onRealClose.emit(this);
@@ -1176,6 +1174,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	auto paletteList = container.get<tgui::ComboBox>("PaletteList");
 	auto colorPanel = container.get<tgui::ScrollablePanel>("AllColorPanel");
 	auto mode = container.get<tgui::Tabs>("ColorModes");
+	auto boundsButton = container.get<tgui::Button>("BoundsButton");
 	tgui::Container &sidePanel = ctrlPanel ? *ctrlPanel : container;
 
 	if (mode)
@@ -1443,6 +1442,11 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_editor.setCanCopyLast(false);
 			this->_editor.setCanCopyNext(blk.size() != 1);
 		});
+	if (boundsButton)
+		boundsButton->onClick.connect([] {
+			// TODO: Not implemented
+			Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+		});
 
 	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation, false);
 	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
@@ -1594,8 +1598,7 @@ void SpiralOfFate::MainWindow::newAction()
 			windowW.lock()->close();
 			this->_rePopulateData();
 		} else
-			// TODO: Hardcoded string
-			Utils::dispMsg(game->gui, "Already exists", "This action already exist. Delete it first if you want to replace it.", MB_ICONERROR);
+			Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.already_exists"), this->_editor.localize("message_box.action_exists"), MB_ICONERROR);
 	});
 }
 

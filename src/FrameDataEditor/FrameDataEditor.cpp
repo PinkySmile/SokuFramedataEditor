@@ -125,9 +125,6 @@ void SpiralOfFate::FrameDataEditor::_loadSettings()
 			this->_locale = json["locale"];
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
-	else {
-		this->_locale = "";
-	}
 }
 
 void SpiralOfFate::FrameDataEditor::saveSettings()
