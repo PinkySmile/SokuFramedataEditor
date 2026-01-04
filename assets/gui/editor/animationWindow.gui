@@ -118,7 +118,7 @@ Panel.AnimationPanel {
     }
 
     BitmapButton.ShowBoxes {
-        Image = "../boxes.png" Middle(0, 0, 16, 16) NoSmooth;
+        Image = "boxes.png" Middle(0, 0, 16, 16) NoSmooth;
         ImageScaling = 0;
         Position = (5, 5);
         Renderer = &1;
@@ -127,7 +127,7 @@ Panel.AnimationPanel {
     }
 
     BitmapButton.Displace {
-        Image = "../dispose.png" NoSmooth;
+        Image = "dispose.png" NoSmooth;
         ImageScaling = 0;
         Position = (5, 50);
         Renderer = &1;
@@ -136,7 +136,7 @@ Panel.AnimationPanel {
     }
 }
 
-Panel.ControlPanel {
+ScrollablePanel.ControlPanel {
     Position = (&.w - w, ControlTabs.h);
     Size = (300, &.h - ControlTabs.h);
 

@@ -89,6 +89,7 @@ Button.ActionSelect {
     Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.BlockLabel {
@@ -199,6 +200,7 @@ ScrollablePanel.AllColorPanel {
     HorizontalScrollbarPolicy = Automatic;
     Position = (10, (ColorSpaceRectPanel.y + ColorSpaceRectPanel.h) + 10);
     Size = (&.w - 20, (&.h - y) - 10);
+    UserData = "70,(&.h - y) - 10";
     VerticalScrollbarPolicy = Automatic;
 
     Renderer {
@@ -233,6 +235,7 @@ ComboBox.PaletteList {
     Position = (10, 170);
     Size = (150, 20);
     TextSize = 13;
+    UserData = NO_LOCALE;
 
     Renderer {
         ArrowBackgroundColor = #F5F5F5;
@@ -334,6 +337,7 @@ Label.ColorComponentName1 {
     Size = (100, 17);
     Text = Hue;
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.ColorComponentName2 {
@@ -344,6 +348,7 @@ Label.ColorComponentName2 {
     Size = (100, 17);
     Text = Saturation;
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.ColorComponentName3 {
@@ -354,6 +359,7 @@ Label.ColorComponentName3 {
     Size = (100, 17);
     Text = Value;
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.RGBColorName {
@@ -364,6 +370,7 @@ Label.RGBColorName {
     Size = (100, 17);
     Text = "color.hexcode";
     TextSize = 13;
+    UserData = "";
 }
 
 Label.ColorIndex {
@@ -374,6 +381,7 @@ Label.ColorIndex {
     Size = (40, 20);
     Text = "#%1";
     TextSize = 13;
+    UserData = NO_LOCALE;
     VerticalAlignment = Center;
 }
 
@@ -382,6 +390,7 @@ Label.ColorPreview {
     ScrollbarPolicy = Automatic;
     Size = (40, 20);
     TextSize = 13;
+    UserData = NO_LOCALE;
 
     Renderer {
         BackgroundColor = white;
@@ -416,6 +425,7 @@ Button.AddPalette {
     Size = (20, 20);
     Text = "+";
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Button.RemovePalette {
@@ -424,6 +434,7 @@ Button.RemovePalette {
     Size = (20, 20);
     Text = "-";
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Tabs.ColorModes {
@@ -431,6 +442,7 @@ Tabs.ColorModes {
     Position = (0, 195);
     Size = (&.w, 20);
     TextSize = 13;
+    UserData = NO_LOCALE;
 
     Renderer {
         BackgroundColor = #F5F5F5;
@@ -455,131 +467,37 @@ Tabs.ColorModes {
 Label.Label2 {
     HorizontalAlignment = Right;
     Position = (5, 5);
+    Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (120, 20);
     Text = "animation.prev_action";
     TextSize = 11;
     VerticalAlignment = Center;
-
-    Renderer {
-        BackgroundColor = transparent;
-        BorderColor = #3C3C3C;
-        Borders = (0, 0, 0, 0);
-        TextColor = #3C3C3C;
-        TextureBackground = None;
-
-        Scrollbar {
-            ArrowBackgroundColor = #F5F5F5;
-            ArrowBackgroundColorHover = white;
-            ArrowColor = #3C3C3C;
-            ArrowColorHover = black;
-            TextureArrowDown = None;
-            TextureArrowDownHover = None;
-            TextureArrowUp = None;
-            TextureArrowUpHover = None;
-            TextureThumb = None;
-            TextureThumbHover = None;
-            TextureTrack = None;
-            TextureTrackHover = None;
-            ThumbColor = #DCDCDC;
-            ThumbColorHover = #E6E6E6;
-            TrackColor = #F5F5F5;
-        }
-    }
 }
 
 Button.PrevAction {
     Position = (130, 5);
+    Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorDown = #EBEBEB;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorDown = black;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorDown = black;
-        TextColorHover = black;
-        Texture = None;
-        TextureDisabled = None;
-        TextureDown = None;
-        TextureDownFocused = None;
-        TextureDownHover = None;
-        TextureFocused = None;
-        TextureHover = None;
-    }
+    UserData = NO_LOCALE;
 }
 
 Button.NextAction {
     Position = (130, 55);
+    Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorDown = #EBEBEB;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorDown = black;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorDown = black;
-        TextColorHover = black;
-        Texture = None;
-        TextureDisabled = None;
-        TextureDown = None;
-        TextureDownFocused = None;
-        TextureDownHover = None;
-        TextureFocused = None;
-        TextureHover = None;
-    }
+    UserData = NO_LOCALE;
 }
 
 Label.Label3 {
     HorizontalAlignment = Right;
     Position = (5, 55);
+    Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (120, 20);
     Text = "animation.next_action";
     TextSize = 11;
     VerticalAlignment = Center;
-
-    Renderer {
-        BackgroundColor = transparent;
-        BorderColor = #3C3C3C;
-        Borders = (0, 0, 0, 0);
-        TextColor = #3C3C3C;
-        TextureBackground = None;
-
-        Scrollbar {
-            ArrowBackgroundColor = #F5F5F5;
-            ArrowBackgroundColorHover = white;
-            ArrowColor = #3C3C3C;
-            ArrowColorHover = black;
-            TextureArrowDown = None;
-            TextureArrowDownHover = None;
-            TextureArrowUp = None;
-            TextureArrowUpHover = None;
-            TextureThumb = None;
-            TextureThumbHover = None;
-            TextureTrack = None;
-            TextureTrackHover = None;
-            ThumbColor = #DCDCDC;
-            ThumbColorHover = #E6E6E6;
-            TrackColor = #F5F5F5;
-        }
-    }
 }

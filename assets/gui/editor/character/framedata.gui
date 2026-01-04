@@ -113,6 +113,7 @@ Button.ActionSelect {
     Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.BlockLabel {
@@ -252,6 +253,7 @@ BitmapButton.BoundsButton {
     Renderer = &5;
     Size = (21, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.Label1 {
@@ -342,6 +344,7 @@ BitmapButton.AFlagsButton {
     Renderer = &5;
     Size = (21, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 BitmapButton.DFlagsButton {
@@ -351,6 +354,7 @@ BitmapButton.DFlagsButton {
     Renderer = &5;
     Size = (21, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 EditBox.AFlags {
@@ -389,6 +393,7 @@ Button.ClearHit {
     Size = (20, 21);
     Text = X;
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Button.HitEdit {
@@ -431,6 +436,7 @@ Button.ClearBlock {
     Size = (20, 21);
     Text = X;
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.Label11 {
@@ -501,6 +507,7 @@ Panel.SelectedBoxPanel {
         Size = (280, 17);
         Text = "Hitbox #2";
         TextSize = 13;
+        UserData = NO_LOCALE;
     }
 }
 
@@ -509,6 +516,7 @@ Button.NextAction {
     Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Button.PrevAction {
@@ -516,6 +524,7 @@ Button.PrevAction {
     Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Label.Label14 {

@@ -532,7 +532,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	auto palettes = this->_characterData["palettes"].get<std::vector<std::string>>();
 
 	this->m_renderer = aurora::makeCopied<Renderer>();
-	this->loadLocalizedWidgetsFromFile("assets/gui/editor/character/animationWindow.gui");
+	this->loadLocalizedWidgetsFromFile("assets/gui/editor/animationWindow.gui");
 	if (!palettes.empty()) {
 		std::array<unsigned char, 768> paletteData;
 
@@ -579,7 +579,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	this->_localizeWidgets(*ctrlPanel, true);
 	Utils::setRenderer(this);
 
-	this->setSize(1200, 600);
+	this->setSize("min(1200, &.w - 20)", "min(600, &.h - 40)");
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
 	this->setTitle(frameDataPath.string());
@@ -640,8 +640,11 @@ bool SpiralOfFate::MainWindow::hasRedoData() const noexcept
 
 void SpiralOfFate::MainWindow::refreshMenuItems() const
 {
+	auto curr = this->_object->_moves.find(this->_object->_action);
+	assert_exp(curr != this->_object->_moves.end());
+
 	auto &mov = this->_object->_moves;
-	auto &act = mov[this->_object->_action];
+	auto &act = curr->second;
 	auto &blk = act[this->_object->_actionBlock];
 
 	this->_editor.setHasRedo(this->hasRedoData());
@@ -656,8 +659,8 @@ void SpiralOfFate::MainWindow::refreshMenuItems() const
 	this->_editor.setHasNextFrame(this->_object->_animation < blk.size() - 1);
 	this->_editor.setHasLastBlock(this->_object->_actionBlock > 0);
 	this->_editor.setHasNextBlock(this->_object->_actionBlock < act.size() - 1);
-	this->_editor.setHasLastAction(this->_object->_moves.find(this->_object->_action) != this->_object->_moves.begin());
-	this->_editor.setHasNextAction(std::next(this->_object->_moves.find(this->_object->_action)) != this->_object->_moves.end());
+	this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
+	this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
 }
 
 void SpiralOfFate::MainWindow::redo()
@@ -1445,6 +1448,9 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		generalEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
 	if (actionSelect)
 		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this, [this](unsigned move){
+			auto curr = this->_object->_moves.find(move);
+			assert_exp(curr != this->_object->_moves.end());
+
 			auto &act = this->_object->_moves[move];
 			auto &blk = act.front();
 
@@ -1453,8 +1459,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_object->_animation = 0;
 			this->_object->_animationCtr = 0;
 			this->_requireReload = true;
-			this->_editor.setHasLastAction(this->_object->_moves.find(move) != this->_object->_moves.begin());
-			this->_editor.setHasNextAction(std::next(this->_object->_moves.find(move)) != this->_object->_moves.end());
+			this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
+			this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
 			this->_editor.setHasLastBlock(false);
 			this->_editor.setHasNextBlock(act.size() != 1);
 			this->_editor.setHasLastFrame(false);
@@ -1578,7 +1584,11 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)), i == 8 || i == 13 || i == 21);
 	if (boxes) {
 		this->_updateFrameElements[&container].emplace_back([boxes, this]{
-			boxes->setVisible(this->_preview->getSelectedBox().first != BOXTYPE_NONE);
+			bool hasBox = this->_preview->getSelectedBox().first != BOXTYPE_NONE;
+
+			boxes->setVisible(hasBox);
+			if (hasBox) boxes->setSize({"&.w", 90});
+			else  boxes->setSize({0, 0});
 			for (auto &fct : this->_updateFrameElements[&*boxes])
 				fct();
 		});
@@ -1825,7 +1835,9 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 		}
 	}
 	if (nextAction) {
-		auto next = std::next(this->_object->_moves.find(this->_object->_action));
+		auto it = this->_object->_moves.find(this->_object->_action);
+		assert_exp(it != this->_object->_moves.end());
+		auto next = std::next(it);
 
 		if (next != this->_object->_moves.end()) {
 			nextAction->setText(this->_localizeActionName(next->first) + " (" + std::to_string(next->first) + ")");
@@ -1914,8 +1926,10 @@ void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &contain
 	}
 	if (colorPanel) {
 		float extra = this->getSize().y - this->getInnerSize().y;
+		auto lay = colorPanel->getSizeLayout();
+		auto data = colorPanel->getUserData<tgui::String>();
 
-		colorPanel->setSize("&.w - 20", tgui::Layout("(&.h - y) - 10 - " + std::to_string(extra)));
+		colorPanel->setSize(lay.x, tgui::Layout("max(" + data + " - " + std::to_string(extra) + ")"));
 		for (size_t i = 0; i < 256; i++) {
 			auto button = colorPanel->get<tgui::Button>("Color" + std::to_string(i));
 			auto render = button->getRenderer();
@@ -2278,19 +2292,24 @@ void SpiralOfFate::MainWindow::navToPrevBlock()
 
 void SpiralOfFate::MainWindow::navToNextAction()
 {
-	auto it = std::next(this->_object->_moves.find(this->_object->_action));
+	auto curr = this->_object->_moves.find(this->_object->_action);
+	assert_exp(curr != this->_object->_moves.end());
+	auto it = std::next(curr);
 	assert_exp(it != this->_object->_moves.end());
 	auto move = it->first;
 	auto &act = this->_object->_moves[move];
 	auto &blk = act.front();
+
+	curr = this->_object->_moves.find(move);
+	assert_exp(curr != this->_object->_moves.end());
 
 	this->_object->_action = move;
 	this->_object->_actionBlock = 0;
 	this->_object->_animation = 0;
 	this->_object->_animationCtr = 0;
 	this->_requireReload = true;
-	this->_editor.setHasLastAction(this->_object->_moves.find(move) != this->_object->_moves.begin());
-	this->_editor.setHasNextAction(std::next(this->_object->_moves.find(move)) != this->_object->_moves.end());
+	this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
+	this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
 	this->_editor.setHasLastBlock(false);
 	this->_editor.setHasNextBlock(act.size() != 1);
 	this->_editor.setHasLastFrame(false);
@@ -2307,13 +2326,16 @@ void SpiralOfFate::MainWindow::navToPrevAction()
 	auto &act = this->_object->_moves[move];
 	auto &blk = act.front();
 
+	auto curr = this->_object->_moves.find(move);
+	assert_exp(curr != this->_object->_moves.end());
+
 	this->_object->_action = move;
 	this->_object->_actionBlock = 0;
 	this->_object->_animation = 0;
 	this->_object->_animationCtr = 0;
 	this->_requireReload = true;
-	this->_editor.setHasLastAction(this->_object->_moves.find(move) != this->_object->_moves.begin());
-	this->_editor.setHasNextAction(std::next(this->_object->_moves.find(move)) != this->_object->_moves.end());
+	this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
+	this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
 	this->_editor.setHasLastBlock(false);
 	this->_editor.setHasNextBlock(act.size() != 1);
 	this->_editor.setHasLastFrame(false);
