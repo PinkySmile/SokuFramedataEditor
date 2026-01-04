@@ -9,7 +9,7 @@
 #include <ranges>
 
 #include "../Operations/DummyOperation.hpp"
-#include "../Operations/BoxModificationOperation.hpp"
+#include "../Operations/EditBoxOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
 
 #define HOVER_ALPHA 0x80
@@ -463,7 +463,7 @@ void SpiralOfFate::PreviewWidget::_handleBoxResize(const tgui::Vector2f &pos)
 	this->_main.updateTransaction([this, &bpos, &bsize]{
 		auto box = this->getSelectedBox();
 
-		return new BoxModificationOperation(
+		return new EditBoxOperation(
 			this->_object,
 			this->_editor.localize("operation.resize_box"),
 			box.first, box.second, { bpos, bsize }
@@ -489,7 +489,7 @@ void SpiralOfFate::PreviewWidget::_handleBoxMove(const tgui::Vector2f &pos)
 	this->_main.updateTransaction([this, &box]{
 		auto b = this->getSelectedBox();
 
-		return new BoxModificationOperation(
+		return new EditBoxOperation(
 			this->_object,
 			this->_editor.localize("operation.move_box"),
 			b.first, b.second, box

@@ -2,11 +2,11 @@
 // Created by PinkySmile on 06/11/2025.
 //
 
-#include "ColorEditionOperation.hpp"
+#include "EditColorOperation.hpp"
 
 namespace SpiralOfFate
 {
-	ColorEditionOperation::ColorEditionOperation(
+	EditColorOperation::EditColorOperation(
 		const std::string &&name,
 		MainWindow::Palette &palette,
 		unsigned &selectedPalette,
@@ -25,7 +25,7 @@ namespace SpiralOfFate
 	{
 	}
 
-	void ColorEditionOperation::apply()
+	void EditColorOperation::apply()
 	{
 		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
 			return;
@@ -35,7 +35,7 @@ namespace SpiralOfFate
 		this->_palette.modified = true;
 	}
 
-	void ColorEditionOperation::undo()
+	void EditColorOperation::undo()
 	{
 		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
 			return;
@@ -45,12 +45,12 @@ namespace SpiralOfFate
 		this->_palette.modified = this->_wasModified;
 	}
 
-	std::string ColorEditionOperation::getName() const noexcept
+	std::string EditColorOperation::getName() const noexcept
 	{
 		return this->_fieldName;
 	}
 
-	bool ColorEditionOperation::hasModification() const
+	bool EditColorOperation::hasModification() const
 	{
 		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
 			return false;

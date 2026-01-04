@@ -10,9 +10,9 @@
 
 namespace SpiralOfFate
 {
-	class SoundChangeOperation : public BasicDataOperation<std::string> {
+	class EditSoundOperation : public BasicDataOperation<std::string> {
 	public:
-		SoundChangeOperation(EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue, bool reset);
+		EditSoundOperation(EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue, bool reset);
 
 		void apply() override;
 		void undo() override;

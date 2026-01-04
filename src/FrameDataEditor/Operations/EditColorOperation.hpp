@@ -12,7 +12,7 @@
 
 namespace SpiralOfFate
 {
-	class ColorEditionOperation : public Operation {
+	class EditColorOperation : public Operation {
 	protected:
 		MainWindow::Palette &_palette;
 		Color _oldValue;
@@ -25,7 +25,7 @@ namespace SpiralOfFate
 		unsigned &_selectedColor;
 
 	public:
-		ColorEditionOperation(
+		EditColorOperation(
 			const std::string &&name,
 			MainWindow::Palette &palette,
 			unsigned &selectedPalette,

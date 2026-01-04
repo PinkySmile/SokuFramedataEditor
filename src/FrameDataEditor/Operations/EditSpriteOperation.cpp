@@ -1,10 +1,10 @@
 //
-// Created by PinkySmile on 11/05/25.
+// Created by PinkySmile on 10/05/25.
 //
 
-#include "SoundChangeOperation.hpp"
+#include "EditSpriteOperation.hpp"
 
-SpiralOfFate::SoundChangeOperation::SoundChangeOperation(
+SpiralOfFate::EditSpriteOperation::EditSpriteOperation(
 	EditableObject &obj,
 	const std::string &&name,
 	std::string FrameData::*field,
@@ -15,20 +15,20 @@ SpiralOfFate::SoundChangeOperation::SoundChangeOperation(
 {
 }
 
-void SpiralOfFate::SoundChangeOperation::apply()
+void SpiralOfFate::EditSpriteOperation::apply()
 {
 	BasicDataOperation::apply();
 
 	auto &data = this->_obj.getFrameData();
 
-	data.reloadSound();
+	data.reloadTexture();
 }
 
-void SpiralOfFate::SoundChangeOperation::undo()
+void SpiralOfFate::EditSpriteOperation::undo()
 {
 	BasicDataOperation::undo();
 
 	auto &data = this->_obj.getFrameData();
 
-	data.reloadSound();
+	data.reloadTexture();
 }

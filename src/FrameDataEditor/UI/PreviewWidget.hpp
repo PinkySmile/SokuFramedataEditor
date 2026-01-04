@@ -8,7 +8,7 @@
 
 #include <TGUI/Widgets/ClickableWidget.hpp>
 #include "../EditableObject.hpp"
-#include "../Operations/BoxModificationOperation.hpp"
+#include "../Operations/EditBoxOperation.hpp"
 
 namespace SpiralOfFate
 {

@@ -12,15 +12,15 @@
 #include "../Operations/DummyOperation.hpp"
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
-#include "../Operations/SpriteChangeOperation.hpp"
-#include "../Operations/SoundChangeOperation.hpp"
+#include "../Operations/EditSpriteOperation.hpp"
+#include "../Operations/EditSoundOperation.hpp"
 #include "../Operations/ClearBlockOperation.hpp"
 #include "../Operations/ClearHitOperation.hpp"
 #include "../Operations/CreateMoveOperation.hpp"
 #include "../Operations/CreateFrameOperation.hpp"
 #include "../Operations/CreateBlockOperation.hpp"
 #include "../Operations/CreateBoxOperation.hpp"
-#include "../Operations/ColorEditionOperation.hpp"
+#include "../Operations/EditColorOperation.hpp"
 #include "../Operations/CreatePaletteOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
@@ -165,7 +165,7 @@ std::string to_hex(unsigned long long value)
                         return;                                                                          \
                 this->_colorChangeSource = src;                                                          \
                 this->updateTransaction([this, color] {                                                  \
-                        return new ColorEditionOperation(                                                \
+                        return new EditColorOperation(                                                   \
                                 this->_editor.localize("color.edit"),                                    \
                                 this->_palettes[this->_selectedPalette],                                 \
                                 this->_selectedPalette,                                                  \
@@ -211,7 +211,7 @@ std::string to_hex(unsigned long long value)
                 sscanf(s.toStdString().c_str(), "#%02hhX%02hhX%02hhX", &color.r, &color.g, &color.b);   \
                 this->_colorChangeSource = 5;                                                           \
                 this->updateTransaction([this, color]{                                                  \
-                        return new ColorEditionOperation(                                               \
+                        return new EditColorOperation(                                                  \
                                 this->_editor.localize("color.edit"),                                   \
                                 this->_palettes[this->_selectedPalette],                                \
                                 this->_selectedPalette,                                                 \
@@ -254,7 +254,7 @@ std::string to_hex(unsigned long long value)
                 converted[index] = value;                                                                            \
                 this->_colorChangeSource = index + 2;                                                                \
                 this->updateTransaction([this, converted]{                                                           \
-                        return new ColorEditionOperation(                                                            \
+                        return new EditColorOperation(                                                               \
                                 this->_editor.localize("color.edit"),                                                \
                                 this->_palettes[this->_selectedPalette],                                             \
                                 this->_selectedPalette,                                                              \
@@ -288,7 +288,7 @@ do {                                                                            
 			};                                                                                \
                         decltype(Box::other) __##other = this->_preview->getSelectedBoxRef()->other;      \
                                                                                                           \
-                        this->updateTransaction([&]{ return new BoxModificationOperation(                 \
+                        this->updateTransaction([&]{ return new EditBoxOperation(                         \
                                 *this->_object,                                                           \
                                 name,                                                                     \
                                 box.first, box.second,                                                    \
@@ -1531,7 +1531,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 		});
 
-	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   SpriteChangeOperation, false);
+	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   EditSpriteOperation, false);
 	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
 	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, false, 0);
 	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, false, 2);
@@ -1545,7 +1545,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	PLACE_HOOK_OPTIONAL_NUMBER(container, "Tier",      priority,          this->_editor.localize("animation.general.tier"),          BasicDataOperation, false, 0);
 	PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, true,  2);
 	PLACE_HOOK_OPTIONAL_VECTOR(container, "Gravity",   gravity,           this->_editor.localize("animation.general.gravity"),       BasicDataOperation, true,  2);
-	PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         SoundChangeOperation, false);
+	PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         EditSoundOperation, false);
 	PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, false, 0);
 	PLACE_HOOK_NUMBER(container,          "ManaCost",  manaCost,          this->_editor.localize("animation.general.manacost"),      BasicDataOperation, false, 0);
 	PLACE_HOOK_NUMBER_DEG(container,      "Rotation",  rotation,          this->_editor.localize("animation.general.rotation"),      BasicDataOperation, true, 2);
@@ -1563,7 +1563,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	PLACE_HOOK_NUMBER(container,        "Untech",    untech,            this->_editor.localize("animation.hit.untech"),  BasicDataOperation, false, 0);
 	PLACE_HOOK_NUMBER(container,        "Damage",    damage,            this->_editor.localize("animation.hit.damage"),  BasicDataOperation, false, 0);
 	PLACE_HOOK_NUMBER(container,        "HitStun",   hitStun,           this->_editor.localize("animation.hit.stun"),    BasicDataOperation, false, 0);
-	PLACE_HOOK_STRING(container,        "HitSound",  hitSoundPath,      this->_editor.localize("animation.hit.sound"),   SoundChangeOperation, false);
+	PLACE_HOOK_STRING(container,        "HitSound",  hitSoundPath,      this->_editor.localize("animation.hit.sound"),   EditSoundOperation, false);
 	PLACE_HOOK_OPTIONAL_SNAP(container, "HitSnap",   snap,              this->_editor.localize("animation.hit.snap"),    BasicDataOperation, false);
 
 	PLACE_HOOK_NUMBER(container, "PBlockStop", blockPlayerHitStop,  this->_editor.localize("animation.block.pstop"),   BasicDataOperation, false, 0);
@@ -1783,6 +1783,18 @@ void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
 void SpiralOfFate::MainWindow::reloadTextures()
 {
 	game->textureMgr.reloadEverything();
+}
+
+void SpiralOfFate::MainWindow::invertColors()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::MainWindow::reversePalette()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::MainWindow::_rePopulateData()

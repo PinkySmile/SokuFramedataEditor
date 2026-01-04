@@ -99,6 +99,8 @@ namespace SpiralOfFate
 		void copyBoxesFromNextFrame();
 		void flattenThisMoveCollisionBoxes();
 		void reloadTextures();
+		void invertColors();
+		void reversePalette();
 
 		tgui::SignalChildWindow onRealClose = {"RealClosed"}; //!< The window was closed. Optional parameter: pointer to the window
 

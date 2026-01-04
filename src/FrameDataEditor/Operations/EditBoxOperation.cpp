@@ -2,9 +2,9 @@
 // Created by PinkySmile on 23/05/25.
 //
 
-#include "BoxModificationOperation.hpp"
+#include "EditBoxOperation.hpp"
 
-SpiralOfFate::Box &SpiralOfFate::BoxModificationOperation::_getBox()
+SpiralOfFate::Box &SpiralOfFate::EditBoxOperation::_getBox()
 {
 	auto &data = this->_obj.getFrameData();
 
@@ -15,7 +15,7 @@ SpiralOfFate::Box &SpiralOfFate::BoxModificationOperation::_getBox()
 	return data.hurtBoxes[this->_boxIndex];
 }
 
-SpiralOfFate::BoxModificationOperation::BoxModificationOperation(
+SpiralOfFate::EditBoxOperation::EditBoxOperation(
 	EditableObject &obj,
 	const std::string &&name,
 	BoxType type,
@@ -34,7 +34,7 @@ SpiralOfFate::BoxModificationOperation::BoxModificationOperation(
 {
 }
 
-void SpiralOfFate::BoxModificationOperation::apply()
+void SpiralOfFate::EditBoxOperation::apply()
 {
 	bool shouldReset =
 		this->_obj._action != this->_action ||
@@ -51,7 +51,7 @@ void SpiralOfFate::BoxModificationOperation::apply()
 	}
 }
 
-void SpiralOfFate::BoxModificationOperation::undo()
+void SpiralOfFate::EditBoxOperation::undo()
 {
 	bool shouldReset =
 		this->_obj._action != this->_action ||
@@ -68,12 +68,12 @@ void SpiralOfFate::BoxModificationOperation::undo()
 	}
 }
 
-std::string SpiralOfFate::BoxModificationOperation::getName() const noexcept
+std::string SpiralOfFate::EditBoxOperation::getName() const noexcept
 {
 	return this->_fieldName;
 }
 
-bool SpiralOfFate::BoxModificationOperation::hasModification() const
+bool SpiralOfFate::EditBoxOperation::hasModification() const
 {
 	return this->_oldValue != this->_newValue;
 }

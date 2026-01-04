@@ -18,7 +18,7 @@ namespace SpiralOfFate
 		BOXTYPE_COLLISIONBOX,
 	};
 
-	class BoxModificationOperation : public Operation {
+	class EditBoxOperation : public Operation {
 	protected:
 		EditableObject &_obj;
 		unsigned _action;
@@ -33,7 +33,7 @@ namespace SpiralOfFate
 		Box &_getBox();
 
 	public:
-		BoxModificationOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, Box newValue);
+		EditBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, Box newValue);
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;

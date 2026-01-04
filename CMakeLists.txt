@@ -407,14 +407,14 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/DummyOperation.hpp
 			src/FrameDataEditor/Operations/FlagOperation.hpp
 			src/FrameDataEditor/Operations/BasicDataOperation.hpp
-			src/FrameDataEditor/Operations/BoxModificationOperation.cpp
-			src/FrameDataEditor/Operations/BoxModificationOperation.hpp
+			src/FrameDataEditor/Operations/EditBoxOperation.cpp
+			src/FrameDataEditor/Operations/EditBoxOperation.hpp
 			src/FrameDataEditor/Operations/ClearBlockOperation.cpp
 			src/FrameDataEditor/Operations/ClearBlockOperation.hpp
 			src/FrameDataEditor/Operations/ClearHitOperation.cpp
 			src/FrameDataEditor/Operations/ClearHitOperation.hpp
-			src/FrameDataEditor/Operations/ColorEditionOperation.cpp
-			src/FrameDataEditor/Operations/ColorEditionOperation.hpp
+			src/FrameDataEditor/Operations/EditColorOperation.cpp
+			src/FrameDataEditor/Operations/EditColorOperation.hpp
 			src/FrameDataEditor/Operations/CreateBlockOperation.cpp
 			src/FrameDataEditor/Operations/CreateBlockOperation.hpp
 			src/FrameDataEditor/Operations/CreateBoxOperation.cpp
@@ -437,10 +437,10 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/Operations/RemoveFrameOperation.hpp
 			src/FrameDataEditor/Operations/RemovePaletteOperation.cpp
 			src/FrameDataEditor/Operations/RemovePaletteOperation.hpp
-			src/FrameDataEditor/Operations/SoundChangeOperation.cpp
-			src/FrameDataEditor/Operations/SoundChangeOperation.hpp
-			src/FrameDataEditor/Operations/SpriteChangeOperation.cpp
-			src/FrameDataEditor/Operations/SpriteChangeOperation.hpp
+			src/FrameDataEditor/Operations/EditSoundOperation.cpp
+			src/FrameDataEditor/Operations/EditSoundOperation.hpp
+			src/FrameDataEditor/Operations/EditSpriteOperation.cpp
+			src/FrameDataEditor/Operations/EditSpriteOperation.hpp
 			src/FrameDataEditor/Operations/RemoveBlockOperation.cpp
 			src/FrameDataEditor/Operations/RemoveBlockOperation.hpp
 			src/FrameDataEditor/Operations/RemoveMoveOperation.cpp

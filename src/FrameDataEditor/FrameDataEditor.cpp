@@ -679,12 +679,14 @@ void SpiralOfFate::FrameDataEditor::_invertColors()
 {
 	// TODO: Not implemented
 	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	this->_focusedWindow->invertColors();
 }
 
 void SpiralOfFate::FrameDataEditor::_reversePalette()
 {
 	// TODO: Not implemented
 	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	this->_focusedWindow->reversePalette();
 }
 
 void SpiralOfFate::FrameDataEditor::_copyBoxesFromLastFrame()

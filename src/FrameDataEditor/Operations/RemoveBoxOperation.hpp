@@ -7,7 +7,7 @@
 
 
 #include <functional>
-#include "BoxModificationOperation.hpp"
+#include "EditBoxOperation.hpp"
 #include "Operation.hpp"
 #include "../EditableObject.hpp"
 
