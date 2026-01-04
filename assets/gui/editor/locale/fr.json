@@ -206,6 +206,8 @@
 	"operation.copy_box_last":                    "Copier boîtes",
 	"operation.copy_box_next":                    "Copier boîtes",
 	"operation.flatten":                          "Homogénéiser boîtes",
+	"operation.invert_colors":                    "Inverser les couleurs",
+	"operation.reverse_palette":                  "Inverser la palette",
 
 	"color.type0.name":                           "RVB",
 	"color.type0.component1":                     "Rouge",

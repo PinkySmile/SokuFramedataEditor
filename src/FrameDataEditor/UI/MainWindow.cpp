@@ -22,6 +22,7 @@
 #include "../Operations/CreateBoxOperation.hpp"
 #include "../Operations/EditColorOperation.hpp"
 #include "../Operations/CreatePaletteOperation.hpp"
+#include "../Operations/EditColorsOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
 #include "../Operations/RemoveFrameOperation.hpp"
@@ -1787,14 +1788,39 @@ void SpiralOfFate::MainWindow::reloadTextures()
 
 void SpiralOfFate::MainWindow::invertColors()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	auto &pal = this->_palettes[this->_selectedPalette];
+	std::array<Color, 256> palette = pal.colors;
+
+	for (size_t i = 1; i < 251; i++) {
+		palette[i].r = ~palette[i].r;
+		palette[i].g = ~palette[i].g;
+		palette[i].b = ~palette[i].b;
+	}
+	this->applyOperation(new EditColorsOperation(
+		this->_editor.localize("operation.invert_colors"),
+		pal, this->_selectedPalette,
+		palette
+	));
 }
 
 void SpiralOfFate::MainWindow::reversePalette()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	auto &pal = this->_palettes[this->_selectedPalette];
+	std::array<Color, 256> palette;
+
+	palette[0] = pal.colors[0];
+	palette[251] = pal.colors[251];
+	palette[252] = pal.colors[252];
+	palette[253] = pal.colors[253];
+	palette[254] = pal.colors[254];
+	palette[255] = pal.colors[255];
+	for (size_t i = 1; i < 251; i++)
+		palette[i] = pal.colors[255 - i];
+	this->applyOperation(new EditColorsOperation(
+		this->_editor.localize("operation.reverse_palette"),
+		pal, this->_selectedPalette,
+		palette
+	));
 }
 
 void SpiralOfFate::MainWindow::_rePopulateData()

@@ -1,9 +1,9 @@
 //
-// Created by PinkySmile on 09/05/25.
+// Created by PinkySmile on 04/01/2026.
 //
 
-#ifndef SOFGV_COLOREDITIONOPERATION_HPP
-#define SOFGV_COLOREDITIONOPERATION_HPP
+#ifndef SOFGV_EDITCOLORSOPERATION_HPP
+#define SOFGV_EDITCOLORSOPERATION_HPP
 
 
 #include "Operation.hpp"
@@ -11,32 +11,29 @@
 
 namespace SpiralOfFate
 {
-	class EditColorOperation : public Operation {
+	class EditColorsOperation : public Operation {
 	protected:
 		MainWindow::Palette &_palette;
-		Color _oldValue;
-		Color _newValue;
+		std::array<Color, 256> _oldValue;
+		std::array<Color, 256> _newValue;
 		std::string _fieldName;
 		bool _wasModified;
 		unsigned _oldSelectedPalette;
-		unsigned _oldSelectedColor;
 		unsigned &_selectedPalette;
-		unsigned &_selectedColor;
 
 	public:
-		EditColorOperation(
+		EditColorsOperation(
 			const std::string &&name,
 			MainWindow::Palette &palette,
 			unsigned &selectedPalette,
-			unsigned &selectedColor,
-			Color newValue
+			std::array<Color, 256> newValue
 		);
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;
 		bool hasModification() const override;
 	};
-}
+} // SpiralOfFate
 
 
-#endif //SOFGV_COLOREDITIONOPERATION_HPP
+#endif //SOFGV_EDITCOLORSOPERATION_HPP

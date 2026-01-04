@@ -206,6 +206,8 @@
 	"operation.copy_box_last":                    "Copy boxes",
 	"operation.copy_box_next":                    "Copy boxes",
 	"operation.flatten":                          "Flatten boxes",
+	"operation.invert_colors":                    "Invert colors",
+	"operation.reverse_palette":                  "Reverse palette",
 
 	"color.type0.name":                           "RGB",
 	"color.type0.component1":                     "Red",
