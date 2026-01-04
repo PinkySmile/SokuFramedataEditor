@@ -29,6 +29,7 @@ Label.Shortcut {
     Size = (Key.x - 15, 17);
     Text = Label;
     TextSize = 13;
+    UserData = NO_LOCALE;
 
     Renderer {
         BackgroundColor = transparent;
@@ -63,6 +64,7 @@ Button.Remove {
     Size = (21, 21);
     Text = X;
     TextSize = 13;
+    UserData = NO_LOCALE;
 }
 
 Button.Key {
@@ -71,4 +73,5 @@ Button.Key {
     Renderer = &1;
     Size = (187, 21);
     TextSize = 13;
+    UserData = NO_LOCALE;
 }

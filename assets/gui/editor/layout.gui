@@ -32,4 +32,9 @@ MenuBar.MainBar {
         Items = ["menu_item.misc.copy_box_last", "menu_item.misc.copy_box_next", "menu_item.misc.flatten", "menu_item.misc.reload"];
         Text = "menu_item.misc";
     }
+
+    Menu {
+        Items = ["menu_item.help.about"];
+        Text = "menu_item.help";
+    }
 }

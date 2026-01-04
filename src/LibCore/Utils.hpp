@@ -152,6 +152,27 @@ namespace SpiralOfFate::Utils
 	}
 
 #ifdef USE_TGUI
+	void setRenderer(tgui::Container &widget);
+	void setRenderer(tgui::Container *widget);
+	void setRenderer(const tgui::Gui &widget);
+
+	template<typename T>
+	void setRenderer(const std::shared_ptr<T> &widget)
+	{
+		auto renderer = tgui::Theme::getDefault()->getRendererNoThrow(widget->getWidgetType());
+
+		if (renderer)
+			widget->setRenderer(renderer);
+	}
+	template<typename T>
+	void setRenderer(const std::shared_ptr<T> &widget, const std::string &name)
+	{
+		widget->setRenderer(tgui::Theme::getDefault()->getRenderer(name));
+	}
+
+	template<>
+	void setRenderer(const tgui::Container::Ptr &widget);
+
 	//! @brief Display a focused window.
 	//! @param gui The gui handling the window.
 	//! @param width The width of the window.
@@ -170,7 +191,8 @@ namespace SpiralOfFate::Utils
 			window = WindowType::create(args...);
 			if (!width.isConstant() || width.getValue() != 0)
 				window->setSize(width, height);
-		}
+		} else
+			setRenderer(static_cast<tgui::Container::Ptr>(window));
 		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
 		gui.add(window);
 
@@ -228,27 +250,6 @@ namespace SpiralOfFate::Utils
 	//! @param onFinish Function to call when exiting the window.
 	//! @return A pointer to the window
 	tgui::ChildWindow::Ptr makeSliderWindow(tgui::Gui &gui, const std::function<void(float value)> &onFinish, float defaultValue = 1, float min = 0, float max = 20, float step = 1);
-
-	void setRenderer(tgui::Container &widget);
-	void setRenderer(tgui::Container *widget);
-	void setRenderer(const tgui::Gui &widget);
-
-	template<typename T>
-	void setRenderer(const std::shared_ptr<T> &widget)
-	{
-		auto renderer = tgui::Theme::getDefault()->getRendererNoThrow(widget->getWidgetType());
-
-		if (renderer)
-			widget->setRenderer(renderer);
-	}
-	template<typename T>
-	void setRenderer(const std::shared_ptr<T> &widget, const std::string &name)
-	{
-		widget->setRenderer(tgui::Theme::getDefault()->getRenderer(name));
-	}
-
-	template<>
-	void setRenderer(const tgui::Container::Ptr &widget);
 #else
 	#define openWindowWithFocus(...) __nothing2()
 	#define makeSliderWindow(...) __nothing2()

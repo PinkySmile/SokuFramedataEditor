@@ -176,6 +176,8 @@
 	"menu_item.navigate.previous_block":  "Previous block",
 	"menu_item.navigate.next_action":     "Next action",
 	"menu_item.navigate.previous_action": "Previous action",
+	"menu_item.help":                     "Help",
+	"menu_item.help.about":               "About",
 
 	"operation.move_box":                 "Move box",
 	"operation.resize_box":               "Rescale box",

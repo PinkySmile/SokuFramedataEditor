@@ -106,6 +106,8 @@ namespace SpiralOfFate
 		void _flattenThisMoveCollisionBoxes();
 		void _reloadTextures();
 
+		void _about();
+
 		bool _isEditBoxSelected(const tgui::Container &container);
 
 	public:

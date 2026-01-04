@@ -176,6 +176,8 @@
 	"menu_item.navigate.previous_block":  "Block précédent",
 	"menu_item.navigate.next_action":     "Action suivante",
 	"menu_item.navigate.previous_action": "Action précédente",
+	"menu_item.help":                     "Aide",
+	"menu_item.help.about":               "À propos",
 
 	"operation.move_box":                 "Déplacer une boîte",
 	"operation.resize_box":               "Redimentionner une boîte",

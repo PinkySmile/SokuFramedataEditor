@@ -284,6 +284,8 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_next" }, &FrameDataEditor::_copyBoxesFromNextFrame);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten"       }, &FrameDataEditor::_flattenThisMoveCollisionBoxes);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reload"        }, &FrameDataEditor::_reloadTextures);
+
+	this->_connectShortcut(menu, {"menu_item.help", "menu_item.help.about"}, &FrameDataEditor::_about);
 }
 
 void SpiralOfFate::FrameDataEditor::_addMenu(const tgui::MenuBar::Ptr &menu, const tgui::MenuBar::GetMenusElement &element, std::vector<tgui::String> hierarchy)
@@ -660,6 +662,15 @@ void SpiralOfFate::FrameDataEditor::_flattenThisMoveCollisionBoxes()
 void SpiralOfFate::FrameDataEditor::_reloadTextures()
 {
 	this->_focusedWindow->reloadTextures();
+}
+
+void SpiralOfFate::FrameDataEditor::_about()
+{
+	auto window = Utils::openWindowWithFocus(game->gui, 470, 150);
+
+	window->loadWidgetsFromFile("assets/gui/editor/about.gui");
+	window->setTitle("About FrameDataEditor");
+	window->get<tgui::Label>("Version")->setText(VERSION_STR);
 }
 
 void SpiralOfFate::FrameDataEditor::setHasRedo(bool hasRedo)

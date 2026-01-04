@@ -5,7 +5,6 @@
 #ifndef SOFGV_LOCALIZEDCONTAINER_HPP
 #define SOFGV_LOCALIZEDCONTAINER_HPP
 
-
 #include <TGUI/Container.hpp>
 #include "../FrameDataEditor.hpp"
 
@@ -18,10 +17,10 @@ namespace SpiralOfFate
 		{
 			// TODO: Create struct LocalizationData and use that instead
 			for (auto &w : container.getWidgets()) {
-				try {
-					if (!w->getUserData<bool>())
-						continue;
-				} catch (std::bad_any_cast &) {}
+				try { if (!w->getUserData<bool>()) continue; } catch (std::bad_any_cast &) {}
+				try { if (w->getUserData<tgui::String>() == "NO_LOCALE") continue; } catch (std::bad_any_cast &) {}
+				try { if (w->getUserData<std::string>() == "NO_LOCALE") continue; } catch (std::bad_any_cast &) {}
+				try { if (strcmp(w->getUserData<const char *>(), "NO_LOCALE") == 0) continue; } catch (std::bad_any_cast &) {}
 				try {
 					if (auto label = w->cast<tgui::Label>()) {
 						if (first)
