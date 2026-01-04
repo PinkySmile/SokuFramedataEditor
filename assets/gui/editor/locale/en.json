@@ -186,6 +186,8 @@
 	"menu_item.help":                             "Help",
 	"menu_item.help.about":                       "About",
 
+	"popup.search":                               "Search...",
+
 	"operation.move_box":                         "Move box",
 	"operation.resize_box":                       "Rescale box",
 	"operation.remove_box":                       "Delete a box",

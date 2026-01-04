@@ -4,6 +4,9 @@
 
 #include <TGUI/RendererDefines.hpp>
 #include "MainWindow.hpp"
+
+#include <ranges>
+
 #include "ColorPlaneWidget.hpp"
 #include "ColorSliderWidget.hpp"
 #include "../Operations/DummyOperation.hpp"
@@ -1054,17 +1057,21 @@ void SpiralOfFate::MainWindow::_createGenericPopup(const std::string &path)
 void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(unsigned)> &onConfirm, bool showNotAdded)
 {
 	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
-	auto contentPanel = tgui::ScrollablePanel::create({500, "&.h - 100"});
-	unsigned i = 0;
+	auto contentPanel = tgui::Panel::create({500, "&.h - 100"});
+	auto movesPanel = tgui::ScrollablePanel::create({"&.w", "&.h - 42"});
+	auto search = tgui::EditBox::create();
 	auto scroll = 0;
+	unsigned i = 0;
 	std::set<unsigned> moves;
+	std::unordered_map<unsigned, std::string> movesNames;
+	std::unordered_map<unsigned, std::string> movesNamesLower;
 
-	for (auto &[moveId, _] : this->_object->_moves)
+	for (const auto &moveId: this->_object->_moves | std::views::keys)
 		moves.insert(moveId);
 	if (showNotAdded) {
-		for (auto &[moveId, _]: SpiralOfFate::actionNames)
+		for (const auto &moveId: SpiralOfFate::actionNames | std::views::keys)
 			moves.insert(moveId);
-		for (auto &[local, _] : this->_editor.getLocalizationData()) {
+		for (const auto &local: this->_editor.getLocalizationData() | std::views::keys) {
 			try {
 				if (local.rfind("action.generic.", 0) == 0)
 					moves.insert(std::stoul(local.substr(strlen("action.generic."))));
@@ -1076,68 +1083,138 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		}
 	}
 
+	search->setPosition({10, 10});
+	search->setSize({"&.w - 20", 22});
+	search->setDefaultText(this->_editor.localize("popup.search"));
+	contentPanel->add(search);
+	movesPanel->setPosition(0, 42);
+	movesPanel->getRenderer()->setBorders({0, 1, 0, 0});
+	contentPanel->add(movesPanel);
+
 	outsidePanel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
 	outsidePanel->setUserData(false);
 	this->add(outsidePanel);
 
 	contentPanel->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
 	this->add(contentPanel);
-
-	auto closePopup = [this](std::weak_ptr<tgui::Panel> outsidePanel, std::weak_ptr<tgui::ScrollablePanel> contentPanel){
-		this->remove(outsidePanel.lock());
-		this->remove(contentPanel.lock());
-	};
-
-	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
-
 	for (auto moveId : moves) {
-		auto name = this->_localizeActionName(moveId);
-		auto label = tgui::Label::create(std::to_string(moveId));
-		auto button = tgui::Button::create(name);
-
-		label->setPosition(10, i * 25 + 12);
-		button->setPosition(50, i * 25 + 10);
-		button->setSize(410, 20);
-		Utils::setRenderer(button);
-		Utils::setRenderer(label);
-		if (moveId == this->_object->_action) {
+		movesNames[moveId] = this->_localizeActionName(moveId);
+		movesNamesLower[moveId].resize(movesNames[moveId].size());
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(movesNames[moveId], movesNamesLower[moveId].begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		if (moveId == this->_object->_action)
 			scroll = i * 25 + 20;
-			button->getRenderer()->setTextColor(tgui::Color::Green);
-			button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
-			button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
-			button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
-			button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
-		} else if (!this->_object->_moves.contains(moveId)) {
-			button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x00, 0x00});
-			button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0x40, 0x40});
-			button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x00, 0});
-			button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x00, 0x00});
-			button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x20, 0x20});
-		} else if (name.rfind("Action #", 0) == 0) {
-			button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00});
-			button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0xA0, 0x40});
-			button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x50, 0});
-			button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x40, 0x00});
-			button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x60, 0x20});
-		}
-
-		button->onClick.connect(onConfirm, moveId);
-		button->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
-
-		contentPanel->add(label);
-		contentPanel->add(button);
 		i++;
 	}
-	scroll -= contentPanel->getSize().y / 2;
 
-	auto label = tgui::Label::create("");
+	auto closePopup = [this](const std::weak_ptr<tgui::Panel> &outsidePanel_w, const std::weak_ptr<tgui::Panel> &contentPanel_w){
+		this->remove(outsidePanel_w.lock());
+		this->remove(contentPanel_w.lock());
+	};
+	auto refresh = [moves, movesNames, movesNamesLower, this, onConfirm, closePopup](
+		const std::weak_ptr<tgui::EditBox> &search_w,
+		const std::weak_ptr<tgui::ScrollablePanel> &movesPanel_w,
+		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
+		const std::weak_ptr<tgui::Panel> &contentPanel_w
+	) {
+		unsigned index = 0;
+		std::string query = search_w.lock()->getText().toStdString();
+		auto movesPanel_p = movesPanel_w.lock();
 
-	label->setPosition(10, i * 25 + 10);
-	label->setSize(100, 10);
-	label->setTextSize(1);
-	contentPanel->add(label);
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		movesPanel_p->removeAllWidgets();
+		for (auto moveId : moves) {
+			if (movesNamesLower.at(moveId).find(query) == std::string::npos)
+				continue;
+
+			const auto &name = movesNames.at(moveId);
+			auto label = tgui::Label::create(std::to_string(moveId));
+			auto button = tgui::Button::create(name);
+
+			label->setPosition(10, index * 25 + 5);
+			button->setPosition(50, index * 25 + 3);
+			button->setSize(410, 20);
+			Utils::setRenderer(button);
+			Utils::setRenderer(label);
+			if (moveId == this->_object->_action) {
+				button->getRenderer()->setTextColor(tgui::Color::Green);
+				button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
+			} else if (!this->_object->_moves.contains(moveId)) {
+				button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x00, 0x00});
+				button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0x40, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x00, 0});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x00, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x20, 0x20});
+			} else if (name.rfind("Action #", 0) == 0) {
+				button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00});
+				button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0xA0, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x50, 0});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x80, 0x40, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x60, 0x20});
+			}
+
+			button->onClick.connect(onConfirm, moveId);
+			button->onClick.connect(closePopup, outsidePanel_w, contentPanel_w);
+
+			movesPanel_p->add(label);
+			movesPanel_p->add(button);
+			index++;
+		}
+
+		auto label = tgui::Label::create("");
+
+		label->setPosition(10, index * 25);
+		label->setSize(100, 5);
+		label->setTextSize(1);
+		movesPanel_p->add(label);
+	};
+	auto validate = [moves, movesNamesLower, onConfirm, closePopup](
+		const std::weak_ptr<tgui::EditBox> &search_w,
+		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
+		const std::weak_ptr<tgui::Panel> &contentPanel_w
+	) {
+		unsigned index = 0;
+		unsigned lastIndex = 0;
+		unsigned move;
+		std::string query = search_w.lock()->getText().toStdString();
+
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		for (auto moveId : moves) {
+			auto &name = movesNamesLower.at(moveId);
+
+			if (name == query) {
+				move = moveId;
+				lastIndex = 1;
+				break;
+			}
+			if (name.find(query) != std::string::npos) {
+				if (lastIndex)
+					lastIndex = UINT32_MAX;
+				else
+					lastIndex = index + 1;
+				move = moveId;
+			}
+			index++;
+		}
+		if (lastIndex == UINT32_MAX || lastIndex == 0)
+			return;
+		onConfirm(move);
+		closePopup(outsidePanel_w, contentPanel_w);
+	};
+
+	refresh(std::weak_ptr(search), std::weak_ptr(movesPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onTextChange.connect(refresh, std::weak_ptr(search), std::weak_ptr(movesPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onReturnKeyPress.connect(validate, std::weak_ptr(search), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	scroll -= movesPanel->getSize().y / 2;
 	if (scroll > 0)
-		contentPanel->getVerticalScrollbar()->setValue(scroll);
+		movesPanel->getVerticalScrollbar()->setValue(scroll);
+	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->setFocused(true);
 }
 
 void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)

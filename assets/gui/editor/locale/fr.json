@@ -22,6 +22,8 @@
 	"message_box.button.ok":                      "OK",
 	"message_box.button.confirm":                 "Confirmer",
 
+	"popup.search":                               "Rechercher...",
+
 	"shortcuts.none":                             "Aucun",
 	"shortcuts.press":                            "Appuyez sur une touche",
 
