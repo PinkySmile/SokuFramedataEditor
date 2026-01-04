@@ -101,10 +101,16 @@ namespace SpiralOfFate
 		void _removeAction();
 		void _removeBox();
 
+		void _exportThisFrameImage();
+		void _exportThisActionImage();
+		void _exportThisCharacterImage();
 		void _copyBoxesFromLastFrame();
 		void _copyBoxesFromNextFrame();
 		void _flattenThisMoveCollisionBoxes();
+		void _flattenThisMoveProperties();
 		void _reloadTextures();
+		void _invertColors();
+		void _reversePalette();
 
 		void _about();
 

@@ -29,7 +29,39 @@ MenuBar.MainBar {
     }
 
     Menu {
-        Items = ["menu_item.misc.copy_box_last", "menu_item.misc.copy_box_next", "menu_item.misc.flatten", "menu_item.misc.reload"];
+        Menu {
+            Text = "menu_item.misc.export_image";
+            Items = ["menu_item.misc.export_image.this_frame", "menu_item.misc.export_image.this_action", "menu_item.misc.export_image.this_character"];
+        }
+
+        Menu {
+            Text = "menu_item.misc.copy_box_last";
+        }
+
+        Menu {
+            Text = "menu_item.misc.copy_box_next";
+        }
+
+        Menu {
+            Text = "menu_item.misc.flatten";
+        }
+
+        Menu {
+            Text = "menu_item.misc.flatten_properties";
+        }
+
+        Menu {
+            Text = "menu_item.misc.reload";
+        }
+
+        Menu {
+            Text = "menu_item.misc.invert_colors";
+        }
+
+        Menu {
+            Text = "menu_item.misc.reverse_palette";
+        }
+
         Text = "menu_item.misc";
     }
 

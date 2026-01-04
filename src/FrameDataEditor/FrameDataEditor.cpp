@@ -280,10 +280,17 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.action" }, &FrameDataEditor::_removeAction);
 	this->_connectShortcut(menu, { "menu_item.remove", "menu_item.remove.box"    }, &FrameDataEditor::_removeBox);
 
-	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_last" }, &FrameDataEditor::_copyBoxesFromLastFrame);
-	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_next" }, &FrameDataEditor::_copyBoxesFromNextFrame);
-	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten"       }, &FrameDataEditor::_flattenThisMoveCollisionBoxes);
-	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reload"        }, &FrameDataEditor::_reloadTextures);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.export_image", "menu_item.misc.export_image.this_frame"     }, &FrameDataEditor::_exportThisFrameImage);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.export_image", "menu_item.misc.export_image.this_action"    }, &FrameDataEditor::_exportThisActionImage);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.export_image", "menu_item.misc.export_image.this_character" }, &FrameDataEditor::_exportThisCharacterImage);
+
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_last"      }, &FrameDataEditor::_copyBoxesFromLastFrame);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_next"      }, &FrameDataEditor::_copyBoxesFromNextFrame);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten"            }, &FrameDataEditor::_flattenThisMoveCollisionBoxes);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten_properties" }, &FrameDataEditor::_flattenThisMoveProperties);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reload"             }, &FrameDataEditor::_reloadTextures);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.invert_colors"      }, &FrameDataEditor::_invertColors);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reverse_palette"    }, &FrameDataEditor::_reversePalette);
 
 	this->_connectShortcut(menu, {"menu_item.help", "menu_item.help.about"}, &FrameDataEditor::_about);
 }
@@ -642,6 +649,42 @@ void SpiralOfFate::FrameDataEditor::_removeAction()
 void SpiralOfFate::FrameDataEditor::_removeBox()
 {
 	this->_focusedWindow->removeBox();
+}
+
+void SpiralOfFate::FrameDataEditor::_exportThisFrameImage()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::FrameDataEditor::_exportThisActionImage()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::FrameDataEditor::_exportThisCharacterImage()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::FrameDataEditor::_flattenThisMoveProperties()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::FrameDataEditor::_invertColors()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+}
+
+void SpiralOfFate::FrameDataEditor::_reversePalette()
+{
+	// TODO: Not implemented
+	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
 void SpiralOfFate::FrameDataEditor::_copyBoxesFromLastFrame()
