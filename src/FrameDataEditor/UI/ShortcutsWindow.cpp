@@ -14,7 +14,7 @@ SpiralOfFate::ShortcutsWindow::ShortcutsWindow(FrameDataEditor &editor) :
 	auto panel = this->get<tgui::ScrollablePanel>("Shortcuts");
 	size_t i = 0;
 
-	for (auto &[name, localeName] : editor.getShortcutsNames()) {
+	for (auto &name : editor.getShortcutsNames()) {
 		auto npanel = std::make_shared<LocalizedContainer<tgui::Panel>>(editor);
 
 		npanel->loadLocalizedWidgetsFromFile("assets/gui/editor/shortcut.gui");
@@ -28,15 +28,19 @@ SpiralOfFate::ShortcutsWindow::ShortcutsWindow(FrameDataEditor &editor) :
 		auto rm = npanel->get<tgui::Button>("Remove");
 		auto shortcut = this->_shortcuts.find(name);
 
-		label->setText(localeName);
+		label->setText(editor.localize("shortcut." + name));
 		if (shortcut == this->_shortcuts.end())
-			key->setText(editor.localize("shortcuts.none"));
+			key->setText(editor.localize("shortcut.none"));
 		else
 			key->setText(editor.shortcutToString(shortcut->second));
 		key->onClick([name, this](std::weak_ptr<tgui::Button> me) {
+			if (this->_changingShortcut.second) {
+				this->_changingShortcut.second->setText(this->_editor.shortcutToString(this->_shortcuts[this->_changingShortcut.first]));
+				Utils::setRenderer(this->_changingShortcut.second);
+			}
 			this->_changingShortcut = {name, me.lock()};
-			this->_changingShortcut.second->setText(this->_editor.localize("shortcuts.press"));
-			this->_changingShortcut.second->getRenderer()->setTextColor(tgui::Color::Red);
+			this->_changingShortcut.second->setText(this->_editor.localize("shortcut.press"));
+			this->_changingShortcut.second->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00, 0xFF});
 			this->_tmp.code = sf::Keyboard::Key::Unknown;
 			this->_tmp.alt = false;
 			this->_tmp.shift = false;
@@ -45,6 +49,8 @@ SpiralOfFate::ShortcutsWindow::ShortcutsWindow(FrameDataEditor &editor) :
 		}, std::weak_ptr(key));
 		rm->onClick([name, key, this] {
 			if (this->_changingShortcut.second) {
+				this->_changingShortcut.second->setText(this->_editor.shortcutToString(this->_shortcuts[this->_changingShortcut.first]));
+				Utils::setRenderer(this->_changingShortcut.second);
 				this->_changingShortcut.second.reset();
 				return;
 			}
@@ -53,7 +59,7 @@ SpiralOfFate::ShortcutsWindow::ShortcutsWindow(FrameDataEditor &editor) :
 			if (it == this->_shortcuts.end())
 				return;
 			this->_shortcuts.erase(it);
-			key->setText(this->_editor.localize("shortcuts.none"));
+			key->setText(this->_editor.localize("shortcut.none"));
 		});
 	}
 

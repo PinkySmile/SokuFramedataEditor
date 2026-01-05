@@ -52,7 +52,7 @@ namespace SpiralOfFate
 		sf::Clock _clock;
 		std::shared_ptr<class ShortcutsWindow> _shortcutWindow;
 		std::map<std::string, Shortcut> _shortcutsNames;
-		std::vector<std::pair<std::string, std::string>> _shortcutData;
+		std::vector<std::string> _shortcutData;
 		std::map<Shortcut, std::pair<std::vector<tgui::String>, void (FrameDataEditor::*)()>> _shortcuts;
 		std::vector<tgui::MenuBar::GetMenusElement> _menuHierarchy;
 		std::map<std::string, std::string> _localization;
@@ -65,6 +65,7 @@ namespace SpiralOfFate
 		void _buildMenu();
 		void _updateMenuBar();
 
+		void _restoreDefaultShortcuts();
 		void _loadSettings();
 		void _tickAnimation();
 
@@ -81,6 +82,7 @@ namespace SpiralOfFate
 		void _navToPrevBlock();
 		void _navToNextAction();
 		void _navToPrevAction();
+		void _navGoTo();
 
 		void _undo();
 		void _redo();
@@ -127,7 +129,7 @@ namespace SpiralOfFate
 		void saveSettings();
 		void setShortcuts(const std::map<std::string, Shortcut> &shortcuts);
 		std::map<std::string, Shortcut> getShortcuts() const;
-		std::vector<std::pair<std::string, std::string>> getShortcutsNames() const;
+		std::vector<std::string> getShortcutsNames() const;
 
 		const std::map<std::string, std::string> &getLocalizationData() const;
 		bool hasLocalization(const std::string &s) const;

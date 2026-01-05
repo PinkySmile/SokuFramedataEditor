@@ -23,14 +23,44 @@ Renderer.1 {
 }
 
 Button.Cancel {
-    Position = ((Save.x - w) - 10, (&.h - h) - 30);
-    Renderer = &1;
+    Position = ((Default.x - w) - 10, (Shortcuts.h + Shortcuts.y) + 10);
     Text = "settings.cancel";
+    TextSize = 13;
+
+    Renderer {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorDown = #EBEBEB;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorDown = black;
+        BorderColorFocused = #1E1EB4;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        TextColorDown = black;
+        TextColorHover = black;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Button.Default {
+    Position = ((Save.x - w) - 10, (Shortcuts.h + Shortcuts.y) + 10);
+    Renderer = &1;
+    Text = "settings.default";
     TextSize = 13;
 }
 
 Button.Save {
-    Position = ((&.w - w) - 10, (&.h - h) - 30);
+    Position = ((&.w - w) - 10, (Shortcuts.h + Shortcuts.y) + 10);
     Renderer = &1;
     Text = "settings.save";
     TextSize = 13;
@@ -40,7 +70,7 @@ ScrollablePanel.Shortcuts {
     ContentSize = (0, 0);
     HorizontalScrollbarPolicy = Automatic;
     Position = (0, 5);
-    Size = (&.w, &.h - 65);
+    Size = (&.w, &.h - 68);
     VerticalScrollbarPolicy = Automatic;
 
     Renderer {

@@ -53,11 +53,26 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 {
 	game->gui.loadWidgetsFromFile("assets/gui/editor/layout.gui");
 	this->_clock.stop();
+	this->_loadSettings();
+
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
+
+	this->_menuHierarchy = menu->getMenus();
+	this->setLocale(this->_locale);
+	Utils::setRenderer(game->gui);
+}
+
+SpiralOfFate::FrameDataEditor::~FrameDataEditor()
+{
+	this->saveSettings();
+}
+
+void SpiralOfFate::FrameDataEditor::_restoreDefaultShortcuts()
+{
+	this->_shortcutsNames.clear();
 	this->_shortcutsNames["menu_item.file.load"]                = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.save"]                = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.save_as"]             = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	// this->_shortcutsNames["menu_item.file.settings"]      = { .code = sf::Keyboard::Key::LAlt, .alt = false, .control = false, .shift = false, .meta = false };
-	// this->_shortcutsNames["menu_item.file.shortcuts"]     = { .code = sf::Keyboard::Key::LAlt, .alt = false, .control = false, .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.file.quit"]                = { .code = sf::Keyboard::Key::Q,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.edit.undo"]                = { .code = sf::Keyboard::Key::Z,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.edit.redo"]                = { .code = sf::Keyboard::Key::Y,      .alt = false, .control = true,  .shift = false, .meta = false };
@@ -72,6 +87,7 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 	this->_shortcutsNames["menu_item.navigate.previous_block"]  = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = false, .shift = true,  .meta = false };
 	this->_shortcutsNames["menu_item.navigate.next_action"]     = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::G,      .alt = false, .control = true,  .shift = false, .meta = false };
 
 	this->_shortcutsNames["menu_item.new.frame"]                = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.new.frame_end"]            = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
@@ -86,19 +102,8 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 	this->_shortcutsNames["menu_item.misc.copy_box_last"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = false, .meta = false };
 	this->_shortcutsNames["menu_item.misc.copy_box_next"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	this->_shortcutsNames["menu_item.misc.flatten"]             = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = false, .meta = false };
+	this->_shortcutsNames["menu_item.misc.flatten_properties"]  = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = true,  .meta = false };
 	this->_shortcutsNames["menu_item.misc.reload"]              = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_loadSettings();
-
-	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
-
-	this->_menuHierarchy = menu->getMenus();
-	this->setLocale(this->_locale);
-	Utils::setRenderer(game->gui);
-}
-
-SpiralOfFate::FrameDataEditor::~FrameDataEditor()
-{
-	this->saveSettings();
 }
 
 bool SpiralOfFate::FrameDataEditor::closeAll()
@@ -128,7 +133,8 @@ void SpiralOfFate::FrameDataEditor::_loadSettings()
 			this->_shortcutsNames.clear();
 			for (const auto &[name, shortcut] : json["shortcuts"].items())
 				from_json(shortcut, this->_shortcutsNames[name]);
-		}
+		} else
+			this->_restoreDefaultShortcuts();
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
 }
@@ -160,7 +166,7 @@ std::map<std::string, SpiralOfFate::FrameDataEditor::Shortcut> SpiralOfFate::Fra
 	return this->_shortcutsNames;
 }
 
-std::vector<std::pair<std::string, std::string>> SpiralOfFate::FrameDataEditor::getShortcutsNames() const
+std::vector<std::string> SpiralOfFate::FrameDataEditor::getShortcutsNames() const
 {
 	return this->_shortcutData;
 }
@@ -219,24 +225,14 @@ std::string SpiralOfFate::FrameDataEditor::localizeShortcut(const std::string &s
 void SpiralOfFate::FrameDataEditor::_connectShortcut(const tgui::MenuBar::Ptr &menu, const std::vector<std::string> &hierarchy, void (FrameDataEditor::*callback)())
 {
 	std::vector<tgui::String> tguiHierarchy;
-	std::string tmp;
 
 	tguiHierarchy.reserve(hierarchy.size());
-	for (size_t i = 0; i < hierarchy.size() - 1; i++) {
-		auto l = this->localize(hierarchy[i]);
-
-		tguiHierarchy.emplace_back(l);
-		if (!tmp.empty())
-			tmp += ", ";
-		tmp += l;
-	}
+	for (size_t i = 0; i < hierarchy.size() - 1; i++)
+		tguiHierarchy.emplace_back(this->localize(hierarchy[i]));
 
 	auto it = this->_shortcutsNames.find(hierarchy.back());
 
-	if (hierarchy.size() >= 2)
-		tmp += " -> ";
-	tmp += this->localize(hierarchy.back());
-	this->_shortcutData.emplace_back(hierarchy.back(), tmp);
+	this->_shortcutData.emplace_back(hierarchy.back());
 	tguiHierarchy.emplace_back(this->localizeShortcut(hierarchy.back()));
 	if (it != this->_shortcutsNames.end()) {
 		game->logger.debug(std::string(hierarchy.back()) + " shortcut is " + this->shortcutToString(it->second));
@@ -267,6 +263,7 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	this->_connectShortcut(menu, { "menu_item.navigate", "menu_item.navigate.previous_block"  }, &FrameDataEditor::_navToPrevBlock);
 	this->_connectShortcut(menu, { "menu_item.navigate", "menu_item.navigate.next_action"     }, &FrameDataEditor::_navToNextAction);
 	this->_connectShortcut(menu, { "menu_item.navigate", "menu_item.navigate.previous_action" }, &FrameDataEditor::_navToPrevAction);
+	this->_connectShortcut(menu, { "menu_item.navigate", "menu_item.navigate.go_to"           }, &FrameDataEditor::_navGoTo);
 
 	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.frame"     }, &FrameDataEditor::_newFrame);
 	this->_connectShortcut(menu, { "menu_item.new", "menu_item.new.frame_end" }, &FrameDataEditor::_newEndFrame);
@@ -524,7 +521,7 @@ void SpiralOfFate::FrameDataEditor::_editShortcuts()
 {
 	this->_shortcutWindow = Utils::openWindowWithFocus<tgui::Gui, ShortcutsWindow>(
 		game->gui,
-		"600", "&.h - 300",
+		"650", "&.h - 300",
 		nullptr,
 		false,
 		std::ref(*this)
@@ -569,6 +566,11 @@ void SpiralOfFate::FrameDataEditor::_navToNextAction()
 void SpiralOfFate::FrameDataEditor::_navToPrevAction()
 {
 	this->_focusedWindow->navToPrevAction();
+}
+
+void SpiralOfFate::FrameDataEditor::_navGoTo()
+{
+	this->_focusedWindow->navGoTo();
 }
 
 void SpiralOfFate::FrameDataEditor::_undo()

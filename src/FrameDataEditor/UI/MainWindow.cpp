@@ -1448,27 +1448,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		// TODO: Change fields label if a character or subobject
 		generalEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
 	if (actionSelect)
-		actionSelect->onClick.connect(&MainWindow::_createMoveListPopup, this, [this](unsigned move){
-			auto curr = this->_object->_moves.find(move);
-			assert_exp(curr != this->_object->_moves.end());
-
-			auto &act = this->_object->_moves[move];
-			auto &blk = act.front();
-
-			this->_object->_action = move;
-			this->_object->_actionBlock = 0;
-			this->_object->_animation = 0;
-			this->_object->_animationCtr = 0;
-			this->_requireReload = true;
-			this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
-			this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
-			this->_editor.setHasLastBlock(false);
-			this->_editor.setHasNextBlock(act.size() != 1);
-			this->_editor.setHasLastFrame(false);
-			this->_editor.setHasNextFrame(blk.size() != 1);
-			this->_editor.setCanCopyLast(false);
-			this->_editor.setCanCopyNext(blk.size() != 1);
-		}, false);
+		actionSelect->onClick.connect(&MainWindow::navGoTo, this);
 	if (prevAction)
 		prevAction->onClick.connect(&MainWindow::navToPrevAction, this);
 	if (nextAction)
@@ -2380,6 +2360,31 @@ void SpiralOfFate::MainWindow::navToPrevAction()
 	this->_editor.setHasNextFrame(blk.size() != 1);
 	this->_editor.setCanCopyLast(false);
 	this->_editor.setCanCopyNext(blk.size() != 1);
+}
+
+void SpiralOfFate::MainWindow::navGoTo()
+{
+	this->_createMoveListPopup([this](unsigned move){
+		auto curr = this->_object->_moves.find(move);
+		assert_exp(curr != this->_object->_moves.end());
+
+		auto &act = this->_object->_moves[move];
+		auto &blk = act.front();
+
+		this->_object->_action = move;
+		this->_object->_actionBlock = 0;
+		this->_object->_animation = 0;
+		this->_object->_animationCtr = 0;
+		this->_requireReload = true;
+		this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
+		this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
+		this->_editor.setHasLastBlock(false);
+		this->_editor.setHasNextBlock(act.size() != 1);
+		this->_editor.setHasLastFrame(false);
+		this->_editor.setHasNextFrame(blk.size() != 1);
+		this->_editor.setCanCopyLast(false);
+		this->_editor.setCanCopyNext(blk.size() != 1);
+	}, false);
 }
 
 void SpiralOfFate::MainWindow::_reinitSidePanel(tgui::Container &panel)

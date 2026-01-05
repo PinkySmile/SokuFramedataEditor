@@ -14,7 +14,7 @@ MenuBar.MainBar {
     }
 
     Menu {
-        Items = ["menu_item.navigate.next_frame", "menu_item.navigate.previous_frame", "menu_item.navigate.next_block", "menu_item.navigate.previous_block", "menu_item.navigate.next_action", "menu_item.navigate.previous_action"];
+        Items = ["menu_item.navigate.next_frame", "menu_item.navigate.previous_frame", "menu_item.navigate.next_block", "menu_item.navigate.previous_block", "menu_item.navigate.next_action", "menu_item.navigate.previous_action", "-", "menu_item.navigate.go_to"];
         Text = "menu_item.navigate";
     }
 

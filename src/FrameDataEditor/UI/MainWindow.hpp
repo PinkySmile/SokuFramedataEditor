@@ -82,6 +82,7 @@ namespace SpiralOfFate
 		void navToPrevBlock();
 		void navToNextAction();
 		void navToPrevAction();
+		void navGoTo();
 
 		void newFrame();
 		void newEndFrame();
