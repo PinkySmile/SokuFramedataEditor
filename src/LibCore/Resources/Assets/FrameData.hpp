@@ -260,6 +260,7 @@ namespace SpiralOfFate
 		unsigned specialMarker = 0;
 		DefensiveFlags dFlag = {0};
 		OffensiveFlags oFlag = {0};
+		// FIXME: Why isn't this just a std::optional?
 		Box *collisionBox = nullptr;
 		unsigned wrongBlockStun = 0;
 		unsigned blockStun = 0;

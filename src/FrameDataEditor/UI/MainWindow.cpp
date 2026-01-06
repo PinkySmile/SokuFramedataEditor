@@ -23,6 +23,7 @@
 #include "../Operations/EditColorOperation.hpp"
 #include "../Operations/CreatePaletteOperation.hpp"
 #include "../Operations/EditColorsOperation.hpp"
+#include "../Operations/FlattenCollisionBoxesOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
 #include "../Operations/RemoveFrameOperation.hpp"
@@ -580,7 +581,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	this->_localizeWidgets(*ctrlPanel, true);
 	Utils::setRenderer(this);
 
-	this->setSize("min(1200, &.w - 20)", "min(600, &.h - 40)");
+	this->setSize("min(1200, &.w - 20)", "min(625, &.h - 40)");
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
 	this->setTitle(frameDataPath.string());
@@ -1756,6 +1757,17 @@ void SpiralOfFate::MainWindow::copyBoxesFromNextFrame()
 }
 
 void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
+{
+	auto &f = this->_object->_moves[this->_object->_action][this->_object->_actionBlock][this->_object->_animation];
+
+	this->applyOperation(new FlattenCollisionBoxesOperation(
+		*this->_object,
+		this->_editor.localize("operation.copy_box_last"),
+		f.collisionBox ? std::optional(*f.collisionBox) : std::optional<Box>()
+	));
+}
+
+void SpiralOfFate::MainWindow::flattenThisMoveProperties()
 {
 	// TODO: Not implemented
 	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);

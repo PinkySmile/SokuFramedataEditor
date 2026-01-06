@@ -449,6 +449,8 @@ if (NOT USE_SDL2)
 			src/FrameDataEditor/UI/ShortcutsWindow.hpp
 			src/FrameDataEditor/Operations/EditColorsOperation.cpp
 			src/FrameDataEditor/Operations/EditColorsOperation.hpp
+			src/FrameDataEditor/Operations/FlattenCollisionBoxesOperation.cpp
+			src/FrameDataEditor/Operations/FlattenCollisionBoxesOperation.hpp
 		)
 		target_link_libraries(FrameDataEditor SoFGVCore png)
 	endif ()

@@ -671,22 +671,6 @@ void SpiralOfFate::FrameDataEditor::_exportThisCharacterImage()
 	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 }
 
-void SpiralOfFate::FrameDataEditor::_flattenThisMoveProperties()
-{
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
-}
-
-void SpiralOfFate::FrameDataEditor::_invertColors()
-{
-	this->_focusedWindow->invertColors();
-}
-
-void SpiralOfFate::FrameDataEditor::_reversePalette()
-{
-	this->_focusedWindow->reversePalette();
-}
-
 void SpiralOfFate::FrameDataEditor::_copyBoxesFromLastFrame()
 {
 	this->_focusedWindow->copyBoxesFromLastFrame();
@@ -700,6 +684,21 @@ void SpiralOfFate::FrameDataEditor::_copyBoxesFromNextFrame()
 void SpiralOfFate::FrameDataEditor::_flattenThisMoveCollisionBoxes()
 {
 	this->_focusedWindow->flattenThisMoveCollisionBoxes();
+}
+
+void SpiralOfFate::FrameDataEditor::_flattenThisMoveProperties()
+{
+	this->_focusedWindow->flattenThisMoveProperties();
+}
+
+void SpiralOfFate::FrameDataEditor::_invertColors()
+{
+	this->_focusedWindow->invertColors();
+}
+
+void SpiralOfFate::FrameDataEditor::_reversePalette()
+{
+	this->_focusedWindow->reversePalette();
 }
 
 void SpiralOfFate::FrameDataEditor::_reloadTextures()
