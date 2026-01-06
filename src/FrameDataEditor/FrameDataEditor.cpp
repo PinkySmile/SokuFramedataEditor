@@ -67,43 +67,43 @@ SpiralOfFate::FrameDataEditor::~FrameDataEditor()
 	this->saveSettings();
 }
 
-void SpiralOfFate::FrameDataEditor::_restoreDefaultShortcuts()
+void SpiralOfFate::FrameDataEditor::restoreDefaultShortcuts(std::map<std::string, Shortcut> &shurtcuts) const
 {
-	this->_shortcutsNames.clear();
-	this->_shortcutsNames["menu_item.file.load"]                = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.file.save"]                = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.file.save_as"]             = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.file.quit"]                = { .code = sf::Keyboard::Key::Q,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.undo"]                = { .code = sf::Keyboard::Key::Z,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.redo"]                = { .code = sf::Keyboard::Key::Y,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.copy"]                = { .code = sf::Keyboard::Key::C,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.paste"]               = { .code = sf::Keyboard::Key::V,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.edit.paste_boxdata"]       = { .code = sf::Keyboard::Key::V,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.edit.paste_animdata"]      = { .code = sf::Keyboard::Key::V,      .alt = true,  .control = true,  .shift = false, .meta = false };
+	shurtcuts.clear();
+	shurtcuts["menu_item.file.load"]                = { .code = sf::Keyboard::Key::O,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.file.save"]                = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.file.save_as"]             = { .code = sf::Keyboard::Key::S,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.file.quit"]                = { .code = sf::Keyboard::Key::Q,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.edit.undo"]                = { .code = sf::Keyboard::Key::Z,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.edit.redo"]                = { .code = sf::Keyboard::Key::Y,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.edit.copy"]                = { .code = sf::Keyboard::Key::C,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.edit.paste"]               = { .code = sf::Keyboard::Key::V,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.edit.paste_boxdata"]       = { .code = sf::Keyboard::Key::V,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.edit.paste_animdata"]      = { .code = sf::Keyboard::Key::V,      .alt = true,  .control = true,  .shift = false, .meta = false };
 
-	this->_shortcutsNames["menu_item.navigate.next_frame"]      = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = false, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.navigate.previous_frame"]  = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = false, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.navigate.next_block"]      = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = false, .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.navigate.previous_block"]  = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = false, .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.navigate.next_action"]     = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::G,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.navigate.next_frame"]      = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = false, .shift = false, .meta = false };
+	shurtcuts["menu_item.navigate.previous_frame"]  = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = false, .shift = false, .meta = false };
+	shurtcuts["menu_item.navigate.next_block"]      = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = false, .shift = true,  .meta = false };
+	shurtcuts["menu_item.navigate.previous_block"]  = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = false, .shift = true,  .meta = false };
+	shurtcuts["menu_item.navigate.next_action"]     = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::G,      .alt = false, .control = true,  .shift = false, .meta = false };
 
-	this->_shortcutsNames["menu_item.new.frame"]                = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.frame_end"]            = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.new.block"]                = { .code = sf::Keyboard::Key::B,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.action"]               = { .code = sf::Keyboard::Key::A,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.hurt_box"]             = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.new.hit_box"]              = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.remove.frame"]             = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.remove.block"]             = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.remove.action"]            = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = true,  .meta = true  };
-	this->_shortcutsNames["menu_item.remove.box"]               = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.copy_box_last"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.copy_box_next"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.misc.flatten"]             = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = false, .meta = false };
-	this->_shortcutsNames["menu_item.misc.flatten_properties"]  = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = true,  .meta = false };
-	this->_shortcutsNames["menu_item.misc.reload"]              = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.new.frame"]                = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.new.frame_end"]            = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.new.block"]                = { .code = sf::Keyboard::Key::B,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.new.action"]               = { .code = sf::Keyboard::Key::A,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.new.hurt_box"]             = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.new.hit_box"]              = { .code = sf::Keyboard::Key::H,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.remove.frame"]             = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.remove.block"]             = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.remove.action"]            = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = true,  .meta = true  };
+	shurtcuts["menu_item.remove.box"]               = { .code = sf::Keyboard::Key::Delete, .alt = false, .control = false, .shift = false, .meta = false };
+	shurtcuts["menu_item.misc.copy_box_last"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.misc.copy_box_next"]       = { .code = sf::Keyboard::Key::I,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.misc.flatten"]             = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shurtcuts["menu_item.misc.flatten_properties"]  = { .code = sf::Keyboard::Key::K,      .alt = false, .control = true,  .shift = true,  .meta = false };
+	shurtcuts["menu_item.misc.reload"]              = { .code = sf::Keyboard::Key::R,      .alt = false, .control = true,  .shift = true,  .meta = false };
 }
 
 bool SpiralOfFate::FrameDataEditor::closeAll()
@@ -134,7 +134,7 @@ void SpiralOfFate::FrameDataEditor::_loadSettings()
 			for (const auto &[name, shortcut] : json["shortcuts"].items())
 				from_json(shortcut, this->_shortcutsNames[name]);
 		} else
-			this->_restoreDefaultShortcuts();
+			this->restoreDefaultShortcuts(this->_shortcutsNames);
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
 }
@@ -409,7 +409,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 		try {
 			this->_openWindows.emplace_back(new MainWindow(path, *this));
 			this->_focusedWindow = this->_openWindows.back();
-			this->_focusedWindow->onFocus.connect([this](const std::weak_ptr<MainWindow> &This){
+			this->_focusedWindow->onFocus([this](const std::weak_ptr<MainWindow> &This){
 				auto lock = This.lock();
 
 				if (this->_focusedWindow != lock) {
@@ -420,7 +420,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 					this->_focusedWindow->refreshMenuItems();
 				}
 			}, std::weak_ptr(this->_focusedWindow));
-			this->_focusedWindow->onRealClose.connect([this](const std::weak_ptr<MainWindow> &This){
+			this->_focusedWindow->onRealClose([this](const std::weak_ptr<MainWindow> &This){
 				this->_openWindows.erase(std::remove(this->_openWindows.begin(), this->_openWindows.end(), This.lock()), this->_openWindows.end());
 				if (this->_focusedWindow == This.lock())
 					this->_focusedWindow = nullptr;
@@ -454,7 +454,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 		{this->localize("file_type.all"), {}}
 	}, 0);
 	file->setMultiSelect(true);
-	file->onFileSelect.connect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
+	file->onFileSelect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
 		for (auto &p : arr) {
 			const std::filesystem::path &filePath = p;
 			std::filesystem::path pathBackup = p;
@@ -476,7 +476,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 				this->localize("message_box.button.yes"),
 				this->localize("message_box.button.no")
 			});
-			dialog->onButtonPress.connect([this, load, filePath, pathBackup](const tgui::String &d){
+			dialog->onButtonPress([this, load, filePath, pathBackup](const tgui::String &d){
 				if (d == this->localize("message_box.button.no"))
 					load(filePath);
 				else if (load(pathBackup))
@@ -499,7 +499,7 @@ void SpiralOfFate::FrameDataEditor::_saveAs()
 		{this->localize("file_type.framedata"), {"*.json"}},
 		{this->localize("file_type.all"), {}}
 	}, 0);
-	file->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
 		this->_focusedWindow->save(arr[0].asString().toStdString());
 	});
 }
@@ -527,7 +527,7 @@ void SpiralOfFate::FrameDataEditor::_editShortcuts()
 		std::ref(*this)
 	);
 	this->_shortcutWindow->setTitle(this->localize("settings.shortcuts"));
-	this->_shortcutWindow->onClose.connect([this] {
+	this->_shortcutWindow->onClose([this] {
 		this->_shortcutWindow.reset();
 	});
 }

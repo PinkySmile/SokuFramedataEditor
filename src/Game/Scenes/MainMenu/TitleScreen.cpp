@@ -204,7 +204,7 @@ namespace SpiralOfFate
 					auto window = Utils::openFileDialog(game->gui, "Open replay", "replays");
 
 					window->setFileTypeFilters({ {"Replay file (*.replay)", {"*.replay"}}, {"All files", {}} }, 0);
-					window->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
+					window->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr){
 						try {
 							this->_loadReplay(arr[0]);
 						} catch (std::exception &e) {
@@ -561,7 +561,7 @@ namespace SpiralOfFate
 			auto dialog = Utils::saveFileDialog(game->gui, "Save inputs", "./profiles");
 
 			dialog->setFileTypeFilters({ {"Inputs file (*.in)", {"*.in"}}, {"All files", {}} }, 0);
-			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr){
+			dialog->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr){
 				std::ofstream stream{static_cast<std::filesystem::path>(arr[0])};
 
 				if (!stream)
@@ -579,7 +579,7 @@ namespace SpiralOfFate
 			auto dialog = Utils::openFileDialog(game->gui, "Load inputs", "profiles");
 
 			dialog->setFileTypeFilters({ {"Inputs file (*.in)", {"*.in"}}, {"All files", {}} }, 0);
-			dialog->onFileSelect.connect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+			dialog->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
 				auto &pair = (this->_changingInputs == 2 ? game->P1 : game->P2);
 
 				// FIXME: Use profile-like system

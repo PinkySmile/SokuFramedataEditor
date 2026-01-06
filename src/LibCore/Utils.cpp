@@ -326,10 +326,10 @@ namespace SpiralOfFate::Utils
 			gui.setTabKeyUsageEnabled(tabUsageEnabled);
 		};
 
-		panel->onClick.connect(closeWindow);
-		dialog->onClose.connect(closeWindow);
-		dialog->onEscapeKeyPress.connect(closeWindow);
-		dialog->onOkPress.connect(onFinish);
+		panel->onClick(closeWindow);
+		dialog->onClose(closeWindow);
+		dialog->onEscapeKeyPress(closeWindow);
+		dialog->onOkPress(onFinish);
 		return dialog;
 	}
 
@@ -352,15 +352,15 @@ namespace SpiralOfFate::Utils
 		slider->setMaximum(max);
 		slider->setStep(step);
 		slider->setValue(defaultValue);
-		slider->onValueChange.connect(sliderCallback);
+		slider->onValueChange(sliderCallback);
 
 		s << slider->getValue();
 		txt->setText(s.str());
 
-		window->get<tgui::Button>("Cancel")->onClick.connect([window]{
+		window->get<tgui::Button>("Cancel")->onClick([window]{
 			window->close();
 		});
-		window->get<tgui::Button>("Ok")->onClick.connect([onFinish, slider, window]{
+		window->get<tgui::Button>("Ok")->onClick([onFinish, slider, window]{
 			if (onFinish)
 				onFinish(slider->getValue());
 			window->close();

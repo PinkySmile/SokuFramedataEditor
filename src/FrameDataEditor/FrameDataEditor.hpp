@@ -65,7 +65,6 @@ namespace SpiralOfFate
 		void _buildMenu();
 		void _updateMenuBar();
 
-		void _restoreDefaultShortcuts();
 		void _loadSettings();
 		void _tickAnimation();
 
@@ -128,6 +127,7 @@ namespace SpiralOfFate
 		std::string getLocale() const;
 		void saveSettings();
 		void setShortcuts(const std::map<std::string, Shortcut> &shortcuts);
+		void restoreDefaultShortcuts(std::map<std::string, Shortcut> &shurtcuts) const;
 		std::map<std::string, Shortcut> getShortcuts() const;
 		std::vector<std::string> getShortcutsNames() const;
 

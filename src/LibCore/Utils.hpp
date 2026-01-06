@@ -204,8 +204,8 @@ namespace SpiralOfFate::Utils
 		};
 
 		if (closeOut)
-			panel->onClick.connect(closeWindow);
-		window->onClose.connect(closeWindow);
+			panel->onClick(closeWindow);
+		window->onClose(closeWindow);
 		window->onEscapeKeyPress(closeWindow);
 		return window;
 	}
@@ -225,7 +225,7 @@ namespace SpiralOfFate::Utils
 		// TODO: use variate
 		(void)variate;
 		openWindowWithFocus(gui, 0, 0, dialog);
-		dialog->onButtonPress.connect([](const std::weak_ptr<tgui::MessageBox> &d){
+		dialog->onButtonPress([](const std::weak_ptr<tgui::MessageBox> &d){
 			d.lock()->close();
 		}, std::weak_ptr(dialog));
 		return dialog;

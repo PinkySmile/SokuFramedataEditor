@@ -17,6 +17,7 @@ namespace SpiralOfFate
 		std::pair<std::string, tgui::Button::Ptr> _changingShortcut;
 		std::map<std::string, FrameDataEditor::Shortcut> _shortcuts;
 
+		void _poplulateData();
 	public:
 		using Ptr = std::shared_ptr<ShortcutsWindow>; //!< Shared widget pointer
 		using ConstPtr = std::shared_ptr<const ShortcutsWindow>; //!< Shared constant widget pointer

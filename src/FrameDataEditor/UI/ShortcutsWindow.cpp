@@ -10,62 +10,16 @@ SpiralOfFate::ShortcutsWindow::ShortcutsWindow(FrameDataEditor &editor) :
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/shortcuts.gui");
 	Utils::setRenderer(*this);
 	this->_shortcuts = editor.getShortcuts();
+	this->_poplulateData();
 
-	auto panel = this->get<tgui::ScrollablePanel>("Shortcuts");
-	size_t i = 0;
-
-	for (auto &name : editor.getShortcutsNames()) {
-		auto npanel = std::make_shared<LocalizedContainer<tgui::Panel>>(editor);
-
-		npanel->loadLocalizedWidgetsFromFile("assets/gui/editor/shortcut.gui");
-		npanel->setSize({"100%", 35});
-		npanel->setPosition({0, i++ * 35});
-		Utils::setRenderer(static_cast<tgui::Container::Ptr>(npanel));
-		panel->add(npanel);
-
-		auto label = npanel->get<tgui::Label>("Shortcut");
-		auto key = npanel->get<tgui::Button>("Key");
-		auto rm = npanel->get<tgui::Button>("Remove");
-		auto shortcut = this->_shortcuts.find(name);
-
-		label->setText(editor.localize("shortcut." + name));
-		if (shortcut == this->_shortcuts.end())
-			key->setText(editor.localize("shortcut.none"));
-		else
-			key->setText(editor.shortcutToString(shortcut->second));
-		key->onClick([name, this](std::weak_ptr<tgui::Button> me) {
-			if (this->_changingShortcut.second) {
-				this->_changingShortcut.second->setText(this->_editor.shortcutToString(this->_shortcuts[this->_changingShortcut.first]));
-				Utils::setRenderer(this->_changingShortcut.second);
-			}
-			this->_changingShortcut = {name, me.lock()};
-			this->_changingShortcut.second->setText(this->_editor.localize("shortcut.press"));
-			this->_changingShortcut.second->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00, 0xFF});
-			this->_tmp.code = sf::Keyboard::Key::Unknown;
-			this->_tmp.alt = false;
-			this->_tmp.shift = false;
-			this->_tmp.control = false;
-			this->_tmp.meta = false;
-		}, std::weak_ptr(key));
-		rm->onClick([name, key, this] {
-			if (this->_changingShortcut.second) {
-				this->_changingShortcut.second->setText(this->_editor.shortcutToString(this->_shortcuts[this->_changingShortcut.first]));
-				Utils::setRenderer(this->_changingShortcut.second);
-				this->_changingShortcut.second.reset();
-				return;
-			}
-			auto it = this->_shortcuts.find(name);
-
-			if (it == this->_shortcuts.end())
-				return;
-			this->_shortcuts.erase(it);
-			key->setText(this->_editor.localize("shortcut.none"));
-		});
-	}
-
+	auto defaut = this->get<tgui::Button>("Default");
 	auto cancel = this->get<tgui::Button>("Cancel");
 	auto save = this->get<tgui::Button>("Save");
 
+	defaut->onClick([this] {
+		this->_editor.restoreDefaultShortcuts(this->_shortcuts);
+		this->_poplulateData();
+	});
 	cancel->onClick([this]{
 		this->close();
 	});
@@ -74,6 +28,68 @@ SpiralOfFate::ShortcutsWindow::ShortcutsWindow(FrameDataEditor &editor) :
 		editor.saveSettings();
 		this->close();
 	});
+}
+
+void SpiralOfFate::ShortcutsWindow::_poplulateData()
+{
+	auto panel = this->get<tgui::ScrollablePanel>("Shortcuts");
+	size_t i = 0;
+
+	for (auto &name : this->_editor.getShortcutsNames()) {
+		auto npanel = panel->get<LocalizedContainer<tgui::Panel>>(name);
+		tgui::Button::Ptr key;
+
+		if (!npanel) {
+			npanel = std::make_shared<LocalizedContainer<tgui::Panel>>(this->_editor);
+			npanel->loadLocalizedWidgetsFromFile("assets/gui/editor/shortcut.gui");
+			npanel->setSize({"100%", 35});
+			npanel->setPosition({0, i++ * 35});
+			Utils::setRenderer(static_cast<tgui::Container::Ptr>(npanel));
+			panel->add(npanel);
+
+			auto label = npanel->get<tgui::Label>("Shortcut");
+			auto rm = npanel->get<tgui::Button>("Remove");
+
+			key = npanel->get<tgui::Button>("Key");
+			label->setText(this->_editor.localize("shortcut." + name));
+			key->onClick([name, this](std::weak_ptr<tgui::Button> me) {
+				if (this->_changingShortcut.second) {
+					this->_changingShortcut.second->setText(this->_editor.shortcutToString(this->_shortcuts[this->_changingShortcut.first]));
+					Utils::setRenderer(this->_changingShortcut.second);
+				}
+				this->_changingShortcut = {name, me.lock()};
+				this->_changingShortcut.second->setText(this->_editor.localize("shortcut.press"));
+				this->_changingShortcut.second->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00, 0xFF});
+				this->_tmp.code = sf::Keyboard::Key::Unknown;
+				this->_tmp.alt = false;
+				this->_tmp.shift = false;
+				this->_tmp.control = false;
+				this->_tmp.meta = false;
+			}, std::weak_ptr(key));
+			rm->onClick([name, key, this] {
+				if (this->_changingShortcut.second) {
+					this->_changingShortcut.second->setText(this->_editor.shortcutToString(this->_shortcuts[this->_changingShortcut.first]));
+					Utils::setRenderer(this->_changingShortcut.second);
+					this->_changingShortcut.second.reset();
+					return;
+				}
+				auto it = this->_shortcuts.find(name);
+
+				if (it == this->_shortcuts.end())
+					return;
+				this->_shortcuts.erase(it);
+				key->setText(this->_editor.localize("shortcut.none"));
+			});
+		} else
+			key = npanel->get<tgui::Button>("Key");
+
+		auto shortcut = this->_shortcuts.find(name);
+
+		if (shortcut == this->_shortcuts.end())
+			key->setText(this->_editor.localize("shortcut.none"));
+		else
+			key->setText(this->_editor.shortcutToString(shortcut->second));
+	}
 }
 
 static_assert(static_cast<int>(sf::Keyboard::Key::Unknown) == static_cast<int>(tgui::Event::KeyboardKey::Unknown));

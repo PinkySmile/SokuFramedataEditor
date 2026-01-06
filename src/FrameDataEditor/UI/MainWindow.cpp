@@ -156,12 +156,12 @@ std::string to_hex(unsigned long long value)
 #define PLACE_HOOK_WIDGET(elem, src) do {                                                                \
         if (!elem)                                                                                       \
                 break;                                                                                   \
-        elem->onChangeStarted.connect([this]{                                                            \
+        elem->onChangeStarted([this]{                                                                    \
                 if (this->_palettes.empty())                                                             \
                         return;                                                                          \
                 this->startTransaction();                                                                \
         });                                                                                              \
-        elem->onChanged.connect([this](WidgetColor color){                                               \
+        elem->onChanged([this](WidgetColor color){                                                       \
                 if (this->_palettes.empty())                                                             \
                         return;                                                                          \
                 this->_colorChangeSource = src;                                                          \
@@ -175,7 +175,7 @@ std::string to_hex(unsigned long long value)
                         );                                                                               \
                 });                                                                                      \
         });                                                                                              \
-        elem->onChangeEnded.connect([this]{                                                              \
+        elem->onChangeEnded([this]{                                                                      \
                 if (this->_palettes.empty())                                                             \
                         return;                                                                          \
                 this->commitTransaction();                                                               \
@@ -185,23 +185,23 @@ std::string to_hex(unsigned long long value)
 #define PLACE_HOOK_HEXCOLOR(elem) do {                                                                  \
         if (!elem)                                                                                      \
                 break;                                                                                  \
-        elem->onFocus.connect([this]{                                                                   \
+        elem->onFocus([this]{                                                                           \
                 if (this->_palettes.empty())                                                            \
                         return;                                                                         \
 	        this->startTransaction();                                                               \
 	}); 	        	        	        	                                        \
-        elem->onUnfocus.connect([this]{                                                                 \
+        elem->onUnfocus([this]{                                                                         \
                 if (this->_palettes.empty())                                                            \
                         return;                                                                         \
 	        this->commitTransaction();                                                              \
 	}); 	        	        	        	                                        \
-        elem->onReturnKeyPress.connect([this]{                                                          \
+        elem->onReturnKeyPress([this]{                                                                  \
                 if (this->_palettes.empty())                                                            \
                         return;                                                                         \
 	        this->commitTransaction();                                                              \
 	        this->startTransaction();                                                               \
 	}); 	        	        	        	                                        \
-        elem->onTextChange.connect([this](const tgui::String &s){                                       \
+        elem->onTextChange([this](const tgui::String &s){                                               \
                 if (this->_palettes.empty())                                                            \
                         return;                                                                         \
                                                                                                         \
@@ -226,23 +226,23 @@ std::string to_hex(unsigned long long value)
 #define PLACE_HOOK_COLOR_COMPONENT(elem, index) do {                                                                 \
         if (!elem)                                                                                                   \
                 break;                                                                                               \
-        elem->onFocus.connect([this]{                                                                                \
+        elem->onFocus([this]{                                                                                        \
                 if (this->_palettes.empty())                                                                         \
                         return;                                                                                      \
 	        this->startTransaction();                                                                            \
 	}); 	        	        	        	                                                     \
-        elem->onUnfocus.connect([this]{                                                                              \
+        elem->onUnfocus([this]{                                                                                      \
                 if (this->_palettes.empty())                                                                         \
                         return;                                                                                      \
 	        this->commitTransaction();                                                                           \
 	}); 	        	        	        	                                                     \
-        elem->onReturnKeyPress.connect([this]{                                                                       \
+        elem->onReturnKeyPress([this]{                                                                               \
                 if (this->_palettes.empty())                                                                         \
                         return;                                                                                      \
 	        this->commitTransaction();                                                                           \
 	        this->startTransaction();                                                                            \
 	}); 	        	        	        	                                                     \
-        elem->onTextChange.connect([this](const tgui::String &s){                                                    \
+        elem->onTextChange([this](const tgui::String &s){                                                            \
                 if (this->_palettes.empty())                                                                         \
                         return;                                                                                      \
                 if (s.empty())                                                                                       \
@@ -272,10 +272,10 @@ do {                                                                            
                                                                                                           \
         if (!__elem)                                                                                      \
                 break;                                                                                    \
-        __elem->onFocus.connect([this]{ this->startTransaction(); });                                     \
-        __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                  \
-        __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); }); \
-        __elem->onTextChange.connect([this](const tgui::String &s){                                       \
+        __elem->onFocus([this]{ this->startTransaction(); });                                     \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                  \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); }); \
+        __elem->onTextChange([this](const tgui::String &s){                                       \
                 auto box = this->_preview->getSelectedBox();                                              \
                                                                                                           \
                 if (box.first == BOXTYPE_NONE || s.empty()) return;                                       \
@@ -316,10 +316,10 @@ do {                                                                            
                                                                                                                  \
         if (!__elem)                                                                                             \
                 break;                                                                                           \
-        __elem->onFocus.connect([this]{ this->startTransaction(); });                                            \
-        __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                         \
-        __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); });        \
-        __elem->onTextChange.connect([this](const tgui::String &s){                                              \
+        __elem->onFocus([this]{ this->startTransaction(); });                                            \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                         \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); });        \
+        __elem->onTextChange([this](const tgui::String &s){                                              \
                 if constexpr (noEmpty) if (s.empty()) return;                                                    \
                 try {                                                                                            \
                         fromStringPre(s)                                                                         \
@@ -346,10 +346,10 @@ do {                                                                            
                                                                                                                                  \
         if (!__elem)                                                                                                             \
                 break;                                                                                                           \
-        __elem->onFocus.connect([this]{ this->startTransaction(); });                                                            \
-        __elem->onUnfocus.connect([this]{ this->commitTransaction(); });                                                         \
-        __elem->onReturnKeyPress.connect([this]{ this->commitTransaction(); this->startTransaction(); });                        \
-        __elem->onTextChange.connect([this](const tgui::String &s){                                                              \
+        __elem->onFocus([this]{ this->startTransaction(); });                                                            \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                                         \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); });                        \
+        __elem->onTextChange([this](const tgui::String &s){                                                              \
                 if (s.empty()) {                                                                                                 \
                         this->updateTransaction([&]{ return new operation(                                                       \
                                 *this->_object,                                                                                  \
@@ -476,7 +476,7 @@ do {                                                                            
                                                                                    \
         if (!__elem)                                                               \
                 break;                                                             \
-        __elem->onChange.connect([this, index](bool b){                            \
+        __elem->onChange([this, index](bool b){                            \
                 this->applyOperation(new FlagOperation(                            \
                         *this->_object,                                            \
                         name,                                                      \
@@ -514,11 +514,11 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	this->_preview = std::make_shared<PreviewWidget>(std::ref(editor), std::ref(*this), *this->_object);
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
-	this->_preview->onBoxSelect.connect([this]{
+	this->_preview->onBoxSelect([this]{
 		this->_editor.setCanDelBoxes(true);
 		this->_rePopulateFrameData();
 	});
-	this->_preview->onBoxUnselect.connect([this]{
+	this->_preview->onBoxUnselect([this]{
 		this->_editor.setCanDelBoxes(false);
 		this->_rePopulateFrameData();
 	});
@@ -586,7 +586,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	this->setTitle(frameDataPath.string());
 	this->setResizable();
 	this->setCloseBehavior(CloseBehavior::None);
-	this->onClose.connect([this]{
+	this->onClose([this]{
 		// TODO: Check if it needs to be saved
 		std::filesystem::remove(this->_pathBak);
 		this->m_parent->remove(this->shared_from_this());
@@ -596,22 +596,22 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 	panel->add(this->_preview);
 	this->_preview->moveToBack();
 
-	showBoxes->onClick.connect([this](std::weak_ptr<tgui::BitmapButton> This){
+	showBoxes->onClick([this](std::weak_ptr<tgui::BitmapButton> This){
 		this->_preview->displayBoxes = !this->_preview->displayBoxes;
 		This.lock()->setImage(tgui::Texture("assets/gui/editor/" + std::string(this->_preview->displayBoxes ? "" : "no") + "boxes.png"));
 	}, std::weak_ptr(showBoxes));
-	displace->onClick.connect([this](std::weak_ptr<tgui::BitmapButton> This){
+	displace->onClick([this](std::weak_ptr<tgui::BitmapButton> This){
 		this->_preview->displaceObject = !this->_preview->displaceObject;
 		This.lock()->setImage(tgui::Texture("assets/gui/editor/" + std::string(this->_preview->displaceObject ? "" : "no") + "dispose.png"));
 	}, std::weak_ptr(displace));
 
-	this->onFocus.connect([this]{
+	this->onFocus([this]{
 		this->m_titleText.setColor(this->_titleColorFocusedCached);
 		this->m_titleBarColorCached = this->_titleBarColorFocusedCached;
 		this->_updateTextureTitleBar();
 		this->_updateTitleButtons();
 	});
-	this->onUnfocus.connect([this]{
+	this->onUnfocus([this]{
 		this->m_titleText.setColor(this->_titleColorUnfocusedCached);
 		this->m_titleBarColorCached = this->_titleBarColorUnfocusedCached;
 		this->_updateTextureTitleBar();
@@ -1019,8 +1019,8 @@ SpiralOfFate::LocalizedContainer<tgui::ChildWindow>::Ptr SpiralOfFate::MainWindo
 	size.y += contentPanel->getSize().y - contentPanel->getInnerSize().y;
 	contentPanel->setSize(size);
 	Utils::setRenderer(contentPanel->cast<tgui::Container>());
-	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
-	contentPanel->onClose.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	outsidePanel->onClick(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	contentPanel->onClose(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 	return contentPanel;
 }
 
@@ -1053,7 +1053,7 @@ void SpiralOfFate::MainWindow::_createGenericPopup(const std::string &path)
 	}
 	contentPanel->setSize(size);
 	Utils::setRenderer(contentPanel->cast<tgui::Container>());
-	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	outsidePanel->onClick(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 	this->_placeUIHooks(*contentPanel);
 	this->_populateData(*contentPanel);
 }
@@ -1161,8 +1161,8 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 				button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x60, 0x20});
 			}
 
-			button->onClick.connect(onConfirm, moveId);
-			button->onClick.connect(closePopup, outsidePanel_w, contentPanel_w);
+			button->onClick(onConfirm, moveId);
+			button->onClick(closePopup, outsidePanel_w, contentPanel_w);
 
 			movesPanel_p->add(label);
 			movesPanel_p->add(button);
@@ -1212,12 +1212,12 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 	};
 
 	refresh(std::weak_ptr(search), std::weak_ptr(movesPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
-	search->onTextChange.connect(refresh, std::weak_ptr(search), std::weak_ptr(movesPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
-	search->onReturnKeyPress.connect(validate, std::weak_ptr(search), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onTextChange(refresh, std::weak_ptr(search), std::weak_ptr(movesPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onReturnKeyPress(validate, std::weak_ptr(search), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 	scroll -= movesPanel->getSize().y / 2;
 	if (scroll > 0)
 		movesPanel->getVerticalScrollbar()->setValue(scroll);
-	outsidePanel->onClick.connect(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	outsidePanel->onClick(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 	search->setFocused(true);
 }
 
@@ -1259,7 +1259,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	tgui::Container &sidePanel = ctrlPanel ? *ctrlPanel : container;
 
 	if (mode)
-		mode->onTabSelect.connect([this, &sidePanel](std::weak_ptr<tgui::Tabs> This){
+		mode->onTabSelect([this, &sidePanel](std::weak_ptr<tgui::Tabs> This){
 			this->_selectColorMethod = This.lock()->getSelectedIndex();
 			this->_reinitSidePanel(sidePanel);
 			this->_rePopulateColorData();
@@ -1278,16 +1278,16 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			button->setPosition({(i % 8) * stepX, (i / 8) * stepY});
 			colorPanel->add(button, "Color" + std::to_string(i));
 
-			button->onClick.connect([this, i, &container]{
+			button->onClick([this, i, &container]{
 				this->_selectedColor = i;
 				this->_preview->setSelectedColor(i);
 				this->_populateColorData(container);
 			});
-			button->onMouseEnter.connect([this, i]{
+			button->onMouseEnter([this, i]{
 				this->_object->_paletteIndex = i;
 				this->_object->_needGenerate = true;
 			});
-			button->onMouseLeave.connect([this]{
+			button->onMouseLeave([this]{
 				if (this->_selectedColor == 0)
 					this->_object->_paletteIndex = -1;
 				else {
@@ -1298,12 +1298,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		}
 	}
 	this->_preview->onColorSelect.disconnectAll();
-	this->_preview->onColorSelect.connect([this, &container](unsigned colorIndex){
+	this->_preview->onColorSelect([this, &container](unsigned colorIndex){
 		this->_selectedColor = colorIndex;
 		this->_populateColorData(container);
 	});
 	if (paletteList)
-		paletteList->onItemSelect.connect([this, &container](unsigned index){
+		paletteList->onItemSelect([this, &container](unsigned index){
 			if (this->_palettes.empty())
 				return;
 			this->_selectedPalette = index;
@@ -1319,7 +1319,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	PLACE_HOOK_HEXCOLOR(hexcode);
 
 	if (addPal)
-		addPal->onClick.connect([this]{
+		addPal->onClick([this]{
 			auto window = this->_createPopup("assets/gui/editor/palette/add.gui");
 			auto create = window->get<tgui::Button>("CreatePalette");
 			auto cancel = window->get<tgui::Button>("CancelPalette");
@@ -1333,7 +1333,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			list->setSelectedItemByIndex(this->_selectedPalette);
 			create->setEnabled(false);
 
-			name->onTextChange.connect([this](std::weak_ptr<tgui::Button> ptr, const tgui::String &s){
+			name->onTextChange([this](std::weak_ptr<tgui::Button> ptr, const tgui::String &s){
 				auto button = ptr.lock();
 
 				if (s.empty()) {
@@ -1347,7 +1347,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 					}
 				button->setEnabled(true);
 			}, std::weak_ptr(create));
-			create->onClick.connect([this, name, list](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
+			create->onClick([this, name, list](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
 				std::array<Color, 256> colors;
 
 				if (this->_palettes.empty()) {
@@ -1368,12 +1368,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				));
 				ptr.lock()->close();
 			}, std::weak_ptr(window));
-			cancel->onClick.connect([](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
+			cancel->onClick([](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
 				ptr.lock()->close();
 			}, std::weak_ptr(window));
 		});
 	if (removePal)
-		removePal->onClick.connect([this]{
+		removePal->onClick([this]{
 			this->applyOperation(new RemovePaletteOperation(
 				this->_palettes,
 				this->_editor.localize("palette.remove_action"),
@@ -1382,7 +1382,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		});
 
 	if (ctrl)
-		ctrl->onTabSelect.connect([this, &sidePanel](std::weak_ptr<tgui::Tabs> This){
+		ctrl->onTabSelect([this, &sidePanel](std::weak_ptr<tgui::Tabs> This){
 			auto selected = This.lock()->getSelectedIndex();
 
 			if (selected == this->_showingPalette)
@@ -1404,7 +1404,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_preview->showingPalette = this->_showingPalette;
 		}, std::weak_ptr(ctrl));
 	if (action)
-		action->onReturnOrUnfocus.connect([this](std::weak_ptr<tgui::EditBox> This, const tgui::String &s){
+		action->onReturnOrUnfocus([this](std::weak_ptr<tgui::EditBox> This, const tgui::String &s){
 			if (std::to_string(this->_object->_action) == s)
 				return;
 			if (s.empty()) {
@@ -1425,46 +1425,46 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_requireReload = true;
 		}, std::weak_ptr(action));
 	if (clearHit)
-		clearHit->onClick.connect([this]{
+		clearHit->onClick([this]{
 			this->applyOperation(new ClearHitOperation(*this->_object, this->_editor));
 		});
 	if (clearBlock)
-		clearBlock->onClick.connect([this]{
+		clearBlock->onClick([this]{
 			this->applyOperation(new ClearBlockOperation(*this->_object, this->_editor));
 		});
 	if (aFlags)
 		// TODO: Change flags label if a character or subobject
-		aFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/attackFlags.gui");
+		aFlags->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/attackFlags.gui");
 	if (dFlags)
 		// TODO: Change flags label if a character or subobject
-		dFlags->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/defenseFlags.gui");
+		dFlags->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/defenseFlags.gui");
 	if (hitEdit)
 		// TODO: Change fields label if a character or subobject
-		hitEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/hitProperties.gui");
+		hitEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/hitProperties.gui");
 	if (blockEdit)
 		// TODO: Change fields label if a character or subobject
-		blockEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/blockProperties.gui");
+		blockEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/blockProperties.gui");
 	if (generalEdit)
 		// TODO: Change fields label if a character or subobject
-		generalEdit->onClick.connect(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
+		generalEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
 	if (actionSelect)
-		actionSelect->onClick.connect(&MainWindow::navGoTo, this);
+		actionSelect->onClick(&MainWindow::navGoTo, this);
 	if (prevAction)
-		prevAction->onClick.connect(&MainWindow::navToPrevAction, this);
+		prevAction->onClick(&MainWindow::navToPrevAction, this);
 	if (nextAction)
-		nextAction->onClick.connect(&MainWindow::navToNextAction, this);
+		nextAction->onClick(&MainWindow::navToNextAction, this);
 	if (play)
-		play->onPress.connect([this]{
+		play->onPress([this]{
 			this->_paused = false;
 		});
 	if (step)
-		step->onPress.connect([this]{
+		step->onPress([this]{
 			this->_paused = false;
 			this->tick();
 			this->_paused = true;
 		});
 	if (frame)
-		frame->onValueChange.connect([this](float value){
+		frame->onValueChange([this](float value){
 			auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
 
 			this->_paused = true;
@@ -1478,7 +1478,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_editor.setHasNextFrame(this->_object->_animation < blk.size() - 1);
 		});
 	if (frameSpin)
-		frameSpin->onValueChange.connect([this](float value){
+		frameSpin->onValueChange([this](float value){
 			auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
 
 			this->_paused = true;
@@ -1492,7 +1492,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_editor.setHasNextFrame(this->_object->_animation < blk.size() - 1);
 		});
 	if (blockSpin)
-		blockSpin->onValueChange.connect([this](float value){
+		blockSpin->onValueChange([this](float value){
 			auto &act = this->_object->_moves[this->_object->_action];
 			auto &blk = act[value];
 
@@ -1507,7 +1507,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_editor.setCanCopyNext(blk.size() != 1);
 		});
 	if (boundsButton)
-		boundsButton->onClick.connect([] {
+		boundsButton->onClick([] {
 			// TODO: Not implemented
 			Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 		});
@@ -1641,7 +1641,7 @@ void SpiralOfFate::MainWindow::newAction()
 
 	window->setTitle(this->_editor.localize("message_box.title.create_action"));
 	create->setEnabled(false);
-	idBox->onTextChange.connect([createW, actionW, idBoxW, this](const tgui::String &t){
+	idBox->onTextChange([createW, actionW, idBoxW, this](const tgui::String &t){
 		if (t.empty()) {
 			actionW.lock()->setText("");
 			createW.lock()->setEnabled(false);
@@ -1650,10 +1650,10 @@ void SpiralOfFate::MainWindow::newAction()
 			createW.lock()->setEnabled(true);
 		}
 	});
-	action->onClick.connect(&MainWindow::_createMoveListPopup, this, [idBoxW](unsigned move){
+	action->onClick(&MainWindow::_createMoveListPopup, this, [idBoxW](unsigned move){
 		idBoxW.lock()->setText(std::to_string(move));
 	}, true);
-	create->onClick.connect([windowW, idBox, this]{
+	create->onClick([windowW, idBox, this]{
 		auto &data = this->_object->getFrameData();
 		auto action = std::stoul(idBox->getText().toStdString());
 
