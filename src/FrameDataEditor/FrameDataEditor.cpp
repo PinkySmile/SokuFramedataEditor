@@ -285,6 +285,7 @@ void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.copy_box_next"      }, &FrameDataEditor::_copyBoxesFromNextFrame);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten"            }, &FrameDataEditor::_flattenThisMoveCollisionBoxes);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.flatten_properties" }, &FrameDataEditor::_flattenThisMoveProperties);
+	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.cleanup_properties" }, &FrameDataEditor::_cleanThisCharacterProperties);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reload"             }, &FrameDataEditor::_reloadTextures);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.invert_colors"      }, &FrameDataEditor::_invertColors);
 	this->_connectShortcut(menu, { "menu_item.misc", "menu_item.misc.reverse_palette"    }, &FrameDataEditor::_reversePalette);
@@ -689,6 +690,11 @@ void SpiralOfFate::FrameDataEditor::_flattenThisMoveCollisionBoxes()
 void SpiralOfFate::FrameDataEditor::_flattenThisMoveProperties()
 {
 	this->_focusedWindow->flattenThisMoveProperties();
+}
+
+void SpiralOfFate::FrameDataEditor::_cleanThisCharacterProperties()
+{
+	this->_focusedWindow->cleanThisCharacterProperties();
 }
 
 void SpiralOfFate::FrameDataEditor::_invertColors()

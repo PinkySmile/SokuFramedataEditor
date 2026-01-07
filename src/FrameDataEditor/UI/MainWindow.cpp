@@ -12,6 +12,7 @@
 #include "../Operations/DummyOperation.hpp"
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
+#include "../Operations/CleanPropertiesOperation.hpp"
 #include "../Operations/EditSpriteOperation.hpp"
 #include "../Operations/EditSoundOperation.hpp"
 #include "../Operations/ClearBlockOperation.hpp"
@@ -24,6 +25,7 @@
 #include "../Operations/CreatePaletteOperation.hpp"
 #include "../Operations/EditColorsOperation.hpp"
 #include "../Operations/FlattenCollisionBoxesOperation.hpp"
+#include "../Operations/FlattenPropretiesOperation.hpp"
 #include "../Operations/RemovePaletteOperation.hpp"
 #include "../Operations/RemoveBoxOperation.hpp"
 #include "../Operations/RemoveFrameOperation.hpp"
@@ -1762,15 +1764,26 @@ void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
 
 	this->applyOperation(new FlattenCollisionBoxesOperation(
 		*this->_object,
-		this->_editor.localize("operation.copy_box_last"),
+		this->_editor.localize("operation.flatten_collision"),
 		f.collisionBox ? std::optional(*f.collisionBox) : std::optional<Box>()
 	));
 }
 
 void SpiralOfFate::MainWindow::flattenThisMoveProperties()
 {
-	// TODO: Not implemented
-	Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
+	this->applyOperation(new FlattenPropretiesOperation(
+		*this->_object,
+		this->_editor.localize("operation.flatten_properties"),
+		this->_object->_moves[this->_object->_action][this->_object->_actionBlock][this->_object->_animation]
+	));
+}
+
+void SpiralOfFate::MainWindow::cleanThisCharacterProperties()
+{
+	this->applyOperation(new CleanPropertiesOperation(
+		*this->_object,
+		this->_editor.localize("operation.flatten_properties")
+	));
 }
 
 void SpiralOfFate::MainWindow::reloadTextures()

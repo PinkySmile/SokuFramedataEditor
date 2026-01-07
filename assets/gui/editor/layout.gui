@@ -51,6 +51,10 @@ MenuBar.MainBar {
         }
 
         Menu {
+            Text = "menu_item.misc.cleanup_properties";
+        }
+
+        Menu {
             Text = "menu_item.misc.reload";
         }
 

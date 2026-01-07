@@ -100,6 +100,7 @@ namespace SpiralOfFate
 		void copyBoxesFromNextFrame();
 		void flattenThisMoveCollisionBoxes();
 		void flattenThisMoveProperties();
+		void cleanThisCharacterProperties();
 		void reloadTextures();
 		void invertColors();
 		void reversePalette();
