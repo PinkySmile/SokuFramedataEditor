@@ -37,17 +37,14 @@ namespace SpiralOfFate
 		}
 	}
 
-	unsigned TextureManager::load(std::string path, Vector2u *size, bool repeated)
+	unsigned TextureManager::load(const std::filesystem::path &path, Vector2u *size, bool repeated)
 	{
-		for (auto pos = path.find('\\'); pos != std::string::npos; pos = path.find('\\'))
-			path[pos] = '/';
-
 		auto oit = this->_overrideList.find(path);
 		auto file = oit == this->_overrideList.end() ? path : oit->second;
 
 		if (this->_allocatedTextures[file].count != 0) {
 			this->_allocatedTextures[file].count++;
-			game->logger.verbose("Returning already loaded file " + path);
+			game->logger.verbose("Returning already loaded file " + path.string());
 			if (size)
 				*size = this->_textures[this->_allocatedTextures[file].index].getSize();
 			return this->_allocatedTextures[file].index;
@@ -58,11 +55,11 @@ namespace SpiralOfFate
 		texture.path = path;
 		texture.count = 1;
 		if (file != path)
-			game->logger.debug("Loading texture " + file + " (" + path + ")");
+			game->logger.debug("Loading texture " + file.string() + " (" + path.string() + ")");
 		else
-			game->logger.debug("Loading texture " + file);
+			game->logger.debug("Loading texture " + file.string());
 		if (this->_loadRegular(file, texture, 0) == 0) {
-			game->logger.warn("Failed to load texture " + file);
+			game->logger.warn("Failed to load texture " + file.string());
 			this->_loadEmpty(texture, 0);
 		}
 
@@ -101,7 +98,7 @@ namespace SpiralOfFate
 		return tex.index;
 	}
 
-	unsigned TextureManager::_load(const std::string &path, AllocatedTexture &tex, unsigned id)
+	unsigned TextureManager::_load(const std::filesystem::path &path, AllocatedTexture &tex, unsigned id)
 	{
 		unsigned result;
 
@@ -114,12 +111,12 @@ namespace SpiralOfFate
 		return result;
 	}
 
-	unsigned TextureManager::_loadRegular(const std::string &path, AllocatedTexture &tex, unsigned id)
+	unsigned TextureManager::_loadRegular(const std::filesystem::path &path, AllocatedTexture &tex, unsigned id)
 	{
 		sf::Texture texture;
 
 		if (!texture.loadFromFile(path)) {
-			game->logger.error("Failed to load " + path + ": " + strerror(errno));
+			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
 			return 0;
 		}
 		tex.palette.reset();
@@ -133,26 +130,26 @@ namespace SpiralOfFate
 			this->_freedIndexes.pop_back();
 		}
 		this->_textures[id].swap(texture);
-		game->logger.verbose("Loaded texture" + path + " successfully");
+		game->logger.verbose("Loaded texture" + path.string() + " successfully");
 		tex.index = id;
 		return id;
 	}
 
-	unsigned TextureManager::_loadPaletted(const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
+	unsigned TextureManager::_loadPaletted(const std::filesystem::path &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
 	{
 		std::error_code err;
 		std::vector<unsigned char> buffer;
 		size_t fileSize = std::filesystem::file_size(path, err);
 		if (err) {
 			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path + ": " + strerror(errno));
+			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
 			return 0;
 		}
 
 		std::ifstream pngStream{path, std::fstream::binary};
 		if (pngStream.fail()) {
 			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path + ": " + strerror(errno));
+			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
 			return 0;
 		}
 
@@ -208,25 +205,25 @@ namespace SpiralOfFate
 		}
 
 		assert_exp(this->_textures[tex.index].loadFromMemory(buffer.data(), buffer.size()));
-		game->logger.verbose("Loaded texture" + path + " successfully");
+		game->logger.verbose("Loaded texture" + path.string() + " successfully");
 		return tex.index;
 	}
 
-	unsigned TextureManager::_loadPaletted(const std::string &path, AllocatedTexture &tex, const std::string &palette, unsigned id)
+	unsigned TextureManager::_loadPaletted(const std::filesystem::path &path, AllocatedTexture &tex, const std::filesystem::path &palette, unsigned id)
 	{
 		std::error_code err;
 		std::vector<unsigned char> buffer;
 		size_t fileSize = std::filesystem::file_size(path, err);
 		if (err) {
 			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path + ": " + strerror(errno));
+			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
 			return 0;
 		}
 
 		std::ifstream pngStream{path, std::fstream::binary};
 		if (pngStream.fail()) {
 			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path + ": " + strerror(errno));
+			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
 			return 0;
 		}
 
@@ -242,7 +239,7 @@ namespace SpiralOfFate
 			std::ifstream palStream{palette, std::fstream::binary};
 			if (palStream.fail()) {
 				// TODO: Only works on Linux
-				game->logger.error("Failed to load " + palette + ": " + strerror(errno));
+				game->logger.error("Failed to load " + palette.string() + ": " + strerror(errno));
 				return 0;
 			}
 
@@ -302,23 +299,19 @@ namespace SpiralOfFate
 		}
 
 		assert_exp(this->_textures[tex.index].loadFromMemory(buffer.data(), buffer.size()));
-		game->logger.verbose("Loaded texture" + path + " successfully");
+		game->logger.verbose("Loaded texture" + path.string() + " successfully");
 		return tex.index;
 	}
 
-	unsigned TextureManager::load(const std::string &path, const std::string &palette, Vector2u *size, bool repeated)
+	unsigned TextureManager::load(const std::filesystem::path &path, const std::filesystem::path &palette, Vector2u *size, bool repeated)
 	{
 		if (palette.empty())
 			return this->load(path, size, repeated);
 
-		std::string allocName = path;
+		std::string allocName = path.string() + ":" + palette.string();
 		auto oit = this->_overrideList.find(path);
 		auto file = oit == this->_overrideList.end() ? path : oit->second;
 
-		for (auto pos = allocName.find('\\'); pos != std::string::npos; pos = allocName.find('\\'))
-			allocName[pos] = '/';
-		allocName += ":";
-		allocName += palette;
 		if (this->_allocatedTextures[allocName].count != 0) {
 			this->_allocatedTextures[allocName].count++;
 			game->logger.verbose("Returning already loaded paletted file " + allocName);
@@ -328,9 +321,9 @@ namespace SpiralOfFate
 		}
 
 		if (file != path)
-			game->logger.debug("Loading texture " + file + " (" + path + ") with palette " + palette);
+			game->logger.debug("Loading texture " + file.string() + " (" + path.string() + ") with palette " + palette.string());
 		else
-			game->logger.debug("Loading texture " + file + " with palette " + palette);
+			game->logger.debug("Loading texture " + file.string() + " with palette " + palette.string());
 
 		AllocatedTexture texture;
 
@@ -348,7 +341,7 @@ namespace SpiralOfFate
 		return texture.index;
 	}
 
-	unsigned TextureManager::load(const std::string &path, const std::array<Color, 256> &palette, Vector2u *size, bool repeated)
+	unsigned TextureManager::load(const std::filesystem::path &path, const std::array<Color, 256> &palette, Vector2u *size, bool repeated)
 	{
 		if (palette.empty())
 			return this->load(path, size, repeated);
@@ -356,7 +349,6 @@ namespace SpiralOfFate
 		std::vector<unsigned char> buffer;
 		std::string paletteName;
 		std::error_code err;
-		std::string allocName = path;
 		auto oit = this->_overrideList.find(path);
 		auto file = oit == this->_overrideList.end() ? path : oit->second;
 
@@ -369,10 +361,8 @@ namespace SpiralOfFate
 			ptr += 6;
 		}
 
-		for (auto pos = allocName.find('\\'); pos != std::string::npos; pos = allocName.find('\\'))
-			allocName[pos] = '/';
-		allocName += ":";
-		allocName += paletteName;
+		std::string allocName = path.string() + ":" + paletteName;
+
 		if (this->_allocatedTextures[allocName].count != 0) {
 			this->_allocatedTextures[allocName].count++;
 			game->logger.verbose("Returning already loaded paletted file " + allocName);
@@ -382,9 +372,9 @@ namespace SpiralOfFate
 		}
 
 		if (file != path)
-			game->logger.debug("Loading texture " + file + " (" + path + ") with palette " + paletteName);
+			game->logger.debug("Loading texture " + file.string() + " (" + path.string() + ") with palette " + paletteName);
 		else
-			game->logger.debug("Loading texture " + file + " with palette " + paletteName);
+			game->logger.debug("Loading texture " + file.string() + " with palette " + paletteName);
 
 		AllocatedTexture texture;
 
@@ -413,10 +403,10 @@ namespace SpiralOfFate
 		if (texture.count) {
 			texture.count--;
 			if (texture.count) {
-				game->logger.verbose("Remove ref to " + path);
+				game->logger.verbose("Remove ref to " + path.string());
 				return;
 			}
-			game->logger.debug("Destroying texture " + path);
+			game->logger.debug("Destroying texture " + path.string());
 		}
 
 		auto it = this->_textures.find(id);
@@ -444,7 +434,7 @@ namespace SpiralOfFate
 		if (texture.count) {
 			texture.count++;
 			assert_exp(texture.count > 1);
-			game->logger.verbose("Adding ref to " + path);
+			game->logger.verbose("Adding ref to " + path.string());
 		}
 	}
 
@@ -459,7 +449,7 @@ namespace SpiralOfFate
 	{
 		for (auto &[loadedPath, attr] : this->_allocatedTextures)
 			if (attr.count) {
-				game->logger.debug("Reloading " + loadedPath);
+				game->logger.debug("Reloading " + loadedPath.string());
 				this->_load(attr.path, attr, attr.index);
 			}
 	}

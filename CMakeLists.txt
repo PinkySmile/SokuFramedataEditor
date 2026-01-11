@@ -46,11 +46,11 @@ if (USE_SDL2)
 		EXTRA_LINK_LIBRARIES
 		${SDL2_LIBRARY}
 		${SDL2_IMAGE_LIBRARY}
-		${SFML_GRAPHICS_LIB}
-		${SFML_AUDIO_LIB}
-		${SFML_SYSTEM_LIB}
-		${SFML_WINDOW_LIB}
-		${SFML_NETWORK_LIB}
+		SFML::Graphics
+		SFML::Audio
+		SFML::Window
+		SFML::System
+		SFML::Network
 		TGUI::TGUI
 	)
 
@@ -93,7 +93,7 @@ else ()
 
 	if (NO_TGUI)
 		set(
-			<EXTRA_LINK_LIBRARIES
+			EXTRA_LINK_LIBRARIES
 			SFML::Graphics
 			SFML::Audio
 			SFML::Network
@@ -199,11 +199,6 @@ if (UBSAN)
 	add_link_options(-fsanitize=undefined)
 endif ()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	if (NOT CMAKE_BUILD_TYPE STREQUAL Debug)
-		add_compile_options("-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/src=src" "-ffile-prefix-map=${CMAKE_SOURCE_DIR}/src=src")
-	endif()
-endif ()
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(-W -Wall -Wextra)
@@ -214,6 +209,7 @@ else ()
 		if (WIN32)
 			add_link_options(-mwindows)
 		endif()
+		add_compile_options("-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/src=src" "-ffile-prefix-map=${CMAKE_SOURCE_DIR}/src=src")
 	endif ()
 	add_compile_definitions(NDEBUG=1)
 endif ()

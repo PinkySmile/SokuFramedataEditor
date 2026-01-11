@@ -115,8 +115,8 @@ namespace SpiralOfFate
 	#endif
 		std::shared_ptr<IInput> activeNetInput;
 
-		Game(const std::string &fontPath, const std::string &settingsPath, const std::string &loggerPath = "./latest.log");
-		std::vector<std::string> getCharacters();
+		Game(const std::filesystem::path &fontPath, const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath = "./latest.log");
+		std::vector<std::filesystem::path> getCharacters();
 		Color getColor(const std::string &name);
 	};
 	extern MYDLL_API Game *game;

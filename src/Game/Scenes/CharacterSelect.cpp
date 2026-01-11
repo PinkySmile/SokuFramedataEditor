@@ -29,9 +29,9 @@ namespace SpiralOfFate
 		game->logger.info("CharacterSelect scene created");
 		this->_entries.reserve(chrList.size());
 		for (auto &entry : chrList) {
-			auto file = entry + "/chr.json";
+			auto file = entry / "chr.json";
 
-			game->logger.debug("Loading character from " + file);
+			game->logger.debug("Loading character from " + file.string());
 
 			auto data = game->fileMgr.readFull(file);
 
@@ -386,9 +386,9 @@ namespace SpiralOfFate
 
 		entries.reserve(chrList.size());
 		for (auto &entry : chrList) {
-			auto file = entry + "/chr.json";
+			auto file = entry / "chr.json";
 
-			game->logger.debug("Loading character from " + file);
+			game->logger.debug("Loading character from " + file.string());
 
 			auto data = game->fileMgr.readFull(file);
 
@@ -422,7 +422,7 @@ namespace SpiralOfFate
 		return {this->_leftInput, this->_rightInput};
 	}
 
-	CharacterEntry::CharacterEntry(const nlohmann::json &json, const std::string &folder) :
+	CharacterEntry::CharacterEntry(const nlohmann::json &json, const std::filesystem::path &folder) :
 		entry(json)
 	{
 		assert_exp(json.contains("pos"));
@@ -464,7 +464,7 @@ namespace SpiralOfFate
 		assert_exp(json["air_drift"]["front"].contains("max"));
 
 		for (auto &j : json["palettes"])
-			this->palettes.push_back(folder + "/" + j.get<std::string>());
+			this->palettes.push_back(folder / j.get<std::string>());
 
 		this->pos = json["pos"];
 		this->name = Utils::utf8ToUtf16(json["name"].get<std::string>());
@@ -472,13 +472,13 @@ namespace SpiralOfFate
 		if (json.contains("class"))
 			this->_class = json["class"];
 		this->folder = folder;
-		this->data = FrameData::loadFile(folder + "/charSelect.json", folder);
+		this->data = FrameData::loadFile(folder / "charSelect.json", folder);
 		if (this->palettes.empty())
-			this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png"));
+			this->icon.emplace_back(game->textureMgr.load(folder / "icon.png"));
 		else {
 			this->icon.reserve(this->palettes.size());
 			for (auto &palette : this->palettes)
-				this->icon.emplace_back(game->textureMgr.load(folder + "/icon.png", palette));
+				this->icon.emplace_back(game->textureMgr.load(folder / "icon.png", palette));
 		}
 	}
 

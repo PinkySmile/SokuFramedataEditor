@@ -238,8 +238,8 @@ namespace SpiralOfFate
 #pragma pack(pop)
 
 	public:
-		std::string __palette;
-		std::string __folder;
+		std::filesystem::path __palette;
+		std::filesystem::path __folder;
 		bool __requireReload = false;
 		const std::array<Color, 256> *__paletteData = nullptr;
 
@@ -296,7 +296,7 @@ namespace SpiralOfFate
 		FrameData() = default;
 		~FrameData();
 		FrameData(const FrameData &other);
-		FrameData(const nlohmann::json &json, const std::string &folder, const std::string &palette = {});
+		FrameData(const nlohmann::json &json, const std::filesystem::path &folder, const std::filesystem::path &palette = {});
 		FrameData &operator=(const FrameData &other);
 		void checkReloadTexture();
 		void reloadTexture();
@@ -310,8 +310,8 @@ namespace SpiralOfFate
 		static size_t printDifference(const char *msgStart, void *data1, void *data2, unsigned startOffset);
 		static size_t printContent(const char *msgStart, void *data, unsigned int startOffset, size_t dataSize);
 
-		static std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> loadFile(const std::string &path, const std::string &folder, const std::string &palette = {});
-		static std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> loadFileJson(const nlohmann::json &path, const std::string &folder, const std::string &palette = {});
+		static std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> loadFile(const std::filesystem::path &path, const std::filesystem::path &folder, const std::filesystem::path &palette = {});
+		static std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> loadFileJson(const nlohmann::json &path, const std::filesystem::path &folder, const std::filesystem::path &palette = {});
 	};
 
 	inline void to_json(nlohmann::json &j, const FrameData &data) {

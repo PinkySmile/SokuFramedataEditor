@@ -28,7 +28,7 @@ namespace SpiralOfFate
 			std::pair<float, float> spawnInterval;
 			std::vector<Particle::InitData> particles;
 
-			InitData(const nlohmann::json &data, const std::string &folder);
+			InitData(const nlohmann::json &data, const std::filesystem::path &folder);
 			InitData(const InitData &) { assert_exp(false); };
 			~InitData();
 		};

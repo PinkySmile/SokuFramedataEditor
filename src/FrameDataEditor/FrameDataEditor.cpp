@@ -469,7 +469,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 			auto dialog = Utils::dispMsg(
 				game->gui,
 				this->localize("message_box.title.backup_exists"),
-				this->localize("message_box.backup_exists", filePath),
+				this->localize("message_box.backup_exists", filePath.string()),
 				MB_ICONINFORMATION
 			);
 

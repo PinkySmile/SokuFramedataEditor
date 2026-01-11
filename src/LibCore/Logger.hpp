@@ -6,6 +6,7 @@
 #define THFGAME_LOGGER_HPP
 
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <mutex>
@@ -23,7 +24,7 @@ namespace SpiralOfFate
 		std::mutex mutex;
 
 	public:
-		explicit Logger(const std::string &filepath = "./latest.log") noexcept;
+		explicit Logger(const std::filesystem::path &filepath = "./latest.log") noexcept;
 		~Logger() noexcept;
 
 #ifdef __ANDROID__

@@ -24,7 +24,7 @@ public:
 	unsigned _animationCtr = 0;
 	int _paletteIndex = -1;
 	float _rotation = 0;
-	std::string _folder;
+	std::filesystem::path _folder;
 	bool _textureValid = false;
 	bool _needGenerate = false;
 	unsigned char _generateCd = 0;
@@ -37,7 +37,7 @@ public:
 	void _simulate(const SpiralOfFate::FrameData &data);
 
 	EditableObject() = default;
-	EditableObject(const std::string &frameData);
+	EditableObject(const std::filesystem::path &frameData);
 	~EditableObject() = default;
 	SpiralOfFate::FrameData &getFrameData();
 	const SpiralOfFate::FrameData &getFrameData() const;

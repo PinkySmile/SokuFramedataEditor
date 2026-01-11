@@ -13,7 +13,7 @@
 
 namespace SpiralOfFate
 {
-	std::vector<FileManager::DirectoryEntry> FileManager::listDirectory(const std::string &path)
+	std::vector<FileManager::DirectoryEntry> FileManager::listDirectory(const std::filesystem::path &path)
 	{
 		std::vector<DirectoryEntry> result;
 
@@ -73,21 +73,21 @@ namespace SpiralOfFate
 		return result;
 	}
 
-	bool FileManager::exists(const std::string &path)
+	bool FileManager::exists(const std::filesystem::path &path)
 	{
 #ifdef __ANDROID__
 		sf::priv::ActivityStates *states = sf::priv::getActivity();
-		AAsset *asset = AAssetManager_open(states->activity->assetManager, path.c_str(), AASSET_MODE_STREAMING);
+		AAsset *asset = AAssetManager_open(states->activity->assetManager, path.string().c_str(), AASSET_MODE_STREAMING);
 
 		if (asset)
 			AAsset_close(asset);
 		return asset != nullptr;
 #else
-		return std::filesystem::exists(std::filesystem::path(path));
+		return std::filesystem::exists(path);
 #endif
 	}
 
-	std::string FileManager::readFull(const std::string &path)
+	std::string FileManager::readFull(const std::filesystem::path &path)
 	{
 		std::string result;
 #ifdef __ANDROID__
@@ -99,14 +99,11 @@ namespace SpiralOfFate
 		AAsset_read(asset, result.data(), result.size());
 		AAsset_close(asset);
 #else
-		struct stat s;
-
-		assert_msg(stat(path.c_str(), &s) >= 0, "Cannot stat " + path + ": " + strerror(errno));
-		result.resize(s.st_size);
+		result.resize(std::filesystem::file_size(path));
 
 		std::ifstream stream{path, std::ifstream::binary};
 
-		assert_msg(stream, "Cannot open " + path + ": " + strerror(errno));
+		assert_msg(stream, "Cannot open " + path.string() + ": " + strerror(errno));
 		stream.read(result.data(), result.size());
 #endif
 		return result;

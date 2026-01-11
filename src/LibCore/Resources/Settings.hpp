@@ -6,20 +6,21 @@
 #define SOFGV_SETTINGS_HPP
 
 
+#include <filesystem>
 #include <string>
 
 namespace SpiralOfFate
 {
 	class Settings {
 	private:
-		std::string _path;
+		std::filesystem::path _path;
 
 	public:
 		std::string inputPresetP1;
 		std::string inputPresetP2;
 		std::string theme;
 
-		Settings(const std::string &path);
+		Settings(const std::filesystem::path &path);
 		~Settings();
 		void save();
 	};

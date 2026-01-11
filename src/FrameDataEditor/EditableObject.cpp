@@ -10,8 +10,8 @@
 using namespace SpiralOfFate;
 
 // TODO: Use std::filesystem::path for paths
-EditableObject::EditableObject(const std::string &frameData) :
-	_folder(frameData.substr(0, frameData.find_last_of(std::filesystem::path::preferred_separator)))
+EditableObject::EditableObject(const std::filesystem::path &frameData) :
+	_folder(frameData.parent_path())
 {
 	for (auto &pair : FrameData::loadFile(frameData, this->_folder))
 		this->_moves[pair.first] = pair.second;
@@ -240,7 +240,7 @@ void EditableObject::_generateOverlaySprite()
 		return;
 
 	auto &data = this->_moves.at(this->_action)[this->_actionBlock][this->_animation];
-	auto &img = pngLoader.loadImage(data.__folder + "/" + data.spritePath);
+	auto &img = pngLoader.loadImage(data.__folder / data.spritePath);
 
 	if (img.bitsPerPixel != 8)
 		return;
@@ -301,7 +301,7 @@ void EditableObject::setMousePosition(const SpiralOfFate::Vector2f *pos)
 		return;
 	}
 
-	auto &img = pngLoader.loadImage(data.__folder + "/" + data.spritePath);
+	auto &img = pngLoader.loadImage(data.__folder / data.spritePath);
 
 	if (img.bitsPerPixel != 8) {
 		this->_paletteIndex = -1;

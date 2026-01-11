@@ -114,7 +114,6 @@ namespace SpiralOfFate
 		data.oFlag.restand = false;
 		data.oFlag.nextBlockOnHit = false;
 		data.oFlag.nextBlockOnBlock = false;
-
 		data.oFlag.hardKnockDown = false;
 		data.oFlag.groundSlam = false;
 		data.oFlag.groundSlamCH = false;

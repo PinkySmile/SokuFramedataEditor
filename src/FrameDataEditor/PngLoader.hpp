@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <string>
 #include <array>
+#include <filesystem>
 #include <png.h>
 #include "Color.hpp"
 
@@ -32,10 +33,10 @@ struct LoadedImage {
 
 class PNGLoader {
 public:
-	const LoadedImage &loadImage(const std::string &path);
+	const LoadedImage &loadImage(const std::filesystem::path &path);
 
 private:
-	std::unordered_map<std::string, std::unique_ptr<LoadedImage>> _cache;
+	std::unordered_map<std::filesystem::path, std::unique_ptr<LoadedImage>> _cache;
 };
 
 extern PNGLoader pngLoader;

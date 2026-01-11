@@ -688,8 +688,8 @@ namespace SpiralOfFate
 		bool _getProjectileDirection(const SubObjectData &data);
 		float _getAnchoredPos(const Character::SubObjectData &data, bool y);
 		Vector2f _calcProjectilePosition(const SubObjectData &data, float dir);
-		void _loadProjectileData(const std::string &path);
-		void _loadParticleData(const std::string &path, const std::string &folder);
+		void _loadProjectileData(const std::filesystem::path &path);
+		void _loadParticleData(const std::filesystem::path &path, const std::filesystem::path &folder);
 		void _tickMove() override;
 		void _applyNewAnimFlags() override;
 		void _applyMoveAttributes() override;
@@ -743,7 +743,7 @@ namespace SpiralOfFate
 		const std::vector<ParticleGenerator::InitData> *systemParticles = nullptr;
 
 		Character();
-		Character(unsigned index, const std::string &folder, const std::string &palette, std::shared_ptr<IInput> input);
+		Character(unsigned index, const std::filesystem::path &folder, const std::filesystem::path &palette, std::shared_ptr<IInput> input);
 		~Character() override = default;
 		void setOpponent(Character *opponent);
 		bool hits(const Object &other) const override;

@@ -218,10 +218,10 @@ namespace SpiralOfFate
 		return this->_target;
 	}
 
-	ParticleGenerator::InitData::InitData(const nlohmann::json &data, const std::string &folder)
+	ParticleGenerator::InitData::InitData(const nlohmann::json &data, const std::filesystem::path &folder)
 	{
 		// TODO: Add proper error checking
-		this->sprite = game->textureMgr.load(folder + "/" + data["sprite"].get<std::string>());
+		this->sprite = game->textureMgr.load(folder / data["sprite"].get<std::string>());
 		assert_exp(this->sprite);
 		this->spawnBoundary.pos.x = data["spawn_boundary"]["left"];
 		this->spawnBoundary.pos.y = data["spawn_boundary"]["top"];

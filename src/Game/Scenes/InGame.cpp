@@ -690,7 +690,7 @@ namespace SpiralOfFate
 	Character *InGame::createCharacter(const CharacterEntry &entry, const CharacterEntry &entryOp, int pos, int palette, std::shared_ptr<IInput> input)
 	{
 		Character *chr;
-		std::string palette_;
+		std::filesystem::path palette_;
 
 		if (!entry.palettes.empty())
 			palette_ = entry.palettes[palette];

@@ -208,12 +208,6 @@ namespace SpiralOfFate::Utils
 		{"",       "assets/icons/unknownFile.png"},
 	};
 
-	std::string wstringToUtf8(const std::wstring& str)
-	{
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> myconv;
-		return myconv.to_bytes(str);
-	}
-
 	std::string getLastExceptionName()
 	{
 #ifdef __GNUG__
@@ -236,17 +230,17 @@ namespace SpiralOfFate::Utils
 	}
 
 #ifdef USE_TGUI
-	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title, const std::string &basePath, bool overWriteWarning, bool mustExist)
+	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title, const std::filesystem::path &basePath, bool overWriteWarning, bool mustExist)
 	{
 		auto dialog = tgui::FileDialog::create(title, overWriteWarning ? "Save" : "Open", overWriteWarning);
 
 		dialog->setFileMustExist(mustExist);
-		dialog->setPath(tgui::Filesystem::Path(absolute(std::filesystem::path(basePath))));
+		dialog->setPath(tgui::Filesystem::Path(absolute(basePath)));
 		openWindowWithFocus(gui, 0, 0, dialog);
 		return dialog;
 	}
 
-	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title, const std::string &basePath)
+	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title, const std::filesystem::path &basePath)
 	{
 		return openFileDialog(gui, title, basePath, true, false);
 	}

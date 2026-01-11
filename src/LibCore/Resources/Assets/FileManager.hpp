@@ -19,13 +19,13 @@ namespace SpiralOfFate
 	public:
 		struct DirectoryEntry {
 			bool dir;
-			std::string path;
+			std::filesystem::path path;
 		};
 
 		FileManager() = default;
-		std::vector<DirectoryEntry> listDirectory(const std::string &path);
-		bool exists(const std::string &path);
-		std::string readFull(const std::string &path);
+		std::vector<DirectoryEntry> listDirectory(const std::filesystem::path &path);
+		bool exists(const std::filesystem::path &path);
+		std::string readFull(const std::filesystem::path &path);
 	};
 }
 

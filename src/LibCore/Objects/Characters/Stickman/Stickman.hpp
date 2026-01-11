@@ -40,7 +40,7 @@ namespace SpiralOfFate
 		static constexpr unsigned char CLASS_ID = 3;
 
 		Stickman() = default;
-		Stickman(unsigned index, const std::string &folder, const std::string &palette, std::shared_ptr<IInput> input);
+		Stickman(unsigned index, const std::filesystem::path &folder, const std::filesystem::path &palette, std::shared_ptr<IInput> input);
 		unsigned int getClassId() const override;
 		void update() override;
 		unsigned int getBufferSize() const override;

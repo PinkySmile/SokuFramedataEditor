@@ -16,8 +16,8 @@ namespace SpiralOfFate
 {
 	Stickman::Stickman(
 		unsigned index,
-		const std::string &folder,
-		const std::string &palette,
+		const std::filesystem::path &folder,
+		const std::filesystem::path &palette,
 		std::shared_ptr<IInput> input
 	) :
 		Character(index, folder, palette, std::move(input))

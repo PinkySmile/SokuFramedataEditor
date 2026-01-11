@@ -236,14 +236,14 @@ namespace SpiralOfFate::Utils
 	//! @param basePath The path of the FileDialog
 	//! @param patterns The patterns of the FileDialog
 	//! @return std::string FileDialog message
-	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title = "Open file", const std::string &basePath = ".", bool overWriteWarning = false, bool mustExist = true);
+	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title = "Open file", const std::filesystem::path &basePath = ".", bool overWriteWarning = false, bool mustExist = true);
 
 	//! @brief Saves a file dialog
 	//! @param title Title of the FileDialog
 	//! @param basePath The path of the FileDialog
 	//! @param patterns The patterns of the FileDialog
 	//! @return std::string FileDialog message
-	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title = "Save file", const std::string &basePath = ".");
+	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title = "Save file", const std::filesystem::path &basePath = ".");
 
 	//! @brief Display a window with a slider.
 	//! @param gui The gui handling the window.

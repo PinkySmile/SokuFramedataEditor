@@ -32,23 +32,23 @@ namespace SpiralOfFate
 {
 	VictoriaStar::VictoriaStar(
 		unsigned int index,
-		const std::string &folder,
-		const std::string &palette,
+		const std::filesystem::path &folder,
+		const std::filesystem::path &palette,
 		std::shared_ptr<IInput> input,
 		const std::string &opName
 	) :
 		Character(index, folder, palette, std::move(input)),
 		_stacks(MAX_STACKS / 2),
-		_hudScale(game->textureMgr.load(folder + "/hud.png")),
-		_hudCursor(game->textureMgr.load(folder + "/cursor.png"))
+		_hudScale(game->textureMgr.load(folder / "hud.png")),
+		_hudCursor(game->textureMgr.load(folder / "cursor.png"))
 	{
 		auto spriteName = "shadow_" + opName + ".png";
-		auto opHandle = game->textureMgr.load(folder + "/" + spriteName);
+		auto opHandle = game->textureMgr.load(folder / spriteName);
 
 		game->logger.debug("VictoriaStar class created");
 		this->_neutralFormFramedata = this->_moves;
-		this->_shadowFormFramedata = FrameData::loadFile(folder + "/flower_form_framedata.json", folder, palette);
-		this->_flowerFormFramedata = FrameData::loadFile(folder + "/shadow_form_framedata.json", folder, palette);
+		this->_shadowFormFramedata = FrameData::loadFile(folder / "flower_form_framedata.json", folder, palette);
+		this->_flowerFormFramedata = FrameData::loadFile(folder / "shadow_form_framedata.json", folder, palette);
 
 		assert_exp(this->_shadowFormFramedata.find(ACTION_GAME_START1) != this->_shadowFormFramedata.end());
 		assert_exp(this->_flowerFormFramedata.find(ACTION_GAME_START1) != this->_flowerFormFramedata.end());

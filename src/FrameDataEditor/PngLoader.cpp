@@ -6,6 +6,7 @@
 #include <cstring>
 #include "PngLoader.hpp"
 #include "Resources/Assert.hpp"
+#include "Resources/Game.hpp"
 
 LoadedImage::~LoadedImage()
 {
@@ -20,23 +21,23 @@ void LoadedImage::alloc()
 
 static void pngError(png_structp, png_const_charp message)
 {
-	fprintf(stderr, "%s\n", message);
+	SpiralOfFate::game->logger.error(message);
 	throw std::runtime_error(message);
 }
 
 static void pngWarning(png_structp, png_const_charp message)
 {
-	printf("%s\n", message);
+	SpiralOfFate::game->logger.warn(message);
 }
 
 static void pngRead(png_structp pngData, png_bytep buffer, png_size_t length)
 {
-	auto *input = (std::istream *)png_get_io_ptr(pngData);
+	auto *input = static_cast<std::istream *>(png_get_io_ptr(pngData));
 
-	input->read((char*)buffer, length);
+	input->read(reinterpret_cast<char *>(buffer), length);
 }
 
-const LoadedImage &PNGLoader::loadImage(const std::string &path)
+const LoadedImage &PNGLoader::loadImage(const std::filesystem::path &path)
 {
 	auto it = this->_cache.find(path);
 
@@ -105,7 +106,7 @@ const LoadedImage &PNGLoader::loadImage(const std::string &path)
 
 	for (size_t i = 0; i < img.height; ++i)
 		pointers[i] = img.raw + i * img.paddedWidth;
-	png_read_image(pngData, (png_bytepp)pointers);
+	png_read_image(pngData, pointers);
 	delete[] pointers;
 
 	// Finish

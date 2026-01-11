@@ -12,7 +12,7 @@ namespace SpiralOfFate
 {
 	MYDLL_API Game *game = nullptr;
 
-	Game::Game(const std::string &fontPath, const std::string &settingsPath, const std::string &loggerPath) :
+	Game::Game(const std::filesystem::path &fontPath, const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath) :
 		settings(settingsPath),
 		logger(loggerPath),
 		font(fontPath)
@@ -52,15 +52,15 @@ namespace SpiralOfFate
 		}
 	}
 
-	std::vector<std::string> Game::getCharacters()
+	std::vector<std::filesystem::path> Game::getCharacters()
 	{
-		std::vector<std::string> result;
+		std::vector<std::filesystem::path> result;
 
 		for (auto &entry : this->fileMgr.listDirectory("assets/characters")) {
 			if (!entry.dir)
 				continue;
 
-			auto file = entry.path + "/chr.json";
+			auto file = entry.path / "chr.json";
 
 			if (!this->fileMgr.exists(file))
 				continue;

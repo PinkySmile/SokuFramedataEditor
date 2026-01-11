@@ -7,7 +7,7 @@
 #include "Settings.hpp"
 #include "Utils.hpp"
 
-SpiralOfFate::Settings::Settings(const std::string &path) :
+SpiralOfFate::Settings::Settings(const std::filesystem::path &path) :
 	_path(path)
 {
 	std::ifstream stream{path};
@@ -19,7 +19,7 @@ SpiralOfFate::Settings::Settings(const std::string &path) :
 		this->inputPresetP2 = json["inputPresetP2"];
 		this->theme = json["theme"];
 	} else if (errno != ENOENT)
-		throw std::runtime_error("Cannot open settings file: " + this->_path + ": " + std::string(strerror(errno)));
+		throw std::runtime_error("Cannot open settings file: " + this->_path.string() + ": " + std::string(strerror(errno)));
 	else {
 		this->inputPresetP1 = "inputs/default1.in";
 		this->inputPresetP2 = "inputs/default2.in";
@@ -42,6 +42,6 @@ void SpiralOfFate::Settings::save()
 	};
 
 	if (!stream)
-		throw std::runtime_error("Cannot open settings file: " + this->_path + ": " + std::string(strerror(errno)));
+		throw std::runtime_error("Cannot open settings file: " + this->_path.string() + ": " + std::string(strerror(errno)));
 	stream << json.dump(4);
 }

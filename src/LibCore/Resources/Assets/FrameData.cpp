@@ -11,13 +11,13 @@
 
 namespace SpiralOfFate
 {
-	std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> SpiralOfFate::FrameData::loadFile(const std::string &path, const std::string &folder, const std::string &palette)
+	std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> FrameData::loadFile(const std::filesystem::path &path, const std::filesystem::path &folder, const std::filesystem::path &palette)
 	{
-		game->logger.debug("Loading framedata file " + path);
+		game->logger.debug("Loading framedata file " + path.string());
 		return loadFileJson(nlohmann::json::parse(game->fileMgr.readFull(path)), folder, palette);
 	}
 
-	std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadFileJson(const nlohmann::json &json, const std::string &folder, const std::string &palette)
+	std::unordered_map<unsigned, std::vector<std::vector<FrameData>>> FrameData::loadFileJson(const nlohmann::json &json, const std::filesystem::path &folder, const std::filesystem::path &palette)
 	{
 		std::unordered_map<unsigned int, std::vector<std::vector<FrameData>>> data;
 
@@ -50,18 +50,18 @@ namespace SpiralOfFate
 		return data;
 	}
 
-	FrameData::FrameData(const nlohmann::json &data, const std::string &folder, const std::string &palette)
+	FrameData::FrameData(const nlohmann::json &data, const std::filesystem::path &folder, const std::filesystem::path &palette)
 	{
 		Vector2u textureSize{0, 0};
 
-		__folder = folder;
-		__palette = palette;
+		this->__folder = folder;
+		this->__palette = palette;
 		assert_msg(data.is_object(), "Invalid json");
 		assert_msg(data.contains("sprite"), "Invalid json");
 		assert_msg(data["sprite"].is_string(), "Invalid json");
 		this->spritePath = data["sprite"];
-		this->textureHandle = game->textureMgr.load(folder + "/" + this->spritePath, palette, &textureSize);
-		this->textureHandleEffects = game->textureMgr.load(folder + "/effects/" + this->spritePath, palette, &textureSize);
+		this->textureHandle = game->textureMgr.load(folder / this->spritePath, palette, &textureSize);
+		this->textureHandleEffects = game->textureMgr.load(folder / "effects" / this->spritePath, palette, &textureSize);
 		if (data.contains("sound")) {
 			assert_msg(data["sound"].is_string(), "Invalid json");
 			this->soundPath = data["sound"];
@@ -524,11 +524,11 @@ namespace SpiralOfFate
 		game->textureMgr.remove(this->textureHandle);
 		game->textureMgr.remove(this->textureHandleEffects);
 		if (!this->__paletteData) {
-			this->textureHandle = game->textureMgr.load(this->__folder + "/" + this->spritePath, this->__palette);
-			this->textureHandleEffects = game->textureMgr.load(this->__folder + "/effects/" + this->spritePath, this->__palette);
+			this->textureHandle = game->textureMgr.load(this->__folder / this->spritePath, this->__palette);
+			this->textureHandleEffects = game->textureMgr.load(this->__folder / "effects" / this->spritePath, this->__palette);
 		} else {
-			this->textureHandle = game->textureMgr.load(this->__folder + "/" + this->spritePath, *this->__paletteData);
-			this->textureHandleEffects = game->textureMgr.load(this->__folder + "/effects/" + this->spritePath, *this->__paletteData);
+			this->textureHandle = game->textureMgr.load(this->__folder / this->spritePath, *this->__paletteData);
+			this->textureHandleEffects = game->textureMgr.load(this->__folder / "effects" / this->spritePath, *this->__paletteData);
 		}
 	}
 
@@ -785,8 +785,8 @@ namespace SpiralOfFate
 		delete this->collisionBox;
 
 		this->spritePath = std::string(dat->texturePath, strnlen(dat->texturePath, sizeof(dat->texturePath)));
-		this->textureHandle = game->textureMgr.load(__folder + "/" + this->spritePath, __palette);
-		this->textureHandleEffects = game->textureMgr.load(__folder + "/effects/" + this->spritePath, __palette);
+		this->textureHandle = game->textureMgr.load(this->__folder / this->spritePath, __palette);
+		this->textureHandleEffects = game->textureMgr.load(this->__folder / "effects" / this->spritePath, __palette);
 		this->particleGenerator = dat->particleGenerator;
 		this->blockStun = dat->blockStun;
 		this->wrongBlockStun = dat->wrongBlockStun;

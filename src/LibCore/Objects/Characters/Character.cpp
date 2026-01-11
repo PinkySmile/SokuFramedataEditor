@@ -382,7 +382,7 @@ namespace SpiralOfFate
 	{
 	}
 
-	Character::Character(unsigned index, const std::string &folder, const std::string &palette, std::shared_ptr<IInput> input) :
+	Character::Character(unsigned index, const std::filesystem::path &folder, const std::filesystem::path &palette, std::shared_ptr<IInput> input) :
 		Character()
 	{
 		this->index = index;
@@ -396,10 +396,10 @@ namespace SpiralOfFate
 		this->_text2.setOutlineThickness(2);
 		this->_text2.setCharacterSize(10);
 		this->_limit.fill(0);
-		this->_moves = FrameData::loadFile(folder + "/framedata.json", folder, palette);
-		this->_subObjectsData = FrameData::loadFile(folder + "/subobj_data.json", folder, palette);
-		this->_loadProjectileData(folder + "/subobjects.json");
-		this->_loadParticleData(folder + "/particles.json", folder);
+		this->_moves = FrameData::loadFile(folder / "framedata.json", folder, palette);
+		this->_subObjectsData = FrameData::loadFile(folder / "subobj_data.json", folder, palette);
+		this->_loadProjectileData(folder / "subobjects.json");
+		this->_loadParticleData(folder / "particles.json", folder);
 		this->_lastInputs.push_back(LastInput{0, false, false, false, false, false, false, 0, 0});
 	}
 
@@ -4564,7 +4564,7 @@ namespace SpiralOfFate
 		throw std::invalid_argument("Invalid dir '" + str + "'");
 	}
 
-	void Character::_loadProjectileData(const std::string &path)
+	void Character::_loadProjectileData(const std::filesystem::path &path)
 	{
 		nlohmann::json j = nlohmann::json::parse(game->fileMgr.readFull(path));
 
@@ -4582,7 +4582,7 @@ namespace SpiralOfFate
 		}
 	}
 
-	void Character::_loadParticleData(const std::string &path, const std::string &folder)
+	void Character::_loadParticleData(const std::filesystem::path &path, const std::filesystem::path &folder)
 	{
 		nlohmann::json j = nlohmann::json::parse(game->fileMgr.readFull(path));
 

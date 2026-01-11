@@ -66,8 +66,8 @@ namespace SpiralOfFate
 
 		VictoriaStar(
 			unsigned index,
-			const std::string &folder,
-			const std::string &palette,
+			const std::filesystem::path &folder,
+			const std::filesystem::path &palette,
 			std::shared_ptr<IInput> input,
 			const std::string &opName
 		);

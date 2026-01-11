@@ -11,7 +11,7 @@
 namespace SpiralOfFate
 {
 #ifndef __ANDROID__
-	Logger::Logger(const std::string &filepath) noexcept :
+	Logger::Logger(const std::filesystem::path &filepath) noexcept :
 		file(std::ofstream(filepath, std::ios::out))
 	{
 	}
