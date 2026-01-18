@@ -12,11 +12,13 @@
 #include "../Operations/DummyOperation.hpp"
 #include "../Operations/FlagOperation.hpp"
 #include "../Operations/BasicDataOperation.hpp"
+#include "../Operations/BasicData2StepOperation.hpp"
+#include "../Operations/BasicDataDoubleOperation.hpp"
+#include "../Operations/BasicDataDouble2Operation.hpp"
+#include "../Operations/BasicDataQuadOperation.hpp"
 #include "../Operations/CleanPropertiesOperation.hpp"
 #include "../Operations/EditSpriteOperation.hpp"
-#include "../Operations/EditSoundOperation.hpp"
-#include "../Operations/ClearBlockOperation.hpp"
-#include "../Operations/ClearHitOperation.hpp"
+#include "../Operations/ClearAttackOperation.hpp"
 #include "../Operations/CreateMoveOperation.hpp"
 #include "../Operations/CreateFrameOperation.hpp"
 #include "../Operations/CreateBlockOperation.hpp"
@@ -34,6 +36,7 @@
 #include "../Operations/PasteDataOperation.hpp"
 #include "../Operations/PasteAnimDataOperation.hpp"
 #include "../Operations/PasteBoxDataOperation.hpp"
+#include "Resources/Assert.hpp"
 
 static ColorConversionCb colorConversions[] = {
 	[](unsigned r, unsigned g, unsigned b) {
@@ -148,11 +151,11 @@ std::string to_string(float value, int pres)
 	return buffer;
 }
 
-std::string to_hex(unsigned long long value)
+std::string to_hex(unsigned long long value, int count)
 {
 	char buffer[17];
 
-	sprintf(buffer, "%016llX", value);
+	sprintf(buffer, "%0*llX", count, value);
 	return buffer;
 }
 
@@ -301,7 +304,7 @@ do {                                                                            
                 } catch (...) { return; }                                                                 \
         });                                                                                               \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{                               \
-                Box *box = this->_preview->getSelectedBoxRef();                                           \
+                ShadyCore::Schema::Sequence::BBox *box = this->_preview->getSelectedBoxRef();                                           \
                                                                                                           \
                 if (!box) return;                                                                         \
                 __elem->onTextChange.setEnabled(false);                                                   \
@@ -314,123 +317,199 @@ do {                                                                            
         this->_containers.emplace(&container);                                                            \
 } while (false)
 #define PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset, noEmpty) \
-do {                                                                                                             \
-        auto __elem = container.get<tgui::EditBox>(guiId);                                                       \
-                                                                                                                 \
-        if (!__elem)                                                                                             \
-                break;                                                                                           \
-        __elem->onFocus([this]{ this->startTransaction(); });                                            \
-        __elem->onUnfocus([this]{ this->commitTransaction(); });                                         \
-        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); });        \
-        __elem->onTextChange([this](const tgui::String &s){                                              \
-                if constexpr (noEmpty) if (s.empty()) return;                                                    \
-                try {                                                                                            \
-                        fromStringPre(s)                                                                         \
-                        this->updateTransaction([&]{ return new operation(                                       \
-                                *this->_object,                                                                  \
-                                name,                                                                            \
-                                &FrameData::field,                                                               \
-                                fromString(s, decltype(FrameData::field)),                                       \
-                                reset                                                                            \
-                        ); });                                                                                   \
-                } catch (...) { return; }                                                                        \
-        });                                                                                                      \
-        this->_updateFrameElements[&container].emplace_back([__elem, this]{                                      \
-                auto &data = this->_object->getFrameData();                                                      \
-                __elem->onTextChange.setEnabled(false);                                                          \
-                __elem->setText(toString(data.field, arg));                                                      \
-                __elem->onTextChange.setEnabled(true);                                                           \
-        });                                                                                                      \
-        this->_containers.emplace(&container);                                                                   \
+do {                                                                                              \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                        \
+                                                                                                  \
+        if (!__elem)                                                                              \
+                break;                                                                            \
+        __elem->onFocus([this]{ this->startTransaction(); });                                     \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                  \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); }); \
+        __elem->onTextChange([this](const tgui::String &s){                                       \
+                if constexpr (noEmpty) if (s.empty()) return;                                     \
+                try {                                                                             \
+                        fromStringPre(s)                                                          \
+                        this->updateTransaction([&]{ return new operation(                        \
+                                *this->_object,                                                   \
+                                name,                                                             \
+                                &FrameData::field,                                                \
+                                fromString(s, decltype(FrameData::field), arg),                   \
+                                reset                                                             \
+                        ); });                                                                    \
+                } catch (...) { return; }                                                         \
+        });                                                                                       \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                       \
+                auto &data = this->_object->getFrameData();                                       \
+                __elem->onTextChange.setEnabled(false);                                           \
+                __elem->setText(toString(data.field, arg));                                       \
+                __elem->onTextChange.setEnabled(true);                                            \
+        });                                                                                       \
+        this->_containers.emplace(&container);                                                    \
 } while (false)
-#define PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, toString, fromStringPre, fromString, arg, reset) \
-do {                                                                                                                             \
-        auto __elem = container.get<tgui::EditBox>(guiId);                                                                       \
-                                                                                                                                 \
-        if (!__elem)                                                                                                             \
-                break;                                                                                                           \
-        __elem->onFocus([this]{ this->startTransaction(); });                                                            \
-        __elem->onUnfocus([this]{ this->commitTransaction(); });                                                         \
-        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); });                        \
-        __elem->onTextChange([this](const tgui::String &s){                                                              \
-                if (s.empty()) {                                                                                                 \
-                        this->updateTransaction([&]{ return new operation(                                                       \
-                                *this->_object,                                                                                  \
-                                name,                                                                                            \
-                                &FrameData::field,                                                                               \
-                                std::make_optional<decltype(FrameData::field)::value_type>(),                                    \
-                                (reset)                                                                                          \
-                        ); });                                                                                                   \
-                        return;                                                                                                  \
-                }                                                                                                                \
-                try {                                                                                                            \
-                        fromStringPre(s)                                                                                         \
-                        this->updateTransaction([&]{ return new operation(                                                       \
-                                *this->_object,                                                                                  \
-                                name,                                                                                            \
-                                &FrameData::field,                                                                               \
-                                std::make_optional<decltype(FrameData::field)::value_type>(                                      \
-                                        fromString(s, decltype(FrameData::field)::value_type)                                    \
-                                ),                                                                                               \
-                                (reset)                                                                                          \
-                        ); });                                                                                                   \
-                } catch (...) { return; }                                                                                        \
-        });                                                                                                                      \
-        this->_updateFrameElements[&container].emplace_back([__elem, this]{                                                      \
-                auto &data = this->_object->getFrameData();                                                                      \
-                __elem->onTextChange.setEnabled(false);                                                                          \
-                if (data.field)                                                                                                  \
-                        __elem->setText(toString(*data.field, arg));                                                             \
-                else                                                                                                             \
-                        __elem->setText("");                                                                                     \
-                __elem->onTextChange.setEnabled(true);                                                                           \
-        });                                                                                                                      \
-        this->_containers.emplace(&container);                                                                                   \
+#define PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, toString, fromStringPre, fromString, arg, reset, noEmpty) \
+do {                                                                                              \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                        \
+                                                                                                  \
+        if (!__elem)                                                                              \
+                break;                                                                            \
+        __elem->onFocus([this]{ this->startTransaction(); });                                     \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                  \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); }); \
+        __elem->onTextChange([this](const tgui::String &s){                                       \
+                if constexpr (noEmpty) if (s.empty()) return;                                     \
+                try {                                                                             \
+                        fromStringPre(s)                                                          \
+                        this->updateTransaction([&]{ return new BasicData2StepOperation(          \
+                                *this->_object,                                                   \
+                                name,                                                             \
+                                &FrameData::field,                                                \
+                                &decltype(FrameData::field)::field2,                              \
+                                fromString(s, decltype(decltype(FrameData::field)::field2), arg), \
+                                reset                                                             \
+                        ); });                                                                    \
+                } catch (...) { return; }                                                         \
+        });                                                                                       \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                       \
+                auto &data = this->_object->getFrameData();                                       \
+                __elem->onTextChange.setEnabled(false);                                           \
+                __elem->setText(toString(data.field.field2, arg));                                \
+                __elem->onTextChange.setEnabled(true);                                            \
+        });                                                                                       \
+        this->_containers.emplace(&container);                                                    \
+} while (false)
+#define PLACE_HOOK_STRUCTURE_DOUBLE(container, guiId, field1, field2, name, toString, fromStringPre, fromString, arg, reset, noEmpty) \
+do {                                                                                              \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                        \
+                                                                                                  \
+        if (!__elem)                                                                              \
+                break;                                                                            \
+        __elem->onFocus([this]{ this->startTransaction(); });                                     \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                  \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); }); \
+        __elem->onTextChange([this](const tgui::String &s){                                       \
+                if constexpr (noEmpty) if (s.empty()) return;                                     \
+                try {                                                                             \
+                        fromStringPre(s)                                                          \
+                        this->updateTransaction([&]{ return new BasicDataDoubleOperation(         \
+                                *this->_object,                                                   \
+                                name,                                                             \
+                                &FrameData::field1,                                               \
+                                &FrameData::field2,                                               \
+                                fromString(s, decltype(FrameData::field2)),                       \
+                                reset                                                             \
+                        ); });                                                                    \
+                } catch (...) { return; }                                                         \
+        });                                                                                       \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                       \
+                auto &data = this->_object->getFrameData();                                       \
+                __elem->onTextChange.setEnabled(false);                                           \
+                __elem->setText(toString(data.field1, data.field2, arg));                         \
+                __elem->onTextChange.setEnabled(true);                                            \
+        });                                                                                       \
+        this->_containers.emplace(&container);                                                    \
+} while (false)
+#define PLACE_HOOK_STRUCTURE_DOUBLE2(container, guiId, field, field1, field2, name, toString, fromStringPre, fromString, arg, reset, noEmpty) \
+do {                                                                                              \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                        \
+                                                                                                  \
+        if (!__elem)                                                                              \
+                break;                                                                            \
+        __elem->onFocus([this]{ this->startTransaction(); });                                     \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                  \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); }); \
+        __elem->onTextChange([this](const tgui::String &s){                                       \
+                if constexpr (noEmpty) if (s.empty()) return;                                     \
+                try {                                                                             \
+                        fromStringPre(s)                                                          \
+                        this->updateTransaction([&]{ return new BasicDataDouble2Operation(        \
+                                *this->_object,                                                   \
+                                name,                                                             \
+                                &FrameData::field,                                                \
+                                &decltype(FrameData::field)::field1,                              \
+                                &decltype(FrameData::field)::field2,                              \
+                                fromString(s, decltype(decltype(FrameData::field)::field2)),      \
+                                reset                                                             \
+                        ); });                                                                    \
+                } catch (...) { return; }                                                         \
+        });                                                                                       \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                       \
+                auto &data = this->_object->getFrameData();                                       \
+                __elem->onTextChange.setEnabled(false);                                           \
+                __elem->setText(toString(data.field.field1, data.field.field2, arg));             \
+                __elem->onTextChange.setEnabled(true);                                            \
+        });                                                                                       \
+        this->_containers.emplace(&container);                                                    \
+} while (false)
+#define PLACE_HOOK_STRUCTURE_QUAD(container, guiId, field1, field2, field3, field4, name, toString, fromStringPre, fromString, arg, reset, noEmpty) \
+do {                                                                                                \
+        auto __elem = container.get<tgui::EditBox>(guiId);                                          \
+                                                                                                    \
+        if (!__elem)                                                                                \
+                break;                                                                              \
+        __elem->onFocus([this]{ this->startTransaction(); });                                       \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                    \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); });   \
+        __elem->onTextChange([this](const tgui::String &s){                                         \
+                if constexpr (noEmpty) if (s.empty()) return;                                       \
+                try {                                                                               \
+                        fromStringPre(s)                                                            \
+                        this->updateTransaction([&]{ return new BasicDataQuadOperation(             \
+                                *this->_object,                                                     \
+                                name,                                                               \
+                                &FrameData::field1,                                                 \
+                                &FrameData::field2,                                                 \
+                                &FrameData::field3,                                                 \
+                                &FrameData::field4,                                                 \
+                                fromString(s, decltype(FrameData::field1)),                         \
+                                reset                                                               \
+                        ); });                                                                      \
+                } catch (...) { return; }                                                           \
+        });                                                                                         \
+        this->_updateFrameElements[&container].emplace_back([__elem, this]{                         \
+                auto &data = this->_object->getFrameData();                                         \
+                __elem->onTextChange.setEnabled(false);                                             \
+                __elem->setText(toString(data.field1, data.field2, data.field3, data.field4, arg)); \
+                __elem->onTextChange.setEnabled(true);                                              \
+        });                                                                                         \
+        this->_containers.emplace(&container);                                                      \
 } while (false)
 
 #define NO_FROMSTRING_PRE(s)
 
-#define STRING_FROM_STRING(s, _) s.toStdString()
+#define STRING_FROM_STRING(s, _, __) s.toStdString()
 #define STRING_TO_STRING(s, _) s
 
-#define NUMBER_FROM_STRING(s, type) static_cast<type>(std::stof(s.toStdString()))
+#define NUMBER_FROM_STRING(s, type, _) static_cast<type>(std::stof(s.toStdString()))
 #define NUMBER_TO_STRING(s, p) to_string(s, p)
 
-#define NUMBER_RAD_FROM_STRING(s, type) static_cast<type>(std::stof(s.toStdString()) * M_PI / 180)
-#define NUMBER_RAD_TO_STRING(s, p) to_string(s * 180 / M_PI, p)
+#define SOKU_FLOAT_FROM_STRING(s, type, p) static_cast<type>(std::stof(s.toStdString()) * std::pow(10, p / 10))
+#define SOKU_FLOAT_TO_STRING(s, p) to_string(static_cast<float>(s / std::pow(10, p / 10)), p % 10)
 
-#define NUMFLAGS_FROM_STRING(s, _) { (unsigned int)std::stoul(s.toStdString(), nullptr, 16) }
-#define NUMFLAGS_TO_STRING(s, _) to_hex(s.flags)
+#define SOKU_FLOAT_PERCENT_FROM_STRING(s, type, p) static_cast<type>(std::stof(s.toStdString()) * std::pow(10, p / 10))
+#define SOKU_FLOAT_PERCENT_TO_STRING(s, p) (to_string(static_cast<float>(s / std::pow(10, p / 10)), p % 10) + "%")
+
+#define NUMFLAGS_FROM_STRING(s, type, __) (type)std::stoul(s.toStdString(), nullptr, sizeof(type) * 2)
+#define NUMFLAGS_TO_STRING(s, d) to_hex(s, d)
 
 #define VECTOR_FROM_STRING_PRE(s)                                       \
         auto pos = s.find(',');                                         \
         auto __x = s.substr(1, pos - 1).toStdString();                  \
         auto __y = s.substr(pos + 1, s.size() - pos - 1).toStdString();
-#define VECTOR_FROM_STRING(s, type) {       \
-        (decltype(type::x))std::stof(__x), \
-        (decltype(type::y))std::stof(__y)  \
-}
-#define VECTOR_TO_STRING(s, p) "(" + \
-	to_string((s).x, p) + "," +  \
-	to_string((s).y, p) +        \
-")"
+#define VECTOR_FROM_STRING(s, type) \
+        (type)std::stof(__x),          \
+        (type)std::stof(__y)
+#define VECTOR_TO_STRING(s1, s2, p) ("(" + \
+	to_string(s1, p) + "," +  \
+	to_string(s2, p) +        \
+")")
 
-#define SNAP_FROM_STRING_PRE(s)                          \
-        auto pos = s.find(',');                          \
-        auto s2 = s.substr(pos + 1, s.size() - pos - 2); \
-        auto pos2 = s2.find(',');                        \
-        auto __x = s.substr(1, pos - 1).toStdString();   \
-        auto __y = s2.substr(0, pos2 - 1).toStdString(); \
-        auto __r = s2.substr(pos2 + 1).toStdString();
-#define SNAP_FROM_STRING(s, type) {                                                           \
-        { (decltype(type::first.x))std::stod(__x), (decltype(type::first.y))std::stod(__y) }, \
-        (decltype(type::second))std::stof(__r) * (float)M_PI / 180.f                          \
-}
-#define SNAP_TO_STRING(s, _) "(" +                     \
-	to_string((s).first.x, 2) + "," +              \
-	to_string((s).first.y, 2) + "," +              \
-	to_string((int)((s).second * 180 / M_PI), 0) + \
-")"
+#define VECTOR_FLOAT_FROM_STRING(s, type)          \
+        (type)(std::stof(__x) * 100), \
+        (type)(std::stof(__y) * 100)
+#define VECTOR_FLOAT_TO_STRING(s1, s2, p) ("(" + \
+	to_string(s1 / 100.f, p) + "," +  \
+	to_string(s2 / 100.f, p) +        \
+")")
 
 #define RECT_FROM_STRING_PRE(s)                                     \
         auto __pos = s.find(',');                                   \
@@ -444,46 +523,59 @@ do {                                                                            
         auto __pos3 = __remainder2.find(',');                       \
         auto __w = __remainder2.substr(0, __pos3 + 1).toStdString();\
         auto __h = __remainder2.substr(__pos3 + 1, __remainder2.size() - __pos3 - 1).toStdString();
-#define RECT_FROM_STRING(s, type) {                                                       \
-        {(decltype(type::pos.x))std::stof(__x),  (decltype(type::pos.y))std::stof(__y) }, \
-        {(decltype(type::size.x))std::stof(__w), (decltype(type::size.y))std::stof(__h) } \
-}
-#define RECT_TO_STRING(s, p) "(" +     \
-        to_string(s.pos.x, p) + "," +  \
-        to_string(s.pos.y, p) + "," +  \
-        to_string(s.size.x, p) + "," + \
-        to_string(s.size.y, p) +       \
-")"
+#define RECT_FROM_STRING(s, type) \
+        (type)std::stof(__x),     \
+        (type)std::stof(__y),     \
+        (type)std::stof(__w),     \
+        (type)std::stof(__h)
+
+#define RECT_TO_STRING(s1, s2, s3, s4, p) ("(" +     \
+        to_string(s1, p) + "," +  \
+        to_string(s2, p) + "," +  \
+        to_string(s3, p) + "," + \
+        to_string(s4, p) +       \
+")")
 
 #define PLACE_HOOK_STRING(container, guiId, field, name, operation, reset) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, STRING_TO_STRING, NO_FROMSTRING_PRE, STRING_FROM_STRING, _, reset, false)
 #define PLACE_HOOK_NUMBER(container, guiId, field, name, operation, reset, precision) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset, true)
-#define PLACE_HOOK_NUMBER_DEG(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMBER_RAD_TO_STRING, NO_FROMSTRING_PRE, NUMBER_RAD_FROM_STRING, precision, reset, true)
-#define PLACE_HOOK_OPTIONAL_NUMBER(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, precision, reset)
 #define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation, reset) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _, reset, true)
-#define PLACE_HOOK_VECTOR(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset, true)
-#define PLACE_HOOK_OPTIONAL_VECTOR(container, guiId, field, name, operation, reset, precision) \
-	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, precision, reset)
-#define PLACE_HOOK_OPTIONAL_SNAP(container, guiId, field, name, operation, reset) \
-	PLACE_HOOK_OPTIONAL_STRUCTURE(container, guiId, field, name, operation, SNAP_TO_STRING, SNAP_FROM_STRING_PRE, SNAP_FROM_STRING, _, reset)
-#define PLACE_HOOK_RECT(container, guiId, field, name, operation, reset) \
-	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0, reset, true)
+
+#define PLACE_HOOK_NUMBER2(container, guiId, field, field2, name) \
+	PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, 0, false, true)
+#define PLACE_HOOK_SOKU_FLOAT2(container, guiId, field, field2, name, precision) \
+	PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, SOKU_FLOAT_TO_STRING, NO_FROMSTRING_PRE, SOKU_FLOAT_FROM_STRING, precision, false, true)
+#define PLACE_HOOK_SOKU_FLOAT_PERCENT2(container, guiId, field, field2, name, precision) \
+	PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, SOKU_FLOAT_PERCENT_TO_STRING, NO_FROMSTRING_PRE, SOKU_FLOAT_PERCENT_FROM_STRING, precision, false, true)
+#define PLACE_HOOK_NUMFLAGS2(container, guiId, field, field2, name, digits) \
+	PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, digits, false, true)
+
+#define PLACE_HOOK_VECTOR(container, guiId, field2, name) \
+	PLACE_HOOK_STRUCTURE_DOUBLE(container, guiId, field2##X, field2##Y, name, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, 0, false, true)
+#define PLACE_HOOK_VECTOR_SOKU_FLOAT(container, guiId, field2, name, precision) \
+	PLACE_HOOK_STRUCTURE_DOUBLE(container, guiId, field2##X, field2##Y, name, VECTOR_FLOAT_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FLOAT_FROM_STRING, precision, false, true)
+
+#define PLACE_HOOK_VECTOR2(container, guiId, field, field2, name) \
+	PLACE_HOOK_STRUCTURE_DOUBLE2(container, guiId, field, field2##X, field2##Y, name, VECTOR_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FROM_STRING, 0, false, true)
+#define PLACE_HOOK_VECTOR_SOKU_FLOAT2(container, guiId, field, field2, name, precision) \
+	PLACE_HOOK_STRUCTURE_DOUBLE2(container, guiId, field, field2##X, field2##Y, name, VECTOR_FLOAT_TO_STRING, VECTOR_FROM_STRING_PRE, VECTOR_FLOAT_FROM_STRING, precision, false, true)
+
+#define PLACE_HOOK_RECT(container, guiId, field, name) \
+	PLACE_HOOK_STRUCTURE_QUAD(container, guiId, field##OffsetX, field##OffsetY, field##Width, field##Height, name, RECT_TO_STRING, RECT_FROM_STRING_PRE, RECT_FROM_STRING, 0, false, true)
+
 #define PLACE_HOOK_FLAG(container, guiId, field, index, name, reset)               \
 do {                                                                               \
         auto __elem = container.get<tgui::CheckBox>(guiId);                        \
                                                                                    \
         if (!__elem)                                                               \
                 break;                                                             \
-        __elem->onChange([this, index](bool b){                            \
+        __elem->onChange([this, index](bool b){                                    \
                 this->applyOperation(new FlagOperation(                            \
                         *this->_object,                                            \
                         name,                                                      \
-                        &FrameData::field,                                         \
+                        &ShadyCore::Schema::Sequence::MoveTraits::field,           \
                         index, b, (reset)                                          \
                 ));                                                                \
                 this->_rePopulateFrameData();                                      \
@@ -491,7 +583,7 @@ do {                                                                            
         this->_updateFrameElements[&container].emplace_back([__elem, this, index]{ \
                 auto &data = this->_object->getFrameData();                        \
                 __elem->onChange.setEnabled(false);                                \
-                __elem->setChecked(data.field.flags & (1ULL << index));            \
+                __elem->setChecked(data.traits.field & (1ULL << index));           \
                 __elem->onChange.setEnabled(true);                                 \
         });                                                                        \
         this->_containers.emplace(&container);                                     \
@@ -505,16 +597,9 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, CloseButtonF
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MaximizeButtonFocused, "ChildWindowButton")
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButtonFocused, "ChildWindowButton")
 
-SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath, FrameDataEditor &editor) :
-	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
-	_editor(editor),
-	_path(frameDataPath),
-	_pathBak(frameDataPath),
-	_chrPath(frameDataPath.parent_path()),
-	_character(frameDataPath.parent_path().filename().string()),
-	_object(new EditableObject(frameDataPath))
+void SpiralOfFate::MainWindow::_init()
 {
-	this->_preview = std::make_shared<PreviewWidget>(std::ref(editor), std::ref(*this), *this->_object);
+	this->_preview = std::make_shared<PreviewWidget>(std::ref(this->_editor), std::ref(*this), *this->_object);
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
 	this->_preview->onBoxSelect([this]{
@@ -525,68 +610,27 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 		this->_editor.setCanDelBoxes(false);
 		this->_rePopulateFrameData();
 	});
-	this->_pathBak += ".bak";
-
-	std::ifstream chrStream{this->_chrPath / "chr.json"};
-
-	if (chrStream.fail())
-		throw std::invalid_argument("Failed to open " + (this->_chrPath / "chr.json").string() + " for reading: " + strerror(errno));
-	chrStream >> this->_characterData;
-
-	auto palettes = this->_characterData["palettes"].get<std::vector<std::string>>();
+	this->_preview->setPalette(&this->_palettes.front().colors);
+	this->_pathBak = "./backups/" + std::to_string(++game->lastSwap) + ".bak";
 
 	this->m_renderer = aurora::makeCopied<Renderer>();
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/animationWindow.gui");
-	if (!palettes.empty()) {
-		std::array<unsigned char, 768> paletteData;
-
-		for (auto &ppath : palettes) {
-			std::ifstream paletteStream{this->_chrPath / ppath};
-
-			this->_palettes.emplace_back();
-
-			auto &pal = this->_palettes.back();
-
-			pal.path = ppath;
-			if (paletteStream.fail()) {
-				game->logger.error("Failed to open " + (this->_chrPath / ppath).string() + " for reading: " + strerror(errno));
-				continue;
-			}
-			paletteStream.read(reinterpret_cast<char *>(paletteData.data()), paletteData.size());
-			if (paletteStream.fail()) {
-				game->logger.error("Failed to read " + (this->_chrPath / ppath).string() + ".");
-				continue;
-			}
-			for (size_t i = 0 ; i < 251; i++) {
-				pal.colors[i].r = paletteData[i * 3];
-				pal.colors[i].g = paletteData[i * 3 + 1];
-				pal.colors[i].b = paletteData[i * 3 + 2];
-				pal.colors[i].a = i == 0 ? 0 : 255;
-			}
-
-			pal.colors[251] = game->typeColors[TYPECOLOR_NEUTRAL];
-			pal.colors[252] = game->typeColors[TYPECOLOR_NON_TYPED];
-			pal.colors[253] = game->typeColors[TYPECOLOR_MATTER];
-			pal.colors[254] = game->typeColors[TYPECOLOR_SPIRIT];
-			pal.colors[255] = game->typeColors[TYPECOLOR_VOID];
-		}
-		this->_preview->setPalette(&this->_palettes.front().colors);
-	} else
-		Utils::dispMsg(*this, this->_editor.localize("message_box.title.no_pal"), this->_editor.localize("message_box.no_pal"), MB_ICONWARNING);
 
 	auto panel = this->get<tgui::Panel>("AnimationPanel");
 	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
-	auto displace = panel->get<tgui::BitmapButton>("Displace");
 	auto ctrlPanel = this->get<tgui::Panel>("ControlPanel");
 
-	ctrlPanel->loadWidgetsFromFile("assets/gui/editor/character/framedata.gui");
+	if (this->_object->_schema.isCharacterData)
+		ctrlPanel->loadWidgetsFromFile("assets/gui/editor/character/framedata.gui");
+	else
+		ctrlPanel->loadWidgetsFromFile("assets/gui/editor/character/animation.gui");
 	this->_localizeWidgets(*ctrlPanel, true);
 	Utils::setRenderer(this);
 
-	this->setSize("min(1200, &.w - 20)", "min(625, &.h - 40)");
+	this->setSize("min(1200, &.w - 20)", "min(655, &.h - 40)");
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
-	this->setTitle(frameDataPath.string());
+	this->setTitle(this->_title);
 	this->setResizable();
 	this->setCloseBehavior(CloseBehavior::None);
 	this->onClose([this]{
@@ -603,10 +647,6 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 		this->_preview->displayBoxes = !this->_preview->displayBoxes;
 		This.lock()->setImage(tgui::Texture("assets/gui/editor/" + std::string(this->_preview->displayBoxes ? "" : "no") + "boxes.png"));
 	}, std::weak_ptr(showBoxes));
-	displace->onClick([this](std::weak_ptr<tgui::BitmapButton> This){
-		this->_preview->displaceObject = !this->_preview->displaceObject;
-		This.lock()->setImage(tgui::Texture("assets/gui/editor/" + std::string(this->_preview->displaceObject ? "" : "no") + "dispose.png"));
-	}, std::weak_ptr(displace));
 
 	this->onFocus([this]{
 		this->m_titleText.setColor(this->_titleColorFocusedCached);
@@ -623,6 +663,47 @@ SpiralOfFate::MainWindow::MainWindow(const std::filesystem::path &frameDataPath,
 
 	this->_placeUIHooks(*this);
 	this->_populateData(*this);
+}
+
+SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::string &frameDataPath, FrameDataEditor &editor) :
+	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
+	_editor(editor),
+	_title(frameDataPath),
+	_chrPath(folder)
+{
+	if (!this->_chrPath.ends_with('/'))
+		this->_chrPath.push_back('/');
+	this->_character = folder;
+	while (this->_character.back() == '/')
+		this->_character.pop_back();
+	this->_character.erase(0, this->_character.find_last_of('/'));
+	if (!std::filesystem::exists(game->settings.palettes / this->_character))
+		std::filesystem::create_directories(game->settings.palettes / this->_character);
+	this->reloadPalette();
+	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
+	this->_init();
+}
+
+SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::filesystem::path &frameDataPath, FrameDataEditor &editor) :
+	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
+	_editor(editor),
+	_pathInit(true),
+	_title(frameDataPath.string()),
+	_chrPath(folder),
+	_path(frameDataPath),
+	_pathBak(frameDataPath)
+{
+	if (!this->_chrPath.ends_with('/'))
+		this->_chrPath.push_back('/');
+	this->_character = folder;
+	while (this->_character.back() == '/')
+		this->_character.pop_back();
+	this->_character.erase(0, this->_character.find_last_of('/') + 1);
+	if (!std::filesystem::exists(game->settings.palettes / this->_character))
+		std::filesystem::create_directories(game->settings.palettes / this->_character);
+	this->reloadPalette();
+	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
+	this->_init();
 }
 
 bool SpiralOfFate::MainWindow::isModified() const noexcept
@@ -644,10 +725,10 @@ bool SpiralOfFate::MainWindow::hasRedoData() const noexcept
 
 void SpiralOfFate::MainWindow::refreshMenuItems() const
 {
-	auto curr = this->_object->_moves.find(this->_object->_action);
-	assert_exp(curr != this->_object->_moves.end());
+	auto curr = this->_object->_schema.framedata.find(this->_object->_action);
+	assert_exp(curr != this->_object->_schema.framedata.end());
 
-	auto &mov = this->_object->_moves;
+	auto &mov = this->_object->_schema.framedata;
 	auto &act = curr->second;
 	auto &blk = act[this->_object->_actionBlock];
 
@@ -663,8 +744,8 @@ void SpiralOfFate::MainWindow::refreshMenuItems() const
 	this->_editor.setHasNextFrame(this->_object->_animation < blk.size() - 1);
 	this->_editor.setHasLastBlock(this->_object->_actionBlock > 0);
 	this->_editor.setHasNextBlock(this->_object->_actionBlock < act.size() - 1);
-	this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
-	this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
+	this->_editor.setHasLastAction(curr != this->_object->_schema.framedata.begin());
+	this->_editor.setHasNextAction(std::next(curr) != this->_object->_schema.framedata.end());
 }
 
 void SpiralOfFate::MainWindow::redo()
@@ -712,23 +793,16 @@ void SpiralOfFate::MainWindow::copyFrame()
 void SpiralOfFate::MainWindow::pasteFrame()
 {
 	auto &data = this->_object->getFrameData();
-	auto oldPal = data.__paletteData;
-	auto oldPalette = data.__palette;
-	auto oldFolder = data.__folder;
 
 	try {
-		auto anim = SpiralOfFate::FrameData(
-			nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
-			this->_object->_folder
-		);
-
-		anim.__paletteData = oldPal;
-		anim.__palette = oldPalette;
-		anim.__folder = oldFolder;
 		this->applyOperation(new PasteDataOperation(
 			*this->_object,
 			this->_editor.localize("operation.paste"),
-			anim
+			{
+				nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
+				data.__folder,
+				data.__paletteData
+			}
 		));
 	} catch (std::exception &e) {
 		game->logger.error("Failed to deserialize frame" + std::string(e.what()));
@@ -738,23 +812,16 @@ void SpiralOfFate::MainWindow::pasteFrame()
 void SpiralOfFate::MainWindow::pasteBoxData()
 {
 	auto &data = this->_object->getFrameData();
-	auto oldPal = data.__paletteData;
-	auto oldPalette = data.__palette;
-	auto oldFolder = data.__folder;
 
 	try {
-		auto anim = SpiralOfFate::FrameData(
-			nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
-			this->_object->_folder
-		);
-
-		anim.__paletteData = oldPal;
-		anim.__palette = oldPalette;
-		anim.__folder = oldFolder;
 		this->applyOperation(new PasteBoxDataOperation(
 			*this->_object,
 			this->_editor.localize("operation.paste_box"),
-			anim
+			{
+				nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
+				data.__folder,
+				data.__paletteData
+			}
 		));
 	} catch (std::exception &e) {
 		game->logger.error("Failed to deserialize frame" + std::string(e.what()));
@@ -764,23 +831,16 @@ void SpiralOfFate::MainWindow::pasteBoxData()
 void SpiralOfFate::MainWindow::pasteAnimData()
 {
 	auto &data = this->_object->getFrameData();
-	auto oldPal = data.__paletteData;
-	auto oldPalette = data.__palette;
-	auto oldFolder = data.__folder;
 
 	try {
-		auto anim = SpiralOfFate::FrameData(
-			nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
-			this->_object->_folder
-		);
-
-		anim.__paletteData = oldPal;
-		anim.__palette = oldPalette;
-		anim.__folder = oldFolder;
 		this->applyOperation(new PasteAnimDataOperation(
 			*this->_object,
 			this->_editor.localize("operation.paste_anim"),
-			anim
+			{
+				nlohmann::json::parse(sf::Clipboard::getString().toAnsiString()),
+				data.__folder,
+				data.__paletteData
+			}
 		));
 	} catch (std::exception &e) {
 		game->logger.error("Failed to deserialize frame" + std::string(e.what()));
@@ -879,31 +939,64 @@ void SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
 
 void SpiralOfFate::MainWindow::setPath(const std::filesystem::path &path)
 {
-	std::error_code err;
-	std::filesystem::path pathBak = path;
-
-	pathBak += ".bak";
-	std::filesystem::rename(this->_pathBak, pathBak, err);
-	if (err)
-		// FIXME: strerror only works on Linux (err.message()?)
-		game->logger.error(this->_editor.localize("error.rename", this->_pathBak.string(), pathBak.string(), strerror(errno)));
 	this->_path = path;
-	this->_pathBak = pathBak;
-	for (auto &pal : this->_palettes)
-		pal.modified = true;
 }
 
 void SpiralOfFate::MainWindow::save()
 {
-	nlohmann::json j = nlohmann::json::array();
-
 	if (this->_pendingTransaction)
 		this->commitTransaction();
-	for (auto &[key, value] : this->_object->_moves)
-		j.push_back({
-			{"action", key},
-			{"framedata", value}
-		});
+
+	if (this->_path.extension() == ".json") {
+		auto j = this->_asJson();
+		std::ofstream stream{this->_path};
+
+		if (stream.fail()) {
+			auto err = this->_editor.localize("error.open", this->_path.string(), strerror(errno));
+
+			// FIXME: strerror only works on Linux (err.message()?)
+			// TODO: Somehow return the message box so the caller can open the save as dialog when OK is clicked
+			SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
+			game->logger.error(err);
+			return;
+		}
+		stream << j;
+		stream.close();
+		this->_operationSaved = this->_operationIndex;
+		this->setTitle(this->_path.string());
+		return;
+	}
+
+	ShadyCore::FileType::Format format;
+	ShadyCore::Schema schema;
+
+	for (auto &action : this->_object->_schema.framedata) {
+		if (action.second.cloned) {
+			auto c = new ShadyCore::Schema::Clone(action.first);
+
+			c->targetId = action.second.clonedId;
+			schema.objects.push_back(c);
+			continue;
+		}
+		for (auto &sequence : action.second) {
+			auto c = new ShadyCore::Schema::Sequence(action.first, !this->_object->_schema.isCharacterData);
+
+			c->loop = sequence.loop;
+			c->moveLock = sequence.moveLock;
+			c->actionLock = sequence.actionLock;
+			for (auto &frame : sequence) {
+				frame.imageIndex = getOrCreateImage(schema, frame.spritePath);
+				c->frames.push_back(new ShadyCore::Schema::Sequence::MoveFrame(frame));
+			}
+			schema.objects.push_back(c);
+		}
+	}
+	if (this->_path.extension() == ".xml")
+		format = ShadyCore::FileType::SCHEMA_XML;
+	else if (this->_object->_schema.isCharacterData)
+		format = ShadyCore::FileType::SCHEMA_GAME_PATTERN;
+	else
+		format = ShadyCore::FileType::SCHEMA_GAME_ANIM;
 
 	std::ofstream stream{this->_path};
 
@@ -916,70 +1009,175 @@ void SpiralOfFate::MainWindow::save()
 		game->logger.error(err);
 		return;
 	}
-	stream << j.dump(2);
+	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_SCHEMA, format})(&schema, stream);
+	stream.close();
+	schema.destroy();
 
 	for (auto &pal : this->_palettes) {
-		auto p = this->_chrPath / pal.path;
-		std::ofstream palStream{p};
+		if (pal.path.empty() && !pal.modified)
+			continue;
+		try {
+			// For this one since we are saving let's keep going anyway and display the error.
+			assert_exp(!pal.path.empty());
+		} catch (std::exception &e) {
+			if (stream.fail()) {
+				auto err = this->_editor.localize("error.open", this->_path.string(), e.what());
 
-		if (palStream.fail()) {
-			auto err = this->_editor.localize("error.open", p.string(), strerror(errno));
+				SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
+				game->logger.error(err);
+				continue;
+			}
+		}
+
+		ShadyCore::Palette palette;
+		auto ptr = new uint32_t[256];
+
+		palette.bitsPerPixel = 32;
+		palette.data = reinterpret_cast<uint8_t *>(ptr);
+		for (size_t i = 0; i < pal.colors.size(); i++)
+			palette.data[i] =
+				(i == 0 ? 0x00000000 : 0xFF000000) |
+				pal.colors[i].r << 16 |
+				pal.colors[i].g << 8 |
+				pal.colors[i].b << 0;
+		palette.pack();
+
+		std::ofstream pstream{pal.path};
+
+		if (pstream.fail()) {
+			auto err = this->_editor.localize("error.open", pal.path.string(), strerror(errno));
 
 			// FIXME: strerror only works on Linux (err.message()?)
-			SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
+			SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_pal_err"), err, MB_ICONERROR);
 			game->logger.error(err);
 			continue;
 		}
-
-		std::array<unsigned char, 768> paletteData;
-
-		for (size_t i = 0 ; i < 256; i++) {
-			paletteData[i * 3]     = pal.colors[i].r;
-			paletteData[i * 3 + 1] = pal.colors[i].g;
-			paletteData[i * 3 + 2] = pal.colors[i].b;
-		}
-		palStream.write(reinterpret_cast<char *>(paletteData.data()), paletteData.size());
-	}
-
-	auto p = this->_chrPath / "chr.json";
-	std::ofstream chrStream{p};
-
-	this->_characterData["palettes"] = nlohmann::json::array();
-	for (auto &pal : this->_palettes)
-		this->_characterData["palettes"].push_back(pal.path);
-	if (!chrStream.fail())
-		chrStream << this->_characterData.dump(2);
-	else {
-		auto err = this->_editor.localize("error.open", p.string(), strerror(errno));
-
-		// FIXME: strerror only works on Linux (err.message()?)
-		// FIXME: Isn't it confusing that we show an error box, but still somewhat ignore the error and proceed?
-		SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_err"), err, MB_ICONERROR);
-		game->logger.error(err);
+		ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, ShadyCore::FileType::PALETTE_ACT})(&palette, pstream);
+		pstream.close();
+		palette.destroy();
 	}
 
 	this->_operationSaved = this->_operationIndex;
 	this->setTitle(this->_path.string());
 }
 
+void SpiralOfFate::MainWindow::exportPalette(const std::filesystem::path &path)
+{
+	auto &pal = this->_palettes[this->_selectedPalette];
+	ShadyCore::Palette palette;
+	auto ptr = new uint32_t[256];
+	ShadyCore::FileType::Format format;
+
+	if (path.extension() == ".act")
+		format = ShadyCore::FileType::PALETTE_ACT;
+	else
+		format = ShadyCore::FileType::PALETTE_PAL;
+	palette.bitsPerPixel = 32;
+	palette.data = reinterpret_cast<uint8_t *>(ptr);
+	for (size_t i = 0; i < pal.colors.size(); i++)
+		palette.data[i] =
+			(i == 0 ? 0x00000000 : 0xFF000000) |
+			pal.colors[i].r << 16 |
+			pal.colors[i].g << 8 |
+			pal.colors[i].b << 0;
+	palette.pack();
+
+	std::ofstream pstream{pal.path};
+
+	if (pstream.fail()) {
+		auto err = this->_editor.localize("error.open", pal.path.string(), strerror(errno));
+
+		// FIXME: strerror only works on Linux (err.message()?)
+		SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.save_pal_err"), err, MB_ICONERROR);
+		game->logger.error(err);
+		return;
+	}
+	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, format})(&palette, pstream);
+	pstream.close();
+	palette.destroy();
+}
+
+void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
+{
+	ShadyCore::FileType::Format format;
+
+	if (path.extension() == ".act")
+		format = ShadyCore::FileType::PALETTE_ACT;
+	else
+		format = ShadyCore::FileType::PALETTE_PAL;
+
+	std::ifstream stream{path};
+	ShadyCore::Palette palette;
+
+	if (stream.fail()) {
+		auto err = this->_editor.localize("error.open", path.string(), strerror(errno));
+
+		// FIXME: strerror only works on Linux (err.message()?)
+		SpiralOfFate::Utils::dispMsg(game->gui, this->_editor.localize("message_box.title.open_pal_err"), err, MB_ICONERROR);
+		game->logger.error(err);
+		return;
+	}
+	ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, format})(&palette, stream);
+	stream.close();
+}
+
+nlohmann::json SpiralOfFate::MainWindow::_asJson() const
+{
+	nlohmann::json json;
+
+	json["path"] = this->_path;
+	json["title"] = this->_title;
+	json["folder"] = this->_chrPath;
+	json["character"] = this->_character;
+	json["isCharacterData"] = this->_object->_schema.isCharacterData;
+	json["framedata"] = nlohmann::json::object();
+	json["palettes"] = nlohmann::json::array();
+	for (auto &[key, action] : this->_object->_schema.framedata) {
+		auto &actionj = json[std::to_string(key)];
+
+		if (action.cloned) {
+			actionj = action.clonedId;
+			continue;
+		}
+		actionj = nlohmann::json::array();
+		for (auto &sequence : action) {
+			auto seqj = nlohmann::json::object();
+
+			seqj["loop"] = sequence.loop;
+			seqj["moveLock"] = sequence.moveLock;
+			seqj["actionLock"] = sequence.actionLock;
+			seqj["frames"] = nlohmann::json::array();
+			for (auto &frame : sequence)
+				seqj["frames"].push_back(frame.toJson());
+			actionj.push_back(seqj);
+		}
+	}
+	for (auto &palette : this->_palettes) {
+		auto palj = nlohmann::json::object();
+		auto colors = nlohmann::json::array();
+
+		for (auto &c : palette.colors)
+			colors.push_back({c.r, c.g, c.r});
+		palj["path"] = palette.path;
+		palj["modified"] = palette.modified;
+		palj["name"] = palette.name.toStdString();
+		palj["colors"] = colors;
+		json["palettes"].push_back(palj);
+	}
+	return json;
+}
+
 void SpiralOfFate::MainWindow::autoSave()
 {
-	nlohmann::json j = nlohmann::json::array();
-
-	for (auto &[key, value] : this->_object->_moves) {
-		j.push_back({
-			{"action", key},
-			{"framedata", value}
-		});
-	}
-
+	auto j = this->_asJson();
 	std::ofstream stream{this->_pathBak};
 
 	if (stream.fail()) {
+		// FIXME: strerror only works on Linux (err.message()?)
 		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_pathBak.string() + ": " + strerror(errno), MB_ICONERROR);
 		return;
 	}
-	stream << j.dump(2);
+	stream << j;
 }
 
 std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
@@ -988,7 +1186,9 @@ std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
 		return this->_editor.localize("action." + this->_character + "." + std::to_string(id));
 	else if (this->_editor.hasLocalization("action.generic." + std::to_string(id)))
 		return this->_editor.localize("action.generic." + std::to_string(id));
-	return Character::actionToString(id);
+	return "Action #" + std::to_string(id);
+	// TODO: Handle labels json
+	//return Character::actionToString(id);
 }
 
 SpiralOfFate::LocalizedContainer<tgui::ChildWindow>::Ptr SpiralOfFate::MainWindow::_createPopup(const std::string &path)
@@ -1061,7 +1261,7 @@ void SpiralOfFate::MainWindow::_createGenericPopup(const std::string &path)
 	this->_populateData(*contentPanel);
 }
 
-void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(unsigned)> &onConfirm, bool showNotAdded)
+void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current, bool showNotAdded)
 {
 	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
 	auto contentPanel = tgui::Panel::create({500, "&.h - 100"});
@@ -1073,11 +1273,12 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 	std::unordered_map<unsigned, std::string> movesNames;
 	std::unordered_map<unsigned, std::string> movesNamesLower;
 
-	for (const auto &moveId: this->_object->_moves | std::views::keys)
+	for (const auto &moveId: this->_object->_schema.framedata | std::views::keys)
 		moves.insert(moveId);
 	if (showNotAdded) {
-		for (const auto &moveId: SpiralOfFate::actionNames | std::views::keys)
-			moves.insert(moveId);
+		// TODO:
+		//for (const auto &moveId: SpiralOfFate::actionNames | std::views::keys)
+		//	moves.insert(moveId);
 		for (const auto &local: this->_editor.getLocalizationData() | std::views::keys) {
 			try {
 				if (local.rfind("action.generic.", 0) == 0)
@@ -1109,7 +1310,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		movesNamesLower[moveId].resize(movesNames[moveId].size());
 		// TODO: Handle non-ascii characters
 		std::ranges::transform(movesNames[moveId], movesNamesLower[moveId].begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
-		if (moveId == this->_object->_action)
+		if (moveId == current)
 			scroll = i * 25 + 20;
 		i++;
 	}
@@ -1118,7 +1319,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		this->remove(outsidePanel_w.lock());
 		this->remove(contentPanel_w.lock());
 	};
-	auto refresh = [moves, movesNames, movesNamesLower, this, onConfirm, closePopup](
+	auto refresh = [moves, movesNames, movesNamesLower, this, onConfirm, closePopup, current](
 		const std::weak_ptr<tgui::EditBox> &search_w,
 		const std::weak_ptr<tgui::ScrollablePanel> &movesPanel_w,
 		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
@@ -1144,13 +1345,13 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 			button->setSize(410, 20);
 			Utils::setRenderer(button);
 			Utils::setRenderer(label);
-			if (moveId == this->_object->_action) {
+			if (moveId == current) {
 				button->getRenderer()->setTextColor(tgui::Color::Green);
 				button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
 				button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
 				button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
 				button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
-			} else if (!this->_object->_moves.contains(moveId)) {
+			} else if (!this->_object->_schema.framedata.contains(moveId)) {
 				button->getRenderer()->setTextColor(tgui::Color{0xFF, 0x00, 0x00});
 				button->getRenderer()->setTextColorHover(tgui::Color{0xFF, 0x40, 0x40});
 				button->getRenderer()->setTextColorDisabled(tgui::Color{0xA0, 0x00, 0});
@@ -1259,6 +1460,9 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	auto colorPanel = container.get<tgui::ScrollablePanel>("AllColorPanel");
 	auto mode = container.get<tgui::Tabs>("ColorModes");
 	auto boundsButton = container.get<tgui::Button>("BoundsButton");
+	auto gndSeq = container.get<tgui::Button>("GndHitSeq");
+	auto airSeq = container.get<tgui::Button>("AirHitSeq");
+	auto atkLevel = container.get<tgui::ComboBox>("AttackLevel");
 	tgui::Container &sidePanel = ctrlPanel ? *ctrlPanel : container;
 
 	if (mode)
@@ -1329,8 +1533,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			auto name = window->get<tgui::EditBox>("PaletteName");
 			auto list = window->get<tgui::ComboBox>("PaletteList");
 
-			for (auto &pal : this->_palettes)
-				list->addItem(pal.path);
+			for (auto &pal : this->_palettes) {
+				if (pal.modified)
+					list->addItem(pal.name + "*");
+				else
+					list->addItem(pal.name);
+			}
 			if (this->_palettes.empty())
 				list->setEnabled(false);
 			list->setSelectedItemByIndex(this->_selectedPalette);
@@ -1356,17 +1564,17 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				if (this->_palettes.empty()) {
 					colors.fill(Color::Black);
 					colors[0] = Color::Transparent;
-					colors[251] = game->typeColors[TYPECOLOR_NEUTRAL];
-					colors[252] = game->typeColors[TYPECOLOR_NON_TYPED];
-					colors[253] = game->typeColors[TYPECOLOR_MATTER];
-					colors[254] = game->typeColors[TYPECOLOR_SPIRIT];
-					colors[255] = game->typeColors[TYPECOLOR_VOID];
 				} else
 					colors = this->_palettes[list->getSelectedItemIndex()].colors;
 				this->applyOperation(new CreatePaletteOperation(
 					this->_palettes,
 					this->_editor.localize("palette.create_action"),
-					{ .path = name->getText().toStdString(), .colors = colors, .modified = true },
+					{
+						.name = name->getText(),
+						.path = game->settings.palettes / this->_character / name->getText().toStdString(),
+						.colors = colors,
+						.modified = true
+					},
 					this->_selectedPalette
 				));
 				ptr.lock()->close();
@@ -1377,6 +1585,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		});
 	if (removePal)
 		removePal->onClick([this]{
+			if (this->_palettes[this->_selectedPalette].path.empty())
+				return;
 			this->applyOperation(new RemovePaletteOperation(
 				this->_palettes,
 				this->_editor.localize("palette.remove_action"),
@@ -1417,7 +1627,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 
 			unsigned action = std::stoul(s.toStdString());
 
-			if (this->_object->_moves.count(action) == 0) {
+			if (this->_object->_schema.framedata.count(action) == 0) {
 				This.lock()->setText(std::to_string(this->_object->_action));
 				return;
 			}
@@ -1429,11 +1639,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		}, std::weak_ptr(action));
 	if (clearHit)
 		clearHit->onClick([this]{
-			this->applyOperation(new ClearHitOperation(*this->_object, this->_editor));
-		});
-	if (clearBlock)
-		clearBlock->onClick([this]{
-			this->applyOperation(new ClearBlockOperation(*this->_object, this->_editor));
+			this->applyOperation(new ClearAttackOperation(*this->_object, this->_editor));
 		});
 	if (aFlags)
 		// TODO: Change flags label if a character or subobject
@@ -1468,7 +1674,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		});
 	if (frame)
 		frame->onValueChange([this](float value){
-			auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+			auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 			this->_paused = true;
 			this->_object->_animation = value;
@@ -1482,7 +1688,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		});
 	if (frameSpin)
 		frameSpin->onValueChange([this](float value){
-			auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+			auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 			this->_paused = true;
 			this->_object->_animation = value;
@@ -1496,7 +1702,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		});
 	if (blockSpin)
 		blockSpin->onValueChange([this](float value){
-			auto &act = this->_object->_moves[this->_object->_action];
+			auto &act = this->_object->_schema.framedata[this->_object->_action];
 			auto &blk = act[value];
 
 			this->_object->_actionBlock = value;
@@ -1514,65 +1720,138 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			// TODO: Not implemented
 			Utils::dispMsg(game->gui, "Error", "Not implemented", MB_ICONERROR);
 		});
+	if (gndSeq) {
+		gndSeq->onClick([this]{
+			this->_createMoveListPopup([this](unsigned move){
+				this->applyOperation(new BasicData2StepOperation(
+					*this->_object,
+					this->_editor.localize("animation.hit.gseq"),
+					&FrameData::traits,
+					&ShadyCore::Schema::Sequence::MoveTraits::onGroundHitSetSequence,
+					static_cast<uint16_t>(move), false
+				));
+			}, this->_object->getFrameData().traits.onGroundHitSetSequence, true);
+		});
 
-	PLACE_HOOK_STRING(container,   "Sprite",   spritePath,    this->_editor.localize("animation.sprite"),   EditSpriteOperation, false);
-	PLACE_HOOK_NUMBER(container,   "Duration", duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
-	PLACE_HOOK_VECTOR(container,   "Offset",   offset,        this->_editor.localize("animation.offset"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_VECTOR(container,   "Scale",    scale,         this->_editor.localize("animation.scale"),    BasicDataOperation, false, 2);
-	PLACE_HOOK_RECT(container,     "Bounds",   textureBounds, this->_editor.localize("animation.bounds"),   BasicDataOperation, false);
-	PLACE_HOOK_NUMFLAGS(container, "AFlags",   oFlag,         this->_editor.localize("animation.aflags"),   BasicDataOperation, false);
-	PLACE_HOOK_NUMFLAGS(container, "DFlags",   dFlag,         this->_editor.localize("animation.dflags"),   BasicDataOperation, false);
+		this->_updateFrameElements[&container].emplace_back([gndSeq, this]{
+			auto &data = this->_object->getFrameData();
 
-	PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,          "Marker",    specialMarker,     this->_editor.localize("animation.general.marker"),        BasicDataOperation, false, 0);
-	PLACE_HOOK_OPTIONAL_NUMBER(container, "Tier",      priority,          this->_editor.localize("animation.general.tier"),          BasicDataOperation, false, 0);
-	PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, true,  2);
-	PLACE_HOOK_OPTIONAL_VECTOR(container, "Gravity",   gravity,           this->_editor.localize("animation.general.gravity"),       BasicDataOperation, true,  2);
-	PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         EditSoundOperation, false);
-	PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,          "ManaCost",  manaCost,          this->_editor.localize("animation.general.manacost"),      BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER_DEG(container,      "Rotation",  rotation,          this->_editor.localize("animation.general.rotation"),      BasicDataOperation, true, 2);
+			if (data.traits.onGroundHitSetSequence == 0)
+				gndSeq->setText(this->_editor.localize("animation.hit.seq.default") + " (0)");
+			else
+				gndSeq->setText(this->_localizeActionName(data.traits.onGroundHitSetSequence) + " (" + std::to_string(data.traits.onGroundHitSetSequence) + ")");
+		});
+	}
+	if (airSeq) {
+		airSeq->onClick([this]{
+			this->_createMoveListPopup([this](unsigned move){
+				this->applyOperation(new BasicData2StepOperation(
+					*this->_object,
+					this->_editor.localize("animation.hit.aseq"),
+					&FrameData::traits,
+					&ShadyCore::Schema::Sequence::MoveTraits::onAirHitSetSequence,
+					static_cast<uint16_t>(move), false
+				));
+			}, this->_object->getFrameData().traits.onAirHitSetSequence, true);
+		});
+		this->_updateFrameElements[&container].emplace_back([airSeq, this]{
+			auto &data = this->_object->getFrameData();
 
-	PLACE_HOOK_NUMBER(container,        "PHitStop",  hitPlayerHitStop,  this->_editor.localize("animation.hit.pstop"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "OHitStop",  hitOpponentHitStop,this->_editor.localize("animation.hit.ostop"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_VECTOR(container,        "HitSpeed",  hitSpeed,          this->_editor.localize("animation.hit.speed"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_VECTOR(container,        "CHitSpeed", counterHitSpeed,   this->_editor.localize("animation.hit.chspeed"), BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "NLimit",    neutralLimit,      this->_editor.localize("animation.hit.nlimit"),  BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "SLimit",    spiritLimit,       this->_editor.localize("animation.hit.slimit"),  BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "MLimit",    matterLimit,       this->_editor.localize("animation.hit.mlimit"),  BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "VLimit",    voidLimit,         this->_editor.localize("animation.hit.vlimit"),  BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "Rate",      prorate,           this->_editor.localize("animation.hit.rate"),    BasicDataOperation, false, 2);
-	PLACE_HOOK_NUMBER(container,        "MinRate",   minProrate,        this->_editor.localize("animation.hit.minrate"), BasicDataOperation, false, 2);
-	PLACE_HOOK_NUMBER(container,        "Untech",    untech,            this->_editor.localize("animation.hit.untech"),  BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "Damage",    damage,            this->_editor.localize("animation.hit.damage"),  BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container,        "HitStun",   hitStun,           this->_editor.localize("animation.hit.stun"),    BasicDataOperation, false, 0);
-	PLACE_HOOK_STRING(container,        "HitSound",  hitSoundPath,      this->_editor.localize("animation.hit.sound"),   EditSoundOperation, false);
-	PLACE_HOOK_OPTIONAL_SNAP(container, "HitSnap",   snap,              this->_editor.localize("animation.hit.snap"),    BasicDataOperation, false);
+			if (data.traits.onAirHitSetSequence == 0)
+				airSeq->setText(this->_editor.localize("animation.hit.seq.default") + " (0)");
+			else
+				airSeq->setText(this->_localizeActionName(data.traits.onAirHitSetSequence) + " (" + std::to_string(data.traits.onAirHitSetSequence) + ")");
+		});
+	}
+	if (atkLevel) {
+		atkLevel->onItemSelect([this](unsigned id){
+			this->applyOperation(new BasicData2StepOperation(
+				*this->_object,
+				this->_editor.localize("animation.hit.aseq"),
+				&FrameData::traits,
+				&ShadyCore::Schema::Sequence::MoveTraits::attackLevel,
+				static_cast<uint16_t>(id), false
+			));
+		});
+		this->_updateFrameElements[&container].emplace_back([atkLevel, this]{
+			auto &data = this->_object->getFrameData();
 
-	PLACE_HOOK_NUMBER(container, "PBlockStop", blockPlayerHitStop,  this->_editor.localize("animation.block.pstop"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "OBlockStop", blockOpponentHitStop,this->_editor.localize("animation.block.ostop"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "PPush",      pushBack,            this->_editor.localize("animation.block.ppush"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "OPush",      pushBlock,           this->_editor.localize("animation.block.opush"),   BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "GuardDmg",   guardDmg,            this->_editor.localize("animation.block.guarddmg"),BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "Chip",       chipDamage,          this->_editor.localize("animation.block.chip"),    BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "BlockStun",  blockStun,           this->_editor.localize("animation.block.stun"),    BasicDataOperation, false, 0);
-	PLACE_HOOK_NUMBER(container, "WBlockStun", wrongBlockStun,      this->_editor.localize("animation.block.wstun"),   BasicDataOperation, false, 0);
+			atkLevel->setSelectedItemByIndex(data.traits.attackLevel);
+		});
+	}
 
-	PLACE_HOOK_BOX(container, "SelectedBoxPos",  pos,  size, this->_editor.localize("animation.selectedbox.pos"));
-	PLACE_HOOK_BOX(container, "SelectedBoxSize", size, pos,  this->_editor.localize("animation.selectedbox.size"));
+	// -- blendOptions --
+	// mode
+	// color
+	// scaleX
+	// scaleY
+	// flipVert
+	// flipHorz
+	// angle
+	// -- effects --
+	// pivotX
+	// pivotY
+	// positionXExtra
+	// positionYExtra
+	// positionX
+	// positionY
+	// unknown02RESETSTATE
+	// speedX
+	// speedY
 
-	for (size_t i = 0; i < 64; i++)
-		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), oFlag, i, this->_editor.localize("animation.aflags.flag" + std::to_string(i)), false);
-	for (size_t i = 0; i < 64; i++)
-		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), dFlag, i, this->_editor.localize("animation.dflags.flag" + std::to_string(i)), i == 8 || i == 13 || i == 21);
+	// unknown
+	PLACE_HOOK_STRING(container, "Sprite",      spritePath,    this->_editor.localize("animation.sprite"),   EditSpriteOperation, false);
+	PLACE_HOOK_NUMBER(container, "Duration",    duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
+	PLACE_HOOK_VECTOR(container, "Offset",      offset,        this->_editor.localize("animation.offset"));
+	PLACE_HOOK_RECT(container,   "Bounds",      tex,           this->_editor.localize("animation.bounds"));
+	PLACE_HOOK_NUMBER(container, "RenderGroup", renderGroup,   this->_editor.localize("animation.rendergrp"), BasicDataOperation, false, 0);
+
+	PLACE_HOOK_NUMBER2(container,             "Damage",       traits, damage,            this->_editor.localize("animation.hit.damage"));
+	PLACE_HOOK_SOKU_FLOAT_PERCENT2(container, "Rate",         traits, proration,         this->_editor.localize("animation.hit.rate"), 11);
+	PLACE_HOOK_NUMBER2(container,             "ChipDamage",   traits, chipDamage,        this->_editor.localize("animation.block.chip"));
+	PLACE_HOOK_NUMBER2(container,             "SpiritDamage", traits, spiritDamage,      this->_editor.localize("animation.block.damage"));
+	PLACE_HOOK_NUMBER2(container,             "Untech",       traits, untech,            this->_editor.localize("animation.hit.untech"));
+	PLACE_HOOK_NUMBER2(container,             "Power",        traits, power,             this->_editor.localize("animation.hit.power"));
+	PLACE_HOOK_SOKU_FLOAT_PERCENT2(container, "Limit",        traits, limit,             this->_editor.localize("animation.hit.limit"), 0);
+	PLACE_HOOK_NUMBER2(container,             "PHitStop",     traits, onHitPlayerStun,   this->_editor.localize("animation.hit.pstop"));
+	PLACE_HOOK_NUMBER2(container,             "OHitStop",     traits, onHitEnemyStun,    this->_editor.localize("animation.hit.ostop"));
+	PLACE_HOOK_NUMBER2(container,             "PBlockStop",   traits, onBlockPlayerStun, this->_editor.localize("animation.block.pstop"));
+	PLACE_HOOK_NUMBER2(container,             "OBlockStop",   traits, onBlockEnemyStun,  this->_editor.localize("animation.block.ostop"));
+	PLACE_HOOK_NUMBER2(container,             "HMeter",       traits, onHitCardGain,     this->_editor.localize("animation.hit.meter"));
+	PLACE_HOOK_NUMBER2(container,             "BMeter",       traits, onBlockCardGain,   this->_editor.localize("animation.block.meter"));
+	PLACE_HOOK_VECTOR_SOKU_FLOAT2(container,  "HitSpeed",     traits, speed,             this->_editor.localize("animation.hit.speed"),  2);
+	PLACE_HOOK_NUMFLAGS2(container,           "cFlags",       traits, comboModifier,     this->_editor.localize("animation.hit.cflags"), 2);
+	PLACE_HOOK_NUMFLAGS2(container,           "AFlags",       traits, attackFlags,       this->_editor.localize("animation.hit.aflags"), 8);
+	PLACE_HOOK_NUMFLAGS2(container,           "DFlags",       traits, frameFlags,        this->_editor.localize("animation.hit.dflags"), 8);
+	for (size_t i = 0; i < 8; i++)
+		PLACE_HOOK_FLAG(container, "cFlag" + std::to_string(i), comboModifier, i,    this->_editor.localize("animation.hit.cflag" + std::to_string(i)), false);
+	for (size_t i = 0; i < 32; i++)
+		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), attackFlags,   i,    this->_editor.localize("animation.aflag" + std::to_string(i)), false);
+	for (size_t i = 0; i < 32; i++)
+		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), frameFlags,    i,    this->_editor.localize("animation.dflag" + std::to_string(i)), false);
+	// onHitSfx
+	// onHitEffect
+
+	//PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, false, 0);
+	//PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, false, 0);
+	//PLACE_HOOK_NUMBER(container,          "Marker",    specialMarker,     this->_editor.localize("animation.general.marker"),        BasicDataOperation, false, 0);
+	//PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, true,  2);
+	//PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         EditSoundOperation, false);
+	//PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, false, 0);
+	//PLACE_HOOK_NUMBER(container,          "ManaCost",  manaCost,          this->_editor.localize("animation.general.manacost"),      BasicDataOperation, false, 0);
+	//PLACE_HOOK_NUMBER_DEG(container,      "Rotation",  rotation,          this->_editor.localize("animation.general.rotation"),      BasicDataOperation, true, 2);
+
+	//PLACE_HOOK_BOX(container, "SelectedBoxPos",  pos,  size, this->_editor.localize("animation.selectedbox.pos"));
+	//PLACE_HOOK_BOX(container, "SelectedBoxSize", size, pos,  this->_editor.localize("animation.selectedbox.size"));
 	if (boxes) {
 		this->_updateFrameElements[&container].emplace_back([boxes, this]{
 			bool hasBox = this->_preview->getSelectedBox().first != BOXTYPE_NONE;
 
 			boxes->setVisible(hasBox);
-			if (hasBox) boxes->setSize({"&.w", 90});
-			else  boxes->setSize({0, 0});
+			if (hasBox)
+				boxes->setSize({"&.w", 90});
+			else
+				boxes->setSize({0, 0});
 			for (auto &fct : this->_updateFrameElements[&*boxes])
 				fct();
 		});
@@ -1616,18 +1895,25 @@ void SpiralOfFate::MainWindow::newEndFrame()
 	this->applyOperation(new CreateFrameOperation(
 		*this->_object,
 		this->_editor.localize("operation.create_frame_end"),
-		this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size(),
+		this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock].size(),
 		this->_object->getFrameData()
 	));
 }
 
 void SpiralOfFate::MainWindow::newAnimationBlock()
 {
+	auto &seq = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
+
 	this->applyOperation(new CreateBlockOperation(
 		*this->_object,
 		this->_editor.localize("operation.create_block"),
 		this->_object->_actionBlock + 1,
-		{ this->_object->getFrameData() }
+		FrameData::Sequence{
+			.data = {this->_object->getFrameData()},
+			.moveLock = seq.moveLock,
+			.actionLock = seq.actionLock,
+			.loop = seq.loop
+		}
 	));
 }
 
@@ -1655,16 +1941,30 @@ void SpiralOfFate::MainWindow::newAction()
 	});
 	action->onClick(&MainWindow::_createMoveListPopup, this, [idBoxW](unsigned move){
 		idBoxW.lock()->setText(std::to_string(move));
-	}, true);
+	}, this->_object->_action, true);
 	create->onClick([windowW, idBox, this]{
 		auto &data = this->_object->getFrameData();
+		auto &seq = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 		auto action = std::stoul(idBox->getText().toStdString());
 
-		if (!this->_object->_moves.contains(action)) {
+		if (!this->_object->_schema.framedata.contains(action)) {
 			this->applyOperation(new CreateMoveOperation(
 				*this->_object,
 				this->_editor.localize("operation.create_move"),
-				action, {{data}}
+				action,
+				FrameData::Action{
+					._sequences = {
+						FrameData::Sequence{
+							.data = { data },
+							.moveLock = seq.moveLock,
+							.actionLock = seq.actionLock,
+							.loop = seq.loop
+						}
+					},
+					// TODO: Allow to create clones
+					.cloned = nullptr,
+					.clonedId = 0
+				}
 			));
 			windowW.lock()->close();
 			this->_rePopulateData();
@@ -1693,7 +1993,7 @@ void SpiralOfFate::MainWindow::newHitBox()
 
 void SpiralOfFate::MainWindow::removeFrame()
 {
-	if (this->_object->_moves[this->_object->_action][this->_object->_actionBlock].size() == 1)
+	if (this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock].size() == 1)
 		return;
 	this->applyOperation(new RemoveFrameOperation(
 		*this->_object,
@@ -1703,7 +2003,7 @@ void SpiralOfFate::MainWindow::removeFrame()
 
 void SpiralOfFate::MainWindow::removeAnimationBlock()
 {
-	assert_exp(this->_object->_moves[this->_object->_action].size() > 1);
+	assert_exp(this->_object->_schema.framedata[this->_object->_action].size() > 1);
 	this->applyOperation(new RemoveBlockOperation(
 		*this->_object,
 		this->_editor.localize("operation.remove_block"),
@@ -1713,7 +2013,7 @@ void SpiralOfFate::MainWindow::removeAnimationBlock()
 
 void SpiralOfFate::MainWindow::removeAction()
 {
-	assert_exp(this->_object->_moves.size() > 1);
+	assert_exp(this->_object->_schema.framedata.size() > 1);
 	this->applyOperation(new RemoveMoveOperation(
 		*this->_object,
 		this->_editor.localize("operation.remove_action"),
@@ -1736,7 +2036,7 @@ void SpiralOfFate::MainWindow::removeBox()
 
 void SpiralOfFate::MainWindow::copyBoxesFromLastFrame()
 {
-	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+	auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 	assert_exp(this->_object->_animation > 0);
 	this->applyOperation(new PasteBoxDataOperation(
@@ -1748,7 +2048,7 @@ void SpiralOfFate::MainWindow::copyBoxesFromLastFrame()
 
 void SpiralOfFate::MainWindow::copyBoxesFromNextFrame()
 {
-	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+	auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 	assert_exp(this->_object->_animation < blk.size() - 1);
 	this->applyOperation(new PasteBoxDataOperation(
@@ -1760,12 +2060,12 @@ void SpiralOfFate::MainWindow::copyBoxesFromNextFrame()
 
 void SpiralOfFate::MainWindow::flattenThisMoveCollisionBoxes()
 {
-	auto &f = this->_object->_moves[this->_object->_action][this->_object->_actionBlock][this->_object->_animation];
+	auto &f = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock][this->_object->_animation];
 
 	this->applyOperation(new FlattenCollisionBoxesOperation(
 		*this->_object,
 		this->_editor.localize("operation.flatten_collision"),
-		f.collisionBox ? std::optional(*f.collisionBox) : std::optional<Box>()
+		f.cBoxes.empty() ? std::optional<ShadyCore::Schema::Sequence::BBox>() : f.cBoxes.front()
 	));
 }
 
@@ -1774,7 +2074,7 @@ void SpiralOfFate::MainWindow::flattenThisMoveProperties()
 	this->applyOperation(new FlattenPropretiesOperation(
 		*this->_object,
 		this->_editor.localize("operation.flatten_properties"),
-		this->_object->_moves[this->_object->_action][this->_object->_actionBlock][this->_object->_animation]
+		this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock][this->_object->_animation]
 	));
 }
 
@@ -1865,9 +2165,9 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 	if (actionSelect)
 		actionSelect->setText(this->_localizeActionName(this->_object->_action) + " (" + std::to_string(this->_object->_action) + ")");
 	if (prevAction) {
-		auto it = this->_object->_moves.find(this->_object->_action);
+		auto it = this->_object->_schema.framedata.find(this->_object->_action);
 
-		if (it != this->_object->_moves.begin()) {
+		if (it != this->_object->_schema.framedata.begin()) {
 			auto prev = std::prev(it)->first;
 
 			prevAction->setText(this->_localizeActionName(prev) + " (" + std::to_string(prev) + ")");
@@ -1878,11 +2178,11 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 		}
 	}
 	if (nextAction) {
-		auto it = this->_object->_moves.find(this->_object->_action);
-		assert_exp(it != this->_object->_moves.end());
+		auto it = this->_object->_schema.framedata.find(this->_object->_action);
+		assert_exp(it != this->_object->_schema.framedata.end());
 		auto next = std::next(it);
 
-		if (next != this->_object->_moves.end()) {
+		if (next != this->_object->_schema.framedata.end()) {
 			nextAction->setText(this->_localizeActionName(next->first) + " (" + std::to_string(next->first) + ")");
 			nextAction->setEnabled(true);
 		} else {
@@ -1894,25 +2194,25 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 		block->setText(this->_editor.localize(
 			block->getUserData<std::string>(),
 			std::to_string(this->_object->_actionBlock),
-			std::to_string(this->_object->_moves.at(this->_object->_action).size() - 1)
+			std::to_string(this->_object->_schema.framedata.at(this->_object->_action).size() - 1)
 		));
 	if (blockSpin) {
 		blockSpin->onValueChange.setEnabled(false);
 		blockSpin->setMinimum(0);
-		blockSpin->setMaximum(this->_object->_moves.at(this->_object->_action).size() - 1);
+		blockSpin->setMaximum(this->_object->_schema.framedata.at(this->_object->_action).size() - 1);
 		blockSpin->setValue(this->_object->_actionBlock);
 		blockSpin->onValueChange.setEnabled(true);
 	}
 	if (frameSpin) {
 		frameSpin->onValueChange.setEnabled(false);
 		frameSpin->setMinimum(0);
-		frameSpin->setMaximum(this->_object->_moves.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1);
+		frameSpin->setMaximum(this->_object->_schema.framedata.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1);
 		frameSpin->onValueChange.setEnabled(true);
 	}
 	if (frame) {
 		frame->onValueChange.setEnabled(false);
 		frame->setMinimum(0);
-		frame->setMaximum(this->_object->_moves.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1);
+		frame->setMaximum(this->_object->_schema.framedata.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1);
 		frame->onValueChange.setEnabled(true);
 	}
 	if (ctrl) {
@@ -2013,7 +2313,7 @@ void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &contain
 		paletteList->onItemSelect.setEnabled(false);
 		paletteList->removeAllItems();
 		for (auto &s : this->_palettes)
-			paletteList->addItem(s.path);
+			paletteList->addItem(s.name);
 		paletteList->setSelectedItemByIndex(this->_selectedPalette);
 		paletteList->onItemSelect.setEnabled(true);
 	}
@@ -2077,7 +2377,7 @@ void SpiralOfFate::MainWindow::_populateFrameData(const tgui::Container &contain
 		frameLabel->setText(this->_editor.localize(
 			frameLabel->getUserData<std::string>(),
 			std::to_string(this->_object->_animation),
-			std::to_string(this->_object->_moves.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1)
+			std::to_string(this->_object->_schema.framedata.at(this->_object->_action).at(this->_object->_actionBlock).size() - 1)
 		));
 	if (frame) {
 		frame->onValueChange.setEnabled(false);
@@ -2117,7 +2417,7 @@ void SpiralOfFate::MainWindow::tick()
 		for (auto key : this->_containers)
 			this->_populateFrameData(*key);
 
-		auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+		auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 		this->_editor.setCanCopyLast(this->_object->_animation > 0);
 		this->_editor.setCanCopyNext(this->_object->_animation < blk.size() - 1);
@@ -2240,6 +2540,106 @@ SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getRenderer()
 	return aurora::downcast<Renderer *>(Widget::getRenderer());
 }
 
+bool SpiralOfFate::MainWindow::hasPath() const
+{
+	return this->_pathInit;
+}
+
+bool SpiralOfFate::MainWindow::hasPaletteChanges() const
+{
+	return std::ranges::any_of(this->_palettes, [](const Palette &pal) { return pal.modified; });
+}
+
+void SpiralOfFate::MainWindow::reloadPalette()
+{
+	typedef std::tuple<std::string, ShadyCore::FileType, ShadyCore::BasePackageEntry *> Key;
+	std::vector<Key> pals;
+
+	this->_palettes.clear();
+	for (auto &entry : game->package) {
+		if (!entry.first.actualName.starts_with(this->_chrPath))
+			continue;
+		if (entry.first.fileType.type != ShadyCore::FileType::TYPE_PALETTE)
+			continue;
+		pals.emplace_back(entry.first.actualName, entry.first.fileType, entry.second);
+	}
+	std::ranges::sort(pals, [](const Key &a, const Key &b) {
+		return std::get<0>(a) < std::get<0>(b);
+	});
+	for (auto &entry : pals) {
+		ShadyCore::Palette pal;
+		auto &stream = std::get<2>(entry)->open();
+
+		ShadyCore::getResourceReader(std::get<1>(entry))(&pal, stream);
+		std::get<2>(entry)->close(stream);
+		this->_palettes.emplace_back();
+
+		auto &p = this->_palettes.back();
+
+		p.name = std::get<0>(entry).substr(std::get<0>(entry).find_last_of('/') + 1);
+		p.modified = false;
+		pal.unpack();
+
+		auto ptr = reinterpret_cast<uint32_t *>(pal.data);
+
+		for (size_t i = 0 ; i < 256; i++) {
+			p.colors[i].r = ptr[i] >> 16 & 0xFF;
+			p.colors[i].g = ptr[i] >> 8  & 0xFF;
+			p.colors[i].b = ptr[i] >> 0  & 0xFF;
+			p.colors[i].a = i == 0 ? 0 : 255;
+		}
+	}
+
+	for (auto &file : std::filesystem::directory_iterator(game->settings.palettes / this->_character)) {
+		auto &path = file.path();
+		ShadyCore::Palette pal;
+		ShadyCore::FileType::Format format;
+
+		if (path.extension() == ".pal")
+			format = ShadyCore::FileType::PALETTE_PAL;
+		else if (path.extension() == ".act")
+			format = ShadyCore::FileType::PALETTE_ACT;
+		else
+			continue;
+
+		std::ifstream stream{path, std::ifstream::binary};
+
+		if (!stream)
+			continue;
+		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, format})(&pal, stream);
+		stream.close();
+		this->_palettes.emplace_back();
+
+		auto &p = this->_palettes.back();
+
+		p.name = path.filename().native();
+		p.path = path;
+		p.modified = false;
+		pal.unpack();
+
+		auto ptr = reinterpret_cast<uint32_t *>(pal.data);
+
+		for (size_t i = 0 ; i < 256; i++) {
+			p.colors[i].r = ptr[i] >> 16 & 0xFF;
+			p.colors[i].g = ptr[i] >> 8  & 0xFF;
+			p.colors[i].b = ptr[i] >> 0  & 0xFF;
+			p.colors[i].a = i == 0 ? 0 : 255;
+		}
+	}
+
+	if (this->_palettes.empty()) {
+		this->_palettes.emplace_back();
+
+		auto &p = this->_palettes.back();
+
+		p.name = "black";
+		p.modified = false;
+		p.colors.fill(Color::Black);
+	}
+	if (this->_preview)
+		this->_preview->setPalette(&this->_palettes.front().colors);
+}
+
 void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
 {
 	if (!event.alt && !event.control && !event.shift && !event.system && event.code == tgui::Event::KeyboardKey::Escape) {
@@ -2264,7 +2664,7 @@ bool SpiralOfFate::MainWindow::canHandleKeyPress(const tgui::Event::KeyEvent &ev
 
 void SpiralOfFate::MainWindow::navToNextFrame()
 {
-	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+	auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 	assert_exp(this->_object->_animation < blk.size() - 1);
 	this->_object->_animation++;
@@ -2284,7 +2684,7 @@ void SpiralOfFate::MainWindow::navToPrevFrame()
 	assert_exp(this->_object->_animation > 0);
 	this->_object->_animation--;
 
-	auto &blk = this->_object->_moves[this->_object->_action][this->_object->_actionBlock];
+	auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
 	this->_paused = true;
 	this->_object->resetState();
@@ -2298,7 +2698,7 @@ void SpiralOfFate::MainWindow::navToPrevFrame()
 
 void SpiralOfFate::MainWindow::navToNextBlock()
 {
-	auto &act = this->_object->_moves[this->_object->_action];
+	auto &act = this->_object->_schema.framedata[this->_object->_action];
 
 	assert_exp(this->_object->_actionBlock < act.size() - 1);
 	this->_object->_actionBlock++;
@@ -2320,7 +2720,7 @@ void SpiralOfFate::MainWindow::navToPrevBlock()
 	assert_exp(this->_object->_actionBlock > 0);
 	this->_object->_actionBlock--;
 
-	auto &act = this->_object->_moves[this->_object->_action];
+	auto &act = this->_object->_schema.framedata[this->_object->_action];
 	auto &blk = act[this->_object->_actionBlock];
 
 	this->_object->_animation = 0;
@@ -2335,24 +2735,24 @@ void SpiralOfFate::MainWindow::navToPrevBlock()
 
 void SpiralOfFate::MainWindow::navToNextAction()
 {
-	auto curr = this->_object->_moves.find(this->_object->_action);
-	assert_exp(curr != this->_object->_moves.end());
+	auto curr = this->_object->_schema.framedata.find(this->_object->_action);
+	assert_exp(curr != this->_object->_schema.framedata.end());
 	auto it = std::next(curr);
-	assert_exp(it != this->_object->_moves.end());
+	assert_exp(it != this->_object->_schema.framedata.end());
 	auto move = it->first;
-	auto &act = this->_object->_moves[move];
-	auto &blk = act.front();
+	auto &act = this->_object->_schema.framedata[move];
+	auto &blk = act.sequences().front();
 
-	curr = this->_object->_moves.find(move);
-	assert_exp(curr != this->_object->_moves.end());
+	curr = this->_object->_schema.framedata.find(move);
+	assert_exp(curr != this->_object->_schema.framedata.end());
 
 	this->_object->_action = move;
 	this->_object->_actionBlock = 0;
 	this->_object->_animation = 0;
 	this->_object->_animationCtr = 0;
 	this->_requireReload = true;
-	this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
-	this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
+	this->_editor.setHasLastAction(curr != this->_object->_schema.framedata.begin());
+	this->_editor.setHasNextAction(std::next(curr) != this->_object->_schema.framedata.end());
 	this->_editor.setHasLastBlock(false);
 	this->_editor.setHasNextBlock(act.size() != 1);
 	this->_editor.setHasLastFrame(false);
@@ -2363,22 +2763,22 @@ void SpiralOfFate::MainWindow::navToNextAction()
 
 void SpiralOfFate::MainWindow::navToPrevAction()
 {
-	auto it = this->_object->_moves.find(this->_object->_action);
-	assert_exp(it != this->_object->_moves.begin());
+	auto it = this->_object->_schema.framedata.find(this->_object->_action);
+	assert_exp(it != this->_object->_schema.framedata.begin());
 	auto move = std::prev(it)->first;
-	auto &act = this->_object->_moves[move];
-	auto &blk = act.front();
+	auto &act = this->_object->_schema.framedata[move];
+	auto &blk = act.sequences().front();
 
-	auto curr = this->_object->_moves.find(move);
-	assert_exp(curr != this->_object->_moves.end());
+	auto curr = this->_object->_schema.framedata.find(move);
+	assert_exp(curr != this->_object->_schema.framedata.end());
 
 	this->_object->_action = move;
 	this->_object->_actionBlock = 0;
 	this->_object->_animation = 0;
 	this->_object->_animationCtr = 0;
 	this->_requireReload = true;
-	this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
-	this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
+	this->_editor.setHasLastAction(curr != this->_object->_schema.framedata.begin());
+	this->_editor.setHasNextAction(std::next(curr) != this->_object->_schema.framedata.end());
 	this->_editor.setHasLastBlock(false);
 	this->_editor.setHasNextBlock(act.size() != 1);
 	this->_editor.setHasLastFrame(false);
@@ -2390,26 +2790,26 @@ void SpiralOfFate::MainWindow::navToPrevAction()
 void SpiralOfFate::MainWindow::navGoTo()
 {
 	this->_createMoveListPopup([this](unsigned move){
-		auto curr = this->_object->_moves.find(move);
-		assert_exp(curr != this->_object->_moves.end());
+		auto curr = this->_object->_schema.framedata.find(move);
+		assert_exp(curr != this->_object->_schema.framedata.end());
 
-		auto &act = this->_object->_moves[move];
-		auto &blk = act.front();
+		auto &act = this->_object->_schema.framedata[move];
+		auto &blk = act.sequences().front();
 
 		this->_object->_action = move;
 		this->_object->_actionBlock = 0;
 		this->_object->_animation = 0;
 		this->_object->_animationCtr = 0;
 		this->_requireReload = true;
-		this->_editor.setHasLastAction(curr != this->_object->_moves.begin());
-		this->_editor.setHasNextAction(std::next(curr) != this->_object->_moves.end());
+		this->_editor.setHasLastAction(curr != this->_object->_schema.framedata.begin());
+		this->_editor.setHasNextAction(std::next(curr) != this->_object->_schema.framedata.end());
 		this->_editor.setHasLastBlock(false);
 		this->_editor.setHasNextBlock(act.size() != 1);
 		this->_editor.setHasLastFrame(false);
 		this->_editor.setHasNextFrame(blk.size() != 1);
 		this->_editor.setCanCopyLast(false);
 		this->_editor.setCanCopyNext(blk.size() != 1);
-	}, false);
+	}, this->_object->_action, false);
 }
 
 void SpiralOfFate::MainWindow::_reinitSidePanel(tgui::Container &panel)

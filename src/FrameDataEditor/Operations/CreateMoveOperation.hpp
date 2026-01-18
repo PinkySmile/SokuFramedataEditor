@@ -16,10 +16,10 @@ namespace SpiralOfFate
 		EditableObject &_obj;
 		std::string _name;
 		unsigned _id;
-		std::vector<std::vector<FrameData>> _newData;
+		FrameData::Action _newData;
 
 	public:
-		CreateMoveOperation(EditableObject &obj, const std::string &&name, unsigned id, const std::vector<std::vector<FrameData>> &newData);
+		CreateMoveOperation(EditableObject &obj, const std::string &&name, unsigned id, const FrameData::Action &newData);
 		void apply() override;
 		void undo() override;
 		bool hasModification() const override;

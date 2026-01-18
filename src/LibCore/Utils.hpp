@@ -37,14 +37,6 @@
 
 namespace SpiralOfFate::Utils
 {
-	namespace Z {
-		std::vector<unsigned char> compress(const std::vector<unsigned char> &buffer, int level);
-		std::vector<unsigned char> decompress(const std::vector<unsigned char> &buffer);
-		int compress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level);
-		int decompress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer);
-		std::string error(int ret);
-	}
-
 	std::string getLocale();
 
 	//! @brief Get the last Exception Name
@@ -130,8 +122,6 @@ namespace SpiralOfFate::Utils
 	}
 
 	bool isBeingDebugged();
-	// FIXME: Forward declare
-	void mergeInputs(class InputStruct &inputs1, const class InputStruct &inputs2);
 
 	unsigned char *allocateManually(size_t size);
 	void deallocateManually(unsigned char *buffer);
@@ -252,8 +242,6 @@ namespace SpiralOfFate::Utils
 	tgui::ChildWindow::Ptr makeSliderWindow(tgui::Gui &gui, const std::function<void(float value)> &onFinish, float defaultValue = 1, float min = 0, float max = 20, float step = 1);
 #else
 	#define openWindowWithFocus(...) __nothing2()
-	#define makeSliderWindow(...) __nothing2()
-	#define makeColorPickWindow(...) __nothing2()
 	#define openFileDialog(...) __nothing3()
 	#define saveFileDialog(...) __nothing3()
 #ifdef USE_SDL

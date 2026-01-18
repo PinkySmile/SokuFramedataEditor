@@ -26,7 +26,7 @@ namespace SpiralOfFate
 		this->_obj._action = this->_action;
 		this->_obj._actionBlock = this->_blockId;
 		this->_obj._animation = this->_id;
-		this->_obj._moves[this->_action][this->_blockId][this->_id] = this->_newValue;
+		this->_obj._schema.framedata[this->_action][this->_blockId][this->_id] = this->_newValue;
 	}
 
 	void PasteDataOperation::undo()
@@ -34,7 +34,7 @@ namespace SpiralOfFate
 		this->_obj._action = this->_action;
 		this->_obj._actionBlock = this->_blockId;
 		this->_obj._animation = this->_id;
-		this->_obj._moves[this->_action][this->_blockId][this->_id] = this->_oldValue;
+		this->_obj._schema.framedata[this->_action][this->_blockId][this->_id] = this->_oldValue;
 	}
 
 	std::string PasteDataOperation::getName() const noexcept

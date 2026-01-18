@@ -12,13 +12,11 @@
 #include <cxxabi.h>
 #endif
 #include <regex>
-#include <codecvt>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <numeric>
 #include <fstream>
 #include <cmath>
-#include <zlib.h>
 #include "Resources/Game.hpp"
 #include "Utils.hpp"
 
@@ -28,127 +26,6 @@
 #ifdef min
 #undef min
 #endif
-
-namespace SpiralOfFate::Utils::Z
-{
-	static constexpr long int CHUNK = {16384};
-
-	int compress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer, int level)
-	{
-		int ret;
-		unsigned have;
-		z_stream strm;
-		unsigned char out[CHUNK];
-
-		outBuffer.clear();
-		strm.zalloc = Z_NULL;
-		strm.zfree = Z_NULL;
-		strm.opaque = Z_NULL;
-		ret = deflateInit(&strm, level);
-		if (ret != Z_OK)
-			return ret;
-
-		strm.avail_in = size;
-		strm.next_in = inBuffer;
-		do {
-			strm.avail_out = CHUNK;
-			strm.next_out = out;
-			ret = deflate(&strm, Z_FINISH);    /* anyone error value */
-			assert_exp(ret != Z_STREAM_ERROR);
-			have = CHUNK - strm.avail_out;
-			outBuffer.insert(outBuffer.end(), out, out + have);
-		} while (strm.avail_out == 0);
-		assert_exp(strm.avail_in == 0);
-		assert_exp(ret == Z_STREAM_END);
-		deflateEnd(&strm);
-		return Z_OK;
-	}
-
-	int decompress(const unsigned char *inBuffer, size_t size, std::vector<unsigned char> &outBuffer)
-	{
-		int ret;
-		unsigned have;
-		z_stream strm;
-		unsigned char out[CHUNK];
-
-		strm.zalloc = Z_NULL;
-		strm.zfree = Z_NULL;
-		strm.opaque = Z_NULL;
-		strm.avail_in = 0;
-		strm.next_in = Z_NULL;
-		ret = inflateInit(&strm);
-		if (ret != Z_OK)
-			return ret;
-
-		strm.avail_in = size;
-		strm.next_in = inBuffer;
-
-		do {
-			strm.avail_out = CHUNK;
-			strm.next_out = out;
-			ret = inflate(&strm, Z_NO_FLUSH);
-			assert_exp(ret != Z_STREAM_ERROR);
-			switch (ret) {
-			case Z_NEED_DICT:
-				ret = Z_DATA_ERROR;
-				// FALLTHROUGH
-			case Z_DATA_ERROR:
-			case Z_MEM_ERROR:
-				inflateEnd(&strm);
-				return ret;
-			default:
-				have = CHUNK - strm.avail_out;
-				outBuffer.insert(outBuffer.end(), out, out + have);
-			}
-		} while (strm.avail_out == 0);
-		assert_exp(ret == Z_STREAM_END);
-
-		inflateEnd(&strm);
-		return Z_OK;
-	}
-
-	std::vector<unsigned char> compress(const std::vector<unsigned char> &buffer, int level)
-	{
-		std::vector<unsigned char> result;
-		int ret = compress(buffer.data(), buffer.size(), result, level);
-
-		if (ret != Z_OK)
-			throw std::runtime_error(error(ret));
-		return result;
-	}
-
-	std::vector<unsigned char> decompress(const std::vector<unsigned char> &buffer)
-	{
-		std::vector<unsigned char> result;
-		int ret = decompress(buffer.data(), buffer.size(), result);
-
-		if (ret != Z_OK)
-			throw std::runtime_error(error(ret));
-		return result;
-	}
-
-	std::string error(int ret)
-	{
-		switch (ret) {
-		case Z_ERRNO:
-			if (ferror(stdin))
-				return "Error reading from stdin.";
-			else if (ferror(stdout))
-				return "Error writing ro stdout.";
-			return "Errno error";
-		case Z_STREAM_ERROR:
-			return "Invalid compression level.";
-		case Z_DATA_ERROR:
-			return "Empty data, invalid or incomplete.";
-		case Z_MEM_ERROR:
-			return "No memory.";
-		case Z_VERSION_ERROR:
-			return "zlib version is incompatible.";
-		default:
-			return "Unknown error " + std::to_string(ret);
-		}
-	}
-}
 
 namespace SpiralOfFate::Utils
 {
@@ -301,67 +178,6 @@ namespace SpiralOfFate::Utils
 		Utils::setRenderer(*widget);
 	}
 
-	tgui::ChildWindow::Ptr makeColorPickWindow(tgui::Gui &gui, const std::function<void(sf::Color color)> &onFinish, sf::Color startColor)
-	{
-		auto dialog = tgui::ColorPicker::create("Pick color", startColor);
-		auto panel = tgui::Panel::create({"100%", "100%"});
-
-		panel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
-		gui.add(panel);
-		dialog->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
-		gui.add(dialog);
-
-		dialog->setFocused(true);
-
-		const bool tabUsageEnabled = gui.isTabKeyUsageEnabled();
-		auto closeWindow = [&gui, dialog, panel, tabUsageEnabled]{
-			gui.remove(dialog);
-			gui.remove(panel);
-			gui.setTabKeyUsageEnabled(tabUsageEnabled);
-		};
-
-		panel->onClick(closeWindow);
-		dialog->onClose(closeWindow);
-		dialog->onEscapeKeyPress(closeWindow);
-		dialog->onOkPress(onFinish);
-		return dialog;
-	}
-
-	tgui::ChildWindow::Ptr makeSliderWindow(tgui::Gui &gui, const std::function<void(float value)> &onFinish, float defaultValue, float min, float max, float step)
-	{
-		auto window = openWindowWithFocus(gui, 260, 80);
-		window->loadWidgetsFromFile("assets/gui/slider.gui");
-
-		auto slider = window->get<tgui::Slider>("Slider");
-		auto txt = window->get<tgui::Label>("Nb");
-		auto sliderCallback = [slider, txt]{
-			std::stringstream s;
-
-			s << slider->getValue();
-			txt->setText(s.str());
-		};
-		std::stringstream s;
-
-		slider->setMaximum(min);
-		slider->setMaximum(max);
-		slider->setStep(step);
-		slider->setValue(defaultValue);
-		slider->onValueChange(sliderCallback);
-
-		s << slider->getValue();
-		txt->setText(s.str());
-
-		window->get<tgui::Button>("Cancel")->onClick([window]{
-			window->close();
-		});
-		window->get<tgui::Button>("Ok")->onClick([onFinish, slider, window]{
-			if (onFinish)
-				onFinish(slider->getValue());
-			window->close();
-		});
-		return window;
-	}
-
 	std::string getLocale()
 	{
 #ifdef _WIN32
@@ -417,16 +233,6 @@ namespace SpiralOfFate::Utils
 	     return IsDebuggerPresent() == TRUE;
 	}
 #endif
-
-	void mergeInputs(InputStruct &inputs1, const InputStruct &inputs2)
-	{
-		if (std::abs(inputs1.horizontalAxis) < std::abs(inputs2.horizontalAxis))
-			inputs1.horizontalAxis = inputs2.horizontalAxis;
-		if (std::abs(inputs1.verticalAxis) < std::abs(inputs2.verticalAxis))
-			inputs1.verticalAxis = inputs2.verticalAxis;
-		for (size_t i = 2; i < sizeof(inputs1) / sizeof(int); i++)
-			((int *)&inputs1)[i] = std::max(((int *)&inputs1)[i], ((int *)&inputs2)[i]);
-	}
 
 	unsigned char *allocateManually(size_t size)
 	{

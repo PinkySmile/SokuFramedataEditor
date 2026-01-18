@@ -35,7 +35,8 @@ namespace SpiralOfFate
 			TGUI_NODISCARD std::shared_ptr<tgui::RendererData> getMinimizeButtonFocused() const;
 		};
 		struct Palette {
-			std::string path;
+			tgui::String name;
+			std::filesystem::path path;
 			std::array<Color, 256> colors;
 			bool modified = false;
 		};
@@ -45,12 +46,17 @@ namespace SpiralOfFate
 
 		static constexpr const char StaticWidgetType[] = "FDEMainWindow"; //!< Type name of the widget
 
-		MainWindow(const std::filesystem::path &frameDataPath, FrameDataEditor &editor);
+		//MainWindow(const nlohmann::json &backup, FrameDataEditor &editor);
+		MainWindow(const std::string &folder, const std::string &frameDataPath, FrameDataEditor &editor);
+		MainWindow(const std::string &folder, const std::filesystem::path &frameDataPath, FrameDataEditor &editor);
 
 		Renderer *getSharedRenderer() override;
 		const Renderer *getSharedRenderer() const override;
 		Renderer *getRenderer() override;
 
+		bool hasPath() const;
+		bool hasPaletteChanges() const;
+		void reloadPalette();
 		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void undo();
 		void redo();
@@ -105,6 +111,9 @@ namespace SpiralOfFate
 		void invertColors();
 		void reversePalette();
 
+		void exportPalette(const std::filesystem::path &path);
+		void importPalette(const std::filesystem::path &path);
+
 		tgui::SignalChildWindow onRealClose = {"RealClosed"}; //!< The window was closed. Optional parameter: pointer to the window
 
 	protected:
@@ -136,11 +145,13 @@ namespace SpiralOfFate
 		bool _paused = true;
 		bool _showingPalette = false;
 		bool _requireReload = false;
+		bool _pathInit = false;
 		unsigned char _colorChangeSource = 255;
+		std::string _title;
+		std::string _chrPath;
+		std::string _character;
 		std::filesystem::path _path;
 		std::filesystem::path _pathBak;
-		std::filesystem::path _chrPath;
-		std::string _character;
 		std::unique_ptr<Operation> _pendingTransaction;
 		std::unique_ptr<EditableObject> _object;
 		std::vector<std::unique_ptr<Operation>> _operationQueue;
@@ -150,11 +161,13 @@ namespace SpiralOfFate
 		unsigned _selectedPalette = 0;
 		unsigned _selectColorMethod = 0;
 		unsigned _selectedColor = 0;
-		nlohmann::json _characterData;
 
+		void _init();
+
+		nlohmann::json _asJson() const;
 		void _initSidePanel(tgui::Container &panel);
 		void _reinitSidePanel(tgui::Container &panel);
-		void _createMoveListPopup(const std::function<void(unsigned)> &onConfirm, bool showNotAdded);
+		void _createMoveListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current, bool showNotAdded);
 		void _placeUIHooks(tgui::Container &container);
 		void _createGenericPopup(const std::string &path);
 		LocalizedContainer<tgui::ChildWindow>::Ptr _createPopup(const std::string &path);

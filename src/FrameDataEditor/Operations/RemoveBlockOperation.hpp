@@ -17,7 +17,7 @@ namespace SpiralOfFate
 		std::string _name;
 		unsigned _action;
 		unsigned _id;
-		std::vector<FrameData> _oldData;
+		FrameData::Sequence _oldData;
 
 	public:
 		RemoveBlockOperation(EditableObject &obj, const std::string &&name, unsigned id);

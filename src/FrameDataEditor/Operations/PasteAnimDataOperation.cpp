@@ -9,7 +9,7 @@ namespace SpiralOfFate
 	PasteAnimDataOperation::PasteAnimDataOperation(
 		EditableObject &obj,
 		const std::string &&name,
-		FrameData newValue
+		const FrameData &newValue
 	) :
 		_obj(obj),
 		_action(obj._action),
@@ -27,15 +27,14 @@ namespace SpiralOfFate
 		this->_obj._actionBlock = this->_blockId;
 		this->_obj._animation = this->_id;
 
-		auto &data = this->_obj._moves[this->_action][this->_blockId][this->_id];
+		auto &data = this->_obj._schema.framedata[this->_action][this->_blockId][this->_id];
 
 		game->textureMgr.remove(data.textureHandle);
 		game->textureMgr.addRef(this->_newValue.textureHandle);
 		data.textureHandle = this->_newValue.textureHandle;
-		data.spritePath = this->_newValue.spritePath;
-		data.textureBounds = this->_newValue.textureBounds;
-		data.scale = this->_newValue.scale;
-		data.offset = this->_newValue.offset;
+		data.imageIndex = this->_newValue.imageIndex;
+		data.renderGroup = this->_newValue.renderGroup;
+		data.blendOptions = this->_newValue.blendOptions;
 	}
 
 	void PasteAnimDataOperation::undo()
@@ -43,7 +42,7 @@ namespace SpiralOfFate
 		this->_obj._action = this->_action;
 		this->_obj._actionBlock = this->_blockId;
 		this->_obj._animation = this->_id;
-		this->_obj._moves[this->_action][this->_blockId][this->_id] = this->_oldValue;
+		this->_obj._schema.framedata[this->_action][this->_blockId][this->_id] = this->_oldValue;
 	}
 
 	std::string PasteAnimDataOperation::getName() const noexcept

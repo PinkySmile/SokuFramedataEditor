@@ -9,7 +9,7 @@ SpiralOfFate::RemoveFrameOperation::RemoveFrameOperation(EditableObject &obj, co
 	_action(obj._action),
 	_actionBlock(obj._actionBlock),
 	_animation(obj._animation),
-	_oldValue(this->_obj._moves[this->_action][this->_actionBlock][this->_animation]),
+	_oldValue(this->_obj._schema.framedata[this->_action][this->_actionBlock][this->_animation]),
 	_fieldName(name)
 {
 }
@@ -20,11 +20,11 @@ void SpiralOfFate::RemoveFrameOperation::apply()
 	this->_obj._actionBlock = this->_actionBlock;
 	this->_obj._animation = this->_animation;
 
-	auto &arr = this->_obj._moves[this->_action][this->_actionBlock];
+	auto &arr = this->_obj._schema.framedata[this->_action][this->_actionBlock];
 
-	arr.erase(arr.begin() + this->_animation);
-	if (arr.size() == this->_animation)
-		this->_obj._animation--;
+	arr.data.erase(arr.data.begin() + this->_animation);
+	if (arr.data.size() == this->_obj._animation)
+		this->_obj._animation = arr.data.size() - 1;
 }
 
 void SpiralOfFate::RemoveFrameOperation::undo()
@@ -33,11 +33,9 @@ void SpiralOfFate::RemoveFrameOperation::undo()
 	this->_obj._actionBlock = this->_actionBlock;
 	this->_obj._animation = this->_animation;
 
-	auto &arr = this->_obj._moves[this->_action][this->_actionBlock];
+	auto &arr = this->_obj._schema.framedata[this->_action][this->_actionBlock];
 
-	arr.insert(arr.begin() + this->_animation, this->_oldValue);
-	if (arr.size() == this->_animation)
-		this->_obj._animation--;
+	arr.data.insert(arr.begin() + this->_animation, this->_oldValue);
 }
 
 std::string SpiralOfFate::RemoveFrameOperation::getName() const noexcept

@@ -26,14 +26,14 @@ namespace SpiralOfFate
 		unsigned _animation;
 		unsigned _boxIndex;
 		BoxType _type;
-		Box _oldValue;
-		Box _newValue;
+		ShadyCore::Schema::Sequence::BBox _oldValue;
+		ShadyCore::Schema::Sequence::BBox _newValue;
 		std::string _fieldName;
 
-		Box &_getBox();
+		ShadyCore::Schema::Sequence::BBox &_getBox();
 
 	public:
-		EditBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, Box newValue);
+		EditBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, ShadyCore::Schema::Sequence::BBox newValue);
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;

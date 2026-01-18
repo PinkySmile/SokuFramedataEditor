@@ -6,6 +6,7 @@
 #define SOFGV_FLAGOPERATION_HPP
 
 
+#include <resource.hpp>
 #include "Operation.hpp"
 #include "../EditableObject.hpp"
 
@@ -18,7 +19,7 @@ namespace SpiralOfFate
 		unsigned _action;
 		unsigned _actionBlock;
 		unsigned _animation;
-		T FrameData::*_field;
+		T ShadyCore::Schema::Sequence::MoveTraits::*_field;
 		bool _oldValue;
 		bool _newValue;
 		std::string _fieldName;
@@ -26,13 +27,13 @@ namespace SpiralOfFate
 		bool _reset;
 
 	public:
-		FlagOperation(EditableObject &obj, const std::string &&name, T FrameData::*field, size_t index, bool newValue, bool reset) :
+		FlagOperation(EditableObject &obj, const std::string &&name, T ShadyCore::Schema::Sequence::MoveTraits::*field, size_t index, bool newValue, bool reset) :
 			_obj(obj),
 			_action(obj._action),
 			_actionBlock(obj._actionBlock),
 			_animation(obj._animation),
 			_field(field),
-			_oldValue((obj.getFrameData().*field).flags & (1ULL << index)),
+			_oldValue((obj.getFrameData().traits.*field) & (1ULL << index)),
 			_newValue(newValue),
 			_fieldName(name),
 			_index(index),
@@ -51,7 +52,7 @@ namespace SpiralOfFate
 			this->_obj._actionBlock = this->_actionBlock;
 			this->_obj._animation = this->_animation;
 
-			unsigned long long &flags = (this->_obj.getFrameData().*_field).flags;
+			auto &flags = this->_obj.getFrameData().traits.*this->_field;
 
 			if (this->_newValue)
 				flags |= 1ULL << this->_index;
@@ -74,7 +75,7 @@ namespace SpiralOfFate
 			this->_obj._actionBlock = this->_actionBlock;
 			this->_obj._animation = this->_animation;
 
-			unsigned long long &flags = (this->_obj.getFrameData().*_field).flags;
+			auto &flags = this->_obj.getFrameData().traits.*this->_field;
 
 			if (this->_oldValue)
 				flags |= 1ULL << this->_index;

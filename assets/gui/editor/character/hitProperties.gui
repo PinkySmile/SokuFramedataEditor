@@ -46,6 +46,56 @@ Renderer.2 {
     TextureHover = None;
 }
 
+Renderer.3 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorDown = #EBEBEB;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorDown = black;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorDown = black;
+    TextColorHover = black;
+    Texture = None;
+    TextureDisabled = None;
+    TextureDown = None;
+    TextureDownFocused = None;
+    TextureDownHover = None;
+    TextureFocused = None;
+    TextureHover = None;
+}
+
+Renderer.4 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    CheckColor = #3C3C3C;
+    CheckColorDisabled = #7D7D7D;
+    CheckColorHover = black;
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorHover = black;
+    TextDistanceRatio = 0.2;
+    TextureChecked = None;
+    TextureCheckedDisabled = None;
+    TextureCheckedFocused = None;
+    TextureCheckedHover = None;
+    TextureUnchecked = None;
+    TextureUncheckedDisabled = None;
+    TextureUncheckedFocused = None;
+    TextureUncheckedHover = None;
+}
+
 Label.Label1 {
     HorizontalAlignment = Right;
     Position = (0, 13);
@@ -61,7 +111,7 @@ EditBox.PHitStop {
     InputValidator = UInt;
     Position = (180, 10);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (120, 21);
     TextSize = 13;
 }
 
@@ -71,22 +121,22 @@ Label.Label3 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.hit.nlimit";
+    Text = "animation.block.pstop";
     TextSize = 13;
 }
 
-EditBox.NLimit {
+EditBox.PBlockStop {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 40);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (120, 21);
     TextSize = 13;
 }
 
 Label.Label2 {
     HorizontalAlignment = Right;
-    Position = (240, 13);
+    Position = (300, 13);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
@@ -97,53 +147,34 @@ Label.Label2 {
 EditBox.OHitStop {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (420, 10);
+    Position = (480, 10);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label4 {
     HorizontalAlignment = Right;
-    Position = (240, 43);
+    Position = (300, 43);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.hit.slimit";
+    Text = "animation.block.ostop";
     TextSize = 13;
 }
 
-EditBox.SLimit {
+EditBox.OBlockStop {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (420, 40);
+    Position = (480, 40);
     Renderer = &2;
-    Size = (60, 21);
-    TextSize = 13;
-}
-
-Label.Label5 {
-    HorizontalAlignment = Right;
-    Position = (240, 73);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.hit.vlimit";
-    TextSize = 13;
-}
-
-EditBox.VLimit {
-    Alignment = Center;
-    InputValidator = UInt;
-    Position = (420, 70);
-    Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label6 {
     HorizontalAlignment = Right;
-    Position = (240, 103);
+    Position = (300, 133);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
@@ -154,15 +185,15 @@ Label.Label6 {
 EditBox.Untech {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (420, 100);
+    Position = (480, 130);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label7 {
     HorizontalAlignment = Right;
-    Position = (0, 103);
+    Position = (300, 73);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
@@ -172,119 +203,63 @@ Label.Label7 {
 
 EditBox.Rate {
     Alignment = Center;
-    InputValidator = Float;
-    Position = (180, 100);
+    InputValidator = "[+-]?[0-9]*\\.?[0-9]*%?";
+    Position = (480, 70);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
-EditBox.MLimit {
+EditBox.HMeter {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (180, 70);
+    Position = (740, 10);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label8 {
     HorizontalAlignment = Right;
-    Position = (0, 73);
+    Position = (560, 13);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.hit.mlimit";
+    Text = "animation.hit.meter";
     TextSize = 13;
 }
 
-EditBox.HitSpeed {
+EditBox.Power {
     Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
-    Position = (670, 10);
+    InputValidator = UInt;
+    Position = (740, 100);
     Renderer = &2;
-    Size = (130, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label9 {
     HorizontalAlignment = Right;
-    Position = (490, 13);
+    Position = (560, 103);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.hit.speed";
-    TextSize = 13;
-}
-
-EditBox.CHitSpeed {
-    Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
-    Position = (670, 40);
-    Renderer = &2;
-    Size = (130, 21);
-    TextSize = 13;
-}
-
-Label.Label10 {
-    HorizontalAlignment = Right;
-    Position = (490, 43);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.hit.chspeed";
-    TextSize = 13;
-}
-
-EditBox.HitSnap {
-    Alignment = Center;
-    InputValidator = "\\(?[+-]?[0-9]*\\.?[0-9]*,?[+-]?[0-9]*\\.?[0-9]*,?[+-]?[0-9]*\\)?";
-    Position = (670, 70);
-    Renderer = &2;
-    Size = (130, 21);
-    TextSize = 13;
-}
-
-Label.Label11 {
-    HorizontalAlignment = Right;
-    Position = (490, 73);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.hit.snap";
-    TextSize = 13;
-}
-
-Label.Label12 {
-    HorizontalAlignment = Right;
-    Position = (490, 103);
-    Renderer = &1;
-    ScrollbarPolicy = Automatic;
-    Size = (175, 17);
-    Text = "animation.hit.sound";
-    TextSize = 13;
-}
-
-EditBox.HitSound {
-    Alignment = Center;
-    Position = (670, 100);
-    Renderer = &2;
-    Size = (130, 21);
+    Text = "animation.hit.power";
     TextSize = 13;
 }
 
 EditBox.Damage {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (420, 130);
+    Position = (740, 70);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label13 {
     HorizontalAlignment = Right;
-    Position = (240, 133);
+    Position = (560, 73);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
@@ -292,39 +267,280 @@ Label.Label13 {
     TextSize = 13;
 }
 
-EditBox.MinRate {
+Label.Label5 {
+    HorizontalAlignment = Right;
+    Position = (560, 43);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.block.meter";
+    TextSize = 13;
+}
+
+EditBox.BMeter {
     Alignment = Center;
-    InputValidator = Float;
-    Position = (180, 130);
+    InputValidator = UInt;
+    Position = (740, 40);
     Renderer = &2;
-    Size = (60, 21);
+    Size = (80, 21);
+    TextSize = 13;
+}
+
+Label.Label10 {
+    HorizontalAlignment = Right;
+    Position = (0, 73);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.limit";
+    TextSize = 13;
+}
+
+EditBox.Limit {
+    Alignment = Center;
+    InputValidator = "[0-9]*%?";
+    Position = (180, 70);
+    Renderer = &2;
+    Size = (120, 21);
+    TextSize = 13;
+}
+
+Label.HitSound {
+    HorizontalAlignment = Right;
+    Position = (0, 193);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.sound";
+    TextSize = 13;
+}
+
+Label.Label11 {
+    HorizontalAlignment = Right;
+    Position = (410, 193);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.effect";
+    TextSize = 13;
+}
+
+Label.Label12 {
+    HorizontalAlignment = Right;
+    Position = (300, 103);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.block.chip";
+    TextSize = 13;
+}
+
+EditBox.ChipDamage {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (480, 100);
+    Renderer = &2;
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label14 {
     HorizontalAlignment = Right;
-    Position = (0, 133);
+    Position = (560, 133);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.hit.minrate";
+    Text = "animation.block.damage";
+    TextSize = 13;
+}
+
+EditBox.SpiritDamage {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (740, 130);
+    Renderer = &2;
+    Size = (80, 21);
     TextSize = 13;
 }
 
 Label.Label15 {
     HorizontalAlignment = Right;
-    Position = (490, 133);
+    Position = (0, 103);
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.hit.stun";
+    Text = "animation.hit.level";
     TextSize = 13;
 }
 
-EditBox.HitStun {
+ComboBox.AttackLevel {
+    ChangeItemOnScroll = false;
+    Items = ["animation.attack.light", "animation.attack.medium", "animation.attack.heavy", "animation.attack.heaviest"];
+    ItemsToDisplay = 0;
+    MaximumItems = 0;
+    Position = (180, 100);
+    SelectedItemIndex = 0;
+    Size = (120, 21);
+    TextSize = 13;
+
+    Renderer {
+        ArrowBackgroundColor = #F5F5F5;
+        ArrowBackgroundColorHover = white;
+        ArrowColor = #3C3C3C;
+        ArrowColorHover = black;
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Padding = (0, 0, 0, 0);
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        TextureArrow = None;
+        TextureArrowDisabled = None;
+        TextureArrowHover = None;
+        TextureBackground = None;
+        TextureBackgroundDisabled = None;
+
+        ListBox {
+            BackgroundColor = #F5F5F5;
+            BackgroundColorHover = white;
+            BorderColor = black;
+            Borders = (1, 1, 1, 1);
+            Padding = (0, 0, 0, 0);
+            SelectedBackgroundColor = #006EFF;
+            SelectedBackgroundColorHover = #1E96FF;
+            SelectedTextColor = white;
+            TextColor = #3C3C3C;
+            TextColorHover = black;
+            TextureBackground = None;
+
+            Scrollbar {
+                ArrowBackgroundColor = #F5F5F5;
+                ArrowBackgroundColorHover = white;
+                ArrowColor = #3C3C3C;
+                ArrowColorHover = black;
+                TextureArrowDown = None;
+                TextureArrowDownHover = None;
+                TextureArrowUp = None;
+                TextureArrowUpHover = None;
+                TextureThumb = None;
+                TextureThumbHover = None;
+                TextureTrack = None;
+                TextureTrackHover = None;
+                ThumbColor = #DCDCDC;
+                ThumbColorHover = #E6E6E6;
+                TrackColor = #F5F5F5;
+            }
+        }
+    }
+}
+
+Label.Label16 {
+    HorizontalAlignment = Right;
+    Position = (0, 133);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.speed";
+    TextSize = 13;
+}
+
+EditBox.HitSpeed {
     Alignment = Center;
-    Position = (670, 130);
+    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
+    Position = (180, 130);
     Renderer = &2;
-    Size = (130, 21);
+    Size = (120, 21);
+    TextSize = 13;
+}
+
+Label.Label17 {
+    HorizontalAlignment = Right;
+    Position = (0, 163);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.gseq";
+    TextSize = 13;
+}
+
+Button.GndHitSeq {
+    Position = (180, 160);
+    Renderer = &3;
+    Size = (230, 21);
+    Text = Button;
+    TextSize = 13;
+    UserData = NO_LOCALE;
+}
+
+Button.AirHitSeq {
+    Position = (590, 160);
+    Renderer = &3;
+    Size = (230, 21);
+    Text = Button;
+    TextSize = 13;
+    UserData = NO_LOCALE;
+}
+
+Label.Label18 {
+    HorizontalAlignment = Right;
+    Position = (410, 163);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.aseq";
+    TextSize = 13;
+}
+
+Button.SelectSound {
+    Position = (180, 190);
+    Renderer = &3;
+    Size = (230, 21);
+    Text = Button;
+    TextSize = 13;
+    UserData = NO_LOCALE;
+}
+
+Button.SelectEffect {
+    Position = (590, 190);
+    Renderer = &3;
+    Size = (230, 21);
+    Text = Button;
+    TextSize = 13;
+    UserData = NO_LOCALE;
+}
+
+CheckBox.cFlag0 {
+    Position = (270, 220);
+    Renderer = &4;
+    Size = (20, 20);
+    Text = "animation.hit.cflag0";
+    TextSize = 13;
+}
+
+EditBox.cFlags {
+    Alignment = Center;
+    InputValidator = Float;
+    Position = (180, 220);
+    Renderer = &2;
+    Size = (80, 21);
+    TextSize = 13;
+}
+
+Label.Label19 {
+    HorizontalAlignment = Right;
+    Position = (0, 223);
+    Renderer = &1;
+    ScrollbarPolicy = Automatic;
+    Size = (175, 17);
+    Text = "animation.hit.cflags";
+    TextSize = 13;
+}
+
+CheckBox.cFlag1 {
+    Position = (400, 220);
+    Renderer = &4;
+    Size = (20, 20);
+    Text = "animation.hit.cflag1";
     TextSize = 13;
 }

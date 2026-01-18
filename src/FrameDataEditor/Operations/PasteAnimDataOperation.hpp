@@ -25,7 +25,7 @@ namespace SpiralOfFate
 		PasteAnimDataOperation(
 			EditableObject &obj,
 			const std::string &&name,
-			FrameData newValue
+			const FrameData &newValue
 		);
 		void apply() override;
 		void undo() override;

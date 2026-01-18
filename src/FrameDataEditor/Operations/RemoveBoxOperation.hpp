@@ -23,10 +23,10 @@ namespace SpiralOfFate
 		unsigned _animation;
 		unsigned _boxIndex;
 		BoxType _type;
-		Box _oldValue;
+		ShadyCore::Schema::Sequence::BBox _oldValue;
 		std::string _fieldName;
 
-		Box &_getBox();
+		ShadyCore::Schema::Sequence::BBox &_getBox();
 
 	public:
 		RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, RemoveBoxApply onApply);

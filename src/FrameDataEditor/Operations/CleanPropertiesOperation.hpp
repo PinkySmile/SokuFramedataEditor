@@ -14,10 +14,10 @@ namespace SpiralOfFate
 	class CleanPropertiesOperation : public Operation {
 	protected:
 		EditableObject &_obj;
-		std::map<unsigned, std::vector<std::vector<FrameData>>> _oldValues;
+		std::map<unsigned, std::vector<std::vector<ShadyCore::Schema::Sequence::MoveTraits>>> _oldTraits;
 		std::string _fieldName;
 
-		static void _clean(FrameData &data, TypeColor type);
+		static void _clean(FrameData &data);
 
 	public:
 		CleanPropertiesOperation(EditableObject &obj, const std::string &&name);

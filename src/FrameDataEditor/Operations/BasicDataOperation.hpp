@@ -11,7 +11,7 @@
 
 namespace SpiralOfFate
 {
-	template<typename T>
+	template<typename T, typename T2>
 	class BasicDataOperation : public Operation {
 	protected:
 		EditableObject &_obj;
@@ -25,7 +25,7 @@ namespace SpiralOfFate
 		bool _reset;
 
 	public:
-		BasicDataOperation(EditableObject &obj, const std::string &&name, T FrameData::*field, T newValue, bool reset) :
+		BasicDataOperation(EditableObject &obj, const std::string &&name, T T2::*field, T newValue, bool reset) :
 			_obj(obj),
 			_action(obj._action),
 			_actionBlock(obj._actionBlock),

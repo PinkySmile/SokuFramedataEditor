@@ -4,6 +4,8 @@
 
 #include <nlohmann/json.hpp>
 #include "FrameDataEditor.hpp"
+
+#include "Resources/Assert.hpp"
 #include "UI/MainWindow.hpp"
 #include "UI/LocalizedContainer.hpp"
 #include "UI/SettingsWindow.hpp"
@@ -60,11 +62,58 @@ SpiralOfFate::FrameDataEditor::FrameDataEditor()
 	this->_menuHierarchy = menu->getMenus();
 	this->setLocale(this->_locale);
 	Utils::setRenderer(game->gui);
+
+	try {
+		this->reloadGamePackages();
+	} catch (...) {
+		this->_settings();
+	}
+	this->_reloadCrashData();
 }
 
 SpiralOfFate::FrameDataEditor::~FrameDataEditor()
 {
 	this->saveSettings();
+}
+
+void SpiralOfFate::FrameDataEditor::_reloadCrashData()
+{
+	// TODO: Not implemented
+}
+
+void SpiralOfFate::FrameDataEditor::reloadGamePackages()
+{
+	std::list<std::filesystem::path> paths = {
+		game->settings.soku / "th123c.dat",
+		game->settings.soku / "th123b.dat",
+		game->settings.soku / "th123a.dat",
+		game->settings.swr  / "th105b.dat",
+		game->settings.swr  / "th105a.dat",
+	};
+
+	try {
+		for (auto &path : game->settings.extra)
+			game->package.merge(path);
+		for (auto &path : std::filesystem::directory_iterator(game->settings.soku2)) {
+			if (!path.is_directory())
+				continue;
+			for (auto &path2 : std::filesystem::directory_iterator(path.path()))
+				if (path2.path().extension() == ".dat")
+					paths.push_front(path2.path());
+		}
+	} catch (const std::exception &e) {
+		game->logger.error("Error loading soku2: " + std::string(e.what()));
+	}
+
+	try {
+		game->package.clear();
+		for (auto &path : paths)
+			game->package.merge(path);
+	} catch (std::exception &e) {
+		game->logger.error("Failed loading packages " + std::string(e.what()));
+		throw;
+	}
+	game->logger.debug("Packages are loaded");
 }
 
 void SpiralOfFate::FrameDataEditor::restoreDefaultShortcuts(std::map<std::string, Shortcut> &shurtcuts) const
@@ -378,10 +427,10 @@ void SpiralOfFate::FrameDataEditor::setLocale(const std::string &name)
 	if (locale.empty())
 		locale = Utils::getLocale();
 
-	std::ifstream stream{ "assets/gui/editor/locale/" + locale + ".json" };
+	std::ifstream stream{ "assets/gui/editor/locale/" + locale + "/strings.json" };
 
 	if (!stream && name.empty())
-		stream.open("assets/gui/editor/locale/en.json");
+		stream.open("assets/gui/editor/locale/en/strings.json");
 	if (stream)
 		stream >> json;
 	if (json.is_object()) {
@@ -405,10 +454,10 @@ std::string SpiralOfFate::FrameDataEditor::getLocale() const
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
 {
-	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_framedata"), "assets/characters");
-	auto load = [this](const std::filesystem::path &path){
+	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_framedata"), ".");
+	auto load = [this](const std::filesystem::path &path, const std::string &folder){
 		try {
-			this->_openWindows.emplace_back(new MainWindow(path, *this));
+			this->_openWindows.emplace_back(new MainWindow(folder, path, *this));
 			this->_focusedWindow = this->_openWindows.back();
 			this->_focusedWindow->onFocus([this](const std::weak_ptr<MainWindow> &This){
 				auto lock = This.lock();
@@ -451,45 +500,40 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 	};
 
 	file->setFileTypeFilters({
-		{this->localize("file_type.framedata"), {"*.json"}},
+		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
 		{this->localize("file_type.all"), {}}
 	}, 0);
 	file->setMultiSelect(true);
 	file->onFileSelect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
 		for (auto &p : arr) {
 			const std::filesystem::path &filePath = p;
-			std::filesystem::path pathBackup = p;
+			auto win = std::make_shared<LocalizedContainer<tgui::ChildWindow>>(*this);
 
-			pathBackup += ".bak";
-			if (!std::filesystem::exists(pathBackup)) {
-				load(filePath);
-				return;
-			}
+			win->loadLocalizedWidgetsFromFile("assets/gui/editor/load_folder.gui");
 
-			auto dialog = Utils::dispMsg(
-				game->gui,
-				this->localize("message_box.title.backup_exists"),
-				this->localize("message_box.backup_exists", filePath.string()),
-				MB_ICONINFORMATION
-			);
+			auto folder = win->get<tgui::EditBox>("Folder");
+			auto label = win->get<tgui::Label>("Label");
+			auto button = win->get<tgui::Button>("Confirm");
 
-			dialog->changeButtons({
-				this->localize("message_box.button.yes"),
-				this->localize("message_box.button.no")
-			});
-			dialog->onButtonPress([this, load, filePath, pathBackup](const tgui::String &d){
-				if (d == this->localize("message_box.button.no"))
-					load(filePath);
-				else if (load(pathBackup))
-					this->_focusedWindow->setPath(filePath);
-			});
+			folder->setText("data/character/" + filePath.filename().stem().string());
+			win->setTitle(this->localize("message_box.title.select_folder"));
+			label->setText(this->localize("message_box.select_folder", filePath.string()));
+			win->setSize({"&.w / 2", 90 + win->getSize().y - win->getInnerSize().y});
+			Utils::openWindowWithFocus(game->gui, 0, 0, win);
+			button->onClick([load, folder, filePath] (const std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> &win_){
+				load(filePath, folder->getText().toStdString());
+				win_.lock()->close();
+			}, std::weak_ptr(win));
 		}
 	});
 }
 
 void SpiralOfFate::FrameDataEditor::_save()
 {
-	this->_focusedWindow->save();
+	if (this->_focusedWindow->hasPath())
+		this->_focusedWindow->save();
+	else
+		this->_saveAs();
 }
 
 void SpiralOfFate::FrameDataEditor::_saveAs()
@@ -844,16 +888,13 @@ bool SpiralOfFate::FrameDataEditor::canHandleKeyPress(const sf::Event::KeyPresse
 
 	game->logger.debug("Pressed keys: " + this->shortcutToString(s));
 	game->logger.debug("Has it? " + std::string(this->_shortcuts.contains(s) ? "true" : "false"));
-	return this->_shortcuts.contains(s);
-}
+	if (!this->_shortcuts.contains(s))
+		return false;
 
-void SpiralOfFate::FrameDataEditor::keyPressed(const sf::Event::KeyPressed &event)
-{
-	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
-	auto it = this->_shortcuts.find(s);
-	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 	std::string tmp = "Check ";
 	std::vector<tgui::String> list;
+	auto it = this->_shortcuts.find(s);
+	auto menu = game->gui.get<tgui::MenuBar>("MainBar");
 
 	assert_exp(it != this->_shortcuts.end());
 	for (size_t i = 0; i < it->second.first.size(); i++) {
@@ -868,8 +909,16 @@ void SpiralOfFate::FrameDataEditor::keyPressed(const sf::Event::KeyPressed &even
 
 		game->logger.debug(tmp + ": is " + (ok ? "enabled" : "disabled"));
 		if (!ok)
-			return;
+			return false;
 	}
+	return true;
+}
+
+void SpiralOfFate::FrameDataEditor::keyPressed(const sf::Event::KeyPressed &event)
+{
+	Shortcut s{ .code = event.code, .alt = event.alt, .control = event.control, .shift = event.shift, .meta = event.system };
+	auto it = this->_shortcuts.find(s);
+
 	game->logger.debug("Execute shortcut: " + this->shortcutToString(s));
 	(this->*(it->second.second))();
 }

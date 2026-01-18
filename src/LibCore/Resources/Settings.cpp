@@ -15,16 +15,19 @@ SpiralOfFate::Settings::Settings(const std::filesystem::path &path) :
 
 	if (!stream.fail()) {
 		stream >> json;
-		this->inputPresetP1 = json["inputPresetP1"];
-		this->inputPresetP2 = json["inputPresetP2"];
-		this->theme = json["theme"];
+		try {
+			this->palettes = json["palettes"].get<std::filesystem::path>();
+			this->theme = json["theme"];
+			this->swr = json["swr"].get<std::filesystem::path>();
+			this->soku = json["soku"].get<std::filesystem::path>();
+			this->soku2 = json["soku2"].get<std::filesystem::path>();
+			this->extra = json["extra"].get<std::vector<std::filesystem::path>>();
+			return;
+		} catch (...) {}
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: " + this->_path.string() + ": " + std::string(strerror(errno)));
-	else {
-		this->inputPresetP1 = "inputs/default1.in";
-		this->inputPresetP2 = "inputs/default2.in";
-		this->theme = "assets/gui/themes/Black.style";
-	}
+	this->theme = "assets/gui/themes/Black.style";
+	this->palettes = "palettes";
 }
 
 SpiralOfFate::Settings::~Settings()
@@ -36,9 +39,12 @@ void SpiralOfFate::Settings::save()
 {
 	std::ofstream stream{this->_path};
 	nlohmann::json json = {
-		{ "inputPresetP1", this->inputPresetP1 },
-		{ "inputPresetP2", this->inputPresetP2 },
+		{ "palettes", this->palettes },
 		{ "theme", this->theme },
+		{ "swr", this->swr },
+		{ "soku", this->soku },
+		{ "soku2", this->soku2 },
+		{ "extra", this->extra },
 	};
 
 	if (!stream)

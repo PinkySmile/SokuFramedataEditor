@@ -1,5 +1,152 @@
+Renderer.1 {
+    BackgroundColor = transparent;
+    BorderColor = #3C3C3C;
+    Borders = (0, 0, 0, 0);
+    TextColor = #3C3C3C;
+    TextureBackground = None;
+
+    Scrollbar {
+        ArrowBackgroundColor = #F5F5F5;
+        ArrowBackgroundColorHover = white;
+        ArrowColor = #3C3C3C;
+        ArrowColorHover = black;
+        TextureArrowDown = None;
+        TextureArrowDownHover = None;
+        TextureArrowUp = None;
+        TextureArrowUpHover = None;
+        TextureThumb = None;
+        TextureThumbHover = None;
+        TextureTrack = None;
+        TextureTrackHover = None;
+        ThumbColor = #DCDCDC;
+        ThumbColorHover = #E6E6E6;
+        TrackColor = #F5F5F5;
+    }
+}
+
+Renderer.2 {
+    ArrowBackgroundColor = #F5F5F5;
+    ArrowBackgroundColorHover = white;
+    ArrowColor = #3C3C3C;
+    ArrowColorHover = black;
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BorderColor = black;
+    Borders = (1, 1, 1, 1);
+    Padding = (0, 0, 0, 0);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextureArrow = None;
+    TextureArrowDisabled = None;
+    TextureArrowHover = None;
+    TextureBackground = None;
+    TextureBackgroundDisabled = None;
+
+    ListBox {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorHover = white;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Padding = (0, 0, 0, 0);
+        SelectedBackgroundColor = #006EFF;
+        SelectedBackgroundColorHover = #1E96FF;
+        SelectedTextColor = white;
+        TextColor = #3C3C3C;
+        TextColorHover = black;
+        TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #F5F5F5;
+            ArrowBackgroundColorHover = white;
+            ArrowColor = #3C3C3C;
+            ArrowColorHover = black;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = #DCDCDC;
+            ThumbColorHover = #E6E6E6;
+            TrackColor = #F5F5F5;
+        }
+    }
+}
+
+Renderer.3 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorDown = #EBEBEB;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorDown = black;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorDown = black;
+    TextColorHover = black;
+    Texture = None;
+    TextureDisabled = None;
+    TextureDown = None;
+    TextureDownFocused = None;
+    TextureDownHover = None;
+    TextureFocused = None;
+    TextureHover = None;
+}
+
+Renderer.4 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    CaretColor = black;
+    CaretWidth = 1;
+    DefaultTextColor = #A0A0A0;
+    Padding = (0, 0, 0, 0);
+    SelectedTextBackgroundColor = #006EFF;
+    SelectedTextColor = white;
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    Texture = None;
+    TextureDisabled = None;
+    TextureFocused = None;
+    TextureHover = None;
+}
+
+Renderer.5 {
+    BackgroundColor = #F5F5F5;
+    BackgroundColorDisabled = #E6E6E6;
+    BackgroundColorDown = #EBEBEB;
+    BackgroundColorHover = white;
+    BorderColor = #3C3C3C;
+    BorderColorDisabled = #7D7D7D;
+    BorderColorDown = black;
+    BorderColorFocused = #1E1EB4;
+    BorderColorHover = black;
+    Borders = (1, 1, 1, 1);
+    TextColor = #3C3C3C;
+    TextColorDisabled = #7D7D7D;
+    TextColorDown = black;
+    TextColorHover = black;
+    Texture = None;
+    TextureDisabled = None;
+    TextureDown = None;
+    TextureDownFocused = None;
+    TextureDownHover = None;
+    TextureFocused = None;
+    TextureHover = None;
+}
+
 Panel.Panel {
-    Size = (330, 102.692);
+    Size = (590, 413);
 
     Renderer {
         BackgroundColor = white;
@@ -10,87 +157,248 @@ Panel.Panel {
     Label.Label1 {
         HorizontalAlignment = Right;
         Position = (0, 12);
+        Renderer = &1;
         ScrollbarPolicy = Automatic;
-        Size = (129, 17);
+        Size = (169, 17);
         Text = "settings.locale";
         TextSize = 13;
-
-        Renderer {
-            BackgroundColor = transparent;
-            BorderColor = #3C3C3C;
-            Borders = (0, 0, 0, 0);
-            TextColor = #3C3C3C;
-            TextureBackground = None;
-
-            Scrollbar {
-                ArrowBackgroundColor = #F5F5F5;
-                ArrowBackgroundColorHover = white;
-                ArrowColor = #3C3C3C;
-                ArrowColorHover = black;
-                ThumbColor = #DCDCDC;
-                ThumbColorHover = #E6E6E6;
-                TrackColor = #F5F5F5;
-            }
-        }
     }
 
     ComboBox.Locale {
         ChangeItemOnScroll = false;
         ItemsToDisplay = 0;
         MaximumItems = 0;
-        Position = (130, 10);
-        Size = (190, 21);
+        Position = (170, 10);
+        Renderer = &2;
+        Size = (160, 21);
         TextSize = 13;
-
-        Renderer {
-            ArrowBackgroundColor = #F5F5F5;
-            ArrowBackgroundColorHover = white;
-            ArrowColor = #3C3C3C;
-            ArrowColorHover = black;
-            BackgroundColor = #F5F5F5;
-            BackgroundColorDisabled = #E6E6E6;
-            BorderColor = black;
-            Borders = (1, 1, 1, 1);
-            Padding = (0, 0, 0, 0);
-            TextColor = #3C3C3C;
-            TextColorDisabled = #7D7D7D;
-            TextureArrow = None;
-            TextureArrowDisabled = None;
-            TextureArrowHover = None;
-            TextureBackground = None;
-            TextureBackgroundDisabled = None;
-
-            ListBox {
-                BackgroundColor = #F5F5F5;
-                BackgroundColorHover = white;
-                BorderColor = black;
-                Borders = (1, 1, 1, 1);
-                Padding = (0, 0, 0, 0);
-                SelectedBackgroundColor = #006EFF;
-                SelectedBackgroundColorHover = #1E96FF;
-                SelectedTextColor = white;
-                TextColor = #3C3C3C;
-                TextColorHover = black;
-
-                Scrollbar {
-                    ArrowBackgroundColor = #F5F5F5;
-                    ArrowBackgroundColorHover = white;
-                    ArrowColor = #3C3C3C;
-                    ArrowColorHover = black;
-                    ThumbColor = #DCDCDC;
-                    ThumbColorHover = #E6E6E6;
-                    TrackColor = #F5F5F5;
-                }
-            }
-        }
     }
 
     Label.Label2 {
         HorizontalAlignment = Right;
-        Position = (0, 42);
+        Position = (330, 12);
+        Renderer = &1;
         ScrollbarPolicy = Automatic;
-        Size = (129, 17);
+        Size = (139, 17);
         Text = "settings.theme";
+        TextSize = 13;
+    }
+
+    ComboBox.Theme {
+        ChangeItemOnScroll = false;
+        ItemsToDisplay = 0;
+        MaximumItems = 0;
+        Position = (470, 10);
+        Renderer = &2;
+        Size = (110, 21);
+        TextSize = 13;
+    }
+
+    Button.Save {
+        Position = ((&.w - w) - 10, (&.h - h) - 11);
+        Renderer = &3;
+        Text = "settings.save";
+        TextSize = 13;
+    }
+
+    Button.Cancel {
+        Position = ((Save.x - w) - 10, (&.h - h) - 11);
+        Renderer = &3;
+        Text = "settings.cancel";
+        TextSize = 13;
+    }
+
+    EditBox.SokuPath {
+        Position = (170, 40);
+        Renderer = &4;
+        Size = (385, 21);
+        TextSize = 13;
+    }
+
+    BitmapButton.SokuPathBrowse {
+        Image = "folder.png" Smooth;
+        ImageScaling = 0;
+        Position = ((&.w - w) - 10, 40);
+        Renderer = &5;
+        Size = (21, 21);
+        TextSize = 13;
+    }
+
+    Label.SokuPathError {
+        Position = (170, SokuPath.y + SokuPath.h);
+        Renderer = &1;
+        ScrollbarPolicy = Automatic;
+        Size = (40, 17);
+        Text = Label;
+        TextSize = 13;
+    }
+
+    EditBox.SwrPath {
+        Position = (170, (SokuPathError.y + SokuPathError.h) + 10);
+        Renderer = &4;
+        Size = (385, 21);
+        TextSize = 13;
+    }
+
+    BitmapButton.SwrPathBrowse {
+        Image = "folder.png" Smooth;
+        ImageScaling = 0;
+        Position = ((&.w - w) - 10, SwrPath.y);
+        Renderer = &5;
+        Size = (21, 21);
+        TextSize = 13;
+    }
+
+    Label.SwrPathError {
+        Position = (170, SwrPath.y + SwrPath.h);
+        Renderer = &1;
+        ScrollbarPolicy = Automatic;
+        Size = (40, 17);
+        Text = Label;
+        TextSize = 13;
+    }
+
+    EditBox.Soku2Path {
+        Position = (170, (SwrPathError.y + SwrPathError.h) + 10);
+        Renderer = &4;
+        Size = (385, 21);
+        TextSize = 13;
+    }
+
+    BitmapButton.Soku2PathBrowse {
+        Image = "folder.png" Smooth;
+        ImageScaling = 0;
+        Position = ((&.w - w) - 10, Soku2Path.y);
+        Renderer = &5;
+        Size = (21, 21);
+        TextSize = 13;
+    }
+
+    Label.Label3 {
+        HorizontalAlignment = Right;
+        Position = (0, 42);
+        Renderer = &1;
+        ScrollbarPolicy = Automatic;
+        Size = (169, 21);
+        Text = "settings.soku";
+        TextSize = 13;
+        VerticalAlignment = Center;
+    }
+
+    Label.Label4 {
+        HorizontalAlignment = Right;
+        Position = (0, Soku2Path.y);
+        Renderer = &1;
+        ScrollbarPolicy = Automatic;
+        Size = (169, 21);
+        Text = "settings.soku2";
+        TextSize = 13;
+        VerticalAlignment = Center;
+    }
+
+    Label.Label5 {
+        HorizontalAlignment = Right;
+        Position = (0, SwrPath.y);
+        Renderer = &1;
+        ScrollbarPolicy = Automatic;
+        Size = (169, 21);
+        Text = "settings.swr";
+        TextSize = 13;
+        VerticalAlignment = Center;
+    }
+
+    Label.Label6 {
+        HorizontalAlignment = Right;
+        Position = (0, ExtraList.y);
+        Renderer = &1;
+        ScrollbarPolicy = Automatic;
+        Size = (169, 21);
+        Text = "settings.extra";
+        TextSize = 13;
+        VerticalAlignment = Center;
+    }
+
+    ListBox.ExtraList {
+        ItemHeight = 19;
+        MaximumItems = 0;
+        Position = (170, (Soku2PathError.y + Soku2PathError.h) + 10);
+        ScrollbarPolicy = Automatic;
+        Size = (385, (Cancel.y - y) - 10);
+        TextSize = 13;
+
+        Renderer {
+            BackgroundColor = #F5F5F5;
+            BackgroundColorHover = white;
+            BorderColor = black;
+            Borders = (1, 1, 1, 1);
+            Padding = (0, 0, 0, 0);
+            SelectedBackgroundColor = #006EFF;
+            SelectedBackgroundColorHover = #1E96FF;
+            SelectedTextColor = white;
+            TextColor = #3C3C3C;
+            TextColorHover = black;
+            TextureBackground = None;
+
+            Scrollbar {
+                ArrowBackgroundColor = #F5F5F5;
+                ArrowBackgroundColorHover = white;
+                ArrowColor = #3C3C3C;
+                ArrowColorHover = black;
+                TextureArrowDown = None;
+                TextureArrowDownHover = None;
+                TextureArrowUp = None;
+                TextureArrowUpHover = None;
+                TextureThumb = None;
+                TextureThumbHover = None;
+                TextureTrack = None;
+                TextureTrackHover = None;
+                ThumbColor = #DCDCDC;
+                ThumbColorHover = #E6E6E6;
+                TrackColor = #F5F5F5;
+            }
+        }
+    }
+
+    BitmapButton.ExtraBrowse {
+        Image = "folder.png" Smooth;
+        ImageScaling = 0;
+        Position = ((&.w - w) - 10, ExtraList.y);
+        Renderer = &5;
+        Size = (21, 21);
+        TextSize = 13;
+    }
+
+    Button.ExtraRemove {
+        Position = ((&.w - w) - 10, (ExtraList.y + ExtraList.h) - h);
+        Renderer = &3;
+        Size = (21, 21);
+        Text = "-";
+        TextSize = 20;
+    }
+
+    BitmapButton.ExtraUp {
+        Image = "arrowUp.png" Smooth;
+        ImageScaling = 0;
+        Position = ((&.w - w) - 10, (ExtraBrowse.y + ExtraBrowse.h) + 4);
+        Renderer = &5;
+        Size = (21, ((ExtraRemove.y - y) - 4) / 2);
+        TextSize = 13;
+    }
+
+    BitmapButton.ExtraDown {
+        Image = "arrowDown.png" Smooth;
+        ImageScaling = 0;
+        Position = ((&.w - w) - 10, ((ExtraBrowse.y + ExtraBrowse.h) + 4) + ExtraUp.h);
+        Renderer = &5;
+        Size = (21, (ExtraRemove.y - y) - 4);
+        TextSize = 13;
+    }
+
+    Label.Soku2PathError {
+        Position = (170, Soku2Path.y + Soku2Path.h);
+        ScrollbarPolicy = Automatic;
+        Size = (40, 17);
+        Text = Label;
         TextSize = 13;
 
         Renderer {
@@ -105,121 +413,18 @@ Panel.Panel {
                 ArrowBackgroundColorHover = white;
                 ArrowColor = #3C3C3C;
                 ArrowColorHover = black;
+                TextureArrowDown = None;
+                TextureArrowDownHover = None;
+                TextureArrowUp = None;
+                TextureArrowUpHover = None;
+                TextureThumb = None;
+                TextureThumbHover = None;
+                TextureTrack = None;
+                TextureTrackHover = None;
                 ThumbColor = #DCDCDC;
                 ThumbColorHover = #E6E6E6;
                 TrackColor = #F5F5F5;
             }
-        }
-    }
-
-    ComboBox.Theme {
-        ChangeItemOnScroll = false;
-        ItemsToDisplay = 0;
-        MaximumItems = 0;
-        Position = (130, 40);
-        Size = (190, 21);
-        TextSize = 13;
-
-        Renderer {
-            ArrowBackgroundColor = #F5F5F5;
-            ArrowBackgroundColorHover = white;
-            ArrowColor = #3C3C3C;
-            ArrowColorHover = black;
-            BackgroundColor = #F5F5F5;
-            BackgroundColorDisabled = #E6E6E6;
-            BorderColor = black;
-            Borders = (1, 1, 1, 1);
-            Padding = (0, 0, 0, 0);
-            TextColor = #3C3C3C;
-            TextColorDisabled = #7D7D7D;
-            TextureArrow = None;
-            TextureArrowDisabled = None;
-            TextureArrowHover = None;
-            TextureBackground = None;
-            TextureBackgroundDisabled = None;
-
-            ListBox {
-                BackgroundColor = #F5F5F5;
-                BackgroundColorHover = white;
-                BorderColor = black;
-                Borders = (1, 1, 1, 1);
-                Padding = (0, 0, 0, 0);
-                SelectedBackgroundColor = #006EFF;
-                SelectedBackgroundColorHover = #1E96FF;
-                SelectedTextColor = white;
-                TextColor = #3C3C3C;
-                TextColorHover = black;
-
-                Scrollbar {
-                    ArrowBackgroundColor = #F5F5F5;
-                    ArrowBackgroundColorHover = white;
-                    ArrowColor = #3C3C3C;
-                    ArrowColorHover = black;
-                    ThumbColor = #DCDCDC;
-                    ThumbColorHover = #E6E6E6;
-                    TrackColor = #F5F5F5;
-                }
-            }
-        }
-    }
-
-    Button.Save {
-        Position = ((&.w - w) - 10, (&.h - h) - 11);
-        Text = "settings.save";
-        TextSize = 13;
-
-        Renderer {
-            BackgroundColor = #F5F5F5;
-            BackgroundColorDisabled = #E6E6E6;
-            BackgroundColorDown = #EBEBEB;
-            BackgroundColorHover = white;
-            BorderColor = #3C3C3C;
-            BorderColorDisabled = #7D7D7D;
-            BorderColorDown = black;
-            BorderColorFocused = #1E1EB4;
-            BorderColorHover = black;
-            Borders = (1, 1, 1, 1);
-            TextColor = #3C3C3C;
-            TextColorDisabled = #7D7D7D;
-            TextColorDown = black;
-            TextColorHover = black;
-            Texture = None;
-            TextureDisabled = None;
-            TextureDown = None;
-            TextureDownFocused = None;
-            TextureDownHover = None;
-            TextureFocused = None;
-            TextureHover = None;
-        }
-    }
-
-    Button.Cancel {
-        Position = ((Save.x - w) - 10, (&.h - h) - 11);
-        Text = "settings.cancel";
-        TextSize = 13;
-
-        Renderer {
-            BackgroundColor = #F5F5F5;
-            BackgroundColorDisabled = #E6E6E6;
-            BackgroundColorDown = #EBEBEB;
-            BackgroundColorHover = white;
-            BorderColor = #3C3C3C;
-            BorderColorDisabled = #7D7D7D;
-            BorderColorDown = black;
-            BorderColorFocused = #1E1EB4;
-            BorderColorHover = black;
-            Borders = (1, 1, 1, 1);
-            TextColor = #3C3C3C;
-            TextColorDisabled = #7D7D7D;
-            TextColorDown = black;
-            TextColorHover = black;
-            Texture = None;
-            TextureDisabled = None;
-            TextureDown = None;
-            TextureDownFocused = None;
-            TextureDownHover = None;
-            TextureFocused = None;
-            TextureHover = None;
         }
     }
 }

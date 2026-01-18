@@ -25,9 +25,9 @@ void SpiralOfFate::CreateFrameOperation::apply()
 	this->_obj._actionBlock = this->_block;
 	this->_obj._animation = this->_id;
 
-	auto &arr = this->_obj._moves[this->_action][this->_block];
+	auto &arr = this->_obj._schema.framedata[this->_action][this->_block];
 
-	arr.insert(arr.begin() + this->_id, this->_newData);
+	arr.data.insert(arr.begin() + this->_id, this->_newData);
 }
 
 void SpiralOfFate::CreateFrameOperation::undo()
@@ -36,11 +36,11 @@ void SpiralOfFate::CreateFrameOperation::undo()
 	this->_obj._actionBlock = this->_block;
 	this->_obj._animation = this->_id;
 
-	auto &arr = this->_obj._moves[this->_action][this->_block];
+	auto &arr = this->_obj._schema.framedata[this->_action][this->_block];
 
+	arr.data.erase(arr.begin() + this->_id);
 	if (arr.size() == this->_obj._animation)
 		this->_obj._animation = arr.size() - 1;
-	arr.erase(arr.begin() + this->_id);
 }
 
 bool SpiralOfFate::CreateFrameOperation::hasModification() const

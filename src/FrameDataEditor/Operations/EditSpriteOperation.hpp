@@ -10,7 +10,7 @@
 
 namespace SpiralOfFate
 {
-	class EditSpriteOperation : public BasicDataOperation<std::string> {
+	class EditSpriteOperation : public BasicDataOperation<std::string, FrameData> {
 	public:
 		EditSpriteOperation(EditableObject &obj, const std::string &&name, std::string FrameData::*field, const std::string &newValue, bool reset);
 

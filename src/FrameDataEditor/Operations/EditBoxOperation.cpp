@@ -4,15 +4,15 @@
 
 #include "EditBoxOperation.hpp"
 
-SpiralOfFate::Box &SpiralOfFate::EditBoxOperation::_getBox()
+ShadyCore::Schema::Sequence::BBox &SpiralOfFate::EditBoxOperation::_getBox()
 {
 	auto &data = this->_obj.getFrameData();
 
 	if (this->_type == BOXTYPE_COLLISIONBOX)
-		return *data.collisionBox;
+		return data.cBoxes.front();
 	if (this->_type == BOXTYPE_HITBOX)
-		return data.hitBoxes[this->_boxIndex];
-	return data.hurtBoxes[this->_boxIndex];
+		return data.aBoxes[this->_boxIndex];
+	return data.hBoxes[this->_boxIndex];
 }
 
 SpiralOfFate::EditBoxOperation::EditBoxOperation(
@@ -20,7 +20,7 @@ SpiralOfFate::EditBoxOperation::EditBoxOperation(
 	const std::string &&name,
 	BoxType type,
 	unsigned int boxIndex,
-	Box newValue
+	ShadyCore::Schema::Sequence::BBox newValue
 ) :
 	_obj(obj),
 	_action(obj._action),
@@ -75,5 +75,9 @@ std::string SpiralOfFate::EditBoxOperation::getName() const noexcept
 
 bool SpiralOfFate::EditBoxOperation::hasModification() const
 {
-	return this->_oldValue != this->_newValue;
+	return
+		this->_oldValue.down != this->_newValue.down ||
+		this->_oldValue.up != this->_newValue.up ||
+		this->_oldValue.left != this->_newValue.left ||
+		this->_oldValue.right != this->_newValue.right;
 }

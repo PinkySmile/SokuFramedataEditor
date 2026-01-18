@@ -13,30 +13,16 @@
 #include <filesystem>
 #include <png.h>
 #include "Color.hpp"
+#include "resource.hpp"
 
-struct LoadedImage {
-	unsigned char bitsPerPixel = 0;
-	unsigned width;
-	unsigned height;
-	unsigned paddedWidth;
-	unsigned altSize = 0;
-	unsigned bufferSize = 0;
-	unsigned char *raw = nullptr;
-	std::array<SpiralOfFate::Color, 256> palette;
-
-	LoadedImage() = default;
-	LoadedImage(const LoadedImage &) = delete;
-	~LoadedImage();
-
-	void alloc();
-};
+using LoadedImage = ShadyCore::Image;
 
 class PNGLoader {
 public:
-	const LoadedImage &loadImage(const std::filesystem::path &path);
+	const LoadedImage &loadImage(const std::string &path);
 
 private:
-	std::unordered_map<std::filesystem::path, std::unique_ptr<LoadedImage>> _cache;
+	std::unordered_map<std::string, std::unique_ptr<LoadedImage>> _cache;
 };
 
 extern PNGLoader pngLoader;

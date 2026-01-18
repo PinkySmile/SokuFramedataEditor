@@ -1,0 +1,3 @@
+[submodule "shady-packer"]
+	path = shady-packer
+	url = https://github.com/PinkySmile/shady-packer

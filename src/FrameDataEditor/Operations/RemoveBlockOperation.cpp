@@ -13,7 +13,7 @@ SpiralOfFate::RemoveBlockOperation::RemoveBlockOperation(
 	_name(name),
 	_action(obj._action),
 	_id(id),
-	_oldData(obj._moves[obj._action][id])
+	_oldData(obj._schema.framedata[obj._action][id])
 {
 }
 
@@ -23,11 +23,11 @@ void SpiralOfFate::RemoveBlockOperation::apply()
 	this->_obj._actionBlock = this->_id;
 	this->_obj._animation = 0;
 
-	auto &arr = this->_obj._moves[this->_action];
+	auto &arr = this->_obj._schema.framedata[this->_action];
 
 	if (arr.size() <= this->_obj._actionBlock)
 		this->_obj._actionBlock = arr.size() - 1;
-	arr.erase(arr.begin() + this->_id);
+	arr.sequences().erase(arr.begin() + this->_id);
 }
 
 void SpiralOfFate::RemoveBlockOperation::undo()
@@ -36,9 +36,9 @@ void SpiralOfFate::RemoveBlockOperation::undo()
 	this->_obj._actionBlock = this->_id;
 	this->_obj._animation = 0;
 
-	auto &arr = this->_obj._moves[this->_action];
+	auto &arr = this->_obj._schema.framedata[this->_action];
 
-	arr.insert(arr.begin() + this->_id, this->_oldData);
+	arr.sequences().insert(arr.begin() + this->_id, this->_oldData);
 }
 
 bool SpiralOfFate::RemoveBlockOperation::hasModification() const

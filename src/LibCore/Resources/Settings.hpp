@@ -16,9 +16,12 @@ namespace SpiralOfFate
 		std::filesystem::path _path;
 
 	public:
-		std::string inputPresetP1;
-		std::string inputPresetP2;
+		std::filesystem::path palettes;
 		std::string theme;
+		std::filesystem::path swr;
+		std::filesystem::path soku;
+		std::filesystem::path soku2;
+		std::vector<std::filesystem::path> extra;
 
 		Settings(const std::filesystem::path &path);
 		~Settings();

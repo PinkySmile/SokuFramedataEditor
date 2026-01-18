@@ -5,6 +5,7 @@
 #include "TextureManager.hpp"
 #include "Resources/Game.hpp"
 #include "Logger.hpp"
+#include "Resources/Assert.hpp"
 
 namespace SpiralOfFate
 {
@@ -37,41 +38,6 @@ namespace SpiralOfFate
 		}
 	}
 
-	unsigned TextureManager::load(const std::filesystem::path &path, Vector2u *size, bool repeated)
-	{
-		auto oit = this->_overrideList.find(path);
-		auto file = oit == this->_overrideList.end() ? path : oit->second;
-
-		if (this->_allocatedTextures[file].count != 0) {
-			this->_allocatedTextures[file].count++;
-			game->logger.verbose("Returning already loaded file " + path.string());
-			if (size)
-				*size = this->_textures[this->_allocatedTextures[file].index].getSize();
-			return this->_allocatedTextures[file].index;
-		}
-
-		AllocatedTexture texture;
-
-		texture.path = path;
-		texture.count = 1;
-		if (file != path)
-			game->logger.debug("Loading texture " + file.string() + " (" + path.string() + ")");
-		else
-			game->logger.debug("Loading texture " + file.string());
-		if (this->_loadRegular(file, texture, 0) == 0) {
-			game->logger.warn("Failed to load texture " + file.string());
-			this->_loadEmpty(texture, 0);
-		}
-
-		if (size)
-			*size = this->_textures[texture.index].getSize();
-
-		this->_textures[texture.index].setRepeated(repeated);
-		this->_allocatedTextures[file] = texture;
-		this->_allocatedTexturesPaths[texture.index] = file;
-		return texture.index;
-	}
-
 	static std::string colorToString(Color color)
 	{
 		char buffer[10];
@@ -83,8 +49,6 @@ namespace SpiralOfFate
 
 	unsigned TextureManager::_loadEmpty(AllocatedTexture &tex, unsigned id)
 	{
-		tex.palette.reset();
-		tex.paletteData.reset();
 		if (id != 0)
 			tex.index = id;
 		else if (this->_freedIndexes.empty()) {
@@ -98,99 +62,45 @@ namespace SpiralOfFate
 		return tex.index;
 	}
 
-	unsigned TextureManager::_load(const std::filesystem::path &path, AllocatedTexture &tex, unsigned id)
-	{
-		unsigned result;
-
-		if (tex.palette)
-			result = this->_loadPaletted(path, tex, *tex.palette, id);
-		else
-			result = this->_loadRegular(path, tex, id);
-		if (result == 0)
-			result = this->_loadEmpty(tex, id);
-		return result;
-	}
-
-	unsigned TextureManager::_loadRegular(const std::filesystem::path &path, AllocatedTexture &tex, unsigned id)
-	{
-		sf::Texture texture;
-
-		if (!texture.loadFromFile(path)) {
-			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
-			return 0;
-		}
-		tex.palette.reset();
-		tex.paletteData.reset();
-		if (id != 0);
-		else if (this->_freedIndexes.empty()) {
-			this->_lastIndex += this->_lastIndex == 0;
-			id = this->_lastIndex++;
-		} else {
-			id = this->_freedIndexes.back();
-			this->_freedIndexes.pop_back();
-		}
-		this->_textures[id].swap(texture);
-		game->logger.verbose("Loaded texture" + path.string() + " successfully");
-		tex.index = id;
-		return id;
-	}
-
-	unsigned TextureManager::_loadPaletted(const std::filesystem::path &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
+	unsigned TextureManager::_loadPaletted(const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
 	{
 		std::error_code err;
 		std::vector<unsigned char> buffer;
-		size_t fileSize = std::filesystem::file_size(path, err);
-		if (err) {
-			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
+		ShadyCore::Image resourceImage;
+		auto entry = game->package.find(path, ShadyCore::FileType::TYPE_IMAGE);
+
+		if (entry == game->package.end()) {
+			game->logger.error("Could not find image " + path);
 			return 0;
 		}
 
-		std::ifstream pngStream{path, std::fstream::binary};
-		if (pngStream.fail()) {
-			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
-			return 0;
-		}
+		auto &stream = entry.open();
 
-		buffer.resize(fileSize);
-		pngStream.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
-		pngStream.close();
+		ShadyCore::getResourceReader(entry.fileType())(&resourceImage, stream);
+		entry.close(stream);
 
-		std::string_view view{reinterpret_cast<char *>(buffer.data()), buffer.size()};
-		size_t pos = view.find("PLTE");
+		sf::Image image{{resourceImage.width, resourceImage.height}};
 
-		if (pos != std::string::npos) {
-			tex.paletteData.emplace();
-			tex.palette = palette;
+		if (resourceImage.bitsPerPixel == 8) {
+			for (unsigned i = 0; i < resourceImage.getRawSize(); ++i) {
+				unsigned x = i % resourceImage.paddedWidth;
+				unsigned y = i / resourceImage.paddedWidth;
 
-			size_t start = pos;
-
-			(*tex.palette)[251] = game->typeColors[TYPECOLOR_NEUTRAL];
-			(*tex.palette)[252] = game->typeColors[TYPECOLOR_NON_TYPED];
-			(*tex.palette)[253] = game->typeColors[TYPECOLOR_MATTER];
-			(*tex.palette)[254] = game->typeColors[TYPECOLOR_SPIRIT];
-			(*tex.palette)[255] = game->typeColors[TYPECOLOR_VOID];
-			for (size_t i = 0, j = 0; i < 256; i++, j += 3) {
-				(*tex.paletteData)[j] = (*tex.palette)[i].r;
-				(*tex.paletteData)[j + 1] = (*tex.palette)[i].g;
-				(*tex.paletteData)[j + 2] = (*tex.palette)[i].b;
+				if (x >= resourceImage.width)
+					continue;
+				if (y >= resourceImage.height)
+					continue;
+				image.setPixel({x, y}, palette[resourceImage.raw[i]]);
 			}
-
-			pos += 4;
-			memcpy(&buffer[pos], tex.paletteData->data(), tex.paletteData->size());
-			pos += tex.paletteData->size();
-
-			unsigned crc = pngCrc32(&buffer[start], tex.paletteData->size() + 4);
-
-			buffer[pos++] = (crc >> 24) & 0xFF;
-			buffer[pos++] = (crc >> 16) & 0xFF;
-			buffer[pos++] = (crc >> 8) & 0xFF;
-			buffer[pos++] = (crc >> 0) & 0xFF;
-
-			pos = buffer.size();
-			buffer.resize(buffer.size() + 13);
-			memcpy(&buffer[pos], "\x00\x00\x00\x01tRNS\x00\x40\xe6\xd8\x66", 13);
+		} else {
+			for (unsigned y = 0; y < resourceImage.height; y++)
+				for (unsigned x = 0; x < resourceImage.width; x++)
+					image.setPixel({x, y}, sf::Color{
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 2],
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 1],
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 0],
+						resourceImage.raw[(y * resourceImage.paddedWidth + x) * 4 + 3]
+					});
 		}
 
 		if (id != 0)
@@ -204,151 +114,15 @@ namespace SpiralOfFate
 			this->_freedIndexes.pop_back();
 		}
 
-		assert_exp(this->_textures[tex.index].loadFromMemory(buffer.data(), buffer.size()));
-		game->logger.verbose("Loaded texture" + path.string() + " successfully");
+		assert_exp(this->_textures[tex.index].loadFromImage(image));
+		game->logger.verbose("Loaded texture" + path + " successfully");
 		return tex.index;
 	}
 
-	unsigned TextureManager::_loadPaletted(const std::filesystem::path &path, AllocatedTexture &tex, const std::filesystem::path &palette, unsigned id)
+	unsigned TextureManager::load(const std::string &path, const std::array<Color, 256> &palette, Vector2u *size, bool repeated)
 	{
-		std::error_code err;
-		std::vector<unsigned char> buffer;
-		size_t fileSize = std::filesystem::file_size(path, err);
-		if (err) {
-			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
-			return 0;
-		}
-
-		std::ifstream pngStream{path, std::fstream::binary};
-		if (pngStream.fail()) {
-			// TODO: Only works on Linux
-			game->logger.error("Failed to load " + path.string() + ": " + strerror(errno));
-			return 0;
-		}
-
-		buffer.resize(fileSize);
-		pngStream.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
-		pngStream.close();
-
-		std::string_view view{reinterpret_cast<char *>(buffer.data()), buffer.size()};
-		size_t pos = view.find("PLTE");
-
-		if (pos != std::string::npos) {
-			size_t start = pos;
-			std::ifstream palStream{palette, std::fstream::binary};
-			if (palStream.fail()) {
-				// TODO: Only works on Linux
-				game->logger.error("Failed to load " + palette.string() + ": " + strerror(errno));
-				return 0;
-			}
-
-			tex.palette.emplace();
-			tex.paletteData.emplace();
-
-			assert_eq(std::filesystem::file_size(palette), 768ULL);
-			palStream.read(reinterpret_cast<char *>(tex.paletteData->data()), tex.paletteData->size());
-			palStream.close();
-
-			(*tex.paletteData)[753] = game->typeColors[TYPECOLOR_NEUTRAL].r;
-			(*tex.paletteData)[754] = game->typeColors[TYPECOLOR_NEUTRAL].g;
-			(*tex.paletteData)[755] = game->typeColors[TYPECOLOR_NEUTRAL].b;
-			(*tex.paletteData)[756] = game->typeColors[TYPECOLOR_NON_TYPED].r;
-			(*tex.paletteData)[757] = game->typeColors[TYPECOLOR_NON_TYPED].g;
-			(*tex.paletteData)[758] = game->typeColors[TYPECOLOR_NON_TYPED].b;
-			(*tex.paletteData)[759] = game->typeColors[TYPECOLOR_MATTER].r;
-			(*tex.paletteData)[760] = game->typeColors[TYPECOLOR_MATTER].g;
-			(*tex.paletteData)[761] = game->typeColors[TYPECOLOR_MATTER].b;
-			(*tex.paletteData)[762] = game->typeColors[TYPECOLOR_SPIRIT].r;
-			(*tex.paletteData)[763] = game->typeColors[TYPECOLOR_SPIRIT].g;
-			(*tex.paletteData)[764] = game->typeColors[TYPECOLOR_SPIRIT].b;
-			(*tex.paletteData)[765] = game->typeColors[TYPECOLOR_VOID].r;
-			(*tex.paletteData)[766] = game->typeColors[TYPECOLOR_VOID].g;
-			(*tex.paletteData)[767] = game->typeColors[TYPECOLOR_VOID].b;
-
-			for (size_t i = 0, j = 0; i < tex.palette->size(); i++, j += 3) {
-				(*tex.palette)[i].r = (*tex.paletteData)[j];
-				(*tex.palette)[i].g = (*tex.paletteData)[j + 1];
-				(*tex.palette)[i].b = (*tex.paletteData)[j + 2];
-			}
-
-			pos += 4;
-			memcpy(&buffer[pos], tex.paletteData->data(), tex.paletteData->size());
-			pos += tex.paletteData->size();
-
-			unsigned crc = pngCrc32(&buffer[start], tex.paletteData->size() + 4);
-
-			buffer[pos++] = (crc >> 24) & 0xFF;
-			buffer[pos++] = (crc >> 16) & 0xFF;
-			buffer[pos++] = (crc >> 8) & 0xFF;
-			buffer[pos++] = (crc >> 0) & 0xFF;
-
-			pos = buffer.size();
-			buffer.resize(buffer.size() + 13);
-			memcpy(&buffer[pos], "\x00\x00\x00\x01tRNS\x00\x40\xe6\xd8\x66", 13);
-		}
-
-		if (id != 0)
-			tex.index = id;
-		else if (this->_freedIndexes.empty()) {
-			this->_lastIndex += this->_lastIndex == 0;
-			tex.index = this->_lastIndex++;
-		} else {
-			tex.index = this->_freedIndexes.back();
-			this->_freedIndexes.pop_back();
-		}
-
-		assert_exp(this->_textures[tex.index].loadFromMemory(buffer.data(), buffer.size()));
-		game->logger.verbose("Loaded texture" + path.string() + " successfully");
-		return tex.index;
-	}
-
-	unsigned TextureManager::load(const std::filesystem::path &path, const std::filesystem::path &palette, Vector2u *size, bool repeated)
-	{
-		if (palette.empty())
-			return this->load(path, size, repeated);
-
-		std::string allocName = path.string() + ":" + palette.string();
-		auto oit = this->_overrideList.find(path);
-		auto file = oit == this->_overrideList.end() ? path : oit->second;
-
-		if (this->_allocatedTextures[allocName].count != 0) {
-			this->_allocatedTextures[allocName].count++;
-			game->logger.verbose("Returning already loaded paletted file " + allocName);
-			if (size)
-				*size = this->_textures[this->_allocatedTextures[allocName].index].getSize();
-			return this->_allocatedTextures[allocName].index;
-		}
-
-		if (file != path)
-			game->logger.debug("Loading texture " + file.string() + " (" + path.string() + ") with palette " + palette.string());
-		else
-			game->logger.debug("Loading texture " + file.string() + " with palette " + palette.string());
-
-		AllocatedTexture texture;
-
-		texture.path = path;
-		texture.count = 1;
-		if (this->_loadPaletted(file, texture, palette, 0) == 0)
-			this->_loadEmpty(texture, 0);
-
-		if (size)
-			*size = this->_textures[texture.index].getSize();
-
-		this->_textures[texture.index].setRepeated(repeated);
-		this->_allocatedTextures[allocName] = texture;
-		this->_allocatedTexturesPaths[texture.index] = allocName;
-		return texture.index;
-	}
-
-	unsigned TextureManager::load(const std::filesystem::path &path, const std::array<Color, 256> &palette, Vector2u *size, bool repeated)
-	{
-		if (palette.empty())
-			return this->load(path, size, repeated);
-
 		std::vector<unsigned char> buffer;
 		std::string paletteName;
-		std::error_code err;
 		auto oit = this->_overrideList.find(path);
 		auto file = oit == this->_overrideList.end() ? path : oit->second;
 
@@ -361,7 +135,7 @@ namespace SpiralOfFate
 			ptr += 6;
 		}
 
-		std::string allocName = path.string() + ":" + paletteName;
+		std::string allocName = path + ":" + paletteName;
 
 		if (this->_allocatedTextures[allocName].count != 0) {
 			this->_allocatedTextures[allocName].count++;
@@ -372,14 +146,12 @@ namespace SpiralOfFate
 		}
 
 		if (file != path)
-			game->logger.debug("Loading texture " + file.string() + " (" + path.string() + ") with palette " + paletteName);
+			game->logger.debug("Loading texture " + file + " (" + path + ") with palette " + paletteName);
 		else
-			game->logger.debug("Loading texture " + file.string() + " with palette " + paletteName);
+			game->logger.debug("Loading texture " + file + " with palette " + paletteName);
 
-		AllocatedTexture texture;
+		AllocatedTexture texture{ 0, 1, path, palette };
 
-		texture.path = path;
-		texture.count = 1;
 		if (this->_loadPaletted(file, texture, palette, 0) == 0)
 			this->_loadEmpty(texture, 0);
 
@@ -403,10 +175,10 @@ namespace SpiralOfFate
 		if (texture.count) {
 			texture.count--;
 			if (texture.count) {
-				game->logger.verbose("Remove ref to " + path.string());
+				game->logger.verbose("Remove ref to " + path);
 				return;
 			}
-			game->logger.debug("Destroying texture " + path.string());
+			game->logger.debug("Destroying texture " + path);
 		}
 
 		auto it = this->_textures.find(id);
@@ -434,7 +206,7 @@ namespace SpiralOfFate
 		if (texture.count) {
 			texture.count++;
 			assert_exp(texture.count > 1);
-			game->logger.verbose("Adding ref to " + path.string());
+			game->logger.verbose("Adding ref to " + path);
 		}
 	}
 
@@ -449,8 +221,9 @@ namespace SpiralOfFate
 	{
 		for (auto &[loadedPath, attr] : this->_allocatedTextures)
 			if (attr.count) {
-				game->logger.debug("Reloading " + loadedPath.string());
-				this->_load(attr.path, attr, attr.index);
+				game->logger.debug("Reloading " + loadedPath);
+				if (this->_loadPaletted(attr.path, attr, attr.palette, attr.index))
+					this->_loadEmpty(attr, attr.index);
 			}
 	}
 
@@ -468,7 +241,7 @@ namespace SpiralOfFate
 		this->_overrideList.erase(it);
 	}
 
-	const std::optional<std::array<Color, 256>> &TextureManager::getPalette(unsigned int id)
+	const std::array<Color, 256> &TextureManager::getPalette(unsigned int id)
 	{
 		auto &path = this->_allocatedTexturesPaths.at(id);
 		auto &texture = this->_allocatedTextures.at(path);

@@ -200,18 +200,18 @@ Slider.Frame {
 EditBox.Sprite {
     Alignment = Center;
     DefaultText = "assets/...";
-    Position = (120, 170);
+    Position = (110, 170);
     Renderer = &4;
-    Size = (170, 21);
+    Size = (180, 21);
     TextSize = 13;
 }
 
 EditBox.Bounds {
     Alignment = Center;
     InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4},[0-9]{1,4},[0-9]{1,4}\\)";
-    Position = (120, 200);
+    Position = (110, 200);
     Renderer = &4;
-    Size = (145, 21);
+    Size = (155, 21);
     Text = "(0,0,0,0)";
     TextSize = 13;
 }
@@ -219,9 +219,9 @@ EditBox.Bounds {
 EditBox.Duration {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (120, 260);
+    Position = (180, 260);
     Renderer = &4;
-    Size = (170, 21);
+    Size = (110, 21);
     Text = 0;
     TextSize = 13;
 }
@@ -229,20 +229,10 @@ EditBox.Duration {
 EditBox.Offset {
     Alignment = Center;
     InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4}\\)";
-    Position = (120, 230);
+    Position = (180, 230);
     Renderer = &4;
-    Size = (170, 21);
+    Size = (110, 21);
     Text = "(0,0)";
-    TextSize = 13;
-}
-
-EditBox.Scale {
-    Alignment = Center;
-    InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
-    Position = (120, 290);
-    Renderer = &4;
-    Size = (170, 21);
-    Text = "(1.0,1.0)";
     TextSize = 13;
 }
 
@@ -272,7 +262,7 @@ Label.Label2 {
     Position = (5, 172);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (100, 17);
     Text = "animation.sprite";
     TextSize = 13;
 }
@@ -282,7 +272,7 @@ Label.Label3 {
     Position = (5, 202);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (100, 17);
     Text = "animation.bounds";
     TextSize = 13;
 }
@@ -292,18 +282,8 @@ Label.Label4 {
     Position = (5, 232);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (170, 17);
     Text = "animation.offset";
-    TextSize = 13;
-}
-
-Label.Label5 {
-    HorizontalAlignment = Right;
-    Position = (5, 292);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (110, 17);
-    Text = "animation.scale";
     TextSize = 13;
 }
 
@@ -312,42 +292,32 @@ Label.Label6 {
     Position = (5, 262);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (170, 17);
     Text = "animation.duration";
     TextSize = 13;
 }
 
 Label.Label7 {
     HorizontalAlignment = Right;
-    Position = (5, 322);
+    Position = (5, 352);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (170, 17);
     Text = "animation.aflags";
     TextSize = 13;
 }
 
 Label.Label8 {
     HorizontalAlignment = Right;
-    Position = (5, 352);
+    Position = (5, 382);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (170, 17);
     Text = "animation.dflags";
     TextSize = 13;
 }
 
 BitmapButton.AFlagsButton {
-    Image = "crayon.png" Smooth;
-    ImageScaling = 0;
-    Position = (270, 320);
-    Renderer = &5;
-    Size = (21, 21);
-    TextSize = 13;
-    UserData = NO_LOCALE;
-}
-
-BitmapButton.DFlagsButton {
     Image = "crayon.png" Smooth;
     ImageScaling = 0;
     Position = (270, 350);
@@ -357,29 +327,39 @@ BitmapButton.DFlagsButton {
     UserData = NO_LOCALE;
 }
 
+BitmapButton.DFlagsButton {
+    Image = "crayon.png" Smooth;
+    ImageScaling = 0;
+    Position = (270, 380);
+    Renderer = &5;
+    Size = (21, 21);
+    TextSize = 13;
+    UserData = NO_LOCALE;
+}
+
 EditBox.AFlags {
     Alignment = Center;
     InputValidator = "[0-9A-Fa-f]*";
-    Position = (120, 320);
+    Position = (180, 350);
     Renderer = &4;
-    Size = (145, 21);
-    Text = 0000000000000000;
+    Size = (85, 21);
+    Text = 00000000;
     TextSize = 13;
 }
 
 EditBox.DFlags {
     Alignment = Center;
     InputValidator = "[0-9A-Fa-f]*";
-    Position = (120, 350);
+    Position = (180, 380);
     Renderer = &4;
-    Size = (145, 21);
-    Text = 0000000000000000;
+    Size = (85, 21);
+    Text = 00000000;
     TextSize = 13;
 }
 
 Label.Label9 {
     HorizontalAlignment = Right;
-    Position = (5, 382);
+    Position = (5, 412);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -388,7 +368,7 @@ Label.Label9 {
 }
 
 Button.ClearHit {
-    Position = (270, 380);
+    Position = (270, 410);
     Renderer = &1;
     Size = (20, 21);
     Text = X;
@@ -397,7 +377,7 @@ Button.ClearHit {
 }
 
 Button.HitEdit {
-    Position = (180, 380);
+    Position = (180, 410);
     Renderer = &1;
     Size = (85, 21);
     Text = "animation.edit";
@@ -406,7 +386,7 @@ Button.HitEdit {
 
 Label.Label10 {
     HorizontalAlignment = Right;
-    Position = (5, 442);
+    Position = (5, 472);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -415,7 +395,7 @@ Label.Label10 {
 }
 
 Button.GeneralEdit {
-    Position = (180, 440);
+    Position = (180, 470);
     Renderer = &1;
     Size = (110, 21);
     Text = "animation.edit";
@@ -423,7 +403,7 @@ Button.GeneralEdit {
 }
 
 Button.BlockEdit {
-    Position = (180, 410);
+    Position = (180, 440);
     Renderer = &1;
     Size = (85, 21);
     Text = "animation.edit";
@@ -431,7 +411,7 @@ Button.BlockEdit {
 }
 
 Button.ClearBlock {
-    Position = (270, 410);
+    Position = (270, 440);
     Renderer = &1;
     Size = (20, 21);
     Text = X;
@@ -441,7 +421,7 @@ Button.ClearBlock {
 
 Label.Label11 {
     HorizontalAlignment = Right;
-    Position = (5, 412);
+    Position = (5, 442);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -450,7 +430,7 @@ Label.Label11 {
 }
 
 Panel.SelectedBoxPanel {
-    Position = (0, 470);
+    Position = (0, 500);
     Size = (300, 90);
 
     Renderer {
@@ -547,4 +527,97 @@ Label.Label15 {
     Text = "animation.next_action";
     TextSize = 11;
     VerticalAlignment = Center;
+}
+
+Button.BlendEdit {
+    Position = (180, 320);
+    Renderer = &1;
+    Size = (85, 21);
+    Text = "animation.edit";
+    TextSize = 13;
+}
+
+Button.ClearBlend {
+    Position = (270, 320);
+    Renderer = &1;
+    Size = (20, 21);
+    Text = X;
+    TextSize = 13;
+    UserData = NO_LOCALE;
+}
+
+Label.Label5 {
+    HorizontalAlignment = Right;
+    Position = (5, 322);
+    Renderer = &2;
+    ScrollbarPolicy = Automatic;
+    Size = (170, 17);
+    Text = "animation.blend";
+    TextSize = 13;
+}
+
+EditBox.RenderGroup {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (180, 290);
+    Size = (110, 21);
+    Text = 0;
+    TextSize = 13;
+
+    Renderer {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        CaretColor = black;
+        CaretWidth = 1;
+        DefaultTextColor = #A0A0A0;
+        Padding = (0, 0, 0, 0);
+        SelectedTextBackgroundColor = #006EFF;
+        SelectedTextColor = white;
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        Texture = None;
+        TextureDisabled = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
+}
+
+Label.Label16 {
+    HorizontalAlignment = Right;
+    Position = (5, 292);
+    ScrollbarPolicy = Automatic;
+    Size = (170, 17);
+    Text = "animation.rendergrp";
+    TextSize = 13;
+
+    Renderer {
+        BackgroundColor = transparent;
+        BorderColor = #3C3C3C;
+        Borders = (0, 0, 0, 0);
+        TextColor = #3C3C3C;
+        TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #F5F5F5;
+            ArrowBackgroundColorHover = white;
+            ArrowColor = #3C3C3C;
+            ArrowColorHover = black;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = #DCDCDC;
+            ThumbColorHover = #E6E6E6;
+            TrackColor = #F5F5F5;
+        }
+    }
 }

@@ -32,7 +32,7 @@ namespace SpiralOfFate
 		tgui::Vector2f _lastMousePos;
 		tgui::Vector2f _startMousePos;
 		std::vector<size_t> _hoveredBoxes;
-		Box _boxSaved;
+		ShadyCore::Schema::Sequence::BBox _boxSaved;
 		unsigned _boxCounter = 0;
 		unsigned _boxHovered = 0;
 		unsigned _boxSelected = 0;
@@ -44,8 +44,8 @@ namespace SpiralOfFate
 		void _handleBoxMove(const tgui::Vector2f &pos);
 		void _updateHover(const tgui::Vector2f &pos);
 		void _updateBoxSliderHover(const tgui::Vector2f &pos, tgui::Cursor::Type &cursor);
-		void _updateBoxSliderHover(const Rectangle &box, const tgui::Vector2f &pos, bool rotate, tgui::Cursor::Type &cursor);
-		void _drawBoxBorder(const Rectangle &box, sf::RenderStates &states, bool rotate) const;
+		void _updateBoxSliderHover(const Rectangle &box, const tgui::Vector2f &pos, tgui::Cursor::Type &cursor);
+		void _drawBoxBorder(const Rectangle &box, sf::RenderStates &states) const;
 		void _drawBox(const Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const;
 	public:
 		tgui::SignalTyped2<BoxType, unsigned> onBoxSelect = {"BoxSelected"};
@@ -58,7 +58,6 @@ namespace SpiralOfFate
 		static constexpr const char StaticWidgetType[] = "FDPreviewWidget"; //!< Type name of the widget
 
 		bool displayBoxes = true;
-		bool displaceObject = true;
 		bool showingPalette = false;
 
 		PreviewWidget(const FrameDataEditor &editor, MainWindow &main, EditableObject &object);
@@ -66,7 +65,7 @@ namespace SpiralOfFate
 
 		void setSelectedBox(BoxType type, unsigned index);
 		std::pair<BoxType, unsigned> getSelectedBox();
-		Box *getSelectedBoxRef();
+		ShadyCore::Schema::Sequence::BBox *getSelectedBoxRef();
 		void frameChanged();
 		bool leftMousePressed(tgui::Vector2f pos) override;
 		void leftMouseButtonNoLongerDown() override;

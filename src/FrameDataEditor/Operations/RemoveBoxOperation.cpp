@@ -6,15 +6,15 @@
 
 #include <utility>
 
-SpiralOfFate::Box &SpiralOfFate::RemoveBoxOperation::_getBox()
+ShadyCore::Schema::Sequence::BBox &SpiralOfFate::RemoveBoxOperation::_getBox()
 {
 	auto &data = this->_obj.getFrameData();
 
 	if (this->_type == BOXTYPE_COLLISIONBOX)
-		return *data.collisionBox;
+		return data.cBoxes.front();
 	if (this->_type == BOXTYPE_HITBOX)
-		return data.hitBoxes[this->_boxIndex];
-	return data.hurtBoxes[this->_boxIndex];
+		return data.aBoxes[this->_boxIndex];
+	return data.hBoxes[this->_boxIndex];
 }
 
 SpiralOfFate::RemoveBoxOperation::RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, RemoveBoxApply onApply) :
@@ -38,13 +38,12 @@ void SpiralOfFate::RemoveBoxOperation::apply()
 
 	auto &data = this->_obj.getFrameData();
 
-	if (this->_type == BOXTYPE_COLLISIONBOX) {
-		delete data.collisionBox;
-		data.collisionBox = nullptr;
-	} else if (this->_type == BOXTYPE_HURTBOX)
-		data.hurtBoxes.erase(data.hurtBoxes.begin() + this->_boxIndex);
+	if (this->_type == BOXTYPE_COLLISIONBOX)
+		data.cBoxes.clear();
+	else if (this->_type == BOXTYPE_HURTBOX)
+		data.hBoxes.erase(data.hBoxes.begin() + this->_boxIndex);
 	else
-		data.hitBoxes.erase(data.hitBoxes.begin() + this->_boxIndex);
+		data.aBoxes.erase(data.aBoxes.begin() + this->_boxIndex);
 	this->_onApply(BOXTYPE_NONE, 0);
 }
 
@@ -56,12 +55,13 @@ void SpiralOfFate::RemoveBoxOperation::undo()
 
 	auto &data = this->_obj.getFrameData();
 
-	if (this->_type == BOXTYPE_COLLISIONBOX)
-		data.collisionBox = new Box{this->_oldValue};
-	else if (this->_type == BOXTYPE_HURTBOX)
-		data.hurtBoxes.insert(data.hurtBoxes.begin() + this->_boxIndex , this->_oldValue);
+	if (this->_type == BOXTYPE_COLLISIONBOX) {
+		data.cBoxes.resize(1);
+		data.cBoxes.front() = this->_oldValue;
+	} else if (this->_type == BOXTYPE_HURTBOX)
+		data.hBoxes.insert(data.hBoxes.begin() + this->_boxIndex , this->_oldValue);
 	else
-		data.hitBoxes.insert(data.hitBoxes.begin() + this->_boxIndex, this->_oldValue);
+		data.aBoxes.insert(data.aBoxes.begin() + this->_boxIndex, this->_oldValue);
 	this->_onApply(this->_type, this->_boxIndex);
 }
 

@@ -27,15 +27,11 @@ namespace SpiralOfFate
 		this->_obj._actionBlock = this->_blockId;
 		this->_obj._animation = this->_id;
 
-		auto &data = this->_obj._moves[this->_action][this->_blockId][this->_id];
+		auto &data = this->_obj._schema.framedata[this->_action][this->_blockId][this->_id];
 
-		delete data.collisionBox;
-		if (this->_newValue.collisionBox)
-			data.collisionBox = new Box{*this->_newValue.collisionBox};
-		else
-			data.collisionBox = nullptr;
-		data.hurtBoxes = this->_newValue.hurtBoxes;
-		data.hitBoxes = this->_newValue.hitBoxes;
+		data.cBoxes = this->_newValue.cBoxes;
+		data.hBoxes = this->_newValue.hBoxes;
+		data.aBoxes = this->_newValue.aBoxes;
 	}
 
 	void PasteBoxDataOperation::undo()
@@ -43,7 +39,7 @@ namespace SpiralOfFate
 		this->_obj._action = this->_action;
 		this->_obj._actionBlock = this->_blockId;
 		this->_obj._animation = this->_id;
-		this->_obj._moves[this->_action][this->_blockId][this->_id] = this->_oldValue;
+		this->_obj._schema.framedata[this->_action][this->_blockId][this->_id] = this->_oldValue;
 	}
 
 	std::string PasteBoxDataOperation::getName() const noexcept

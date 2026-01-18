@@ -9,14 +9,14 @@ namespace SpiralOfFate
 	FlattenCollisionBoxesOperation::FlattenCollisionBoxesOperation(
 		EditableObject &obj,
 		const std::string &&name,
-		std::optional<Box> newValue
+		std::optional<ShadyCore::Schema::Sequence::BBox> newValue
 	) :
 		_obj(obj),
 		_action(obj._action),
 		_newValue(newValue),
 		_fieldName(name)
 	{
-		auto &act = obj._moves.at(obj._action);
+		auto &act = obj._schema.framedata.at(obj._action);
 
 		this->_oldValues.reserve(act.size());
 		for (auto &blk : act) {
@@ -26,49 +26,47 @@ namespace SpiralOfFate
 
 			vec.reserve(blk.size());
 			for (auto &f : blk)
-				if (f.collisionBox)
-					vec.emplace_back(*f.collisionBox);
-				else
+				if (f.cBoxes.empty())
 					vec.emplace_back();
+				else
+					vec.emplace_back(f.cBoxes.front());
 		}
 	}
 
 	void FlattenCollisionBoxesOperation::apply()
 	{
-		auto &act = this->_obj._moves.at(this->_action);
+		auto &act = this->_obj._schema.framedata.at(this->_action);
 
 		for (auto &blk : act)
 			for (auto &f : blk) {
-				if (!f.collisionBox && !this->_newValue)
+				if (f.cBoxes.empty() && !this->_newValue)
 					continue;
-				if (!f.collisionBox)
-					f.collisionBox = new Box(*this->_newValue);
-				else if (!this->_newValue) {
-					delete f.collisionBox;
-					f.collisionBox = nullptr;
-				} else
-					*f.collisionBox = *this->_newValue;
+				if (f.cBoxes.empty())
+					f.cBoxes.resize(1, *this->_newValue);
+				else if (!this->_newValue)
+					f.cBoxes.clear();
+				else
+					f.cBoxes.front() = *this->_newValue;
 			}
 	}
 
 	void FlattenCollisionBoxesOperation::undo()
 	{
-		auto &act = this->_obj._moves.at(this->_action);
+		auto &act = this->_obj._schema.framedata.at(this->_action);
 
 		for (size_t blk = 0; blk < act.size(); blk++)
 			for (size_t frame = 0; frame < act[blk].size(); frame++) {
 				auto &f = act[blk][frame];
 				auto &o = this->_oldValues[blk][frame];
 
-				if (!f.collisionBox && !o)
+				if (f.cBoxes.empty() && !o)
 					continue;
-				if (!f.collisionBox)
-					f.collisionBox = new Box(*o);
-				else if (!o) {
-					delete f.collisionBox;
-					f.collisionBox = nullptr;
-				} else
-					*f.collisionBox = *o;
+				if (f.cBoxes.empty())
+					f.cBoxes.resize(1, *o);
+				else if (!o)
+					f.cBoxes.clear();
+				else
+					f.cBoxes.front() = *o;
 			}
 	}
 

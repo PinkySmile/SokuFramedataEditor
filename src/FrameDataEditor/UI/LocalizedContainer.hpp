@@ -35,8 +35,16 @@ namespace SpiralOfFate
 							check->setUserData(std::string(check->getText()));
 						check->setText(this->_editor.localize(std::string(check->getUserData<std::string>())));
 					} else if (auto combo = w->cast<tgui::ComboBox>()) {
-						for (const auto &item : combo->getItemIds())
-							combo->changeItemById(item, this->_editor.localize(item.toStdString()));
+						if (first) {
+							auto items = combo->getItems();
+
+							combo->removeAllItems();
+							for (const auto &item : items)
+								combo->addItem(this->_editor.localize(item.toStdString()), item);
+						} else {
+							for (const auto &item : combo->getItemIds())
+								combo->changeItemById(item, this->_editor.localize(item.toStdString()));
+						}
 					} else if (auto cont = w->cast<tgui::Container>())
 						this->_localizeWidgets(*cont, first);
 				} catch (std::bad_any_cast &) {}

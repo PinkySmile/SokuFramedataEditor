@@ -11,7 +11,7 @@ SpiralOfFate::EditSpriteOperation::EditSpriteOperation(
 	const std::string &newValue,
 	bool reset
 ) :
-	BasicDataOperation<std::string>(obj, std::move(name), field, newValue, reset)
+	BasicDataOperation<std::string, FrameData>(obj, std::move(name), field, newValue, reset)
 {
 }
 

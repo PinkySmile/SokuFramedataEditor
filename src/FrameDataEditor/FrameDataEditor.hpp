@@ -113,6 +113,7 @@ namespace SpiralOfFate
 		void _reloadTextures();
 		void _invertColors();
 		void _reversePalette();
+		void _reloadCrashData();
 
 		void _about();
 
@@ -154,6 +155,7 @@ namespace SpiralOfFate
 			return localize;
 		}
 
+		void reloadGamePackages();
 		void refreshInterface();
 		void update();
 		void render();

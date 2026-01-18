@@ -1,7 +1,7 @@
 CheckBox.aFlag0 {
     Position = (10, 10);
     Size = (17, 17);
-    Text = "animation.aflags.flag0";
+    Text = "animation.aflag0";
     TextSize = 13;
 
     Renderer {
@@ -34,7 +34,7 @@ CheckBox.aFlag0 {
 CheckBox.aFlag1 {
     Position = (210, 10);
     Size = (17, 17);
-    Text = "animation.aflags.flag1";
+    Text = "animation.aflag1";
     TextSize = 13;
 
     Renderer {
@@ -67,7 +67,7 @@ CheckBox.aFlag1 {
 CheckBox.aFlag2 {
     Position = (410, 10);
     Size = (17, 17);
-    Text = "animation.aflags.flag2";
+    Text = "animation.aflag2";
     TextSize = 13;
 
     Renderer {
@@ -100,7 +100,7 @@ CheckBox.aFlag2 {
 CheckBox.aFlag3 {
     Position = (610, 10);
     Size = (17, 17);
-    Text = "animation.aflags.flag3";
+    Text = "animation.aflag3";
     TextSize = 13;
 
     Renderer {
@@ -133,7 +133,7 @@ CheckBox.aFlag3 {
 CheckBox.aFlag4 {
     Position = (10, 40);
     Size = (17, 17);
-    Text = "animation.aflags.flag4";
+    Text = "animation.aflag4";
     TextSize = 13;
 
     Renderer {
@@ -166,7 +166,7 @@ CheckBox.aFlag4 {
 CheckBox.aFlag5 {
     Position = (210, 40);
     Size = (17, 17);
-    Text = "animation.aflags.flag5";
+    Text = "animation.aflag5";
     TextSize = 13;
 
     Renderer {
@@ -199,7 +199,7 @@ CheckBox.aFlag5 {
 CheckBox.aFlag6 {
     Position = (410, 40);
     Size = (17, 17);
-    Text = "animation.aflags.flag6";
+    Text = "animation.aflag6";
     TextSize = 13;
 
     Renderer {
@@ -232,7 +232,7 @@ CheckBox.aFlag6 {
 CheckBox.aFlag7 {
     Position = (610, 40);
     Size = (17, 17);
-    Text = "animation.aflags.flag7";
+    Text = "animation.aflag7";
     TextSize = 13;
 
     Renderer {
@@ -265,7 +265,7 @@ CheckBox.aFlag7 {
 CheckBox.aFlag8 {
     Position = (10, 70);
     Size = (17, 17);
-    Text = "animation.aflags.flag8";
+    Text = "animation.aflag8";
     TextSize = 13;
 
     Renderer {
@@ -298,7 +298,7 @@ CheckBox.aFlag8 {
 CheckBox.aFlag9 {
     Position = (210, 70);
     Size = (17, 17);
-    Text = "animation.aflags.flag9";
+    Text = "animation.aflag9";
     TextSize = 13;
 
     Renderer {
@@ -331,7 +331,7 @@ CheckBox.aFlag9 {
 CheckBox.aFlag10 {
     Position = (410, 70);
     Size = (17, 17);
-    Text = "animation.aflags.flag10";
+    Text = "animation.aflag10";
     TextSize = 13;
 
     Renderer {
@@ -364,7 +364,7 @@ CheckBox.aFlag10 {
 CheckBox.aFlag11 {
     Position = (610, 70);
     Size = (17, 17);
-    Text = "animation.aflags.flag11";
+    Text = "animation.aflag11";
     TextSize = 13;
 
     Renderer {
@@ -397,7 +397,7 @@ CheckBox.aFlag11 {
 CheckBox.aFlag12 {
     Position = (10, 100);
     Size = (17, 17);
-    Text = "animation.aflags.flag12";
+    Text = "animation.aflag12";
     TextSize = 13;
 
     Renderer {
@@ -430,7 +430,7 @@ CheckBox.aFlag12 {
 CheckBox.aFlag13 {
     Position = (210, 100);
     Size = (17, 17);
-    Text = "animation.aflags.flag13";
+    Text = "animation.aflag13";
     TextSize = 13;
 
     Renderer {
@@ -463,7 +463,7 @@ CheckBox.aFlag13 {
 CheckBox.aFlag14 {
     Position = (410, 100);
     Size = (17, 17);
-    Text = "animation.aflags.flag14";
+    Text = "animation.aflag14";
     TextSize = 13;
 
     Renderer {
@@ -496,7 +496,7 @@ CheckBox.aFlag14 {
 CheckBox.aFlag15 {
     Position = (610, 100);
     Size = (17, 17);
-    Text = "animation.aflags.flag15";
+    Text = "animation.aflag15";
     TextSize = 13;
 
     Renderer {
@@ -529,7 +529,7 @@ CheckBox.aFlag15 {
 CheckBox.aFlag16 {
     Position = (10, 130);
     Size = (17, 17);
-    Text = "animation.aflags.flag16";
+    Text = "animation.aflag16";
     TextSize = 13;
 
     Renderer {
@@ -562,7 +562,7 @@ CheckBox.aFlag16 {
 CheckBox.aFlag17 {
     Position = (210, 130);
     Size = (17, 17);
-    Text = "animation.aflags.flag17";
+    Text = "animation.aflag17";
     TextSize = 13;
 
     Renderer {
@@ -595,7 +595,7 @@ CheckBox.aFlag17 {
 CheckBox.aFlag18 {
     Position = (410, 130);
     Size = (17, 17);
-    Text = "animation.aflags.flag18";
+    Text = "animation.aflag18";
     TextSize = 13;
 
     Renderer {
@@ -628,7 +628,7 @@ CheckBox.aFlag18 {
 CheckBox.aFlag19 {
     Position = (610, 130);
     Size = (17, 17);
-    Text = "animation.aflags.flag19";
+    Text = "animation.aflag19";
     TextSize = 13;
 
     Renderer {
@@ -661,7 +661,7 @@ CheckBox.aFlag19 {
 CheckBox.aFlag20 {
     Position = (10, 160);
     Size = (17, 17);
-    Text = "animation.aflags.flag20";
+    Text = "animation.aflag20";
     TextSize = 13;
 
     Renderer {
@@ -694,7 +694,7 @@ CheckBox.aFlag20 {
 CheckBox.aFlag21 {
     Position = (210, 160);
     Size = (17, 17);
-    Text = "animation.aflags.flag21";
+    Text = "animation.aflag21";
     TextSize = 13;
 
     Renderer {
@@ -727,7 +727,7 @@ CheckBox.aFlag21 {
 CheckBox.aFlag22 {
     Position = (410, 160);
     Size = (17, 17);
-    Text = "animation.aflags.flag22";
+    Text = "animation.aflag22";
     TextSize = 13;
 
     Renderer {
@@ -760,7 +760,7 @@ CheckBox.aFlag22 {
 CheckBox.aFlag23 {
     Position = (610, 160);
     Size = (17, 17);
-    Text = "animation.aflags.flag23";
+    Text = "animation.aflag23";
     TextSize = 13;
 
     Renderer {
@@ -793,7 +793,7 @@ CheckBox.aFlag23 {
 CheckBox.aFlag24 {
     Position = (10, 190);
     Size = (17, 17);
-    Text = "animation.aflags.flag24";
+    Text = "animation.aflag24";
     TextSize = 13;
 
     Renderer {
@@ -826,7 +826,7 @@ CheckBox.aFlag24 {
 CheckBox.aFlag25 {
     Position = (210, 190);
     Size = (17, 17);
-    Text = "animation.aflags.flag25";
+    Text = "animation.aflag25";
     TextSize = 13;
 
     Renderer {
@@ -859,7 +859,7 @@ CheckBox.aFlag25 {
 CheckBox.aFlag26 {
     Position = (410, 190);
     Size = (17, 17);
-    Text = "animation.aflags.flag26";
+    Text = "animation.aflag26";
     TextSize = 13;
 
     Renderer {
@@ -892,7 +892,7 @@ CheckBox.aFlag26 {
 CheckBox.aFlag27 {
     Position = (610, 190);
     Size = (17, 17);
-    Text = "animation.aflags.flag27";
+    Text = "animation.aflag27";
     TextSize = 13;
 
     Renderer {
@@ -925,7 +925,7 @@ CheckBox.aFlag27 {
 CheckBox.aFlag28 {
     Position = (10, 220);
     Size = (17, 17);
-    Text = "animation.aflags.flag28";
+    Text = "animation.aflag28";
     TextSize = 13;
 
     Renderer {
@@ -958,7 +958,7 @@ CheckBox.aFlag28 {
 CheckBox.aFlag29 {
     Position = (210, 220);
     Size = (17, 17);
-    Text = "animation.aflags.flag29";
+    Text = "animation.aflag29";
     TextSize = 13;
 
     Renderer {
@@ -991,7 +991,7 @@ CheckBox.aFlag29 {
 CheckBox.aFlag30 {
     Position = (410, 220);
     Size = (17, 17);
-    Text = "animation.aflags.flag30";
+    Text = "animation.aflag30";
     TextSize = 13;
 
     Renderer {
@@ -1024,1063 +1024,7 @@ CheckBox.aFlag30 {
 CheckBox.aFlag31 {
     Position = (610, 220);
     Size = (17, 17);
-    Text = "animation.aflags.flag31";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag32 {
-    Position = (10, 250);
-    Size = (17, 17);
-    Text = "animation.aflags.flag32";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag33 {
-    Position = (210, 250);
-    Size = (17, 17);
-    Text = "animation.aflags.flag33";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag34 {
-    Position = (410, 250);
-    Size = (17, 17);
-    Text = "animation.aflags.flag34";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag35 {
-    Position = (610, 250);
-    Size = (17, 17);
-    Text = "animation.aflags.flag35";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag36 {
-    Position = (10, 280);
-    Size = (17, 17);
-    Text = "animation.aflags.flag36";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag37 {
-    Position = (210, 280);
-    Size = (17, 17);
-    Text = "animation.aflags.flag37";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag38 {
-    Position = (410, 280);
-    Size = (17, 17);
-    Text = "animation.aflags.flag38";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag39 {
-    Position = (610, 280);
-    Size = (17, 17);
-    Text = "animation.aflags.flag39";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag40 {
-    Position = (10, 310);
-    Size = (17, 17);
-    Text = "animation.aflags.flag40";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag41 {
-    Position = (210, 310);
-    Size = (17, 17);
-    Text = "animation.aflags.flag41";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag42 {
-    Position = (410, 310);
-    Size = (17, 17);
-    Text = "animation.aflags.flag42";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag43 {
-    Position = (610, 310);
-    Size = (17, 17);
-    Text = "animation.aflags.flag43";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag44 {
-    Position = (10, 340);
-    Size = (17, 17);
-    Text = "animation.aflags.flag44";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag45 {
-    Position = (210, 340);
-    Size = (17, 17);
-    Text = "animation.aflags.flag45";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag46 {
-    Position = (410, 340);
-    Size = (17, 17);
-    Text = "animation.aflags.flag46";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag47 {
-    Position = (610, 340);
-    Size = (17, 17);
-    Text = "animation.aflags.flag47";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag48 {
-    Position = (10, 370);
-    Size = (17, 17);
-    Text = "animation.aflags.flag48";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag49 {
-    Position = (210, 370);
-    Size = (17, 17);
-    Text = "animation.aflags.flag49";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag50 {
-    Position = (410, 370);
-    Size = (17, 17);
-    Text = "animation.aflags.flag50";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag51 {
-    Position = (610, 370);
-    Size = (17, 17);
-    Text = "animation.aflags.flag51";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag52 {
-    Position = (10, 400);
-    Size = (17, 17);
-    Text = "animation.aflags.flag52";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag53 {
-    Position = (210, 400);
-    Size = (17, 17);
-    Text = "animation.aflags.flag53";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag54 {
-    Position = (410, 400);
-    Size = (17, 17);
-    Text = "animation.aflags.flag54";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag55 {
-    Position = (610, 400);
-    Size = (17, 17);
-    Text = "animation.aflags.flag55";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag56 {
-    Position = (10, 430);
-    Size = (17, 17);
-    Text = "animation.aflags.flag56";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag57 {
-    Position = (210, 430);
-    Size = (17, 17);
-    Text = "animation.aflags.flag57";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag58 {
-    Position = (410, 430);
-    Size = (17, 17);
-    Text = "animation.aflags.flag58";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag59 {
-    Position = (610, 430);
-    Size = (17, 17);
-    Text = "animation.aflags.flag59";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag60 {
-    Position = (10, 460);
-    Size = (17, 17);
-    Text = "animation.aflags.flag60";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag61 {
-    Position = (210, 460);
-    Size = (17, 17);
-    Text = "animation.aflags.flag61";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag62 {
-    Position = (410, 460);
-    Size = (17, 17);
-    Text = "animation.aflags.flag62";
-    TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorFocused = #1E1EB4;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CheckColor = #3C3C3C;
-        CheckColorDisabled = #7D7D7D;
-        CheckColorHover = black;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        TextColorHover = black;
-        TextDistanceRatio = 0.2;
-        TextureChecked = None;
-        TextureCheckedDisabled = None;
-        TextureCheckedFocused = None;
-        TextureCheckedHover = None;
-        TextureUnchecked = None;
-        TextureUncheckedDisabled = None;
-        TextureUncheckedFocused = None;
-        TextureUncheckedHover = None;
-    }
-}
-
-CheckBox.aFlag63 {
-    Position = (610, 460);
-    Size = (17, 17);
-    Text = "animation.aflags.flag63";
+    Text = "animation.aflag31";
     TextSize = 13;
 
     Renderer {

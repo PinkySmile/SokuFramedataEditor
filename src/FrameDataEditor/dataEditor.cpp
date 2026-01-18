@@ -42,7 +42,7 @@ void initEditor()
 
 	new Game("assets/fonts/Retro Gaming.ttf", "settings.json", "./editor.log");
 	game->logger.info("Starting editor.");
-	game->screen = std::make_unique<Screen>("Spiral of Fate: Grand Vision | FrameData Editor");
+	game->screen = std::make_unique<Screen>("Touhou 12.3: Hisoutensoku | FrameData Editor");
 	if (icon.loadFromFile("assets/editorIcon.png"))
 		game->screen->setIcon(icon.getSize(), icon.getPixelsPtr());
 	game->screen->setFramerateLimit(240);
@@ -66,9 +66,11 @@ int main()
 		initEditor();
 		run();
 	} catch (std::exception &e) {
-		if (game)
+		if (game) {
 			game->logger.fatal(e.what());
-		delete game;
+			delete game;
+		} else
+			std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	game->logger.info("Goodbye !");

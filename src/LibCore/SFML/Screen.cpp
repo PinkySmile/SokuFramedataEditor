@@ -4,6 +4,8 @@
 
 #include "Logger.hpp"
 #include "Screen.hpp"
+
+#include "Resources/Assert.hpp"
 #include "Resources/Game.hpp"
 #ifdef __linux__
 #include <X11/Xlib.h>

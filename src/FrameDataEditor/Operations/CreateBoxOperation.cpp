@@ -23,9 +23,9 @@ void SpiralOfFate::CreateBoxOperation::apply()
 	auto &data = this->_obj.getFrameData();
 
 	if (this->_hurtbox)
-		data.hurtBoxes.push_back({{-20, -20}, {40, 40}});
+		data.hBoxes.push_back({-10, -10, 10, 10});
 	else
-		data.hitBoxes.push_back({{-20, -20}, {40, 40}});
+		data.aBoxes.push_back({-10, -10, 10, 10});
 }
 
 void SpiralOfFate::CreateBoxOperation::undo()
@@ -37,9 +37,9 @@ void SpiralOfFate::CreateBoxOperation::undo()
 	auto &data = this->_obj.getFrameData();
 
 	if (this->_hurtbox)
-		data.hurtBoxes.pop_back();
+		data.hBoxes.pop_back();
 	else
-		data.hitBoxes.pop_back();
+		data.hBoxes.pop_back();
 }
 
 std::string SpiralOfFate::CreateBoxOperation::getName() const noexcept

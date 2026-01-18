@@ -15,12 +15,12 @@ namespace SpiralOfFate
 	protected:
 		EditableObject &_obj;
 		unsigned _action;
-		std::vector<std::vector<std::optional<Box>>> _oldValues;
-		std::optional<Box> _newValue;
+		std::vector<std::vector<std::optional<ShadyCore::Schema::Sequence::BBox>>> _oldValues;
+		std::optional<ShadyCore::Schema::Sequence::BBox> _newValue;
 		std::string _fieldName;
 
 	public:
-		FlattenCollisionBoxesOperation(EditableObject &obj, const std::string &&name, std::optional<Box> newValue);
+		FlattenCollisionBoxesOperation(EditableObject &obj, const std::string &&name, std::optional<ShadyCore::Schema::Sequence::BBox> newValue);
 		void apply() override;
 		void undo() override;
 		std::string getName() const noexcept override;
