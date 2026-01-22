@@ -146,7 +146,7 @@ Renderer.5 {
 }
 
 Panel.Panel {
-    Size = (590, 413);
+    Size = (800, 413);
 
     Renderer {
         BackgroundColor = white;
@@ -170,16 +170,16 @@ Panel.Panel {
         MaximumItems = 0;
         Position = (170, 10);
         Renderer = &2;
-        Size = (160, 21);
+        Size = ((Theme.x - Locale.x) / 2, 21);
         TextSize = 13;
     }
 
     Label.Label2 {
         HorizontalAlignment = Right;
-        Position = (330, 12);
+        Position = (Theme.x - w, 12);
         Renderer = &1;
         ScrollbarPolicy = Automatic;
-        Size = (139, 17);
+        Size = ((Theme.x - Locale.x) / 2, 17);
         Text = "settings.theme";
         TextSize = 13;
     }
@@ -188,7 +188,7 @@ Panel.Panel {
         ChangeItemOnScroll = false;
         ItemsToDisplay = 0;
         MaximumItems = 0;
-        Position = (470, 10);
+        Position = ((&.w - w) - 10, 10);
         Renderer = &2;
         Size = (110, 21);
         TextSize = 13;
@@ -211,7 +211,7 @@ Panel.Panel {
     EditBox.SokuPath {
         Position = (170, 40);
         Renderer = &4;
-        Size = (385, 21);
+        Size = ((SokuPathBrowse.x - x) - 10, 21);
         TextSize = 13;
     }
 
@@ -236,7 +236,7 @@ Panel.Panel {
     EditBox.SwrPath {
         Position = (170, (SokuPathError.y + SokuPathError.h) + 10);
         Renderer = &4;
-        Size = (385, 21);
+        Size = ((SwrPathBrowse.x - x) - 10, 21);
         TextSize = 13;
     }
 
@@ -261,7 +261,7 @@ Panel.Panel {
     EditBox.Soku2Path {
         Position = (170, (SwrPathError.y + SwrPathError.h) + 10);
         Renderer = &4;
-        Size = (385, 21);
+        Size = ((Soku2PathBrowse.x - x) - 10, 21);
         TextSize = 13;
     }
 
@@ -323,7 +323,7 @@ Panel.Panel {
         MaximumItems = 0;
         Position = (170, (Soku2PathError.y + Soku2PathError.h) + 10);
         ScrollbarPolicy = Automatic;
-        Size = (385, (Cancel.y - y) - 10);
+        Size = ((ExtraBrowse.x - x) - 10, (Cancel.y - y) - 10);
         TextSize = 13;
 
         Renderer {
@@ -396,35 +396,10 @@ Panel.Panel {
 
     Label.Soku2PathError {
         Position = (170, Soku2Path.y + Soku2Path.h);
+        Renderer = &1;
         ScrollbarPolicy = Automatic;
         Size = (40, 17);
         Text = Label;
         TextSize = 13;
-
-        Renderer {
-            BackgroundColor = transparent;
-            BorderColor = #3C3C3C;
-            Borders = (0, 0, 0, 0);
-            TextColor = #3C3C3C;
-            TextureBackground = None;
-
-            Scrollbar {
-                ArrowBackgroundColor = #F5F5F5;
-                ArrowBackgroundColorHover = white;
-                ArrowColor = #3C3C3C;
-                ArrowColorHover = black;
-                TextureArrowDown = None;
-                TextureArrowDownHover = None;
-                TextureArrowUp = None;
-                TextureArrowUpHover = None;
-                TextureThumb = None;
-                TextureThumbHover = None;
-                TextureTrack = None;
-                TextureTrackHover = None;
-                ThumbColor = #DCDCDC;
-                ThumbColorHover = #E6E6E6;
-                TrackColor = #F5F5F5;
-            }
-        }
     }
 }
