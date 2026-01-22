@@ -184,8 +184,10 @@ void SpiralOfFate::FrameDataEditor::_loadSettings()
 				from_json(shortcut, this->_shortcutsNames[name]);
 		} else
 			this->restoreDefaultShortcuts(this->_shortcutsNames);
+		return;
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
+	this->restoreDefaultShortcuts(this->_shortcutsNames);
 }
 
 void SpiralOfFate::FrameDataEditor::saveSettings()
@@ -227,6 +229,9 @@ bool SpiralOfFate::FrameDataEditor::hasLocalization(const std::string &s) const
 
 std::string SpiralOfFate::FrameDataEditor::localize(const std::string &s) const
 {
+	if (s.empty() || s == "Label" || s == "-")
+		return s;
+
 	auto it = this->_localization.find(s);
 
 	if (it != this->_localization.end())
