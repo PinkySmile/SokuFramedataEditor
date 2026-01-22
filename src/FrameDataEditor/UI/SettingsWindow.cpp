@@ -208,7 +208,7 @@ bool SpiralOfFate::SettingsWindow::_checkSwrPackages()
 		return false;
 	}
 	for (size_t i = 0; i < swrFiles.size();) {
-		if (std::filesystem::exists(game->settings.soku / swrFiles[i]))
+		if (std::filesystem::exists(game->settings.swr / swrFiles[i]))
 			swrFiles.erase(swrFiles.begin() + i);
 		else
 			i++;
