@@ -1,7 +1,7 @@
-CheckBox.aFlag0 {
+CheckBox.dFlag0 {
     Position = (10, 10);
     Size = (17, 17);
-    Text = "animation.player.aflag0";
+    Text = "animation.object.dflag0";
     TextSize = 13;
 
     Renderer {
@@ -31,10 +31,10 @@ CheckBox.aFlag0 {
     }
 }
 
-CheckBox.aFlag1 {
+CheckBox.dFlag1 {
     Position = (210, 10);
     Size = (17, 17);
-    Text = "animation.player.aflag1";
+    Text = "animation.object.dflag1";
     TextSize = 13;
 
     Renderer {
@@ -64,10 +64,10 @@ CheckBox.aFlag1 {
     }
 }
 
-CheckBox.aFlag2 {
+CheckBox.dFlag2 {
     Position = (410, 10);
     Size = (17, 17);
-    Text = "animation.player.aflag2";
+    Text = "animation.object.dflag2";
     TextSize = 13;
 
     Renderer {
@@ -97,10 +97,10 @@ CheckBox.aFlag2 {
     }
 }
 
-CheckBox.aFlag3 {
+CheckBox.dFlag3 {
     Position = (610, 10);
     Size = (17, 17);
-    Text = "animation.player.aflag3";
+    Text = "animation.object.dflag3";
     TextSize = 13;
 
     Renderer {
@@ -130,10 +130,10 @@ CheckBox.aFlag3 {
     }
 }
 
-CheckBox.aFlag4 {
+CheckBox.dFlag4 {
     Position = (10, 40);
     Size = (17, 17);
-    Text = "animation.player.aflag4";
+    Text = "animation.object.dflag4";
     TextSize = 13;
 
     Renderer {
@@ -163,10 +163,10 @@ CheckBox.aFlag4 {
     }
 }
 
-CheckBox.aFlag5 {
+CheckBox.dFlag5 {
     Position = (210, 40);
     Size = (17, 17);
-    Text = "animation.player.aflag5";
+    Text = "animation.object.dflag5";
     TextSize = 13;
 
     Renderer {
@@ -196,10 +196,10 @@ CheckBox.aFlag5 {
     }
 }
 
-CheckBox.aFlag6 {
+CheckBox.dFlag6 {
     Position = (410, 40);
     Size = (17, 17);
-    Text = "animation.player.aflag6";
+    Text = "animation.object.dflag6";
     TextSize = 13;
 
     Renderer {
@@ -229,10 +229,10 @@ CheckBox.aFlag6 {
     }
 }
 
-CheckBox.aFlag7 {
+CheckBox.dFlag7 {
     Position = (610, 40);
     Size = (17, 17);
-    Text = "animation.player.aflag7";
+    Text = "animation.object.dflag7";
     TextSize = 13;
 
     Renderer {
@@ -262,10 +262,10 @@ CheckBox.aFlag7 {
     }
 }
 
-CheckBox.aFlag8 {
+CheckBox.dFlag8 {
     Position = (10, 70);
     Size = (17, 17);
-    Text = "animation.player.aflag8";
+    Text = "animation.object.dflag8";
     TextSize = 13;
 
     Renderer {
@@ -295,10 +295,10 @@ CheckBox.aFlag8 {
     }
 }
 
-CheckBox.aFlag9 {
+CheckBox.dFlag9 {
     Position = (210, 70);
     Size = (17, 17);
-    Text = "animation.player.aflag9";
+    Text = "animation.object.dflag9";
     TextSize = 13;
 
     Renderer {
@@ -328,10 +328,10 @@ CheckBox.aFlag9 {
     }
 }
 
-CheckBox.aFlag10 {
+CheckBox.dFlag10 {
     Position = (410, 70);
     Size = (17, 17);
-    Text = "animation.player.aflag10";
+    Text = "animation.object.dflag10";
     TextSize = 13;
 
     Renderer {
@@ -361,10 +361,10 @@ CheckBox.aFlag10 {
     }
 }
 
-CheckBox.aFlag11 {
+CheckBox.dFlag11 {
     Position = (610, 70);
     Size = (17, 17);
-    Text = "animation.player.aflag11";
+    Text = "animation.object.dflag11";
     TextSize = 13;
 
     Renderer {
@@ -394,10 +394,10 @@ CheckBox.aFlag11 {
     }
 }
 
-CheckBox.aFlag12 {
+CheckBox.dFlag12 {
     Position = (10, 100);
     Size = (17, 17);
-    Text = "animation.player.aflag12";
+    Text = "animation.object.dflag12";
     TextSize = 13;
 
     Renderer {
@@ -427,10 +427,10 @@ CheckBox.aFlag12 {
     }
 }
 
-CheckBox.aFlag13 {
+CheckBox.dFlag13 {
     Position = (210, 100);
     Size = (17, 17);
-    Text = "animation.player.aflag13";
+    Text = "animation.object.dflag13";
     TextSize = 13;
 
     Renderer {
@@ -460,10 +460,10 @@ CheckBox.aFlag13 {
     }
 }
 
-CheckBox.aFlag14 {
+CheckBox.dFlag14 {
     Position = (410, 100);
     Size = (17, 17);
-    Text = "animation.player.aflag14";
+    Text = "animation.object.dflag14";
     TextSize = 13;
 
     Renderer {
@@ -493,10 +493,10 @@ CheckBox.aFlag14 {
     }
 }
 
-CheckBox.aFlag15 {
+CheckBox.dFlag15 {
     Position = (610, 100);
     Size = (17, 17);
-    Text = "animation.player.aflag15";
+    Text = "animation.object.dflag15";
     TextSize = 13;
 
     Renderer {
@@ -526,10 +526,10 @@ CheckBox.aFlag15 {
     }
 }
 
-CheckBox.aFlag16 {
+CheckBox.dFlag16 {
     Position = (10, 130);
     Size = (17, 17);
-    Text = "animation.player.aflag16";
+    Text = "animation.object.dflag16";
     TextSize = 13;
 
     Renderer {
@@ -559,10 +559,10 @@ CheckBox.aFlag16 {
     }
 }
 
-CheckBox.aFlag17 {
+CheckBox.dFlag17 {
     Position = (210, 130);
     Size = (17, 17);
-    Text = "animation.player.aflag17";
+    Text = "animation.object.dflag17";
     TextSize = 13;
 
     Renderer {
@@ -592,10 +592,10 @@ CheckBox.aFlag17 {
     }
 }
 
-CheckBox.aFlag18 {
+CheckBox.dFlag18 {
     Position = (410, 130);
     Size = (17, 17);
-    Text = "animation.player.aflag18";
+    Text = "animation.object.dflag18";
     TextSize = 13;
 
     Renderer {
@@ -625,10 +625,10 @@ CheckBox.aFlag18 {
     }
 }
 
-CheckBox.aFlag19 {
+CheckBox.dFlag19 {
     Position = (610, 130);
     Size = (17, 17);
-    Text = "animation.player.aflag19";
+    Text = "animation.object.dflag19";
     TextSize = 13;
 
     Renderer {
@@ -658,10 +658,10 @@ CheckBox.aFlag19 {
     }
 }
 
-CheckBox.aFlag20 {
+CheckBox.dFlag20 {
     Position = (10, 160);
     Size = (17, 17);
-    Text = "animation.player.aflag20";
+    Text = "animation.object.dflag20";
     TextSize = 13;
 
     Renderer {
@@ -691,10 +691,10 @@ CheckBox.aFlag20 {
     }
 }
 
-CheckBox.aFlag21 {
+CheckBox.dFlag21 {
     Position = (210, 160);
     Size = (17, 17);
-    Text = "animation.player.aflag21";
+    Text = "animation.object.dflag21";
     TextSize = 13;
 
     Renderer {
@@ -724,10 +724,10 @@ CheckBox.aFlag21 {
     }
 }
 
-CheckBox.aFlag22 {
+CheckBox.dFlag22 {
     Position = (410, 160);
     Size = (17, 17);
-    Text = "animation.player.aflag22";
+    Text = "animation.object.dflag22";
     TextSize = 13;
 
     Renderer {
@@ -757,10 +757,10 @@ CheckBox.aFlag22 {
     }
 }
 
-CheckBox.aFlag23 {
+CheckBox.dFlag23 {
     Position = (610, 160);
     Size = (17, 17);
-    Text = "animation.player.aflag23";
+    Text = "animation.object.dflag23";
     TextSize = 13;
 
     Renderer {
@@ -790,10 +790,10 @@ CheckBox.aFlag23 {
     }
 }
 
-CheckBox.aFlag24 {
+CheckBox.dFlag24 {
     Position = (10, 190);
     Size = (17, 17);
-    Text = "animation.player.aflag24";
+    Text = "animation.object.dflag24";
     TextSize = 13;
 
     Renderer {
@@ -823,10 +823,10 @@ CheckBox.aFlag24 {
     }
 }
 
-CheckBox.aFlag25 {
+CheckBox.dFlag25 {
     Position = (210, 190);
     Size = (17, 17);
-    Text = "animation.player.aflag25";
+    Text = "animation.object.dflag25";
     TextSize = 13;
 
     Renderer {
@@ -856,10 +856,10 @@ CheckBox.aFlag25 {
     }
 }
 
-CheckBox.aFlag26 {
+CheckBox.dFlag26 {
     Position = (410, 190);
     Size = (17, 17);
-    Text = "animation.player.aflag26";
+    Text = "animation.object.dflag26";
     TextSize = 13;
 
     Renderer {
@@ -889,10 +889,10 @@ CheckBox.aFlag26 {
     }
 }
 
-CheckBox.aFlag27 {
+CheckBox.dFlag27 {
     Position = (610, 190);
     Size = (17, 17);
-    Text = "animation.player.aflag27";
+    Text = "animation.object.dflag27";
     TextSize = 13;
 
     Renderer {
@@ -922,10 +922,10 @@ CheckBox.aFlag27 {
     }
 }
 
-CheckBox.aFlag28 {
+CheckBox.dFlag28 {
     Position = (10, 220);
     Size = (17, 17);
-    Text = "animation.player.aflag28";
+    Text = "animation.object.dflag28";
     TextSize = 13;
 
     Renderer {
@@ -955,10 +955,10 @@ CheckBox.aFlag28 {
     }
 }
 
-CheckBox.aFlag29 {
+CheckBox.dFlag29 {
     Position = (210, 220);
     Size = (17, 17);
-    Text = "animation.player.aflag29";
+    Text = "animation.object.dflag29";
     TextSize = 13;
 
     Renderer {
@@ -988,10 +988,10 @@ CheckBox.aFlag29 {
     }
 }
 
-CheckBox.aFlag30 {
+CheckBox.dFlag30 {
     Position = (410, 220);
     Size = (17, 17);
-    Text = "animation.player.aflag30";
+    Text = "animation.object.dflag30";
     TextSize = 13;
 
     Renderer {
@@ -1021,10 +1021,10 @@ CheckBox.aFlag30 {
     }
 }
 
-CheckBox.aFlag31 {
+CheckBox.dFlag31 {
     Position = (610, 220);
     Size = (17, 17);
-    Text = "animation.player.aflag31";
+    Text = "animation.object.dflag31";
     TextSize = 13;
 
     Renderer {

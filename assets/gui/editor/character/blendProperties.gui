@@ -52,11 +52,11 @@ Label.Label1 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.extra.pivot";
+    Text = "animation.blend.mode";
     TextSize = 13;
 }
 
-EditBox.SpeedX {
+EditBox.FlipVert {
     Alignment = Center;
     InputValidator = UInt;
     Position = (460, 10);
@@ -71,11 +71,11 @@ Label.Label3 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.extra.positionextra";
+    Text = "animation.blend.color";
     TextSize = 13;
 }
 
-EditBox.SpeedY {
+EditBox.FlipHorz {
     Alignment = Center;
     InputValidator = UInt;
     Position = (460, 40);
@@ -90,13 +90,13 @@ Label.Label2 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.extra.speedX";
+    Text = "animation.blend.flipVert";
     TextSize = 13;
 }
 
-EditBox.Pivot {
+EditBox.Mode {
     Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*,[+-]?[0-9]*\\)";
+    InputValidator = UInt;
     Position = (180, 10);
     Renderer = &2;
     Size = (100, 21);
@@ -109,7 +109,7 @@ Label.Label4 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.extra.speedY";
+    Text = "animation.blend.flipHorz";
     TextSize = 13;
 }
 
@@ -119,11 +119,11 @@ Label.Label5 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.extra.unknown";
+    Text = "animation.blend.angle";
     TextSize = 13;
 }
 
-EditBox.Unknown02 {
+EditBox.Angle {
     Alignment = Center;
     InputValidator = UInt;
     Position = (460, 70);
@@ -138,66 +138,26 @@ Label.Label8 {
     Renderer = &1;
     ScrollbarPolicy = Automatic;
     Size = (175, 17);
-    Text = "animation.extra.position";
+    Text = "animation.blend.scale";
     TextSize = 13;
 }
 
-EditBox.PositionExtra {
+EditBox.Color {
     Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*,[+-]?[0-9]*\\)";
+    InputValidator = "#[0-9A-Fa-f]{1,8}";
     Position = (180, 40);
+    Renderer = &2;
     Size = (100, 21);
+    Text = "#FFFFFFFF";
     TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CaretColor = black;
-        CaretWidth = 1;
-        DefaultTextColor = #A0A0A0;
-        Padding = (0, 0, 0, 0);
-        SelectedTextBackgroundColor = #006EFF;
-        SelectedTextColor = white;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        Texture = None;
-        TextureDisabled = None;
-        TextureFocused = None;
-        TextureHover = None;
-    }
 }
 
-EditBox.Position {
+EditBox.Scale {
     Alignment = Center;
-    InputValidator = "\\([+-]?[0-9]*,[+-]?[0-9]*\\)";
+    InputValidator = "\\([+-]?[0-9]*\\.?[0-9]*,[+-]?[0-9]*\\.?[0-9]*\\)";
     Position = (180, 70);
+    Renderer = &2;
     Size = (100, 21);
+    Text = "(1.0,1.0)";
     TextSize = 13;
-
-    Renderer {
-        BackgroundColor = #F5F5F5;
-        BackgroundColorDisabled = #E6E6E6;
-        BackgroundColorHover = white;
-        BorderColor = #3C3C3C;
-        BorderColorDisabled = #7D7D7D;
-        BorderColorHover = black;
-        Borders = (1, 1, 1, 1);
-        CaretColor = black;
-        CaretWidth = 1;
-        DefaultTextColor = #A0A0A0;
-        Padding = (0, 0, 0, 0);
-        SelectedTextBackgroundColor = #006EFF;
-        SelectedTextColor = white;
-        TextColor = #3C3C3C;
-        TextColorDisabled = #7D7D7D;
-        Texture = None;
-        TextureDisabled = None;
-        TextureFocused = None;
-        TextureHover = None;
-    }
 }

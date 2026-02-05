@@ -6,6 +6,8 @@
 #define SOFGV_MAINWINDOW_HPP
 
 
+#include <atomic>
+#include <thread>
 #include <TGUI/Widgets/ChildWindow.hpp>
 #include "LocalizedContainer.hpp"
 #include "PreviewWidget.hpp"
@@ -49,6 +51,7 @@ namespace SpiralOfFate
 		//MainWindow(const nlohmann::json &backup, FrameDataEditor &editor);
 		MainWindow(const std::string &folder, const std::string &frameDataPath, FrameDataEditor &editor);
 		MainWindow(const std::string &folder, const std::filesystem::path &frameDataPath, FrameDataEditor &editor);
+		~MainWindow();
 
 		Renderer *getSharedRenderer() override;
 		const Renderer *getSharedRenderer() const override;
@@ -131,7 +134,7 @@ namespace SpiralOfFate
 		std::shared_ptr<tgui::RendererData> _maximizeButtonRendererFocusedCached;
 		std::shared_ptr<tgui::RendererData> _maximizeButtonRendererUnFocusedCached;
 
-		std::string _localizeActionName(unsigned id);
+		std::string _localizeActionName(unsigned id) const;
 		void _updateTitleButtons();
 		void _updateTextureTitleBar();
 		void rendererChanged(const tgui::String &property) override;
@@ -146,6 +149,8 @@ namespace SpiralOfFate
 		bool _showingPalette = false;
 		bool _requireReload = false;
 		bool _pathInit = false;
+		bool _requireAutoSave = false;
+		std::atomic<bool> _stopped = false;
 		unsigned char _colorChangeSource = 255;
 		std::string _title;
 		std::string _chrPath;
@@ -154,6 +159,7 @@ namespace SpiralOfFate
 		std::filesystem::path _pathBak;
 		std::unique_ptr<Operation> _pendingTransaction;
 		std::unique_ptr<EditableObject> _object;
+		std::unique_ptr<EditableObject> _effectObject;
 		std::vector<std::unique_ptr<Operation>> _operationQueue;
 		size_t _operationIndex = 0;
 		size_t _operationSaved = 0;
@@ -161,12 +167,16 @@ namespace SpiralOfFate
 		unsigned _selectedPalette = 0;
 		unsigned _selectColorMethod = 0;
 		unsigned _selectedColor = 0;
+		std::thread _autoSaveThread;
+		std::recursive_mutex _saveMutex;
 
 		void _init();
-
+		void _autoSaveLoop();
 		nlohmann::json _asJson() const;
 		void _initSidePanel(tgui::Container &panel);
 		void _reinitSidePanel(tgui::Container &panel);
+		void _createSfxListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current);
+		void _createEffectListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current);
 		void _createMoveListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current, bool showNotAdded);
 		void _placeUIHooks(tgui::Container &container);
 		void _createGenericPopup(const std::string &path);

@@ -173,6 +173,8 @@ add_executable(
 	src/LibCore/SFML/Sprite.cpp
 	src/LibCore/SFML/TextureManager.cpp
 	src/LibCore/SFML/TextureManager.hpp
+	src/LibCore/SFML/SoundManager.cpp
+	src/LibCore/SFML/SoundManager.hpp
 	src/FrameDataEditor/Rectangle.cpp
 	src/FrameDataEditor/Rectangle.hpp
 )

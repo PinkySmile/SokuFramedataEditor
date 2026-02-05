@@ -4,6 +4,9 @@
 
 #include <memory>
 #include "Game.hpp"
+
+#include <ranges>
+
 #include "Assert.hpp"
 #include "Logger.hpp"
 
@@ -11,10 +14,9 @@ namespace SpiralOfFate
 {
 	MYDLL_API Game *game = nullptr;
 
-	Game::Game(const std::filesystem::path &fontPath, const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath) :
+	Game::Game(const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath) :
 		settings(settingsPath),
-		logger(loggerPath),
-		font(fontPath)
+		logger(loggerPath)
 	{
 		assert_exp(!game);
 		game = this;
@@ -23,6 +25,29 @@ namespace SpiralOfFate
 		} catch (std::exception &) {
 			game = nullptr;
 			throw;
+		}
+	}
+
+	Game::~Game()
+	{
+		for (auto id : this->soundEffects | std::ranges::views::values)
+			this->soundMgr.remove(id);
+	}
+
+	void Game::reloadSounds()
+	{
+		char buffer[] = "data/se/000.wav";
+
+		for (auto id : this->soundEffects | std::ranges::views::values)
+			this->soundMgr.remove(id);
+		this->soundEffects.clear();
+		for (unsigned i = 0; i < 256; i++) {
+			sprintf(buffer, "data/se/%03u.wav", i);
+
+			auto id = this->soundMgr.load(buffer);
+			if (id == 0)
+				continue;
+			this->soundEffects[i] = id;
 		}
 	}
 }

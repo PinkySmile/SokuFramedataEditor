@@ -469,7 +469,7 @@ Button.GndHitSeq {
     Renderer = &3;
     Size = (230, 21);
     Text = Button;
-    TextSize = 13;
+    TextSize = 11;
     UserData = NO_LOCALE;
 }
 
@@ -478,7 +478,7 @@ Button.AirHitSeq {
     Renderer = &3;
     Size = (230, 21);
     Text = Button;
-    TextSize = 13;
+    TextSize = 11;
     UserData = NO_LOCALE;
 }
 
@@ -497,7 +497,7 @@ Button.SelectSound {
     Renderer = &3;
     Size = (230, 21);
     Text = Button;
-    TextSize = 13;
+    TextSize = 11;
     UserData = NO_LOCALE;
 }
 
@@ -506,7 +506,7 @@ Button.SelectEffect {
     Renderer = &3;
     Size = (230, 21);
     Text = Button;
-    TextSize = 13;
+    TextSize = 11;
     UserData = NO_LOCALE;
 }
 

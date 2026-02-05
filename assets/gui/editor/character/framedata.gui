@@ -299,7 +299,7 @@ Label.Label6 {
 
 Label.Label7 {
     HorizontalAlignment = Right;
-    Position = (5, 352);
+    Position = (5, 382);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -309,7 +309,7 @@ Label.Label7 {
 
 Label.Label8 {
     HorizontalAlignment = Right;
-    Position = (5, 382);
+    Position = (5, 412);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -320,7 +320,7 @@ Label.Label8 {
 BitmapButton.AFlagsButton {
     Image = "crayon.png" Smooth;
     ImageScaling = 0;
-    Position = (270, 350);
+    Position = (270, 380);
     Renderer = &5;
     Size = (21, 21);
     TextSize = 13;
@@ -330,7 +330,7 @@ BitmapButton.AFlagsButton {
 BitmapButton.DFlagsButton {
     Image = "crayon.png" Smooth;
     ImageScaling = 0;
-    Position = (270, 380);
+    Position = (270, 410);
     Renderer = &5;
     Size = (21, 21);
     TextSize = 13;
@@ -340,7 +340,7 @@ BitmapButton.DFlagsButton {
 EditBox.AFlags {
     Alignment = Center;
     InputValidator = "[0-9A-Fa-f]*";
-    Position = (180, 350);
+    Position = (180, 380);
     Renderer = &4;
     Size = (85, 21);
     Text = 00000000;
@@ -350,7 +350,7 @@ EditBox.AFlags {
 EditBox.DFlags {
     Alignment = Center;
     InputValidator = "[0-9A-Fa-f]*";
-    Position = (180, 380);
+    Position = (180, 410);
     Renderer = &4;
     Size = (85, 21);
     Text = 00000000;
@@ -359,7 +359,7 @@ EditBox.DFlags {
 
 Label.Label9 {
     HorizontalAlignment = Right;
-    Position = (5, 412);
+    Position = (5, 442);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -368,7 +368,7 @@ Label.Label9 {
 }
 
 Button.ClearHit {
-    Position = (270, 410);
+    Position = (270, 440);
     Renderer = &1;
     Size = (20, 21);
     Text = X;
@@ -377,7 +377,7 @@ Button.ClearHit {
 }
 
 Button.HitEdit {
-    Position = (180, 410);
+    Position = (180, 440);
     Renderer = &1;
     Size = (85, 21);
     Text = "animation.edit";
@@ -402,36 +402,9 @@ Button.GeneralEdit {
     TextSize = 13;
 }
 
-Button.BlockEdit {
-    Position = (180, 440);
-    Renderer = &1;
-    Size = (85, 21);
-    Text = "animation.edit";
-    TextSize = 13;
-}
-
-Button.ClearBlock {
-    Position = (270, 440);
-    Renderer = &1;
-    Size = (20, 21);
-    Text = X;
-    TextSize = 13;
-    UserData = NO_LOCALE;
-}
-
-Label.Label11 {
-    HorizontalAlignment = Right;
-    Position = (5, 442);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (170, 17);
-    Text = "animation.blockproperties";
-    TextSize = 13;
-}
-
 Panel.SelectedBoxPanel {
     Position = (0, 500);
-    Size = (300, 90);
+    Size = (300, 150);
 
     Renderer {
         BackgroundColor = white;
@@ -445,27 +418,27 @@ Panel.SelectedBoxPanel {
         Renderer = &2;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
-        Text = "animation.selectedbox.pos";
+        Text = "animation.selectedbox.left";
         TextSize = 13;
     }
 
-    EditBox.SelectedBoxPos {
+    EditBox.SelectedBoxLeft {
         Alignment = Center;
-        InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
+        InputValidator = Int;
         Position = (120, 29.5);
         Renderer = &4;
         Size = (170, 21);
-        Text = "(1.0,1.0)";
+        Text = 0;
         TextSize = 13;
     }
 
-    EditBox.SelectedBoxSize {
+    EditBox.SelectedBoxRight {
         Alignment = Center;
-        InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
+        InputValidator = Int;
         Position = (120, 59.5);
         Renderer = &4;
         Size = (170, 21);
-        Text = "(1.0,1.0)";
+        Text = 1;
         TextSize = 13;
     }
 
@@ -475,7 +448,7 @@ Panel.SelectedBoxPanel {
         Renderer = &2;
         ScrollbarPolicy = Automatic;
         Size = (110, 17);
-        Text = "animation.selectedbox.size";
+        Text = "animation.selectedbox.right";
         TextSize = 13;
     }
 
@@ -488,6 +461,46 @@ Panel.SelectedBoxPanel {
         Text = "Hitbox #2";
         TextSize = 13;
         UserData = NO_LOCALE;
+    }
+
+    Label.Label17 {
+        HorizontalAlignment = Right;
+        Position = (5, 91.5);
+        Renderer = &2;
+        ScrollbarPolicy = Automatic;
+        Size = (110, 17);
+        Text = "animation.selectedbox.up";
+        TextSize = 13;
+    }
+
+    Label.Label18 {
+        HorizontalAlignment = Right;
+        Position = (5, 121.5);
+        Renderer = &2;
+        ScrollbarPolicy = Automatic;
+        Size = (110, 17);
+        Text = "animation.selectedbox.down";
+        TextSize = 13;
+    }
+
+    EditBox.SelectedBoxDown {
+        Alignment = Center;
+        InputValidator = Int;
+        Position = (120, 119.5);
+        Renderer = &4;
+        Size = (170, 21);
+        Text = 3;
+        TextSize = 13;
+    }
+
+    EditBox.SelectedBoxUp {
+        Alignment = Center;
+        InputValidator = Int;
+        Position = (120, 89.5);
+        Renderer = &4;
+        Size = (170, 21);
+        Text = 2;
+        TextSize = 13;
     }
 }
 
@@ -530,7 +543,7 @@ Label.Label15 {
 }
 
 Button.BlendEdit {
-    Position = (180, 320);
+    Position = (180, 350);
     Renderer = &1;
     Size = (85, 21);
     Text = "animation.edit";
@@ -538,7 +551,7 @@ Button.BlendEdit {
 }
 
 Button.ClearBlend {
-    Position = (270, 320);
+    Position = (270, 350);
     Renderer = &1;
     Size = (20, 21);
     Text = X;
@@ -548,7 +561,7 @@ Button.ClearBlend {
 
 Label.Label5 {
     HorizontalAlignment = Right;
-    Position = (5, 322);
+    Position = (5, 352);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
@@ -557,6 +570,26 @@ Label.Label5 {
 }
 
 EditBox.RenderGroup {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (180, 320);
+    Renderer = &4;
+    Size = (110, 21);
+    Text = 0;
+    TextSize = 13;
+}
+
+Label.Label16 {
+    HorizontalAlignment = Right;
+    Position = (5, 322);
+    Renderer = &2;
+    ScrollbarPolicy = Automatic;
+    Size = (170, 17);
+    Text = "animation.rendergrp";
+    TextSize = 13;
+}
+
+EditBox.Unknown {
     Alignment = Center;
     InputValidator = UInt;
     Position = (180, 290);
@@ -587,12 +620,12 @@ EditBox.RenderGroup {
     }
 }
 
-Label.Label16 {
+Label.Label11 {
     HorizontalAlignment = Right;
     Position = (5, 292);
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
-    Text = "animation.rendergrp";
+    Text = "animation.unknown";
     TextSize = 13;
 
     Renderer {

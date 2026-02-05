@@ -121,26 +121,6 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states)
 		target.draw(this->_sprite, states);
 	} else
 		target.draw(this->_sprite, states);
-
-	sf::RectangleShape rect;
-	rect.setOutlineThickness(1);
-	rect.setScale(scale);
-	rect.setOutlineColor(Color::White);
-	rect.setFillColor(Color::Transparent);
-	rect.setPosition(this->_sprite.getPosition());
-	rect.setOrigin({data.texWidth / 2.f, data.texHeight / 2.f});
-	rect.setSize({static_cast<float>(data.texWidth), static_cast<float>(data.texHeight)});
-	target.draw(rect, states);
-
-	rect.setOutlineThickness(2);
-	rect.setOutlineColor(Color::White);
-	rect.setFillColor(Color::Black);
-	rect.setOrigin({0, 0});
-	rect.setScale({1, 1});
-	rect.setRotation(sf::radians(0));
-	rect.setPosition(Vector2f{-4, -4});
-	rect.setSize({9, 9});
-	target.draw(rect, states);
 }
 
 void EditableObject::update()

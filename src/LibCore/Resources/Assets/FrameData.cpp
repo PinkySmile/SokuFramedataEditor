@@ -223,8 +223,8 @@ namespace SpiralOfFate
 
 		this->effect.pivotX = json["effectPivotX"];
 		this->effect.pivotY = json["effectPivotY"];
-		this->effect.positionXExtra = json["effectPositionXExtra"];
-		this->effect.positionYExtra = json["effectPositionYExtra"];
+		this->effect.positionExtraX = json["effectPositionExtraX"];
+		this->effect.positionExtraY = json["effectPositionExtraY"];
 		this->effect.positionX = json["effectPositionX"];
 		this->effect.positionY = json["effectPositionY"];
 		this->effect.unknown02RESETSTATE = json["effectUnknown02RESETSTATE"];
@@ -341,80 +341,79 @@ namespace SpiralOfFate
 	nlohmann::json FrameData::toJson() const
 	{
 		nlohmann::json j{
+			{ "sprite", this->spritePath },
+			{ "unknown", this->unknown },
+			{ "texOffsetX", this->texOffsetX },
+			{ "texOffsetY", this->texOffsetY },
+			{ "texWidth", this->texWidth },
+			{ "texHeight", this->texHeight },
+			{ "offsetX", this->offsetX },
+			{ "offsetY", this->offsetY },
+			{ "duration", this->duration },
+			{ "renderGroup", this->renderGroup },
+			{ "blendMode", this->blendOptions.mode },
+			{ "blendColor", this->blendOptions.color },
+			{ "blendScaleX", this->blendOptions.scaleX },
+			{ "blendScaleY", this->blendOptions.scaleY },
+			{ "blendFlipVert", this->blendOptions.flipVert },
+			{ "blendFlipHorz", this->blendOptions.flipHorz },
+			{ "blendAngle", this->blendOptions.angle },
+			{ "traitDamage", this->traits.damage },
+			{ "traitProration", this->traits.proration },
+			{ "traitChipDamage", this->traits.chipDamage },
+			{ "traitSpiritDamage", this->traits.spiritDamage },
+			{ "traitUntech", this->traits.untech },
+			{ "traitPower", this->traits.power },
+			{ "traitLimit", this->traits.limit },
+			{ "traitOnHitPlayerStun", this->traits.onHitPlayerStun },
+			{ "traitOnHitEnemyStun", this->traits.onHitEnemyStun },
+			{ "traitOnBlockPlayerStun", this->traits.onBlockPlayerStun },
+			{ "traitOnBlockEnemyStun", this->traits.onBlockEnemyStun },
+			{ "traitOnHitCardGain", this->traits.onHitCardGain },
+			{ "traitOnBlockCardGain", this->traits.onBlockCardGain },
+			{ "traitOnAirHitSetSequence", this->traits.onAirHitSetSequence },
+			{ "traitOnGroundHitSetSequence", this->traits.onGroundHitSetSequence },
+			{ "traitSpeedX", this->traits.speedX },
+			{ "traitSpeedY", this->traits.speedY },
+			{ "traitOnHitSfx", this->traits.onHitSfx },
+			{ "traitOnHitEffect", this->traits.onHitEffect },
+			{ "traitAttackLevel", this->traits.attackLevel },
+			{ "traitComboModifier", this->traits.comboModifier },
+			{ "traitFrameFlags", this->traits.frameFlags },
+			{ "traitAttackFlags", this->traits.attackFlags },
+			{ "effectPivotX", this->effect.pivotX },
+			{ "effectPivotY", this->effect.pivotY },
+			{ "effectPositionExtraX", this->effect.positionExtraX },
+			{ "effectPositionExtraY", this->effect.positionExtraY },
+			{ "effectPositionX", this->effect.positionX },
+			{ "effectPositionY", this->effect.positionY },
+			{ "effectUnknown02RESETSTATE", this->effect.unknown02RESETSTATE },
+			{ "effectSpeedX", this->effect.speedX },
+			{ "effectSpeedY", this->effect.speedY },
 			{ "collision", std::vector<std::string>() },
 			{ "attack", std::vector<std::string>() },
-			{ "hit", std::vector<std::string>() }
+			{ "hit", std::vector<std::string>() },
 		};
-
-		j["sprite"] = this->spritePath;
-		j["unknown"] = this->unknown;
-		j["texOffsetX"] = this->texOffsetX;
-		j["texOffsetY"] = this->texOffsetY;
-		j["texWidth"] = this->texWidth;
-		j["texHeight"] = this->texHeight;
-		j["offsetX"] = this->offsetX;
-		j["offsetY"] = this->offsetY;
-		j["duration"] = this->duration;
-
-		j["renderGroup"] = this->renderGroup;
-		j["blendMode"] = this->blendOptions.mode;
-		j["blendColor"] = this->blendOptions.color;
-		j["blendScaleX"] = this->blendOptions.scaleX;
-		j["blendScaleY"] = this->blendOptions.scaleY;
-		j["blendFlipVert"] = this->blendOptions.flipVert;
-		j["blendFlipHorz"] = this->blendOptions.flipHorz;
-		j["blendAngle"] = this->blendOptions.angle;
-
-		j["traitDamage"] = this->traits.damage;
-		j["traitProration"] = this->traits.proration;
-		j["traitChipDamage"] = this->traits.chipDamage;
-		j["traitSpiritDamage"] = this->traits.spiritDamage;
-		j["traitUntech"] = this->traits.untech;
-		j["traitPower"] = this->traits.power;
-		j["traitLimit"] = this->traits.limit;
-		j["traitOnHitPlayerStun"] = this->traits.onHitPlayerStun;
-		j["traitOnHitEnemyStun"] = this->traits.onHitEnemyStun;
-		j["traitOnBlockPlayerStun"] = this->traits.onBlockPlayerStun;
-		j["traitOnBlockEnemyStun"] = this->traits.onBlockEnemyStun;
-		j["traitOnHitCardGain"] = this->traits.onHitCardGain;
-		j["traitOnBlockCardGain"] = this->traits.onBlockCardGain;
-		j["traitOnAirHitSetSequence"] = this->traits.onAirHitSetSequence;
-		j["traitOnGroundHitSetSequence"] = this->traits.onGroundHitSetSequence;
-		j["traitSpeedX"] = this->traits.speedX;
-		j["traitSpeedY"] = this->traits.speedY;
-		j["traitOnHitSfx"] = this->traits.onHitSfx;
-		j["traitOnHitEffect"] = this->traits.onHitEffect;
-		j["traitAttackLevel"] = this->traits.attackLevel;
-		j["traitComboModifier"] = this->traits.comboModifier;
-		j["traitFrameFlags"] = this->traits.frameFlags;
-		j["traitAttackFlags"] = this->traits.attackFlags;
-
-		j["effectPivotX"] = this->effect.pivotX;
-		j["effectPivotY"] = this->effect.pivotY;
-		j["effectPositionXExtra"] = this->effect.positionXExtra;
-		j["effectPositionYExtra"] = this->effect.positionYExtra;
-		j["effectPositionX"] = this->effect.positionX;
-		j["effectPositionY"] = this->effect.positionY;
-		j["effectUnknown02RESETSTATE"] = this->effect.unknown02RESETSTATE;
-		j["effectSpeedX"] = this->effect.speedX;
-		j["effectSpeedY"] = this->effect.speedY;
+		auto &collision = j["collision"];
+		auto &attack = j["attack"];
+		auto &hit = j["hit"];
 
 		for (auto &b : this->cBoxes)
-			j["collision"].push_back({
+			collision.push_back({
 				{ "left", b.left },
 				{ "right", b.right },
 				{ "up", b.up },
 				{ "down", b.down },
 			});
 		for (auto &b : this->aBoxes)
-			j["attack"].push_back({
+			attack.push_back({
 				{ "left", b.left },
 				{ "right", b.right },
 				{ "up", b.up },
 				{ "down", b.down },
 			});
 		for (auto &b : this->hBoxes)
-			j["hit"].push_back({
+			hit.push_back({
 				{ "left", b.left },
 				{ "right", b.right },
 				{ "up", b.up },

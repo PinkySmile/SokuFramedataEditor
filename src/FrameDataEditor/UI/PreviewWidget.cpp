@@ -25,6 +25,7 @@ SpiralOfFate::PreviewWidget::PreviewWidget(const FrameDataEditor &editor, MainWi
 	_main(main)
 {
 	assert_exp(this->_stageTexture.loadFromFile("assets/stages/editor.png"));
+	this->invalidatePalette();
 }
 
 std::pair<SpiralOfFate::BoxType, unsigned int> SpiralOfFate::PreviewWidget::getSelectedBox()
@@ -382,104 +383,79 @@ void SpiralOfFate::PreviewWidget::_handleBoxResize(const tgui::Vector2f &pos)
 		return;
 
 	float angle = 0;
-	Vector2i bpos{ this->_boxSaved.left, this->_boxSaved.up };
-	Vector2u bsize{
-		static_cast<unsigned>(this->_boxSaved.right - this->_boxSaved.left),
-		static_cast<unsigned>(this->_boxSaved.down  - this->_boxSaved.up)
-	};
+	ShadyCore::Schema::Sequence::BBox boxCopy = this->_boxSaved;
 
 	diff.rotate(-angle, {0, 0});
 	switch (this->_cornerSelected) {
 	case 1:
 		// TopLeft
-		bsize -= diff;
-		bpos += diff;
-		if (bsize.x < BOX_SIZE_MIN) {
-			bpos.x -= BOX_SIZE_MIN - bsize.x;
-			bsize.x = BOX_SIZE_MIN;
-		}
-		if (bsize.y < BOX_SIZE_MIN) {
-			bpos.y -= BOX_SIZE_MIN - bsize.y;
-			bsize.y = BOX_SIZE_MIN;
-		}
+		boxCopy.left += diff.x;
+		boxCopy.up += diff.y;
+		if (boxCopy.right - boxCopy.left < BOX_SIZE_MIN)
+			boxCopy.left = boxCopy.right - BOX_SIZE_MIN;
+		if (boxCopy.down - boxCopy.up < BOX_SIZE_MIN)
+			boxCopy.up = boxCopy.down - BOX_SIZE_MIN;
 		break;
 	case 2:
 		// BottomLeft
-		bsize.y += diff.y;
-		if (bsize.y < BOX_SIZE_MIN)
-			bsize.y = BOX_SIZE_MIN;
-		bsize.x -= diff.x;
-		bpos.x += diff.x;
-		if (bsize.x < BOX_SIZE_MIN) {
-			bpos.x -= BOX_SIZE_MIN - bsize.x;
-			bsize.x = BOX_SIZE_MIN;
-		}
+		boxCopy.left += diff.x;
+		boxCopy.down += diff.y;
+		if (boxCopy.right - boxCopy.left < BOX_SIZE_MIN)
+			boxCopy.left = boxCopy.right - BOX_SIZE_MIN;
+		if (boxCopy.down - boxCopy.up < BOX_SIZE_MIN)
+			boxCopy.down = boxCopy.up + BOX_SIZE_MIN;
 		break;
 	case 3:
 		// BottomRight
-		bsize += diff;
-		if (bsize.x < BOX_SIZE_MIN)
-			bsize.x = BOX_SIZE_MIN;
-		if (bsize.y < BOX_SIZE_MIN)
-			bsize.y = BOX_SIZE_MIN;
+		boxCopy.right += diff.x;
+		boxCopy.down += diff.y;
+		if (boxCopy.right - boxCopy.left < BOX_SIZE_MIN)
+			boxCopy.right = boxCopy.left + BOX_SIZE_MIN;
+		if (boxCopy.down - boxCopy.up < BOX_SIZE_MIN)
+			boxCopy.down = boxCopy.up + BOX_SIZE_MIN;
 		break;
 	case 4:
 		// TopRight
-		bsize.y -= diff.y;
-		bpos.y += diff.y;
-		if (bsize.y < BOX_SIZE_MIN) {
-			bpos.y -= BOX_SIZE_MIN - bsize.y;
-			bsize.y = BOX_SIZE_MIN;
-		}
-		bsize.x += diff.x;
-		if (bsize.x < BOX_SIZE_MIN)
-			bsize.x = BOX_SIZE_MIN;
+		boxCopy.right += diff.x;
+		boxCopy.up += diff.y;
+		if (boxCopy.right - boxCopy.left < BOX_SIZE_MIN)
+			boxCopy.right = boxCopy.left + BOX_SIZE_MIN;
+		if (boxCopy.down - boxCopy.up < BOX_SIZE_MIN)
+			boxCopy.up = boxCopy.down - BOX_SIZE_MIN;
 		break;
 	case 5:
 		// Left
-		bsize.x -= diff.x;
-		bpos.x += diff.x;
-		if (bsize.x < BOX_SIZE_MIN) {
-			bpos.x -= BOX_SIZE_MIN - bsize.x;
-			bsize.x = BOX_SIZE_MIN;
-		}
+		boxCopy.left += diff.x;
+		if (boxCopy.right - boxCopy.left < BOX_SIZE_MIN)
+			boxCopy.left = boxCopy.right - BOX_SIZE_MIN;
 		break;
 	case 6:
 		// Bottom
-		bsize.y += diff.y;
-		if (bsize.y < BOX_SIZE_MIN)
-			bsize.y = BOX_SIZE_MIN;
+		boxCopy.down += diff.y;
+		if (boxCopy.down - boxCopy.up < BOX_SIZE_MIN)
+			boxCopy.down = boxCopy.up + BOX_SIZE_MIN;
 		break;
 	case 7:
-		// Right
-		bsize.x += diff.x;
-		if (bsize.x < BOX_SIZE_MIN)
-			bsize.x = BOX_SIZE_MIN;
+		boxCopy.right += diff.x;
+		if (boxCopy.right - boxCopy.left < BOX_SIZE_MIN)
+			boxCopy.right = boxCopy.left + BOX_SIZE_MIN;
 		break;
 	case 8:
 		// Top
-		bsize.y -= diff.y;
-		bpos.y += diff.y;
-		if (bsize.y < BOX_SIZE_MIN) {
-			bpos.y -= BOX_SIZE_MIN - bsize.y;
-			bsize.y = BOX_SIZE_MIN;
-		}
+		boxCopy.up += diff.y;
+		if (boxCopy.down - boxCopy.up < BOX_SIZE_MIN)
+			boxCopy.up = boxCopy.down - BOX_SIZE_MIN;
 		break;
 	}
 
-	std::function<Operation *()> o = [this, &bpos, &bsize]{
+	std::function<Operation *()> o = [this, &boxCopy]{
 		auto box = this->getSelectedBox();
 
 		return new EditBoxOperation(
 			this->_object,
 			this->_editor.localize("operation.resize_box"),
 			box.first, box.second,
-			ShadyCore::Schema::Sequence::BBox{
-				.left  = bpos.x,
-				.up    = bpos.y,
-				.right = static_cast<int>(bpos.x - bsize.x),
-				.down  = static_cast<int>(bpos.y - bsize.y)
-			}
+			boxCopy
 		);
 	};
 
@@ -496,27 +472,21 @@ void SpiralOfFate::PreviewWidget::_handleBoxMove(const tgui::Vector2f &pos)
 		return;
 
 	float angle = 0;
-	Vector2i bpos{ this->_boxSaved.left, this->_boxSaved.up };
-	Vector2u bsize{
-		static_cast<unsigned>(this->_boxSaved.right - this->_boxSaved.left),
-		static_cast<unsigned>(this->_boxSaved.down  - this->_boxSaved.up)
-	};
+	ShadyCore::Schema::Sequence::BBox boxCopy = this->_boxSaved;
 
 	diff.rotate(-angle, {0, 0});
-	bpos += Vector2f{diff.x, diff.y};
-	this->_main.updateTransaction([this, &bpos, &bsize]{
+	boxCopy.left += diff.x;
+	boxCopy.right += diff.x;
+	boxCopy.up += diff.y;
+	boxCopy.down += diff.y;
+	this->_main.updateTransaction([this, &boxCopy]{
 		auto b = this->getSelectedBox();
 
 		return new EditBoxOperation(
 			this->_object,
 			this->_editor.localize("operation.move_box"),
 			b.first, b.second,
-			ShadyCore::Schema::Sequence::BBox{
-				.left  = bpos.x,
-				.up    = bpos.y,
-				.right = static_cast<int>(bpos.x - bsize.x),
-				.down  = static_cast<int>(bpos.y - bsize.y)
-			}
+			boxCopy
 		);
 	});
 	this->_commited = true;

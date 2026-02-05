@@ -9,33 +9,10 @@
 
 namespace SpiralOfFate
 {
-	static unsigned pngCrcTable[256];
-
-	static unsigned pngCrc32(const unsigned char *data, size_t length, unsigned crc = 0)
-	{
-		unsigned c = crc ^ 0xFFFFFFFF;
-
-		for (size_t i = 0; i < length; i++)
-			c = pngCrcTable[(c ^ data[i]) & 255] ^ ((c >> 8) & 0xFFFFFF);
-		return c ^ 0xFFFFFFFF;
-	}
-
 	TextureManager::TextureManager()
 	{
 		this->_dummy.clear(Color::Transparent);
 		this->_dummy.display();
-
-		for (size_t i = 0; i < 256; i++) {
-			size_t c = i;
-
-			for (size_t k = 0; k < 8; k++) {
-				if (c & 1)
-					c = 0xEDB88320 ^ ((c >> 1) & 0x7FFFFFFF);
-				else
-					c = (c >> 1) & 0x7FFFFFFF;
-			}
-			pngCrcTable[i] = c;
-		}
 	}
 
 	static std::string colorToString(Color color)
@@ -64,7 +41,6 @@ namespace SpiralOfFate
 
 	unsigned TextureManager::_loadPaletted(const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
 	{
-		std::error_code err;
 		std::vector<unsigned char> buffer;
 		ShadyCore::Image resourceImage;
 		auto entry = game->package.find(path, ShadyCore::FileType::TYPE_IMAGE);
@@ -75,7 +51,6 @@ namespace SpiralOfFate
 		}
 
 		auto &stream = entry.open();
-
 		ShadyCore::getResourceReader(entry.fileType())(&resourceImage, stream);
 		entry.close(stream);
 

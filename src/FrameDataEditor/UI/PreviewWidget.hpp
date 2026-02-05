@@ -27,8 +27,6 @@ namespace SpiralOfFate
 		bool _dragStarted = false;
 		bool _translateDragStarted = false;
 		unsigned char _selectedColor = 0;
-		float _scale = 1;
-		tgui::Vector2f _translate = {0, 0};
 		tgui::Vector2f _lastMousePos;
 		tgui::Vector2f _startMousePos;
 		std::vector<size_t> _hoveredBoxes;
@@ -59,6 +57,8 @@ namespace SpiralOfFate
 
 		bool displayBoxes = true;
 		bool showingPalette = false;
+		float _scale = 1;
+		tgui::Vector2f _translate = {0, 0};
 
 		PreviewWidget(const FrameDataEditor &editor, MainWindow &main, EditableObject &object);
 		~PreviewWidget() override = default;

@@ -272,46 +272,37 @@ std::string to_hex(unsigned long long value, int count)
         });                                                                                                          \
         this->_containers.emplace(&container);                                                                       \
 } while (false)
-#define PLACE_HOOK_BOX(container, guiId, field, other, name)                                              \
+#define PLACE_HOOK_BOX(container, guiId, field, name)                                                     \
 do {                                                                                                      \
         auto __elem = container.get<tgui::EditBox>(guiId);                                                \
                                                                                                           \
         if (!__elem)                                                                                      \
                 break;                                                                                    \
-        __elem->onFocus([this]{ this->startTransaction(); });                                     \
-        __elem->onUnfocus([this]{ this->commitTransaction(); });                                  \
-        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); }); \
-        __elem->onTextChange([this](const tgui::String &s){                                       \
+        __elem->onFocus([this]{ this->startTransaction(); });                                             \
+        __elem->onUnfocus([this]{ this->commitTransaction(); });                                          \
+        __elem->onReturnKeyPress([this]{ this->commitTransaction(); this->startTransaction(); });         \
+        __elem->onTextChange([this](const tgui::String &s){                                               \
                 auto box = this->_preview->getSelectedBox();                                              \
                                                                                                           \
                 if (box.first == BOXTYPE_NONE || s.empty()) return;                                       \
                 try {                                                                                     \
-			auto pos = s.find(',');                                                           \
-			auto __x = s.substr(1, pos - 1).toStdString();                                    \
-			auto __y = s.substr(pos + 1, s.size() - pos - 1).toStdString();                   \
-                        decltype(Box::field) __##field{                                                   \
-				(decltype(Box::field.x))std::stoi(__x),                                   \
-				(decltype(Box::field.y))std::stoi(__y)                                    \
-			};                                                                                \
-                        decltype(Box::other) __##other = this->_preview->getSelectedBoxRef()->other;      \
+                        ShadyCore::Schema::Sequence::BBox old = *this->_preview->getSelectedBoxRef();     \
                                                                                                           \
+                        old.field = std::stoi(s.toStdString());                                           \
                         this->updateTransaction([&]{ return new EditBoxOperation(                         \
                                 *this->_object,                                                           \
                                 name,                                                                     \
                                 box.first, box.second,                                                    \
-                                Box{ .pos = __pos, .size = __size }                                       \
+                                old                                                                       \
                         ); });                                                                            \
                 } catch (...) { return; }                                                                 \
         });                                                                                               \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{                               \
-                ShadyCore::Schema::Sequence::BBox *box = this->_preview->getSelectedBoxRef();                                           \
+                ShadyCore::Schema::Sequence::BBox *box = this->_preview->getSelectedBoxRef();             \
                                                                                                           \
                 if (!box) return;                                                                         \
                 __elem->onTextChange.setEnabled(false);                                                   \
-                __elem->setText("(" +                                                                     \
-			std::to_string(box->field.x) + "," +                                              \
-			std::to_string(box->field.y) +                                                    \
-		")");                                                                                     \
+                __elem->setText(std::to_string(box->field));                                              \
                 __elem->onTextChange.setEnabled(true);                                                    \
         });                                                                                               \
         this->_containers.emplace(&container);                                                            \
@@ -479,6 +470,9 @@ do {                                                                            
 #define STRING_FROM_STRING(s, _, __) s.toStdString()
 #define STRING_TO_STRING(s, _) s
 
+#define HEXNUMBER_FROM_STRING(s, type, _) static_cast<type>(std::stoul(s.toStdString().substr(1), nullptr, 16))
+#define HEXNUMBER_TO_STRING(s, p) ("#" + to_hex(s, p))
+
 #define NUMBER_FROM_STRING(s, type, _) static_cast<type>(std::stof(s.toStdString()))
 #define NUMBER_TO_STRING(s, p) to_string(s, p)
 
@@ -543,6 +537,8 @@ do {                                                                            
 #define PLACE_HOOK_NUMFLAGS(container, guiId, field, name, operation, reset) \
 	PLACE_HOOK_STRUCTURE(container, guiId, field, name, operation, NUMFLAGS_TO_STRING, NO_FROMSTRING_PRE, NUMFLAGS_FROM_STRING, _, reset, true)
 
+#define PLACE_HOOK_HEXCOLOR_INT2(container, guiId, field, field2, name, digits) \
+	PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, HEXNUMBER_TO_STRING, NO_FROMSTRING_PRE, HEXNUMBER_FROM_STRING, digits, false, true)
 #define PLACE_HOOK_NUMBER2(container, guiId, field, field2, name) \
 	PLACE_HOOK_STRUCTURE2(container, guiId, field, field2, name, NUMBER_TO_STRING, NO_FROMSTRING_PRE, NUMBER_FROM_STRING, 0, false, true)
 #define PLACE_HOOK_SOKU_FLOAT2(container, guiId, field, field2, name, precision) \
@@ -599,6 +595,8 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButt
 
 void SpiralOfFate::MainWindow::_init()
 {
+	if (this->_object->_schema.isCharacterData)
+		this->_effectObject = std::make_unique<EditableObject>("data/effect/", std::string("data/effect/effect.xml"), &this->_palettes.front().colors);
 	this->_preview = std::make_shared<PreviewWidget>(std::ref(this->_editor), std::ref(*this), *this->_object);
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
@@ -613,6 +611,7 @@ void SpiralOfFate::MainWindow::_init()
 	this->_preview->setPalette(&this->_palettes.front().colors);
 	this->_pathBak = "./backups/" + std::to_string(++game->lastSwap) + ".bak";
 
+	std::filesystem::create_directories("./backups");
 	this->m_renderer = aurora::makeCopied<Renderer>();
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/animationWindow.gui");
 
@@ -627,7 +626,7 @@ void SpiralOfFate::MainWindow::_init()
 	this->_localizeWidgets(*ctrlPanel, true);
 	Utils::setRenderer(this);
 
-	this->setSize("min(1200, &.w - 20)", "min(655, &.h - 40)");
+	this->setSize("min(1200, &.w - 20)", "min(695, &.h - 40)");
 	this->setPosition(10, 30);
 	this->setTitleButtons(TitleButton::Minimize | TitleButton::Maximize | TitleButton::Close);
 	this->setTitle(this->_title);
@@ -663,6 +662,7 @@ void SpiralOfFate::MainWindow::_init()
 
 	this->_placeUIHooks(*this);
 	this->_populateData(*this);
+	this->_autoSaveThread = std::thread{&MainWindow::_autoSaveLoop, this};
 }
 
 SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::string &frameDataPath, FrameDataEditor &editor) :
@@ -704,6 +704,13 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::files
 	this->reloadPalette();
 	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
 	this->_init();
+}
+
+SpiralOfFate::MainWindow::~MainWindow()
+{
+	this->_stopped = true;
+	if (this->_autoSaveThread.joinable())
+		this->_autoSaveThread.join();
 }
 
 bool SpiralOfFate::MainWindow::isModified() const noexcept
@@ -756,16 +763,19 @@ void SpiralOfFate::MainWindow::redo()
 		return;
 	}
 
-	auto wasModified = this->isModified();
+	std::string title = this->_path.string();
+	std::lock_guard guard{this->_saveMutex};
 
 	this->_operationQueue[this->_operationIndex]->apply();
 	this->_operationIndex++;
 	this->_requireReload = true;
-	if (!wasModified)
-		this->setTitle(this->_path.string() + "*");
+	if (this->isModified())
+		title += "*";
+	title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(this->hasRedoData());
-	this->autoSave();
+	this->_requireAutoSave = true;
 }
 
 void SpiralOfFate::MainWindow::undo()
@@ -775,14 +785,20 @@ void SpiralOfFate::MainWindow::undo()
 		this->cancelTransaction();
 		return;
 	}
+
+	std::lock_guard guard{this->_saveMutex};
+	std::string title = this->_path.string();
+
 	this->_operationIndex--;
 	this->_operationQueue[this->_operationIndex]->undo();
 	this->_requireReload = true;
-	if (!this->isModified())
-		this->setTitle(this->_path.string());
+	if (this->isModified())
+		title += "*";
+	title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setHasRedo(true);
-	this->autoSave();
+	this->_requireAutoSave = true;
 }
 
 void SpiralOfFate::MainWindow::copyFrame()
@@ -851,14 +867,18 @@ void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operati
 {
 	assert_exp(!this->_pendingTransaction);
 
-	auto wasModified = this->isModified();
+	std::lock_guard guard{this->_saveMutex};
+	std::string title = this->_path.string();
 
 	if (!operation)
 		operation = new DummyOperation();
 	this->_pendingTransaction.reset(operation);
 	this->_pendingTransaction->apply();
-	if (!wasModified && this->_pendingTransaction->hasModification())
-		this->setTitle(this->_path.string() + "*");
+	if (this->isModified())
+		title += "*";
+	if (this->_requireAutoSave)
+		title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 }
 
@@ -866,23 +886,32 @@ void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *
 {
 	assert_exp(this->_pendingTransaction);
 
-	auto wasModified = this->isModified();
+	std::lock_guard guard{this->_saveMutex};
+	std::string title = this->_path.string();
 
 	this->_pendingTransaction->undo();
 	this->_pendingTransaction.reset(operation());
 	this->_pendingTransaction->apply();
-	if (!wasModified && this->_pendingTransaction->hasModification())
-		this->setTitle(this->_path.string() + "*");
+	if (this->isModified())
+		title += "*";
+	if (this->_requireAutoSave)
+		title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 }
 
 void SpiralOfFate::MainWindow::cancelTransaction()
 {
+	std::lock_guard guard{this->_saveMutex};
+	std::string title = this->_path.string();
+
 	assert_exp(this->_pendingTransaction);
 	this->_pendingTransaction->undo();
 	this->_pendingTransaction.reset();
-	if (!this->isModified())
-		this->setTitle(this->_path.string());
+	if (this->isModified())
+		title += "*";
+	title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 }
 
@@ -892,7 +921,8 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	if (!this->_pendingTransaction->hasModification())
 		return this->_pendingTransaction.reset();
 
-	auto wasModified = this->isModified();
+	std::lock_guard guard{this->_saveMutex};
+	std::string title = this->_path.string();
 
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(nullptr);
@@ -901,11 +931,14 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
-	if (!wasModified)
-		this->setTitle(this->_path.string() + "*");
-	this->autoSave();
+
+	if (this->isModified())
+		title += "*";
+	title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
+	this->_requireAutoSave = true;
 }
 
 void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
@@ -915,7 +948,8 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 		return;
 	}
 
-	auto wasModified = this->isModified();
+	std::lock_guard guard{this->_saveMutex};
+	std::string title = this->_path.string();
 
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
@@ -924,11 +958,14 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	if (this->_operationIndex < this->_operationSaved)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
-	if (wasModified)
-		this->setTitle(this->_path.string() + "*");
+
+	if (this->isModified())
+		title += "*";
+	title += "~";
+	this->setTitle(title);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
-	this->autoSave();
+	this->_requireAutoSave = true;
 }
 
 void SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
@@ -1121,19 +1158,40 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 	stream.close();
 }
 
+void SpiralOfFate::MainWindow::_autoSaveLoop()
+{
+	while (!this->_stopped) {
+		for (size_t i = 0; i < 100; i++) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			if (this->_stopped)
+				return;
+		}
+
+		std::lock_guard guard{this->_saveMutex};
+
+		if (this->_pendingTransaction)
+			continue;
+		this->autoSave();
+	}
+}
+
 nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 {
 	nlohmann::json json;
+
+	json["framedata"] = nlohmann::json::object();
+	json["palettes"] = nlohmann::json::array();
+
+	auto &framedata = json["framedata"];
+	auto &palettes = json["palettes"];
 
 	json["path"] = this->_path;
 	json["title"] = this->_title;
 	json["folder"] = this->_chrPath;
 	json["character"] = this->_character;
 	json["isCharacterData"] = this->_object->_schema.isCharacterData;
-	json["framedata"] = nlohmann::json::object();
-	json["palettes"] = nlohmann::json::array();
 	for (auto &[key, action] : this->_object->_schema.framedata) {
-		auto &actionj = json[std::to_string(key)];
+		auto &actionj = framedata[std::to_string(key)];
 
 		if (action.cloned) {
 			actionj = action.clonedId;
@@ -1141,34 +1199,39 @@ nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 		}
 		actionj = nlohmann::json::array();
 		for (auto &sequence : action) {
-			auto seqj = nlohmann::json::object();
+			actionj.push_back(nlohmann::json::object());
+			auto &seqj = actionj.back();
+
+			seqj["frames"] = nlohmann::json::array();
+			auto &frames = seqj["frames"];
 
 			seqj["loop"] = sequence.loop;
 			seqj["moveLock"] = sequence.moveLock;
 			seqj["actionLock"] = sequence.actionLock;
-			seqj["frames"] = nlohmann::json::array();
 			for (auto &frame : sequence)
-				seqj["frames"].push_back(frame.toJson());
+				frames.push_back(frame.toJson());
 			actionj.push_back(seqj);
 		}
 	}
 	for (auto &palette : this->_palettes) {
-		auto palj = nlohmann::json::object();
-		auto colors = nlohmann::json::array();
+		palettes.push_back(nlohmann::json::object());
+		auto &palj = palettes.back();
+
+		palj["colors"] = nlohmann::json::array();
+		auto &colors = palj["colors"];
 
 		for (auto &c : palette.colors)
 			colors.push_back({c.r, c.g, c.r});
 		palj["path"] = palette.path;
 		palj["modified"] = palette.modified;
 		palj["name"] = palette.name.toStdString();
-		palj["colors"] = colors;
-		json["palettes"].push_back(palj);
 	}
 	return json;
 }
 
 void SpiralOfFate::MainWindow::autoSave()
 {
+	std::lock_guard guard{this->_saveMutex};
 	auto j = this->_asJson();
 	std::ofstream stream{this->_pathBak};
 
@@ -1178,13 +1241,21 @@ void SpiralOfFate::MainWindow::autoSave()
 		return;
 	}
 	stream << j;
+	stream.close();
+	this->_requireAutoSave = false;
+
+	std::string title = this->_path.string();
+
+	if (this->isModified())
+		title += "*";
+	this->setTitle(title);
 }
 
-std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id)
+std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id) const
 {
 	if (this->_editor.hasLocalization("action." + this->_character + "." + std::to_string(id)))
 		return this->_editor.localize("action." + this->_character + "." + std::to_string(id));
-	else if (this->_editor.hasLocalization("action.generic." + std::to_string(id)))
+	if (this->_editor.hasLocalization("action.generic." + std::to_string(id)))
 		return this->_editor.localize("action.generic." + std::to_string(id));
 	return "Action #" + std::to_string(id);
 	// TODO: Handle labels json
@@ -1251,14 +1322,341 @@ void SpiralOfFate::MainWindow::_createGenericPopup(const std::string &path)
 
 	contentPanel->loadLocalizedWidgetsFromFile(path);
 	for (auto &w : contentPanel->getWidgets()) {
-		size.x = std::max(size.x, w->getFullSize().x + w->getPosition().x + 20);
-		size.y = std::max(size.y, w->getFullSize().y + w->getPosition().y + 20);
+		size.x = std::max(size.x, w->getFullSize().x + w->getPosition().x + 10);
+		size.y = std::max(size.y, w->getFullSize().y + w->getPosition().y + 10);
 	}
 	contentPanel->setSize(size);
 	Utils::setRenderer(contentPanel->cast<tgui::Container>());
 	outsidePanel->onClick(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
 	this->_placeUIHooks(*contentPanel);
 	this->_populateData(*contentPanel);
+}
+
+void SpiralOfFate::MainWindow::_createEffectListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current)
+{
+	assert_exp(this->_effectObject);
+
+	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
+	auto contentPanel = tgui::Panel::create({756, "&.h - 100"});
+	auto effectsPanel = tgui::ScrollablePanel::create({"&.w", "&.h - 42"});
+	auto search = tgui::EditBox::create();
+	auto scroll = 0;
+	unsigned i = 0;
+	std::set<unsigned> effects;
+	std::unordered_map<unsigned, std::string> effectsNames;
+	std::unordered_map<unsigned, std::string> effectsNamesLower;
+	auto preview = std::make_shared<PreviewWidget>(std::ref(this->_editor), std::ref(*this), *this->_effectObject);
+	auto previewLabel = tgui::Label::create();
+
+	effects.insert(0);
+	for (const auto &effectId: this->_effectObject->_schema.framedata | std::views::keys)
+		effects.insert(effectId);
+
+	this->_effectObject->_action = current;
+	this->_effectObject->_actionBlock = 0;
+	this->_effectObject->_animation = 0;
+	this->_effectObject->_animationCtr = 0;
+
+	search->setPosition({10, 10});
+	search->setSize({"&.w - 20", 22});
+	search->setDefaultText(this->_editor.localize("popup.search"));
+	contentPanel->add(search);
+	effectsPanel->setPosition(0, 42);
+	effectsPanel->getRenderer()->setBorders({0, 1, 0, 0});
+	contentPanel->add(effectsPanel);
+
+	preview->_scale = 0.5;
+	preview->displayBoxes = false;
+	preview->_translate = {48, 44};
+	preview->setSize(256, 256);
+	preview->setPosition(470, 52);
+	contentPanel->add(preview);
+
+	outsidePanel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
+	outsidePanel->setUserData(false);
+	this->add(outsidePanel);
+
+	contentPanel->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+	this->add(contentPanel);
+	for (auto effectId : effects) {
+		effectsNames[effectId] = this->_editor.localize("effect." + std::to_string(effectId));
+		effectsNamesLower[effectId].resize(effectsNames[effectId].size());
+		std::ranges::transform(effectsNames[effectId], effectsNamesLower[effectId].begin(), [](signed char c) -> char {
+			// TODO: Handle non-ascii characters properly
+			if (c < 0) return c;
+			return std::tolower(c);
+		});
+		if (effectId == current)
+			scroll = i * 25 + 20;
+		i++;
+	}
+
+	previewLabel->getRenderer()->setTextColor(tgui::Color::Black);
+	previewLabel->setText(std::to_string(current) + " - " + effectsNames[current]);
+	previewLabel->setPosition(470, 52);
+	contentPanel->add(previewLabel);
+
+	auto closePopup = [this](const std::weak_ptr<tgui::Panel> &outsidePanel_w, const std::weak_ptr<tgui::Panel> &contentPanel_w){
+		this->remove(outsidePanel_w.lock());
+		this->remove(contentPanel_w.lock());
+	};
+	auto refresh = [previewLabel, effects, effectsNames, effectsNamesLower, this, onConfirm, closePopup, current](
+		const std::weak_ptr<tgui::EditBox> &search_w,
+		const std::weak_ptr<tgui::ScrollablePanel> &movesPanel_w,
+		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
+		const std::weak_ptr<tgui::Panel> &contentPanel_w
+	) {
+		unsigned index = 0;
+		std::string query = search_w.lock()->getText().toStdString();
+		auto movesPanel_p = movesPanel_w.lock();
+
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char {
+			if (c < 0) return c;
+			return std::tolower(c);
+		});
+		movesPanel_p->removeAllWidgets();
+		for (auto effectId : effects) {
+			if (effectsNamesLower.at(effectId).find(query) == std::string::npos)
+				continue;
+
+			const auto &name = effectsNames.at(effectId);
+			auto label = tgui::Label::create(std::to_string(effectId));
+			auto button = tgui::Button::create(name);
+
+			label->setPosition(10, index * 25 + 5);
+			button->setPosition(50, index * 25 + 3);
+			button->setSize(410, 20);
+			Utils::setRenderer(button);
+			Utils::setRenderer(label);
+			if (effectId == current) {
+				button->getRenderer()->setTextColor(tgui::Color::Green);
+				button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
+			}
+
+			button->onClick(onConfirm, effectId);
+			button->onClick(closePopup, outsidePanel_w, contentPanel_w);
+			button->onMouseEnter([previewLabel, effectsNames, this, effectId] {
+				try {
+					previewLabel->setText(std::to_string(effectId) + " - " + effectsNames.at(effectId));
+				} catch (...) {
+					previewLabel->setText(std::to_string(effectId) + " - effect." + std::to_string(effectId));
+				}
+				this->_effectObject->_action = effectId;
+				this->_effectObject->_actionBlock = 0;
+				this->_effectObject->_animation = 0;
+				this->_effectObject->_animationCtr = 0;
+			});
+
+			movesPanel_p->add(label);
+			movesPanel_p->add(button);
+			index++;
+		}
+
+		auto label = tgui::Label::create("");
+
+		label->setPosition(10, index * 25);
+		label->setSize(100, 5);
+		label->setTextSize(1);
+		movesPanel_p->add(label);
+	};
+	auto validate = [effects, effectsNamesLower, onConfirm, closePopup](
+		const std::weak_ptr<tgui::EditBox> &search_w,
+		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
+		const std::weak_ptr<tgui::Panel> &contentPanel_w
+	) {
+		unsigned index = 0;
+		unsigned lastIndex = 0;
+		unsigned move;
+		std::string query = search_w.lock()->getText().toStdString();
+
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		for (auto moveId : effects) {
+			auto &name = effectsNamesLower.at(moveId);
+
+			if (name == query) {
+				move = moveId;
+				lastIndex = 1;
+				break;
+			}
+			if (name.find(query) != std::string::npos) {
+				if (lastIndex)
+					lastIndex = UINT32_MAX;
+				else
+					lastIndex = index + 1;
+				move = moveId;
+			}
+			index++;
+		}
+		if (lastIndex == UINT32_MAX || lastIndex == 0)
+			return;
+		onConfirm(move);
+		closePopup(outsidePanel_w, contentPanel_w);
+	};
+
+	refresh(std::weak_ptr(search), std::weak_ptr(effectsPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onTextChange(refresh, std::weak_ptr(search), std::weak_ptr(effectsPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onReturnKeyPress(validate, std::weak_ptr(search), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	scroll -= effectsPanel->getSize().y / 2;
+	if (scroll > 0)
+		effectsPanel->getVerticalScrollbar()->setValue(scroll);
+	outsidePanel->onClick(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->setFocused(true);
+}
+
+void SpiralOfFate::MainWindow::_createSfxListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current)
+{
+	auto outsidePanel = tgui::Panel::create({"100%", "100%"});
+	auto contentPanel = tgui::Panel::create({500, "&.h - 100"});
+	auto sfxsPanel = tgui::ScrollablePanel::create({"&.w", "&.h - 42"});
+	auto search = tgui::EditBox::create();
+	auto scroll = 0;
+	unsigned i = 0;
+	std::set<unsigned> sfxs;
+	std::unordered_map<unsigned, std::string> sfxNames;
+	std::unordered_map<unsigned, std::string> sfxNamesLower;
+
+	sfxs.insert(0);
+	for (const auto &moveId: game->soundEffects | std::views::keys)
+		sfxs.insert(moveId);
+
+	search->setPosition({10, 10});
+	search->setSize({"&.w - 20", 22});
+	search->setDefaultText(this->_editor.localize("popup.search"));
+	contentPanel->add(search);
+	sfxsPanel->setPosition(0, 42);
+	sfxsPanel->getRenderer()->setBorders({0, 1, 0, 0});
+	contentPanel->add(sfxsPanel);
+
+	outsidePanel->getRenderer()->setBackgroundColor({0, 0, 0, 175});
+	outsidePanel->setUserData(false);
+	this->add(outsidePanel);
+
+	contentPanel->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
+	this->add(contentPanel);
+	for (auto sndId : sfxs) {
+		sfxNames[sndId] = this->_editor.localize("sound.system." + std::to_string(sndId));
+		sfxNamesLower[sndId].resize(sfxNames[sndId].size());
+		std::ranges::transform(sfxNames[sndId], sfxNamesLower[sndId].begin(), [](signed char c) -> char {
+			// TODO: Handle non-ascii characters properly
+			if (c < 0) return c;
+			return std::tolower(c);
+		});
+		if (sndId == current)
+			scroll = i * 25 + 20;
+		i++;
+	}
+
+	auto closePopup = [this](const std::weak_ptr<tgui::Panel> &outsidePanel_w, const std::weak_ptr<tgui::Panel> &contentPanel_w){
+		this->remove(outsidePanel_w.lock());
+		this->remove(contentPanel_w.lock());
+	};
+	auto refresh = [sfxs, sfxNames, sfxNamesLower, this, onConfirm, closePopup, current](
+		const std::weak_ptr<tgui::EditBox> &search_w,
+		const std::weak_ptr<tgui::ScrollablePanel> &movesPanel_w,
+		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
+		const std::weak_ptr<tgui::Panel> &contentPanel_w
+	) {
+		unsigned index = 0;
+		std::string query = search_w.lock()->getText().toStdString();
+		auto movesPanel_p = movesPanel_w.lock();
+
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char {
+			if (c < 0) return c;
+			return std::tolower(c);
+		});
+		movesPanel_p->removeAllWidgets();
+		for (auto sfxId : sfxs) {
+			if (sfxNamesLower.at(sfxId).find(query) == std::string::npos)
+				continue;
+
+			const auto &name = sfxNames.at(sfxId);
+			auto label = tgui::Label::create(std::to_string(sfxId));
+			auto button = tgui::Button::create(name);
+			auto play = tgui::BitmapButton::create();
+
+			play->setImage({ "assets/gui/editor/play.png" });
+			play->setPosition(50, index * 25 + 5);
+			play->setSize(20, 20);
+			label->setPosition(10, index * 25 + 5);
+			button->setPosition(80, index * 25 + 3);
+			button->setSize(370, 20);
+			Utils::setRenderer(button);
+			Utils::setRenderer(label);
+			if (sfxId == current) {
+				button->getRenderer()->setTextColor(tgui::Color::Green);
+				button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
+				button->getRenderer()->setTextColorDisabled(tgui::Color{0x00, 0xA0, 0x00});
+				button->getRenderer()->setTextColorDown(tgui::Color{0x00, 0x80, 0x00});
+				button->getRenderer()->setTextColorFocused(tgui::Color{0x20, 0x80, 0x20});
+			}
+
+			play->onClick([sfxId] { game->soundMgr.play(game->soundEffects[sfxId]); });
+			button->onClick(onConfirm, sfxId);
+			button->onClick(closePopup, outsidePanel_w, contentPanel_w);
+
+			movesPanel_p->add(label);
+			movesPanel_p->add(button);
+			if (sfxId)
+				movesPanel_p->add(play);
+			index++;
+		}
+
+		auto label = tgui::Label::create("");
+
+		label->setPosition(10, index * 25);
+		label->setSize(100, 5);
+		label->setTextSize(1);
+		movesPanel_p->add(label);
+	};
+	auto validate = [sfxs, sfxNamesLower, onConfirm, closePopup](
+		const std::weak_ptr<tgui::EditBox> &search_w,
+		const std::weak_ptr<tgui::Panel> &outsidePanel_w,
+		const std::weak_ptr<tgui::Panel> &contentPanel_w
+	) {
+		unsigned index = 0;
+		unsigned lastIndex = 0;
+		unsigned move;
+		std::string query = search_w.lock()->getText().toStdString();
+
+		// TODO: Handle non-ascii characters
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		for (auto sndId : sfxs) {
+			auto &name = sfxNamesLower.at(sndId);
+
+			if (name == query) {
+				move = sndId;
+				lastIndex = 1;
+				break;
+			}
+			if (name.find(query) != std::string::npos) {
+				if (lastIndex)
+					lastIndex = UINT32_MAX;
+				else
+					lastIndex = index + 1;
+				move = sndId;
+			}
+			index++;
+		}
+		if (lastIndex == UINT32_MAX || lastIndex == 0)
+			return;
+		onConfirm(move);
+		closePopup(outsidePanel_w, contentPanel_w);
+	};
+
+	refresh(std::weak_ptr(search), std::weak_ptr(sfxsPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onTextChange(refresh, std::weak_ptr(search), std::weak_ptr(sfxsPanel), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->onReturnKeyPress(validate, std::weak_ptr(search), std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	scroll -= sfxsPanel->getSize().y / 2;
+	if (scroll > 0)
+		sfxsPanel->getVerticalScrollbar()->setValue(scroll);
+	outsidePanel->onClick(closePopup, std::weak_ptr(outsidePanel), std::weak_ptr(contentPanel));
+	search->setFocused(true);
 }
 
 void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(unsigned)> &onConfirm, unsigned current, bool showNotAdded)
@@ -1308,8 +1706,11 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 	for (auto moveId : moves) {
 		movesNames[moveId] = this->_localizeActionName(moveId);
 		movesNamesLower[moveId].resize(movesNames[moveId].size());
-		// TODO: Handle non-ascii characters
-		std::ranges::transform(movesNames[moveId], movesNamesLower[moveId].begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		std::ranges::transform(movesNames[moveId], movesNamesLower[moveId].begin(), [](signed char c) -> char {
+			// TODO: Handle non-ascii characters properly
+			if (c < 0) return c;
+			return std::tolower(c);
+		});
 		if (moveId == current)
 			scroll = i * 25 + 20;
 		i++;
@@ -1330,7 +1731,10 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		auto movesPanel_p = movesPanel_w.lock();
 
 		// TODO: Handle non-ascii characters
-		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
+		std::ranges::transform(query, query.begin(), [](signed char c) -> char {
+			if (c < 0) return c;
+			return std::tolower(c);
+		});
 		movesPanel_p->removeAllWidgets();
 		for (auto moveId : moves) {
 			if (movesNamesLower.at(moveId).find(query) == std::string::npos)
@@ -1441,7 +1845,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	auto aFlags = container.get<tgui::Button>("AFlagsButton");
 	auto dFlags = container.get<tgui::Button>("DFlagsButton");
 	auto hitEdit = container.get<tgui::Button>("HitEdit");
-	auto blockEdit = container.get<tgui::Button>("BlockEdit");
+	auto blendEdit = container.get<tgui::Button>("BlendEdit");
 	auto generalEdit = container.get<tgui::Button>("GeneralEdit");
 	auto ctrl = container.get<tgui::Tabs>("ControlTabs");
 	auto ctrlPanel = container.get<tgui::Panel>("ControlPanel");
@@ -1463,6 +1867,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 	auto gndSeq = container.get<tgui::Button>("GndHitSeq");
 	auto airSeq = container.get<tgui::Button>("AirHitSeq");
 	auto atkLevel = container.get<tgui::ComboBox>("AttackLevel");
+	auto selectSnd = container.get<tgui::Button>("SelectSound");
+	auto selectEff = container.get<tgui::Button>("SelectEffect");
 	tgui::Container &sidePanel = ctrlPanel ? *ctrlPanel : container;
 
 	if (mode)
@@ -1642,20 +2048,25 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->applyOperation(new ClearAttackOperation(*this->_object, this->_editor));
 		});
 	if (aFlags)
-		// TODO: Change flags label if a character or subobject
-		aFlags->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/attackFlags.gui");
+		aFlags->onClick([this] {
+			if (this->_object->_action < 800)
+				this->_createGenericPopup("assets/gui/editor/character/attackFlags.gui");
+			else
+				this->_createGenericPopup("assets/gui/editor/character/attackFlags_objects.gui");
+		});
 	if (dFlags)
-		// TODO: Change flags label if a character or subobject
-		dFlags->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/defenseFlags.gui");
+		dFlags->onClick([this] {
+			if (this->_object->_action < 800)
+				this->_createGenericPopup("assets/gui/editor/character/defenseFlags.gui");
+			else
+				this->_createGenericPopup("assets/gui/editor/character/defenseFlags_objects.gui");
+		});
 	if (hitEdit)
-		// TODO: Change fields label if a character or subobject
 		hitEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/hitProperties.gui");
-	if (blockEdit)
-		// TODO: Change fields label if a character or subobject
-		blockEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/blockProperties.gui");
 	if (generalEdit)
-		// TODO: Change fields label if a character or subobject
 		generalEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/generalProperties.gui");
+	if (blendEdit)
+		blendEdit->onClick(&MainWindow::_createGenericPopup, this, "assets/gui/editor/character/blendProperties.gui");
 	if (actionSelect)
 		actionSelect->onClick(&MainWindow::navGoTo, this);
 	if (prevAction)
@@ -1779,32 +2190,49 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			atkLevel->setSelectedItemByIndex(data.traits.attackLevel);
 		});
 	}
+	if (selectSnd) {
+		selectSnd->onClick([this]{
+			this->_createSfxListPopup([this](unsigned move){
+				this->applyOperation(new BasicData2StepOperation(
+					*this->_object,
+					this->_editor.localize("animation.hit.sound"),
+					&FrameData::traits,
+					&ShadyCore::Schema::Sequence::MoveTraits::onHitSfx,
+					static_cast<uint16_t>(move), false
+				));
+			}, this->_object->getFrameData().traits.onHitSfx);
+		});
+		this->_updateFrameElements[&container].emplace_back([selectSnd, this]{
+			auto &data = this->_object->getFrameData();
 
-	// -- blendOptions --
-	// mode
-	// color
-	// scaleX
-	// scaleY
-	// flipVert
-	// flipHorz
-	// angle
-	// -- effects --
-	// pivotX
-	// pivotY
-	// positionXExtra
-	// positionYExtra
-	// positionX
-	// positionY
-	// unknown02RESETSTATE
-	// speedX
-	// speedY
+			selectSnd->setText(this->_editor.localize("sound.system." + std::to_string(data.traits.onHitSfx)) + " (" + std::to_string(data.traits.onHitSfx) + ")");
+		});
+	}
+	if (selectEff) {
+		selectEff->onClick([this]{
+			this->_createEffectListPopup([this](unsigned move){
+				this->applyOperation(new BasicData2StepOperation(
+					*this->_object,
+					this->_editor.localize("animation.hit.effect"),
+					&FrameData::traits,
+					&ShadyCore::Schema::Sequence::MoveTraits::onHitEffect,
+					static_cast<uint16_t>(move), false
+				));
+			}, this->_object->getFrameData().traits.onHitEffect);
+		});
+		this->_updateFrameElements[&container].emplace_back([selectEff, this]{
+			auto &data = this->_object->getFrameData();
 
-	// unknown
+			selectEff->setText(this->_editor.localize("effect." + std::to_string(data.traits.onHitEffect)) + " (" + std::to_string(data.traits.onHitEffect) + ")");
+		});
+	}
+
 	PLACE_HOOK_STRING(container, "Sprite",      spritePath,    this->_editor.localize("animation.sprite"),   EditSpriteOperation, false);
 	PLACE_HOOK_NUMBER(container, "Duration",    duration,      this->_editor.localize("animation.duration"), BasicDataOperation, false, 0);
 	PLACE_HOOK_VECTOR(container, "Offset",      offset,        this->_editor.localize("animation.offset"));
 	PLACE_HOOK_RECT(container,   "Bounds",      tex,           this->_editor.localize("animation.bounds"));
 	PLACE_HOOK_NUMBER(container, "RenderGroup", renderGroup,   this->_editor.localize("animation.rendergrp"), BasicDataOperation, false, 0);
+	PLACE_HOOK_NUMBER(container, "Unknown",     unknown,       this->_editor.localize("animation.unknown"), BasicDataOperation, false, 0);
 
 	PLACE_HOOK_NUMBER2(container,             "Damage",       traits, damage,            this->_editor.localize("animation.hit.damage"));
 	PLACE_HOOK_SOKU_FLOAT_PERCENT2(container, "Rate",         traits, proration,         this->_editor.localize("animation.hit.rate"), 11);
@@ -1829,27 +2257,32 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		PLACE_HOOK_FLAG(container, "aFlag" + std::to_string(i), attackFlags,   i,    this->_editor.localize("animation.aflag" + std::to_string(i)), false);
 	for (size_t i = 0; i < 32; i++)
 		PLACE_HOOK_FLAG(container, "dFlag" + std::to_string(i), frameFlags,    i,    this->_editor.localize("animation.dflag" + std::to_string(i)), false);
-	// onHitSfx
-	// onHitEffect
 
-	//PLACE_HOOK_NUMBER(container,          "PGen",      particleGenerator, this->_editor.localize("animation.general.partgenerator"), BasicDataOperation, false, 0);
-	//PLACE_HOOK_NUMBER(container,          "SubObj",    subObjectSpawn,    this->_editor.localize("animation.general.subobj"),        BasicDataOperation, false, 0);
-	//PLACE_HOOK_NUMBER(container,          "Marker",    specialMarker,     this->_editor.localize("animation.general.marker"),        BasicDataOperation, false, 0);
-	//PLACE_HOOK_VECTOR(container,          "MoveSpeed", speed,             this->_editor.localize("animation.general.speed"),         BasicDataOperation, true,  2);
-	//PLACE_HOOK_STRING(container,          "Sound",     soundPath,         this->_editor.localize("animation.general.sound"),         EditSoundOperation, false);
-	//PLACE_HOOK_NUMBER(container,          "FadeTime",  fadeTime,          this->_editor.localize("animation.general.fadetime"),      BasicDataOperation, false, 0);
-	//PLACE_HOOK_NUMBER(container,          "ManaCost",  manaCost,          this->_editor.localize("animation.general.manacost"),      BasicDataOperation, false, 0);
-	//PLACE_HOOK_NUMBER_DEG(container,      "Rotation",  rotation,          this->_editor.localize("animation.general.rotation"),      BasicDataOperation, true, 2);
+	PLACE_HOOK_NUMBER2(container, "SpeedX",        effect, speedX,              this->_editor.localize("animation.extra.speedX"));
+	PLACE_HOOK_NUMBER2(container, "SpeedY",        effect, speedY,              this->_editor.localize("animation.extra.speedY"));
+	PLACE_HOOK_NUMBER2(container, "Unknown02",     effect, unknown02RESETSTATE, this->_editor.localize("animation.extra.unknown"));
+	PLACE_HOOK_VECTOR2(container, "Pivot",         effect, pivot,               this->_editor.localize("animation.extra.pivot"));
+	PLACE_HOOK_VECTOR2(container, "PositionExtra", effect, positionExtra,       this->_editor.localize("animation.extra.positionextra"));
+	PLACE_HOOK_VECTOR2(container, "Position",      effect, position,            this->_editor.localize("animation.extra.position"));
 
-	//PLACE_HOOK_BOX(container, "SelectedBoxPos",  pos,  size, this->_editor.localize("animation.selectedbox.pos"));
-	//PLACE_HOOK_BOX(container, "SelectedBoxSize", size, pos,  this->_editor.localize("animation.selectedbox.size"));
+	PLACE_HOOK_NUMBER2(container,            "Mode",     blendOptions, mode,     this->_editor.localize("animation.blend.mode"));
+	PLACE_HOOK_HEXCOLOR_INT2(container,      "Color",    blendOptions, color,    this->_editor.localize("animation.blend.color"), 8);
+	PLACE_HOOK_VECTOR_SOKU_FLOAT2(container, "Scale",    blendOptions, scale,    this->_editor.localize("animation.blend.scale"), 2);
+	PLACE_HOOK_NUMBER2(container,            "FlipVert", blendOptions, flipVert, this->_editor.localize("animation.blend.flipVert"));
+	PLACE_HOOK_NUMBER2(container,            "FlipHorz", blendOptions, flipHorz, this->_editor.localize("animation.blend.flipHorz"));
+	PLACE_HOOK_NUMBER2(container,            "Angle",    blendOptions, angle,    this->_editor.localize("animation.blend.angle"));
+
+	PLACE_HOOK_BOX(container, "SelectedBoxLeft",  left,  this->_editor.localize("animation.selectedbox.left"));
+	PLACE_HOOK_BOX(container, "SelectedBoxRight", right, this->_editor.localize("animation.selectedbox.right"));
+	PLACE_HOOK_BOX(container, "SelectedBoxUp",    up,    this->_editor.localize("animation.selectedbox.up"));
+	PLACE_HOOK_BOX(container, "SelectedBoxDown",  down,  this->_editor.localize("animation.selectedbox.down"));
 	if (boxes) {
 		this->_updateFrameElements[&container].emplace_back([boxes, this]{
 			bool hasBox = this->_preview->getSelectedBox().first != BOXTYPE_NONE;
 
 			boxes->setVisible(hasBox);
 			if (hasBox)
-				boxes->setSize({"&.w", 90});
+				boxes->setSize({"&.w", 150});
 			else
 				boxes->setSize({0, 0});
 			for (auto &fct : this->_updateFrameElements[&*boxes])
@@ -2412,6 +2845,8 @@ void SpiralOfFate::MainWindow::tick()
 	}
 	if (!this->_paused)
 		this->_object->update();
+	if (this->_effectObject)
+		this->_effectObject->update();
 	if (animation != this->_object->_animation) {
 		this->_preview->frameChanged();
 		for (auto key : this->_containers)

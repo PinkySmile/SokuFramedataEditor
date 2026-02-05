@@ -16,6 +16,7 @@
 #include "TextureManager.hpp"
 #include "Logger.hpp"
 #include "MSVCMacros.hpp"
+#include "SoundManager.hpp"
 
 #define random_distrib(r, mi, ma) ((((uint64_t)(r)() - (r).min()) * ((ma) - (mi))) / ((r).max() - (r).min()) + (mi))
 
@@ -24,14 +25,17 @@ namespace SpiralOfFate
 	struct Game {
 		Settings settings;
 		Logger logger;
-		sf::Font font;
 		std::unique_ptr<Screen> screen;
 		ShadyCore::PackageEx package;
 		TextureManager textureMgr;
+		SoundManager soundMgr;
 		tgui::Gui gui;
+		std::map<unsigned, unsigned> soundEffects;
 		unsigned lastSwap = 0;
 
-		Game(const std::filesystem::path &fontPath, const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath = "./latest.log");
+		Game(const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath = "./latest.log");
+		~Game();
+		void reloadSounds();
 	};
 	extern MYDLL_API Game *game;
 }

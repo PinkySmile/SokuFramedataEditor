@@ -114,6 +114,7 @@ void SpiralOfFate::FrameDataEditor::reloadGamePackages()
 		throw;
 	}
 	game->logger.debug("Packages are loaded");
+	game->reloadSounds();
 }
 
 void SpiralOfFate::FrameDataEditor::restoreDefaultShortcuts(std::map<std::string, Shortcut> &shurtcuts) const

@@ -40,7 +40,7 @@ void initEditor()
 {
 	sf::Image icon;
 
-	new Game("assets/fonts/Retro Gaming.ttf", "settings.json", "./editor.log");
+	new Game("settings.json", "./editor.log");
 	game->logger.info("Starting editor.");
 	game->screen = std::make_unique<Screen>("Touhou 12.3: Hisoutensoku | FrameData Editor");
 	if (icon.loadFromFile("assets/editorIcon.png"))
