@@ -4,6 +4,8 @@
 
 #include "SettingsWindow.hpp"
 
+#include "FileDialog.hpp"
+
 SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 	LocalizedContainer<tgui::ChildWindow>(editor)
 {
@@ -25,6 +27,17 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 	auto soku2PathBrowse = this->get<tgui::Button>("Soku2PathBrowse");
 	auto sokuPathBrowse = this->get<tgui::Button>("SokuPathBrowse");
 	auto swrPathBrowse = this->get<tgui::Button>("SwrPathBrowse");
+	auto extraList = this->get<tgui::ListBox>("ExtraList");
+	auto extraBrowse = this->get<tgui::Button>("ExtraBrowse");
+	auto extraUp = this->get<tgui::BitmapButton>("ExtraUp");
+	auto extraDown = this->get<tgui::BitmapButton>("ExtraDown");
+	auto extraRemove = this->get<tgui::Button>("ExtraRemove");
+	auto setArrowColor = [](const tgui::BitmapButton::Ptr &button, sf::Color color){
+		tgui::Texture texture = button->getImage();
+
+		texture.setColor(color);
+		button->setImage(texture);
+	};
 
 	locale->addItem(editor.localize("settings.locale."), "settings.locale.");
 	for (auto &entry : std::filesystem::directory_iterator("assets/gui/editor/locale/")) {
@@ -51,10 +64,14 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 	soku2Path->setText(game->settings.soku2.native());
 	sokuPath->setText(game->settings.soku.native());
 	swrPath->setText(game->settings.swr.native());
+	for (auto &extra : game->settings.extra)
+		extraList->addItem(extra.native());
+	setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColorDisabled());
+	setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColorDisabled());
+	extraUp->setEnabled(false);
+	extraDown->setEnabled(false);
+	extraRemove->setEnabled(false);
 	this->checkPackages();
-
-	// TODO: Extra assets
-
 
 	locale->onItemSelect([&editor](const tgui::String &, const tgui::String &id){
 		size_t pos = id.find_last_of('.');
@@ -62,12 +79,21 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 
 		editor.setLocale(locale.toStdString());
 	});
-	theme->onItemSelect([this, &editor](const tgui::String &, const tgui::String &id){
+	theme->onItemSelect([this, setArrowColor, extraUp, extraDown, &editor](const tgui::String &, const tgui::String &id){
 		tgui::Theme::setDefault(tgui::Theme::create("assets/gui/themes/" + id + ".style"));
 		Utils::setRenderer(game->gui);
 		this->_resize();
 		editor.refreshInterface();
 		this->checkPackages();
+
+		if (extraUp->isEnabled())
+			setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColor());
+		else
+			setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColorDisabled());
+		if (extraDown->isEnabled())
+			setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColor());
+		else
+			setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColorDisabled());
 	});
 	soku2Path->onTextChange([this] (const tgui::String &s){
 		game->settings.soku2 = static_cast<std::filesystem::path::string_type>(s);
@@ -137,6 +163,88 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 			swrPath->setText(file[0].getParentPath().asString());
 		});
 	});
+	extraList->onItemSelect([setArrowColor, extraUp, extraDown, extraRemove](int id) {
+		if (id == -1) {
+			setArrowColor(extraUp, extraUp->getSharedRenderer()->getTextColorDisabled());
+			setArrowColor(extraDown, extraDown->getSharedRenderer()->getTextColorDisabled());
+			extraUp->setEnabled(false);
+			extraDown->setEnabled(false);
+			extraRemove->setEnabled(false);
+			return;
+		}
+
+		auto upR = extraUp->getSharedRenderer();
+		auto doR = extraUp->getSharedRenderer();
+
+		if (id == 0) {
+			extraUp->setEnabled(false);
+			setArrowColor(extraUp, upR->getTextColorDisabled());
+		} else {
+			extraUp->setEnabled(true);
+			setArrowColor(extraUp, upR->getTextColor());
+		}
+
+		if (static_cast<size_t>(id) >= game->settings.extra.size() - 1) {
+			extraDown->setEnabled(false);
+			setArrowColor(extraDown, doR->getTextColorDisabled());
+		} else {
+			extraDown->setEnabled(true);
+			setArrowColor(extraDown, doR->getTextColor());
+		}
+
+		extraRemove->setEnabled(true);
+	});
+	extraBrowse->onClick([this](const std::weak_ptr<tgui::ListBox> &extraList_w) {
+		auto file = FileDialog::create(this->localize("message_box.title.open_framedata"), "Open", false);
+
+		file->setSize(750, 450);
+		file->setFileMustExist(true);
+		file->setPath(tgui::Filesystem::Path(std::filesystem::current_path()));
+		Utils::openWindowWithFocus(game->gui, 0, 0, file);
+		file->setFileTypeFilters({
+			{this->localize("file_type.res_folder"), {"*"}},
+			{this->localize("file_type.res_dat"), {"*.dat"}},
+			{this->localize("file_type.res_zip"), {"*.zip"}},
+			{this->localize("file_type.all"), {}}
+		}, 0);
+		file->setMultiSelect(true);
+		file->onFileSelect([extraList_w](const std::vector<tgui::Filesystem::Path> &arr) {
+			for (auto &p : arr)
+				game->settings.extra.push_back(p);
+
+			auto extraList = extraList_w.lock();
+
+			extraList->removeAllItems();
+			for (auto &extra : game->settings.extra)
+				extraList->addItem(extra.native());
+		});
+	}, std::weak_ptr(extraList));
+	extraUp->onClick([](const std::weak_ptr<tgui::ListBox> &extraList_w) {
+		auto extraList = extraList_w.lock();
+		auto selected = extraList->getSelectedItemIndex();
+
+		std::swap(game->settings.extra[selected], game->settings.extra[selected - 1]);
+		extraList->removeAllItems();
+		for (auto &extra : game->settings.extra)
+			extraList->addItem(extra.native());
+		extraList->setSelectedItemByIndex(selected - 1);
+	}, std::weak_ptr(extraList));
+	extraDown->onClick([](const std::weak_ptr<tgui::ListBox> &extraList_w) {
+		auto extraList = extraList_w.lock();
+		auto selected = extraList->getSelectedItemIndex();
+
+		std::swap(game->settings.extra[selected], game->settings.extra[selected + 1]);
+		extraList->removeAllItems();
+		for (auto &extra : game->settings.extra)
+			extraList->addItem(extra.native());
+		extraList->setSelectedItemByIndex(selected + 1);
+	}, std::weak_ptr(extraList));
+	extraRemove->onClick([](const std::weak_ptr<tgui::ListBox> &extraList_w) {
+		auto extraList = extraList_w.lock();
+
+		game->settings.extra.erase(game->settings.extra.begin() + extraList->getSelectedItemIndex());
+		extraList->removeItemByIndex(extraList->getSelectedItemIndex());
+	}, std::weak_ptr(extraList));
 
 
 	auto cancel = this->get<tgui::Button>("Cancel");

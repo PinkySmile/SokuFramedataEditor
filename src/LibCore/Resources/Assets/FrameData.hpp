@@ -94,23 +94,23 @@ namespace SpiralOfFate
 
 			[[nodiscard]] size_t size() const
 			{
-				return this->_sequences.size();
+				return this->sequences().size();
 			}
 			[[nodiscard]] const Sequence &at(size_t i) const
 			{
-				return this->_sequences.at(i);
+				return this->sequences().at(i);
 			}
 			[[nodiscard]] Sequence &at(size_t i)
 			{
-				return this->_sequences.at(i);
+				return this->sequences().at(i);
 			}
 			[[nodiscard]] const Sequence &operator[](size_t i) const
 			{
-				return this->_sequences[i];
+				return this->sequences()[i];
 			}
 			[[nodiscard]] Sequence &operator[](size_t i)
 			{
-				return this->_sequences[i];
+				return this->sequences()[i];
 			}
 			[[nodiscard]] const std::vector<Sequence> &sequences() const
 			{

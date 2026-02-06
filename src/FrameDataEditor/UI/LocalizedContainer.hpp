@@ -5,6 +5,7 @@
 #ifndef SOFGV_LOCALIZEDCONTAINER_HPP
 #define SOFGV_LOCALIZEDCONTAINER_HPP
 
+
 #include <TGUI/Container.hpp>
 #include "../FrameDataEditor.hpp"
 
@@ -13,7 +14,7 @@ namespace SpiralOfFate
 	template<typename BaseContainer>
 	class LocalizedContainer : public BaseContainer {
 	protected:
-		void _localizeWidgets(tgui::Container &container, bool first)
+		void _localizeWidgets(const tgui::Container &container, bool first)
 		{
 			// TODO: Create struct LocalizationData and use that instead
 			for (auto &w : container.getWidgets()) {
@@ -25,25 +26,25 @@ namespace SpiralOfFate
 					if (auto label = w->cast<tgui::Label>()) {
 						if (first)
 							label->setUserData(std::string(label->getText()));
-						label->setText(this->_editor.localize(std::string(label->getUserData<std::string>())));
+						label->setText(this->localize(std::string(label->getUserData<std::string>())));
 					} else if (auto button = w->cast<tgui::ButtonBase>()) {
 						if (first)
 							button->setUserData(std::string(button->getText()));
-						button->setText(this->_editor.localize(std::string(button->getUserData<std::string>())));
+						button->setText(this->localize(std::string(button->getUserData<std::string>())));
 					} else if (auto check = w->cast<tgui::CheckBox>()) {
 						if (first)
 							check->setUserData(std::string(check->getText()));
-						check->setText(this->_editor.localize(std::string(check->getUserData<std::string>())));
+						check->setText(this->localize(std::string(check->getUserData<std::string>())));
 					} else if (auto combo = w->cast<tgui::ComboBox>()) {
 						if (first) {
 							auto items = combo->getItems();
 
 							combo->removeAllItems();
 							for (const auto &item : items)
-								combo->addItem(this->_editor.localize(item.toStdString()), item);
+								combo->addItem(this->localize(item.toStdString()), item);
 						} else {
 							for (const auto &item : combo->getItemIds())
-								combo->changeItemById(item, this->_editor.localize(item.toStdString()));
+								combo->changeItemById(item, this->localize(item.toStdString()));
 						}
 					} else if (auto cont = w->cast<tgui::Container>())
 						this->_localizeWidgets(*cont, first);
@@ -53,6 +54,7 @@ namespace SpiralOfFate
 
 	protected:
 		const FrameDataEditor &_editor;
+		std::map<std::string, std::string> _localizationOverride;
 
 	public:
 		using Ptr = std::shared_ptr<LocalizedContainer>; //!< Shared widget pointer
@@ -73,6 +75,23 @@ namespace SpiralOfFate
 		void reLocalize()
 		{
 			this->_localizeWidgets(*this, false);
+		}
+
+		template<typename ...Args>
+		std::string localize(const std::string &s, const Args... args) const
+		{
+			for (auto &[key, value] : this->_localizationOverride)
+				if (s.starts_with(key))
+					return this->_editor.localize(value + s.substr(key.size()), args...);
+			return this->_editor.localize(s, args...);
+		}
+
+		std::string localize(const std::string &s)
+		{
+			for (auto &[key, value] : this->_localizationOverride)
+				if (s.starts_with(key))
+					return this->_editor.localize(value + s.substr(key.size()));
+			return this->_editor.localize(s);
 		}
 	};
 }

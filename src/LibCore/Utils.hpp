@@ -177,12 +177,12 @@ namespace SpiralOfFate::Utils
 		panel->setUserData(false);
 		gui.add(panel);
 
-		if (!window) {
+		if (!window)
 			window = WindowType::create(args...);
-			if (!width.isConstant() || width.getValue() != 0)
-				window->setSize(width, height);
-		} else
+		else
 			setRenderer(static_cast<tgui::Container::Ptr>(window));
+		if (!width.isConstant() || width.getValue() != 0)
+			window->setSize(width, height);
 		window->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
 		gui.add(window);
 
@@ -226,14 +226,14 @@ namespace SpiralOfFate::Utils
 	//! @param basePath The path of the FileDialog
 	//! @param patterns The patterns of the FileDialog
 	//! @return std::string FileDialog message
-	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title = "Open file", const std::filesystem::path &basePath = ".", bool overWriteWarning = false, bool mustExist = true);
+	tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title = "Open file", const std::filesystem::path &basePath = std::filesystem::current_path(), bool overWriteWarning = false, bool mustExist = true);
 
 	//! @brief Saves a file dialog
 	//! @param title Title of the FileDialog
 	//! @param basePath The path of the FileDialog
 	//! @param patterns The patterns of the FileDialog
 	//! @return std::string FileDialog message
-	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title = "Save file", const std::filesystem::path &basePath = ".");
+	tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title = "Save file", const std::filesystem::path &basePath = std::filesystem::current_path());
 
 	//! @brief Display a window with a slider.
 	//! @param gui The gui handling the window.

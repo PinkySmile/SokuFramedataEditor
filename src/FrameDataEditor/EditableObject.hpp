@@ -36,6 +36,8 @@ public:
 	EditableObject(const std::string &folder, const std::string &frameData, const std::array<SpiralOfFate::Color, 256> *palette);
 	EditableObject(const std::string &folder, const std::filesystem::path &frameData, const std::array<SpiralOfFate::Color, 256> *palette);
 	~EditableObject() = default;
+	SpiralOfFate::FrameData::Sequence &getSequence();
+	const SpiralOfFate::FrameData::Sequence &getSequence() const;
 	SpiralOfFate::FrameData &getFrameData();
 	const SpiralOfFate::FrameData &getFrameData() const;
 	void render(sf::RenderTarget &target, sf::RenderStates states);

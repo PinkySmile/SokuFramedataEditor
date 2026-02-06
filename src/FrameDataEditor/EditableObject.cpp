@@ -125,14 +125,22 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states)
 
 void EditableObject::update()
 {
-	auto *data = &this->_schema.framedata.at(this->_action)[this->_actionBlock][this->_animation];
+	auto &action = this->_schema.framedata.at(this->_action);
+	auto &seq = action[this->_actionBlock];
+	auto *data = &seq[this->_animation];
 
 	this->_animationCtr++;
 	while (this->_animationCtr >= data->duration) {
 		this->_animationCtr = 0;
 		this->_animation++;
-		this->_animation %= this->_schema.framedata.at(this->_action)[this->_actionBlock].size();
-		data = &this->_schema.framedata.at(this->_action)[this->_actionBlock][this->_animation];
+		if (this->_animation >= seq.size()) {
+			this->_animation = 0;
+			if (!seq.loop) {
+				this->_actionBlock++;
+				this->_actionBlock %= action.size();
+			}
+		}
+		data = &action[this->_actionBlock][this->_animation];
 		this->resetState();
 		this->_needGenerate = false;
 		this->_generateOverlaySprite();
@@ -147,6 +155,16 @@ FrameData &EditableObject::getFrameData()
 const FrameData &EditableObject::getFrameData() const
 {
 	return this->_schema.framedata.at(this->_action).at(this->_actionBlock).at(this->_animation);
+}
+
+FrameData::Sequence &EditableObject::getSequence()
+{
+	return this->_schema.framedata.at(this->_action).at(this->_actionBlock);
+}
+
+const FrameData::Sequence &EditableObject::getSequence() const
+{
+	return this->_schema.framedata.at(this->_action).at(this->_actionBlock);
 }
 
 std::vector<Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const

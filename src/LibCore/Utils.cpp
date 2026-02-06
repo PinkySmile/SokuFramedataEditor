@@ -113,7 +113,7 @@ namespace SpiralOfFate::Utils
 
 		dialog->setFileMustExist(mustExist);
 		dialog->setPath(tgui::Filesystem::Path(absolute(basePath)));
-		openWindowWithFocus(gui, 0, 0, dialog);
+		openWindowWithFocus(gui, 750, 450, dialog);
 		return dialog;
 	}
 

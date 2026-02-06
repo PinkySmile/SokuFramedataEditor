@@ -48,15 +48,16 @@ namespace SpiralOfFate
 
 		static constexpr const char StaticWidgetType[] = "FDEMainWindow"; //!< Type name of the widget
 
-		//MainWindow(const nlohmann::json &backup, FrameDataEditor &editor);
+		MainWindow(const nlohmann::json &backup, FrameDataEditor &editor);
 		MainWindow(const std::string &folder, const std::string &frameDataPath, FrameDataEditor &editor);
 		MainWindow(const std::string &folder, const std::filesystem::path &frameDataPath, FrameDataEditor &editor);
-		~MainWindow();
+		~MainWindow() override;
 
 		Renderer *getSharedRenderer() override;
 		const Renderer *getSharedRenderer() const override;
 		Renderer *getRenderer() override;
 
+		std::filesystem::path getPath() const;
 		bool hasPath() const;
 		bool hasPaletteChanges() const;
 		void reloadPalette();

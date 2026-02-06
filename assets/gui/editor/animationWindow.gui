@@ -1,113 +1,3 @@
-Renderer.1 {
-    BackgroundColor = #F5F5F5;
-    BackgroundColorDisabled = #E6E6E6;
-    BackgroundColorDown = #EBEBEB;
-    BackgroundColorHover = white;
-    BorderColor = #3C3C3C;
-    BorderColorDisabled = #7D7D7D;
-    BorderColorDown = black;
-    BorderColorFocused = #1E1EB4;
-    BorderColorHover = black;
-    Borders = (1, 1, 1, 1);
-    TextColor = #3C3C3C;
-    TextColorDisabled = #7D7D7D;
-    TextColorDown = black;
-    TextColorHover = black;
-    Texture = None;
-    TextureDisabled = None;
-    TextureDown = None;
-    TextureDownFocused = None;
-    TextureDownHover = None;
-    TextureFocused = None;
-    TextureHover = None;
-}
-
-Renderer.2 {
-    BackgroundColor = #F5F5F5;
-    BackgroundColorDisabled = #E6E6E6;
-    BackgroundColorHover = white;
-    BorderColor = #3C3C3C;
-    BorderColorDisabled = #7D7D7D;
-    BorderColorHover = black;
-    Borders = (1, 1, 1, 1);
-    CaretColor = black;
-    CaretWidth = 1;
-    DefaultTextColor = #A0A0A0;
-    Padding = (0, 0, 0, 0);
-    SelectedTextBackgroundColor = #006EFF;
-    SelectedTextColor = white;
-    TextColor = #3C3C3C;
-    TextColorDisabled = #7D7D7D;
-    Texture = None;
-    TextureDisabled = None;
-    TextureFocused = None;
-    TextureHover = None;
-}
-
-Renderer.3 {
-    BackgroundColor = #F5F5F5;
-    BackgroundColorDisabled = #E6E6E6;
-    BackgroundColorDown = #EBEBEB;
-    BackgroundColorHover = white;
-    BorderColor = #3C3C3C;
-    BorderColorDisabled = #7D7D7D;
-    BorderColorDown = black;
-    BorderColorFocused = #1E1EB4;
-    BorderColorHover = black;
-    Borders = (1, 1, 1, 1);
-    TextColor = #3C3C3C;
-    TextColorDisabled = #7D7D7D;
-    TextColorDown = black;
-    TextColorHover = black;
-    Texture = None;
-    TextureDisabled = None;
-    TextureDown = None;
-    TextureDownFocused = None;
-    TextureDownHover = None;
-    TextureFocused = None;
-    TextureHover = None;
-}
-
-Renderer.4 {
-    BackgroundColor = transparent;
-    BorderColor = #3C3C3C;
-    Borders = (0, 0, 0, 0);
-    TextColor = #3C3C3C;
-    TextureBackground = None;
-
-    Scrollbar {
-        ArrowBackgroundColor = #F5F5F5;
-        ArrowBackgroundColorHover = white;
-        ArrowColor = #3C3C3C;
-        ArrowColorHover = black;
-        TextureArrowDown = None;
-        TextureArrowDownHover = None;
-        TextureArrowUp = None;
-        TextureArrowUpHover = None;
-        TextureThumb = None;
-        TextureThumbHover = None;
-        TextureTrack = None;
-        TextureTrackHover = None;
-        ThumbColor = #DCDCDC;
-        ThumbColorHover = #E6E6E6;
-        TrackColor = #F5F5F5;
-    }
-}
-
-Renderer.5 {
-    ArrowColor = #3C3C3C;
-    ArrowColorHover = black;
-    BackgroundColor = #F5F5F5;
-    BackgroundColorHover = white;
-    BorderBetweenArrows = 2;
-    BorderColor = black;
-    Borders = (1, 1, 1, 1);
-    TextureArrowDown = None;
-    TextureArrowDownHover = None;
-    TextureArrowUp = None;
-    TextureArrowUpHover = None;
-}
-
 Panel.AnimationPanel {
     Size = (ControlPanel.x, &.h);
 
@@ -121,29 +11,64 @@ Panel.AnimationPanel {
         Image = "boxes.png" Middle(0, 0, 16, 16) NoSmooth;
         ImageScaling = 0;
         Position = (5, 5);
-        Renderer = &1;
         Size = (40, 40);
         TextSize = 13;
-    }
 
-    BitmapButton.Displace {
-        Image = "dispose.png" NoSmooth;
-        ImageScaling = 0;
-        Position = (5, 50);
-        Renderer = &1;
-        Size = (40, 40);
-        TextSize = 13;
+        Renderer {
+            BackgroundColor = #F5F5F5;
+            BackgroundColorDisabled = #E6E6E6;
+            BackgroundColorDown = #EBEBEB;
+            BackgroundColorHover = white;
+            BorderColor = #3C3C3C;
+            BorderColorDisabled = #7D7D7D;
+            BorderColorDown = black;
+            BorderColorFocused = #1E1EB4;
+            BorderColorHover = black;
+            Borders = (1, 1, 1, 1);
+            TextColor = #3C3C3C;
+            TextColorDisabled = #7D7D7D;
+            TextColorDown = black;
+            TextColorHover = black;
+            Texture = None;
+            TextureDisabled = None;
+            TextureDown = None;
+            TextureDownFocused = None;
+            TextureDownHover = None;
+            TextureFocused = None;
+            TextureHover = None;
+        }
     }
 }
 
 ScrollablePanel.ControlPanel {
+    ContentSize = (0, 0);
+    HorizontalScrollbarPolicy = Automatic;
     Position = (&.w - w, ControlTabs.h);
     Size = (300, &.h - ControlTabs.h);
+    VerticalScrollbarPolicy = Automatic;
 
     Renderer {
         BackgroundColor = white;
         BorderColor = black;
         TextureBackground = None;
+
+        Scrollbar {
+            ArrowBackgroundColor = #F5F5F5;
+            ArrowBackgroundColorHover = white;
+            ArrowColor = #3C3C3C;
+            ArrowColorHover = black;
+            TextureArrowDown = None;
+            TextureArrowDownHover = None;
+            TextureArrowUp = None;
+            TextureArrowUpHover = None;
+            TextureThumb = None;
+            TextureThumbHover = None;
+            TextureTrack = None;
+            TextureTrackHover = None;
+            ThumbColor = #DCDCDC;
+            ThumbColorHover = #E6E6E6;
+            TrackColor = #F5F5F5;
+        }
     }
 }
 

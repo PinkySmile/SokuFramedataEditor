@@ -94,6 +94,10 @@ void SpiralOfFate::FrameDataEditor::reloadGamePackages()
 	try {
 		for (auto &path : game->settings.extra)
 			game->package.merge(path);
+	} catch (const std::exception &e) {
+		game->logger.error("Error loading extras: " + std::string(e.what()));
+	}
+	try {
 		for (auto &path : std::filesystem::directory_iterator(game->settings.soku2)) {
 			if (!path.is_directory())
 				continue;
@@ -460,7 +464,7 @@ std::string SpiralOfFate::FrameDataEditor::getLocale() const
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
 {
-	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_framedata"), ".");
+	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_framedata"));
 	auto load = [this](const std::filesystem::path &path, const std::string &folder){
 		try {
 			this->_openWindows.emplace_back(new MainWindow(folder, path, *this));
@@ -504,15 +508,79 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 		}
 		return false;
 	};
+	auto loadJson = [this](const std::filesystem::path &path){
+		try {
+			std::ifstream stream{path};
+			nlohmann::json json;
+
+			if (!stream) {
+				Utils::dispMsg(
+					game->gui,
+					this->localize("message_box.title.load_failed"),
+					// TODO: Only works on Linux
+					this->localize("message_box.invalid_file", strerror(errno)),
+					MB_ICONERROR
+				);
+				return false;
+			}
+			stream >> json;
+			this->_openWindows.emplace_back(new MainWindow(json, *this));
+			this->_focusedWindow = this->_openWindows.back();
+			this->_focusedWindow->onFocus([this](const std::weak_ptr<MainWindow> &This){
+				auto lock = This.lock();
+
+				if (this->_focusedWindow != lock) {
+					if (this->_focusedWindow)
+						this->_focusedWindow->setFocused(false);
+					this->_focusedWindow = lock;
+					this->_updateMenuBar();
+					this->_focusedWindow->refreshMenuItems();
+				}
+			}, std::weak_ptr(this->_focusedWindow));
+			this->_focusedWindow->onRealClose([this](const std::weak_ptr<MainWindow> &This){
+				this->_openWindows.erase(std::remove(this->_openWindows.begin(), this->_openWindows.end(), This.lock()), this->_openWindows.end());
+				if (this->_focusedWindow == This.lock())
+					this->_focusedWindow = nullptr;
+				this->_updateMenuBar();
+			}, std::weak_ptr(this->_focusedWindow));
+			game->gui.add(this->_focusedWindow);
+			this->_focusedWindow->setFocused(true);
+			this->_updateMenuBar();
+			this->_focusedWindow->refreshMenuItems();
+			return true;
+		} catch (_AssertionFailedException &e) { // TODO: Very dirty
+			Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.load_failed"),
+				this->localize("message_box.invalid_file", e.what()),
+				MB_ICONERROR
+			);
+		} catch (std::exception &e) {
+			Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.load_failed"),
+				this->localize("message_box.internal_error", Utils::getLastExceptionName(), e.what()),
+				MB_ICONERROR
+			);
+		}
+		return false;
+	};
 
 	file->setFileTypeFilters({
 		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
+		{this->localize("file_type.framedata_editor"), {"*.json"}},
 		{this->localize("file_type.all"), {}}
 	}, 0);
 	file->setMultiSelect(true);
-	file->onFileSelect([load, this](const std::vector<tgui::Filesystem::Path> &arr) {
+	file->onFileSelect([loadJson, load, this](const std::vector<tgui::Filesystem::Path> &arr) {
 		for (auto &p : arr) {
 			const std::filesystem::path &filePath = p;
+
+			if (filePath.extension() == ".json") {
+				loadJson(filePath);
+				continue;
+			}
+
 			auto win = std::make_shared<LocalizedContainer<tgui::ChildWindow>>(*this);
 
 			win->loadLocalizedWidgetsFromFile("assets/gui/editor/load_folder.gui");
@@ -544,14 +612,19 @@ void SpiralOfFate::FrameDataEditor::_save()
 
 void SpiralOfFate::FrameDataEditor::_saveAs()
 {
-	auto file = Utils::saveFileDialog(game->gui, this->localize("message_box.title.save_framedata"), "assets/characters");
+	auto file = Utils::saveFileDialog(game->gui, this->localize("message_box.title.save_framedata"), this->_focusedWindow->getPath());
 
 	file->setFileTypeFilters({
-		{this->localize("file_type.framedata"), {"*.json"}},
+		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
+		{this->localize("file_type.framedata_editor"), {"*.json"}},
 		{this->localize("file_type.all"), {}}
 	}, 0);
 	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
-		this->_focusedWindow->save(arr[0].asString().toStdString());
+		std::filesystem::path p = arr[0];
+
+		if (!p.has_extension())
+			p.replace_extension("pat");
+		this->_focusedWindow->save(p);
 	});
 }
 

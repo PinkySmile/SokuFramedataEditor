@@ -117,6 +117,7 @@ add_executable(
 	src/FrameDataEditor/Operations/DummyOperation.hpp
 	src/FrameDataEditor/Operations/FlagOperation.hpp
 	src/FrameDataEditor/Operations/BasicDataOperation.hpp
+	src/FrameDataEditor/Operations/BasicDataOperationSeq.hpp
 	src/FrameDataEditor/Operations/BasicData2StepOperation.hpp
 	src/FrameDataEditor/Operations/BasicDataDoubleOperation.hpp
 	src/FrameDataEditor/Operations/BasicDataDouble2Operation.hpp
@@ -177,6 +178,8 @@ add_executable(
 	src/LibCore/SFML/SoundManager.hpp
 	src/FrameDataEditor/Rectangle.cpp
 	src/FrameDataEditor/Rectangle.hpp
+	src/FrameDataEditor/UI/FileDialog.cpp
+	src/FrameDataEditor/UI/FileDialog.hpp
 )
 
 set(

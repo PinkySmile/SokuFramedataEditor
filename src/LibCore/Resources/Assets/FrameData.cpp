@@ -163,6 +163,7 @@ namespace SpiralOfFate
 		__folder(other.__folder),
 		__requireReload(other.__requireReload),
 		__paletteData(other.__paletteData),
+		spritePath(other.spritePath),
 		textureHandle(other.textureHandle)
 	{
 		game->textureMgr.addRef(this->textureHandle);
