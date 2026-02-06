@@ -789,9 +789,12 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::strin
 	this->_character = folder;
 	while (this->_character.back() == '/')
 		this->_character.pop_back();
-	this->_character.erase(0, this->_character.find_last_of('/'));
-	if (!std::filesystem::exists(game->settings.palettes / this->_character))
-		std::filesystem::create_directories(game->settings.palettes / this->_character);
+	this->_character.erase(0, this->_character.find_last_of('/') + 1);
+
+	auto palFolder = game->settings.palettes / this->_character;
+
+	if (!std::filesystem::exists(palFolder))
+		std::filesystem::create_directories(palFolder);
 	this->reloadPalette();
 	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
 	this->_init();
@@ -812,8 +815,11 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::files
 	while (this->_character.back() == '/')
 		this->_character.pop_back();
 	this->_character.erase(0, this->_character.find_last_of('/') + 1);
-	if (!std::filesystem::exists(game->settings.palettes / this->_character))
-		std::filesystem::create_directories(game->settings.palettes / this->_character);
+
+	auto palFolder = game->settings.palettes / this->_character;
+
+	if (!std::filesystem::exists(palFolder))
+		std::filesystem::create_directories(palFolder);
 	this->reloadPalette();
 	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
 	this->_init();

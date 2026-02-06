@@ -4,7 +4,7 @@ MenuBar.MainBar {
     TextSize = 13;
 
     Menu {
-        Items = ["menu_item.file.load", "menu_item.file.save", "menu_item.file.save_as", "menu_item.file.shortcuts", "menu_item.file.settings", "menu_item.file.quit"];
+        Items = ["menu_item.file.load", "menu_item.file.explore", "menu_item.file.save", "menu_item.file.save_as", "menu_item.file.shortcuts", "menu_item.file.settings", "menu_item.file.quit"];
         Text = "menu_item.file";
     }
 

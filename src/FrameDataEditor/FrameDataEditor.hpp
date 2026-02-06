@@ -69,6 +69,7 @@ namespace SpiralOfFate
 		void _tickAnimation();
 
 		void _loadFramedata();
+		void _explorePackage();
 		void _save();
 		void _saveAs();
 		void _settings();

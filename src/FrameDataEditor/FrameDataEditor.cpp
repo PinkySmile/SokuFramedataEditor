@@ -8,6 +8,7 @@
 #include "Resources/Assert.hpp"
 #include "UI/MainWindow.hpp"
 #include "UI/LocalizedContainer.hpp"
+#include "UI/PackageFileDialog.hpp"
 #include "UI/SettingsWindow.hpp"
 #include "UI/ShortcutsWindow.hpp"
 
@@ -92,6 +93,7 @@ void SpiralOfFate::FrameDataEditor::reloadGamePackages()
 	};
 
 	try {
+		game->package.clear();
 		for (auto &path : game->settings.extra)
 			game->package.merge(path);
 	} catch (const std::exception &e) {
@@ -110,7 +112,6 @@ void SpiralOfFate::FrameDataEditor::reloadGamePackages()
 	}
 
 	try {
-		game->package.clear();
 		for (auto &path : paths)
 			game->package.merge(path);
 	} catch (std::exception &e) {
@@ -303,6 +304,7 @@ void SpiralOfFate::FrameDataEditor::_connectShortcut(const tgui::MenuBar::Ptr &m
 void SpiralOfFate::FrameDataEditor::_placeMenuCallbacks(const tgui::MenuBar::Ptr &menu)
 {
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.load"      }, &FrameDataEditor::_loadFramedata);
+	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.explore"   }, &FrameDataEditor::_explorePackage);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.save"      }, &FrameDataEditor::_save);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.save_as"   }, &FrameDataEditor::_saveAs);
 	this->_connectShortcut(menu, { "menu_item.file", "menu_item.file.settings"  }, &FrameDataEditor::_settings);
@@ -599,6 +601,71 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 				win_.lock()->close();
 			}, std::weak_ptr(win));
 		}
+	});
+}
+
+void SpiralOfFate::FrameDataEditor::_explorePackage()
+{
+	auto file = tgui::PackageFileDialog::create(game->package, this->localize("message_box.title.open_framedata"), "Open");
+
+	file->setFileMustExist(true);
+	file->setPath("");
+	Utils::openWindowWithFocus(game->gui, 750, 450, file);
+	auto load = [this](const tgui::String &path){
+		try {
+			auto pos = path.find_last_of('/');
+			auto folder = path.substr(0, pos);
+
+			this->_openWindows.emplace_back(new MainWindow(folder.toStdString(), path.toStdString(), *this));
+			this->_focusedWindow = this->_openWindows.back();
+			this->_focusedWindow->onFocus([this](const std::weak_ptr<MainWindow> &This){
+				auto lock = This.lock();
+
+				if (this->_focusedWindow != lock) {
+					if (this->_focusedWindow)
+						this->_focusedWindow->setFocused(false);
+					this->_focusedWindow = lock;
+					this->_updateMenuBar();
+					this->_focusedWindow->refreshMenuItems();
+				}
+			}, std::weak_ptr(this->_focusedWindow));
+			this->_focusedWindow->onRealClose([this](const std::weak_ptr<MainWindow> &This){
+				this->_openWindows.erase(std::remove(this->_openWindows.begin(), this->_openWindows.end(), This.lock()), this->_openWindows.end());
+				if (this->_focusedWindow == This.lock())
+					this->_focusedWindow = nullptr;
+				this->_updateMenuBar();
+			}, std::weak_ptr(this->_focusedWindow));
+			game->gui.add(this->_focusedWindow);
+			this->_focusedWindow->setFocused(true);
+			this->_updateMenuBar();
+			this->_focusedWindow->refreshMenuItems();
+			return true;
+		} catch (_AssertionFailedException &e) { // TODO: Very dirty
+			Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.load_failed"),
+				this->localize("message_box.invalid_file", e.what()),
+				MB_ICONERROR
+			);
+		} catch (std::exception &e) {
+			Utils::dispMsg(
+				game->gui,
+				this->localize("message_box.title.load_failed"),
+				this->localize("message_box.internal_error", Utils::getLastExceptionName(), e.what()),
+				MB_ICONERROR
+			);
+		}
+		return false;
+	};
+
+	file->setFileTypeFilters({
+		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
+		{this->localize("file_type.all"), {}}
+	}, 0);
+	file->setMultiSelect(true);
+	file->onFileSelect([load](const std::vector<tgui::String> &arr) {
+		for (auto &path : arr)
+			load(path);
 	});
 }
 

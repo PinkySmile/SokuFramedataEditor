@@ -180,6 +180,8 @@ add_executable(
 	src/FrameDataEditor/Rectangle.hpp
 	src/FrameDataEditor/UI/FileDialog.cpp
 	src/FrameDataEditor/UI/FileDialog.hpp
+	src/FrameDataEditor/UI/PackageFileDialog.cpp
+	src/FrameDataEditor/UI/PackageFileDialog.hpp
 )
 
 set(

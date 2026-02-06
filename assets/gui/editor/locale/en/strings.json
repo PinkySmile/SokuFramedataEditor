@@ -143,6 +143,7 @@
 
 	"menu_item.file":                                      "File",
 	"menu_item.file.load":                                 "Open",
+	"menu_item.file.explore":                              "Explore package",
 	"menu_item.file.save":                                 "Save",
 	"menu_item.file.save_as":                              "Save As",
 	"menu_item.file.settings":                             "Settings",

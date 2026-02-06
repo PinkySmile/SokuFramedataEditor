@@ -145,6 +145,7 @@
 
 	"menu_item.file":                                      "Fichier",
 	"menu_item.file.load":                                 "Ouvrir",
+	"menu_item.file.explore":                              "Explorer paquet",
 	"menu_item.file.save":                                 "Enregister",
 	"menu_item.file.save_as":                              "Enregister sous",
 	"menu_item.file.settings":                             "Paramètres",
