@@ -882,7 +882,7 @@ void SpiralOfFate::MainWindow::redo()
 		return;
 	}
 
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 	std::lock_guard guard{this->_saveMutex};
 
 	this->_operationQueue[this->_operationIndex]->apply();
@@ -906,7 +906,7 @@ void SpiralOfFate::MainWindow::undo()
 	}
 
 	std::lock_guard guard{this->_saveMutex};
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	this->_operationIndex--;
 	this->_operationQueue[this->_operationIndex]->undo();
@@ -987,7 +987,7 @@ void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operati
 	assert_exp(!this->_pendingTransaction);
 
 	std::lock_guard guard{this->_saveMutex};
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	if (!operation)
 		operation = new DummyOperation();
@@ -1006,7 +1006,7 @@ void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *
 	assert_exp(this->_pendingTransaction);
 
 	std::lock_guard guard{this->_saveMutex};
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	this->_pendingTransaction->undo();
 	this->_pendingTransaction.reset(operation());
@@ -1022,7 +1022,7 @@ void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *
 void SpiralOfFate::MainWindow::cancelTransaction()
 {
 	std::lock_guard guard{this->_saveMutex};
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	assert_exp(this->_pendingTransaction);
 	this->_pendingTransaction->undo();
@@ -1041,7 +1041,7 @@ void SpiralOfFate::MainWindow::commitTransaction()
 		return this->_pendingTransaction.reset();
 
 	std::lock_guard guard{this->_saveMutex};
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(nullptr);
@@ -1068,7 +1068,7 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	}
 
 	std::lock_guard guard{this->_saveMutex};
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
@@ -1362,7 +1362,7 @@ void SpiralOfFate::MainWindow::autoSave()
 	stream.close();
 	this->_requireAutoSave = false;
 
-	std::string title = this->_path.string();
+	std::string title = this->_title;
 
 	if (this->isModified())
 		title += "*";
