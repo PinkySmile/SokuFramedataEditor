@@ -114,7 +114,7 @@ SpinButton.BlockSpin {
 
 Label.FrameLabel {
     HorizontalAlignment = Right;
-    Position = (0, 108);
+    Position = (0, 109);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (110, 17);
@@ -125,7 +125,7 @@ Label.FrameLabel {
 SpinButton.FrameSpin {
     Maximum = 10;
     Minimum = 0;
-    Position = (110, 106);
+    Position = (110, 107);
     Renderer = &3;
     Size = (42, 21);
     Step = 1;
@@ -141,7 +141,7 @@ Button.Play {
 }
 
 Button.Step {
-    Position = (160, 106);
+    Position = (160, 107);
     Renderer = &1;
     Size = (130, 21);
     Text = "animation.step";

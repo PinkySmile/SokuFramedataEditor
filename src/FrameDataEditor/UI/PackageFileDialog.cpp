@@ -23,12 +23,17 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Altered to change the data source from filesystem to shady-loader packages
 
+
 #include "PackageFileDialog.hpp"
 #include <TGUI/FileDialogIconLoader.hpp>
 
 #include <vector>
 #include <map>
 #include <ctime>
+#include <TGUI/Widgets/Scrollbar.hpp>
+// From shady
+#include <util/encodingConverter.hpp>
+#include "Resources/Game.hpp"
 
 #ifdef TGUI_SYSTEM_WINDOWS
 	#include <TGUI/extlibs/IncludeWindows.hpp>
@@ -56,11 +61,35 @@ namespace tgui
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	PackageFileDialog::PackageFileDialog(const char* typeName, bool initRenderer) :
-		ChildWindow{typeName, false},
-		m_iconLoader(FileDialogIconLoader::createInstance())
+		ChildWindow{typeName, false}
 	{
-		setClientSize({600, 400});
+		setClientSize({1000, 400});
 
+		m_icons = {
+			Texture{ "assets/icons/unknown.png" },
+			Texture{ "assets/icons/dialog.png" },
+			Texture{ "assets/icons/table.png" },
+			Texture{ "assets/icons/musicLoop.png" },
+			Texture{ "assets/icons/image.png" },
+			Texture{ "assets/icons/palette.png" },
+			Texture{ "assets/icons/sfx.png" },
+			Texture{ "assets/icons/music.png" },
+			Texture{ "assets/icons/chr.png" },
+			Texture{ "assets/icons/menu.png" },
+			Texture{ "assets/icons/folder.png" }
+		};
+
+		m_previewPanel = Panel::create();
+		m_previewError = Label::create();
+		m_playPause = BitmapButton::create();
+		m_playSlider = Slider::create();
+		m_playLabel = Label::create();
+		m_previewPicture = Picture::create();
+		m_previewPalette = Picture::create();
+		m_previewPicSize = Label::create();
+		m_previewText = TextArea::create();
+
+		m_filesPanel = Panel::create();
 		m_buttonBack = Button::create();
 		m_buttonForward = Button::create();
 		m_buttonUp = Button::create();
@@ -75,16 +104,60 @@ namespace tgui
 		m_buttonCancel->setText("Cancel");
 		m_buttonConfirm->setText("Open");
 
-		add(m_buttonBack, "#TGUI_INTERNAL$ButtonBack#");
-		add(m_buttonForward, "#TGUI_INTERNAL$ButtonForward#");
-		add(m_buttonUp, "#TGUI_INTERNAL$ButtonUp#");
-		add(m_editBoxPath, "#TGUI_INTERNAL$EditBoxPath#");
-		add(m_listView, "#TGUI_INTERNAL$ListView#");
-		add(m_labelFilename, "#TGUI_INTERNAL$LabelFilename#");
-		add(m_editBoxFilename, "#TGUI_INTERNAL$EditBoxFilename#");
-		add(m_comboBoxFileTypes, "#TGUI_INTERNAL$ComboBoxFileTypes#");
-		add(m_buttonCancel, "#TGUI_INTERNAL$ButtonCancel#");
-		add(m_buttonConfirm, "#TGUI_INTERNAL$ButtonConfirm#");
+		m_previewPanel->add(m_playPause, "#TGUI_INTERNAL$PlayPause#");
+		m_previewPanel->add(m_playSlider, "#TGUI_INTERNAL$PlaySlider#");
+		m_previewPanel->add(m_playLabel, "#TGUI_INTERNAL$PlayLabel#");
+		m_previewPanel->add(m_previewPicture, "#TGUI_INTERNAL$PreviewPic#");
+		m_previewPanel->add(m_previewPalette, "#TGUI_INTERNAL$PreviewPal#");
+		m_previewPanel->add(m_previewPicSize, "#TGUI_INTERNAL$PreviewPicSize#");
+		m_previewPanel->add(m_previewText, "#TGUI_INTERNAL$PreviewText#");
+		m_previewPanel->add(m_previewError, "#TGUI_INTERNAL$PreviewError#");
+		add(m_previewPanel, "#TGUI_INTERNAL$PreviewPanel#");
+		m_filesPanel->add(m_buttonBack, "#TGUI_INTERNAL$ButtonBack#");
+		m_filesPanel->add(m_buttonForward, "#TGUI_INTERNAL$ButtonForward#");
+		m_filesPanel->add(m_buttonUp, "#TGUI_INTERNAL$ButtonUp#");
+		m_filesPanel->add(m_editBoxPath, "#TGUI_INTERNAL$EditBoxPath#");
+		m_filesPanel->add(m_listView, "#TGUI_INTERNAL$ListView#");
+		m_filesPanel->add(m_labelFilename, "#TGUI_INTERNAL$LabelFilename#");
+		m_filesPanel->add(m_editBoxFilename, "#TGUI_INTERNAL$EditBoxFilename#");
+		m_filesPanel->add(m_comboBoxFileTypes, "#TGUI_INTERNAL$ComboBoxFileTypes#");
+		m_filesPanel->add(m_buttonCancel, "#TGUI_INTERNAL$ButtonCancel#");
+		m_filesPanel->add(m_buttonConfirm, "#TGUI_INTERNAL$ButtonConfirm#");
+		add(m_filesPanel, "#TGUI_INTERNAL$FilesPanel#");
+
+		// ------------- Previews ------------- //
+		m_previewPanel->setPosition({"&.w - w", 0});
+		m_previewPanel->setSize({500, "100%"});
+
+		m_previewError->setPosition({10, 10});
+		m_previewError->setSize({"100% - 20", 20});
+		m_previewError->setHorizontalAlignment(HorizontalAlignment::Center);
+		m_previewError->setVerticalAlignment(VerticalAlignment::Center);
+
+		m_playPause->setPosition({10, 10});
+		m_playPause->setSize({20, 20});
+
+		m_playSlider->setPosition({"#TGUI_INTERNAL$PlayPause#.x + #TGUI_INTERNAL$PlayPause#.w + 15", 14});
+		m_playSlider->setSize({"#TGUI_INTERNAL$PlayLabel#.x - x - 20", 12});
+		m_playSlider->setStep(0.01f);
+
+		m_playLabel->setPosition("&.w - w - 10", 13);
+
+		m_previewPicture->setPosition("(&.w - w) / 2", 10);
+
+		m_previewPalette->setPosition("(100% - w) / 2", "#TGUI_INTERNAL$PreviewPic#.y + #TGUI_INTERNAL$PreviewPic#.h + 10");
+		m_previewPalette->setSize(256, 16);
+
+		m_previewPicSize->setPosition(10, "#TGUI_INTERNAL$PreviewPic#.y + #TGUI_INTERNAL$PreviewPic#.h + 10");
+		m_previewPicSize->setSize("&.w - 20", 20);
+		m_previewPicSize->setHorizontalAlignment(HorizontalAlignment::Center);
+
+		m_previewText->setPosition({10, 10});
+		m_previewText->setSize({"100% - 20", "100% - 20"});
+
+		// ------------- Files ------------- //
+		m_filesPanel->setPosition({0, 0});
+		m_filesPanel->setSize({"#TGUI_INTERNAL$PreviewPanel#.x", "100%"});
 
 		m_buttonConfirm->setOrigin(1, 1);
 		m_buttonCancel->setOrigin(1, 1);
@@ -127,14 +200,15 @@ namespace tgui
 		m_listView->addColumn("Format      ", 95, HorizontalAlignment::Right);
 		m_listView->setColumnExpanded(0, true);
 
-		if (m_iconLoader->supportsSystemIcons())
-			m_listView->setFixedIconSize({static_cast<float>(m_listView->getItemHeight()) * 0.8f, 0});
+		m_listView->setFixedIconSize({static_cast<float>(m_listView->getItemHeight()) * 0.8f, 0});
 
 		m_labelFilename->setText("Filename:");
 		m_editBoxPath->setText(m_currentDirectory);
 		m_buttonBack->setText(U"\u2190");
 		m_buttonForward->setText(U"\u2192");
 		m_buttonUp->setText(U"\u2191");
+		m_playPause->setImage("assets/gui/editor/play.png");
+		m_previewText->getHorizontalScrollbar()->setPolicy(Scrollbar::Policy::Automatic);
 
 		if (initRenderer)
 		{
@@ -158,6 +232,7 @@ namespace tgui
 		m_fileList              {other.m_fileList},
 		m_currentDirectory      {other.m_currentDirectory},
 		m_filesInDirectory      {other.m_filesInDirectory},
+		m_icons                 {other.m_icons},
 		m_fileIcons             {other.m_fileIcons},
 		m_sortColumnIndex       {other.m_sortColumnIndex},
 		m_sortInversed          {other.m_sortInversed},
@@ -168,7 +243,6 @@ namespace tgui
 		m_multiSelect           {other.m_multiSelect},
 		m_fileTypeFilters       {other.m_fileTypeFilters},
 		m_selectedFileTypeFilter{other.m_selectedFileTypeFilter},
-		m_iconLoader            {FileDialogIconLoader::createInstance()},
 		m_selectedFiles         {other.m_selectedFiles}
 	{
 		identifyChildWidgets();
@@ -186,6 +260,8 @@ namespace tgui
 		onCancel                {std::move(other.onCancel)},
 		m_root                  {std::move(other.m_root)},
 		m_fileList              {std::move(other.m_fileList)},
+		m_source                {std::move(other.m_source)},
+		m_ownSource             {std::move(other.m_ownSource)},
 		m_buttonBack            {std::move(other.m_buttonBack)},
 		m_buttonForward         {std::move(other.m_buttonForward)},
 		m_buttonUp              {std::move(other.m_buttonUp)},
@@ -198,6 +274,7 @@ namespace tgui
 		m_buttonConfirm         {std::move(other.m_buttonConfirm)},
 		m_currentDirectory      {std::move(other.m_currentDirectory)},
 		m_filesInDirectory      {std::move(other.m_filesInDirectory)},
+		m_icons                 {std::move(other.m_icons)},
 		m_fileIcons             {std::move(other.m_fileIcons)},
 		m_sortColumnIndex       {std::move(other.m_sortColumnIndex)},
 		m_sortInversed          {std::move(other.m_sortInversed)},
@@ -208,10 +285,16 @@ namespace tgui
 		m_multiSelect           {std::move(other.m_multiSelect)},
 		m_fileTypeFilters       {std::move(other.m_fileTypeFilters)},
 		m_selectedFileTypeFilter{std::move(other.m_selectedFileTypeFilter)},
-		m_iconLoader            {std::move(other.m_iconLoader)},
 		m_selectedFiles         {std::move(other.m_selectedFiles)}
 	{
+		m_sound.setLooping(true);
 		connectSignals();
+	}
+
+	PackageFileDialog::~PackageFileDialog()
+	{
+		if (m_ownSource)
+			delete m_source;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,6 +311,7 @@ namespace tgui
 			m_fileList = other.m_fileList;
 			m_currentDirectory = other.m_currentDirectory;
 			m_filesInDirectory = other.m_filesInDirectory;
+			m_icons = other.m_icons,
 			m_fileIcons = other.m_fileIcons;
 			m_sortColumnIndex = other.m_sortColumnIndex;
 			m_sortInversed = other.m_sortInversed;
@@ -238,7 +322,6 @@ namespace tgui
 			m_multiSelect = other.m_multiSelect;
 			m_fileTypeFilters = other.m_fileTypeFilters;
 			m_selectedFileTypeFilter = other.m_selectedFileTypeFilter;
-			m_iconLoader = FileDialogIconLoader::createInstance();
 			m_selectedFiles = other.m_selectedFiles;
 
 			identifyChildWidgets();
@@ -273,6 +356,7 @@ namespace tgui
 			m_buttonConfirm = std::move(other.m_buttonConfirm);
 			m_currentDirectory = std::move(other.m_currentDirectory);
 			m_filesInDirectory = std::move(other.m_filesInDirectory);
+			m_icons = std::move(other.m_icons),
 			m_fileIcons = std::move(other.m_fileIcons);
 			m_sortColumnIndex = std::move(other.m_sortColumnIndex);
 			m_sortInversed = std::move(other.m_sortInversed);
@@ -283,7 +367,6 @@ namespace tgui
 			m_multiSelect = std::move(other.m_multiSelect);
 			m_fileTypeFilters = std::move(other.m_fileTypeFilters);
 			m_selectedFileTypeFilter = std::move(other.m_selectedFileTypeFilter);
-			m_iconLoader = std::move(other.m_iconLoader);
 			m_selectedFiles = std::move(other.m_selectedFiles);
 			ChildWindow::operator=(std::move(other));
 
@@ -295,10 +378,10 @@ namespace tgui
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	PackageFileDialog::Ptr PackageFileDialog::create(const ShadyCore::Package &source, const String& title, const String& confirmButtonText)
+	PackageFileDialog::Ptr PackageFileDialog::create(ShadyCore::Package *source, bool takeOwnership, const String& title, const String& confirmButtonText)
 	{
 		auto fileDialog = std::make_shared<PackageFileDialog>();
-		fileDialog->setSource(source);
+		fileDialog->setSource(source, takeOwnership);
 		fileDialog->setTitle(title);
 		fileDialog->setConfirmButtonText(confirmButtonText);
 		return fileDialog;
@@ -405,14 +488,17 @@ namespace tgui
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void PackageFileDialog::setSource(const ShadyCore::Package &source)
+	void PackageFileDialog::setSource(ShadyCore::Package *source, bool takeOwnership)
 	{
+		if (m_ownSource)
+			delete m_source;
+		m_source = source;
+		m_ownSource = takeOwnership;
 		m_fileList.clear();
 		m_fileList[""] = &this->m_root;
 		m_root.children.clear();
-		for (auto &[key, entry] : source)
-			this->addEntry(key.actualName, entry->getSize(), key.fileType);
-		std::cout << "Done!" << std::endl;
+		for (auto &[key, entry] : *source)
+			this->addEntry(shiftJISDecode(key.actualName), entry->getSize(), key.fileType);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -609,21 +695,6 @@ namespace tgui
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void PackageFileDialog::setIconLoader(std::shared_ptr<FileDialogIconLoader> iconLoader)
-	{
-		TGUI_ASSERT(iconLoader != nullptr, "Icon loader can't be a nullptr");
-		m_iconLoader = std::move(iconLoader);
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	std::shared_ptr<FileDialogIconLoader> PackageFileDialog::getIconLoader() const
-	{
-		return m_iconLoader;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	void PackageFileDialog::keyPressed(const Event::KeyEvent& event)
 	{
 		if ((event.code == Event::KeyboardKey::Enter) && (!m_editBoxPath->isFocused()))
@@ -682,25 +753,6 @@ namespace tgui
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	bool PackageFileDialog::updateTime(Duration elapsedTime)
-	{
-		const bool childWidgetUpdated = ChildWindow::updateTime(elapsedTime);
-
-		if (!m_iconLoader->update())
-			return childWidgetUpdated;
-
-		m_fileIcons = m_iconLoader->retrieveFileIcons();
-
-		const int oldSelectedItem = m_listView->getSelectedItemIndex();
-		sortFilesInListView();
-		if (oldSelectedItem >= 0)
-			m_listView->setSelectedItem(static_cast<std::size_t>(oldSelectedItem));
-
-		return true;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	void PackageFileDialog::changePath(const String& path, bool updateHistory)
 	{
 		if (updateHistory && (m_currentDirectory != path))
@@ -732,20 +784,45 @@ namespace tgui
 			);
 		}
 
-		// TODO: Load icons
-		m_fileIcons.resize(m_filesInDirectory.size());
-		/*if (m_iconLoader->hasGenericIcons())
-		{
-			m_fileIcons.reserve(m_filesInDirectory.size());
-			for (const auto& file : m_filesInDirectory)
-				m_fileIcons.push_back(m_iconLoader->getGenericFileIcon(file));
+		m_fileIcons.clear();
+		m_fileIcons.reserve(m_filesInDirectory.size());
+		for (const auto& file : m_filesInDirectory) {
+			if (file.directory)
+				m_fileIcons.push_back(m_icons[10]);
+			else if (file.type.type == ShadyCore::FileType::TYPE_TEXTURE)
+				m_fileIcons.push_back(m_icons[0]);
+			else if (file.type.format == ShadyCore::FileType::SCHEMA_GAME_GUI)
+				m_fileIcons.push_back(m_icons[9]);
+			else
+				m_fileIcons.push_back(m_icons[file.type.type]);
 		}
 
-		m_iconLoader->requestFileIcons(m_filesInDirectory);*/
+		if (m_source) {
+			auto it = m_source->find((m_currentDirectory + "/palette000.pal").toStdString());
+
+			if (it != m_source->end()) {
+				ShadyCore::Palette pal;
+				auto &stream = it->second->open();
+
+				ShadyCore::getResourceReader(it->first.fileType)(&pal, stream);
+				it->second->close(stream);
+				pal.unpack();
+
+				auto ptr = reinterpret_cast<uint32_t *>(pal.data);
+
+				for (size_t i = 0 ; i < 256; i++) {
+					m_palette[i].r = ptr[i] >> 16 & 0xFF;
+					m_palette[i].g = ptr[i] >> 8  & 0xFF;
+					m_palette[i].b = ptr[i] >> 0  & 0xFF;
+					m_palette[i].a = i == 0 ? 0 : 255;
+				}
+			}
+		}
 
 		m_listView->getVerticalScrollbar()->setValue(0);
 		sortFilesInListView();
 		updateConfirmButtonEnabled();
+		updatePreview();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -887,7 +964,8 @@ namespace tgui
 			String type;
 			switch (file.type.type) {
 			default:
-				type = "Unknown";
+				if (!file.directory)
+					type = "Unknown";
 				break;
 			case ShadyCore::FileType::TYPE_TEXT:
 				type = "Text";
@@ -921,7 +999,8 @@ namespace tgui
 			String format;
 			switch (file.type.format) {
 			case ShadyCore::FileType::FORMAT_UNKNOWN:
-				format = "Unknown";
+				if (!file.directory)
+					format = "Unknown";
 				break;
 			case ShadyCore::FileType::TEXT_GAME:
 				format = "cv0";
@@ -1021,6 +1100,304 @@ namespace tgui
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	void PackageFileDialog::updatePreview()
+	{
+		auto indices = m_listView->getSelectedItemIndices();
+
+		m_sound.stop();
+		m_music.stop();
+		m_previewError->setVisible(false);
+		m_playPause->setVisible(false);
+		m_playSlider->setVisible(false);
+		m_playLabel->setVisible(false);
+		m_previewPicture->setVisible(false);
+		m_previewPalette->setVisible(false);
+		m_previewPicSize->setVisible(false);
+		m_previewText->setVisible(false);
+		if (indices.size() != 1 || !m_source)
+			return;
+
+		auto selected = m_listView->getItem(*indices.begin());
+		auto path = m_currentDirectory.empty() ? selected : m_currentDirectory + "/" + selected;
+		auto it = m_source->find(shiftJISEncode(path.toUtf32()));
+
+		if (it == m_source->end())
+			return;
+
+		auto &entry = it->second->open();
+		std::stringstream stream;
+		ShadyCore::FileType type = it->first.fileType;
+
+		switch (it->first.fileType.type) {
+		case ShadyCore::FileType::TYPE_TEXT: {
+			ShadyCore::TextResource res;
+
+			if (path.ends_with(".cv0"))
+				type.format = ShadyCore::FileType::TEXT_GAME;
+			else
+				type.format = ShadyCore::FileType::TEXT_NORMAL;
+			ShadyCore::getResourceReader(type)(&res, entry);
+			ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_TEXT, ShadyCore::FileType::TEXT_NORMAL})(&res, stream);
+			m_previewText->setText(shiftJISDecode(stream.str()));
+			m_previewText->getVerticalScrollbar()->setValue(0);
+			m_previewText->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_TABLE: {
+			ShadyCore::TextResource res;
+
+			if (path.ends_with(".cv1"))
+				type.format = ShadyCore::FileType::TABLE_GAME;
+			else if (path.ends_with(".csv"))
+				type.format = ShadyCore::FileType::TABLE_CSV;
+			else {
+				m_previewError->setVisible(true);
+				m_previewError->setText("Table of unknown format");
+				break;
+			}
+			ShadyCore::getResourceReader(type)(&res, entry);
+			ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_TABLE, ShadyCore::FileType::TABLE_CSV})(&res, stream);
+			m_previewText->setText(shiftJISDecode(stream.str()));
+			m_previewText->getVerticalScrollbar()->setValue(0);
+			m_previewText->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_LABEL: {
+			ShadyCore::TextResource res;
+
+			ShadyCore::getResourceReader(type)(&res, entry);
+			ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_LABEL, ShadyCore::FileType::LABEL_LBL})(&res, stream);
+			m_previewText->setText(shiftJISDecode(stream.str()));
+			m_previewText->getVerticalScrollbar()->setValue(0);
+			m_previewText->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_IMAGE: {
+			ShadyCore::Image res;
+
+			ShadyCore::getResourceReader(type)(&res, entry);
+
+			sf::Image image{{res.width, res.height}};
+
+			if (res.bitsPerPixel == 8) {
+				for (unsigned i = 0; i < res.getRawSize(); ++i) {
+					unsigned x = i % res.paddedWidth;
+					unsigned y = i / res.paddedWidth;
+
+					if (x >= res.width)
+						continue;
+					if (y >= res.height)
+						continue;
+					image.setPixel({x, y}, m_palette[res.raw[i]]);
+				}
+			} else {
+				for (unsigned y = 0; y < res.height; y++)
+					for (unsigned x = 0; x < res.width; x++)
+						image.setPixel({x, y}, sf::Color{
+							res.raw[(y * res.paddedWidth + x) * 4 + 2],
+							res.raw[(y * res.paddedWidth + x) * 4 + 1],
+							res.raw[(y * res.paddedWidth + x) * 4 + 0],
+							res.raw[(y * res.paddedWidth + x) * 4 + 3]
+						});
+			}
+
+			Texture t;
+			auto size = m_previewPanel->getInnerSize();
+
+			size.x -= 20;
+			size.y -= 50;
+			t.loadFromPixelData(image.getSize(), image.getPixelsPtr());
+			if (res.width > size.x || res.height > size.y) {
+				if (res.width * size.y < size.x * res.height) {
+					size.x = size.y * res.width / res.height;
+				} else {
+					size.y = size.x * res.height / res.width;
+				}
+			} else {
+				size.x = res.width;
+				size.y = res.height;
+			}
+			m_previewPicture->getRenderer()->setTexture(t);
+			m_previewPicture->setSize(size);
+			m_previewPicture->setVisible(true);
+			m_previewPicSize->setText(std::to_string(res.width) + "x" + std::to_string(res.height));
+			m_previewPicSize->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_PALETTE: {
+			ShadyCore::Palette pal;
+			ShadyCore::Image res;
+
+			ShadyCore::getResourceReader(type)(&pal, entry);
+			pal.unpack();
+
+			auto ptr = reinterpret_cast<uint32_t *>(pal.data);
+
+			for (size_t i = 0 ; i < 256; i++) {
+				m_palette[i].r = ptr[i] >> 16 & 0xFF;
+				m_palette[i].g = ptr[i] >> 8  & 0xFF;
+				m_palette[i].b = ptr[i] >> 0  & 0xFF;
+				m_palette[i].a = i == 0 ? 0 : 255;
+			}
+
+			auto its = m_source->find(shiftJISEncode((m_currentDirectory + "/stand000.bmp").toUtf32()));
+
+			if (its == m_source->end())
+				its = m_source->find(shiftJISEncode((m_currentDirectory + "/stand000 .bmp").toUtf32()));
+			if (its == m_source->end()) {
+				m_previewError->setVisible(true);
+				m_previewError->setText("Cannot find stand000.bmp");
+				break;
+			}
+
+			auto &pstream = its->second->open();
+			ShadyCore::getResourceReader(its->first.fileType)(&res, pstream);
+			its->second->close(pstream);
+			sf::Image image{{res.width, res.height}};
+
+			if (res.bitsPerPixel == 8) {
+				for (unsigned i = 0; i < res.getRawSize(); ++i) {
+					unsigned x = i % res.paddedWidth;
+					unsigned y = i / res.paddedWidth;
+
+					if (x >= res.width)
+						continue;
+					if (y >= res.height)
+						continue;
+					image.setPixel({x, y}, m_palette[res.raw[i]]);
+				}
+			} else {
+				for (unsigned y = 0; y < res.height; y++)
+					for (unsigned x = 0; x < res.width; x++)
+						image.setPixel({x, y}, sf::Color{
+							res.raw[(y * res.paddedWidth + x) * 4 + 2],
+							res.raw[(y * res.paddedWidth + x) * 4 + 1],
+							res.raw[(y * res.paddedWidth + x) * 4 + 0],
+							res.raw[(y * res.paddedWidth + x) * 4 + 3]
+						});
+			}
+
+			sf::Image img{{256, 16}};
+
+			for (unsigned i = 0; i < 256; i++)
+				for (unsigned x = 0; x < 4; x++)
+					for (unsigned y = 0; y < 4; y++)
+						img.setPixel({(i % 64) * 4 + x, (i / 64) * 4 + y}, m_palette[i]);
+
+			Texture t;
+			Texture t2;
+			auto size = m_previewPanel->getInnerSize();
+
+			size.x -= 20;
+			size.y -= 50;
+			t.loadFromPixelData(image.getSize(), image.getPixelsPtr());
+			t2.loadFromPixelData(img.getSize(), img.getPixelsPtr());
+			if (res.width > size.x || res.height > size.y) {
+				if (res.width * size.y < size.x * res.height) {
+					size.x = size.y * res.width / res.height;
+				} else {
+					size.y = size.x * res.height / res.width;
+				}
+			} else {
+				size.x = res.width;
+				size.y = res.height;
+			}
+			m_previewPicture->getRenderer()->setTexture(t);
+			m_previewPicture->setSize(size);
+			m_previewPicture->setVisible(true);
+			m_previewPalette->getRenderer()->setTexture(t2);
+			m_previewPalette->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_SFX: {
+			ShadyCore::Sfx sfx;
+
+			ShadyCore::getResourceReader(type)(&sfx, entry);
+			if (sfx.bitsPerSample != 16) {
+				m_previewError->setVisible(true);
+				m_previewError->setText("Unsupported bits per sample");
+				break;
+			}
+
+			std::vector channels{sfx.channels, sf::SoundChannel::Mono};
+
+			if (!m_soundBuffer.loadFromSamples(
+				reinterpret_cast<const std::int16_t *>(sfx.data),
+				sfx.size / 2,
+				sfx.channels,
+				sfx.sampleRate, channels
+			)) {
+				m_previewError->setVisible(true);
+				m_previewError->setText("Failed to load samples");
+				break;
+			}
+			m_usesMusic = false;
+			m_playPause->setVisible(true);
+			m_playSlider->setMaximum(m_soundBuffer.getDuration().asSeconds());
+			m_playSlider->setValue(0);
+			m_playSlider->setVisible(true);
+			m_playLabel->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_BGM: {
+			auto pstream = std::make_unique<PackageStream>(it->second);
+
+			if (!m_music.openFromStream(*pstream)) {
+				m_previewError->setVisible(true);
+				m_previewError->setText("Failed to load from stream");
+				break;
+			}
+			m_musicStream.swap(pstream);
+			m_usesMusic = true;
+			m_playPause->setVisible(true);
+			m_playSlider->setMaximum(m_music.getDuration().asSeconds());
+			m_playSlider->setValue(0);
+			m_playSlider->setVisible(true);
+			m_playLabel->setVisible(true);
+			break;
+		}
+		case ShadyCore::FileType::TYPE_SCHEMA: {
+			ShadyCore::Schema res;
+			std::set<unsigned> actions;
+			unsigned frames = 0;
+
+			if (type.format == ShadyCore::FileType::FORMAT_UNKNOWN) {
+				if (path.ends_with(".xml"))
+					type.format = ShadyCore::FileType::SCHEMA_XML;
+				else if (path.ends_with(".dat"))
+					type.format = ShadyCore::FileType::SCHEMA_GAME_GUI;
+				else if (path.ends_with("effect.pat") || path.ends_with("stand.pat"))
+					type.format = ShadyCore::FileType::SCHEMA_GAME_ANIM;
+				else
+					type.format = ShadyCore::FileType::SCHEMA_GAME_PATTERN;
+			}
+			if (type.format == ShadyCore::FileType::SCHEMA_GAME_GUI) {
+				m_previewError->setVisible(true);
+				m_previewError->setText("GUIs not supported");
+				break;
+			}
+			ShadyCore::getResourceReader(type)(&res, entry);
+			for (auto &seq : res.objects) {
+				actions.emplace(seq->getId());
+				if (seq->getType() != 7)
+					frames += reinterpret_cast<ShadyCore::Schema::Sequence *>(seq)->frames.size();
+			}
+			m_previewText->setText(std::to_string(actions.size()) + " ids\n" + std::to_string(res.objects.size()) + " sequences\n" + std::to_string(frames) + " frames");
+			m_previewText->setVisible(true);
+			break;
+		}
+		default:
+			m_previewError->setVisible(true);
+			m_previewError->setText("File of unknown format");
+			break;
+		}
+		it->second->close(entry);
+		m_previewText->getHorizontalScrollbar()->setValue(0);
+		m_previewText->getVerticalScrollbar()->setValue(0);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	void PackageFileDialog::confirmButtonPressed()
 	{
 		if (m_multiSelect && (m_listView->getSelectedItemIndices().size() > 1))
@@ -1110,6 +1487,8 @@ namespace tgui
 		m_buttonCancel->onPress.disconnectAll();
 		m_buttonConfirm->onPress.disconnectAll();
 		m_editBoxFilename->onTextChange.disconnectAll();
+		m_playPause->onPress.disconnectAll();
+		m_playSlider->onValueChange.disconnectAll();
 
 		m_buttonBack->onPress([this]{
 			--m_pathHistoryIndex;
@@ -1130,7 +1509,8 @@ namespace tgui
 			if (pos == m_currentDirectory.size() - 1) {
 				pos = parent.find_last_of('/');
 				parent = parent.substr(0, pos);
-			}
+			} else if (pos == String::npos)
+				parent = "";
 
 			changePath(parent, true);
 		});
@@ -1145,6 +1525,7 @@ namespace tgui
 		});
 		m_listView->onItemSelect([this](int itemIndex){
 			updateConfirmButtonEnabled();
+			updatePreview();
 			if (itemIndex < 0)
 				return;
 
@@ -1199,6 +1580,36 @@ namespace tgui
 			}
 
 			updateConfirmButtonEnabled();
+		});
+		m_playPause->onPress([this] {
+			auto status = m_usesMusic ? m_music.getStatus() : m_sound.getStatus();
+
+			if (status == sf::Sound::Status::Stopped) {
+				m_playPause->setImage("assets/gui/editor/pause.png");
+				if (m_usesMusic) {
+					(void)m_music.openFromStream(*m_musicStream);
+					m_music.play();
+				} else
+					m_sound.play();
+			} else if (status == sf::Sound::Status::Playing) {
+				m_playPause->setImage("assets/gui/editor/play.png");
+				if (m_usesMusic)
+					m_music.pause();
+				else
+					m_sound.pause();
+			} else {
+				m_playPause->setImage("assets/gui/editor/pause.png");
+				if (m_usesMusic)
+					m_music.play();
+				else
+					m_sound.play();
+			}
+		});
+		m_playSlider->onValueChange([this] {
+			if (m_usesMusic)
+				m_music.setPlayingOffset(sf::seconds(m_playSlider->getValue()));
+			else
+				m_sound.setPlayingOffset(sf::seconds(m_playSlider->getValue()));
 		});
 
 		m_closeButton->onPress([this]{ filesSelected({}); });
@@ -1431,12 +1842,110 @@ namespace tgui
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	bool PackageFileDialog::updateTime(Duration elapsedTime)
+	{
+		bool b = ChildWindow::updateTime(elapsedTime);
+		auto offset = (m_usesMusic ? this->m_music.getPlayingOffset() : this->m_sound.getPlayingOffset()).asSeconds();
+		auto size = (m_usesMusic ? this->m_music.getDuration() : this->m_soundBuffer.getDuration()).asSeconds();
+		std::string text;
+
+		if (size >= 3600) {
+			text += std::to_string(static_cast<int>(offset / 3600));
+			text += ":";
+		}
+
+		int m = static_cast<int>(offset / 60) % 60;
+		int s = static_cast<int>(offset) % 60;
+
+		if (m < 10 && size >= 3600)
+			text += "0";
+		text += std::to_string(m);
+		text += ":";
+		if (s < 10)
+			text += "0";
+		text += std::to_string(s);
+
+		text += " / ";
+		if (size >= 3600) {
+			text += std::to_string(static_cast<int>(offset / 3600));
+			text += ":";
+		}
+
+		m = static_cast<int>(size / 60) % 60;
+		s = static_cast<int>(size) % 60;
+		if (m < 10 && size >= 3600)
+			text += "0";
+		text += std::to_string(m);
+		text += ":";
+		if (s < 10)
+			text += "0";
+		text += std::to_string(s);
+
+		m_playLabel->setText(text);
+		m_playSlider->onValueChange.setEnabled(false);
+		m_playSlider->setValue(offset);
+		m_playSlider->onValueChange.setEnabled(true);
+
+		auto status = m_usesMusic ? m_music.getStatus() : m_sound.getStatus();
+
+		if (m_lastStatus != status) {
+			m_lastStatus = status;
+			if (m_lastStatus == sf::Sound::Status::Playing)
+				m_playPause->setImage("assets/gui/editor/pause.png");
+			else
+				m_playPause->setImage("assets/gui/editor/play.png");
+		}
+		return b;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Widget::Ptr PackageFileDialog::clone() const
 	{
 		return std::make_shared<PackageFileDialog>(*this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	PackageStream::PackageStream(ShadyCore::BasePackageEntry *entry) :
+		entry(entry),
+		stream(entry->open()),
+		size(entry->getSize())
+	{
+	}
+
+	PackageStream::~PackageStream()
+	{
+		entry->close(stream);
+	}
+
+	std::optional<std::size_t> PackageStream::read(void *data, std::size_t s)
+	{
+		stream.read(static_cast<std::istream::char_type *>(data), s);
+		if (!stream)
+			return std::nullopt;
+		return stream.gcount();
+	}
+
+	std::optional<std::size_t> PackageStream::seek(std::size_t position)
+	{
+		stream.seekg(position);
+		if (!stream)
+			return std::nullopt;
+		return stream.tellg();
+	}
+
+	std::optional<std::size_t> PackageStream::tell()
+	{
+		if (!stream)
+			return std::nullopt;
+		return stream.tellg();
+	}
+
+	std::optional<std::size_t> PackageStream::getSize()
+	{
+		return size - stream.tellg();
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

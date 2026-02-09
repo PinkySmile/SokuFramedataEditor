@@ -7,12 +7,14 @@
 
 
 #include <filesystem>
+#include <map>
 #include <unordered_map>
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "Sprite.hpp"
 #include "Data/Vector.hpp"
 #include "Color.hpp"
+#include "package.hpp"
 
 namespace SpiralOfFate
 {
@@ -29,16 +31,16 @@ namespace SpiralOfFate
 		unsigned _lastIndex = 0;
 		std::vector<unsigned> _freedIndexes;
 		std::unordered_map<unsigned, sf::Texture> _textures;
-		std::unordered_map<unsigned, std::string> _allocatedTexturesPaths;
-		std::unordered_map<std::string, AllocatedTexture> _allocatedTextures;
+		std::unordered_map<unsigned, std::pair<ShadyCore::Package *, std::string>> _allocatedTexturesPaths;
+		std::map<std::pair<ShadyCore::Package *, std::string>, AllocatedTexture> _allocatedTextures;
 		std::unordered_map<std::string, std::string> _overrideList;
 
 		unsigned _loadEmpty(AllocatedTexture &tex, unsigned currentIndex);
-		unsigned _loadPaletted(const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned currentIndex);
+		unsigned _loadPaletted(ShadyCore::Package *package, const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned currentIndex);
 	public:
 		TextureManager();
 
-		unsigned load(const std::string &file, const std::array<Color, 256> &palette, Vector2u *size = nullptr, bool repeated = false);
+		unsigned load(ShadyCore::Package *package, const std::string &file, const std::array<Color, 256> &palette, Vector2u *size = nullptr, bool repeated = true);
 		Vector2u getTextureSize(unsigned id) const;
 		void addRef(unsigned id);
 		void remove(unsigned id);

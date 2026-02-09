@@ -54,9 +54,10 @@ namespace SpiralOfFate
 
 	protected:
 		const FrameDataEditor &_editor;
-		std::map<std::string, std::string> _localizationOverride;
 
 	public:
+		std::map<std::string, std::string> localizationOverride;
+
 		using Ptr = std::shared_ptr<LocalizedContainer>; //!< Shared widget pointer
 		using ConstPtr = std::shared_ptr<const LocalizedContainer>; //!< Shared constant widget pointer
 
@@ -80,7 +81,7 @@ namespace SpiralOfFate
 		template<typename ...Args>
 		std::string localize(const std::string &s, const Args... args) const
 		{
-			for (auto &[key, value] : this->_localizationOverride)
+			for (auto &[key, value] : this->localizationOverride)
 				if (s.starts_with(key))
 					return this->_editor.localize(value + s.substr(key.size()), args...);
 			return this->_editor.localize(s, args...);
@@ -88,7 +89,7 @@ namespace SpiralOfFate
 
 		std::string localize(const std::string &s)
 		{
-			for (auto &[key, value] : this->_localizationOverride)
+			for (auto &[key, value] : this->localizationOverride)
 				if (s.starts_with(key))
 					return this->_editor.localize(value + s.substr(key.size()));
 			return this->_editor.localize(s);

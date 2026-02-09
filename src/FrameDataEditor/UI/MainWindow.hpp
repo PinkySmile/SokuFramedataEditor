@@ -60,7 +60,7 @@ namespace SpiralOfFate
 		std::filesystem::path getPath() const;
 		bool hasPath() const;
 		bool hasPaletteChanges() const;
-		void reloadPalette();
+		void reloadPalette(const std::string &folder);
 		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void undo();
 		void redo();

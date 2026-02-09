@@ -84,32 +84,8 @@ Renderer.4 {
     TextureHover = None;
 }
 
-Renderer.5 {
-    BackgroundColor = #F5F5F5;
-    BackgroundColorDisabled = #E6E6E6;
-    BackgroundColorDown = #EBEBEB;
-    BackgroundColorHover = white;
-    BorderColor = #3C3C3C;
-    BorderColorDisabled = #7D7D7D;
-    BorderColorDown = black;
-    BorderColorFocused = #1E1EB4;
-    BorderColorHover = black;
-    Borders = (1, 1, 1, 1);
-    TextColor = #3C3C3C;
-    TextColorDisabled = #7D7D7D;
-    TextColorDown = black;
-    TextColorHover = black;
-    Texture = None;
-    TextureDisabled = None;
-    TextureDown = None;
-    TextureDownFocused = None;
-    TextureDownHover = None;
-    TextureFocused = None;
-    TextureHover = None;
-}
-
 Button.ActionSelect {
-    Position = (130, 30);
+    Position = (130, 5);
     Renderer = &1;
     Size = (160, 21);
     TextSize = 13;
@@ -118,7 +94,7 @@ Button.ActionSelect {
 
 Label.BlockLabel {
     HorizontalAlignment = Right;
-    Position = (0, 88);
+    Position = (0, 33);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (110, 17);
@@ -129,7 +105,7 @@ Label.BlockLabel {
 SpinButton.BlockSpin {
     Maximum = 10;
     Minimum = 0;
-    Position = (110, 86);
+    Position = (110, 30);
     Renderer = &3;
     Size = (42, 21);
     Step = 1;
@@ -138,7 +114,7 @@ SpinButton.BlockSpin {
 
 Label.FrameLabel {
     HorizontalAlignment = Right;
-    Position = (0, 108);
+    Position = (0, 54);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (110, 17);
@@ -149,7 +125,7 @@ Label.FrameLabel {
 SpinButton.FrameSpin {
     Maximum = 10;
     Minimum = 0;
-    Position = (110, 106);
+    Position = (110, 51);
     Renderer = &3;
     Size = (42, 21);
     Step = 1;
@@ -157,7 +133,7 @@ SpinButton.FrameSpin {
 }
 
 Button.Play {
-    Position = (160, 86);
+    Position = (160, 30);
     Renderer = &1;
     Size = (130, 21);
     Text = "animation.play";
@@ -165,7 +141,7 @@ Button.Play {
 }
 
 Button.Step {
-    Position = (160, 106);
+    Position = (160, 51);
     Renderer = &1;
     Size = (130, 21);
     Text = "animation.step";
@@ -177,10 +153,10 @@ Slider.Frame {
     InvertedDirection = false;
     Maximum = 10;
     Minimum = 0;
-    Position = (20, 140);
+    Position = (20, 80);
     Size = (260, 16);
     Step = 1;
-    Value = 0;
+    Value = 10;
 
     Renderer {
         BorderColor = #3C3C3C;
@@ -200,18 +176,18 @@ Slider.Frame {
 EditBox.Sprite {
     Alignment = Center;
     DefaultText = "assets/...";
-    Position = (120, 170);
+    Position = (110, 130);
     Renderer = &4;
-    Size = (170, 21);
+    Size = (180, 21);
     TextSize = 13;
 }
 
 EditBox.Bounds {
     Alignment = Center;
     InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4},[0-9]{1,4},[0-9]{1,4}\\)";
-    Position = (120, 200);
+    Position = (110, 160);
     Renderer = &4;
-    Size = (145, 21);
+    Size = (155, 21);
     Text = "(0,0,0,0)";
     TextSize = 13;
 }
@@ -219,9 +195,9 @@ EditBox.Bounds {
 EditBox.Duration {
     Alignment = Center;
     InputValidator = UInt;
-    Position = (120, 260);
+    Position = (180, 220);
     Renderer = &4;
-    Size = (170, 21);
+    Size = (110, 21);
     Text = 0;
     TextSize = 13;
 }
@@ -229,36 +205,49 @@ EditBox.Duration {
 EditBox.Offset {
     Alignment = Center;
     InputValidator = "\\(-?[0-9]{1,4},-?[0-9]{1,4}\\)";
-    Position = (120, 230);
+    Position = (180, 190);
     Renderer = &4;
-    Size = (170, 21);
+    Size = (110, 21);
     Text = "(0,0)";
-    TextSize = 13;
-}
-
-EditBox.Scale {
-    Alignment = Center;
-    InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
-    Position = (120, 290);
-    Renderer = &4;
-    Size = (170, 21);
-    Text = "(1.0,1.0)";
     TextSize = 13;
 }
 
 BitmapButton.BoundsButton {
     Image = "crayon.png" Smooth;
     ImageScaling = 0;
-    Position = (270, 200);
-    Renderer = &5;
+    Position = (270, 160);
     Size = (21, 21);
     TextSize = 13;
     UserData = NO_LOCALE;
+
+    Renderer {
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorDown = #EBEBEB;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorDown = black;
+        BorderColorFocused = #1E1EB4;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        TextColorDown = black;
+        TextColorHover = black;
+        Texture = None;
+        TextureDisabled = None;
+        TextureDown = None;
+        TextureDownFocused = None;
+        TextureDownHover = None;
+        TextureFocused = None;
+        TextureHover = None;
+    }
 }
 
 Label.Label1 {
     HorizontalAlignment = Right;
-    Position = (5, 30);
+    Position = (5, 5);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (120, 20);
@@ -269,126 +258,54 @@ Label.Label1 {
 
 Label.Label2 {
     HorizontalAlignment = Right;
-    Position = (5, 172);
+    Position = (5, 132);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (100, 17);
     Text = "animation.sprite";
     TextSize = 13;
 }
 
 Label.Label3 {
     HorizontalAlignment = Right;
-    Position = (5, 202);
+    Position = (5, 162);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (100, 17);
     Text = "animation.bounds";
     TextSize = 13;
 }
 
 Label.Label4 {
     HorizontalAlignment = Right;
-    Position = (5, 232);
+    Position = (5, 192);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (170, 17);
     Text = "animation.offset";
-    TextSize = 13;
-}
-
-Label.Label5 {
-    HorizontalAlignment = Right;
-    Position = (5, 292);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (110, 17);
-    Text = "animation.scale";
     TextSize = 13;
 }
 
 Label.Label6 {
     HorizontalAlignment = Right;
-    Position = (5, 262);
+    Position = (5, 222);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (110, 17);
+    Size = (170, 17);
     Text = "animation.duration";
     TextSize = 13;
 }
 
-Label.Label7 {
-    HorizontalAlignment = Right;
-    Position = (5, 322);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (110, 17);
-    Text = "animation.aflags";
+Button.BlendEdit {
+    Position = (180, 310);
+    Renderer = &1;
+    Size = (85, 21);
+    Text = "animation.edit";
     TextSize = 13;
 }
 
-Label.Label8 {
-    HorizontalAlignment = Right;
-    Position = (5, 352);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (110, 17);
-    Text = "animation.dflags";
-    TextSize = 13;
-}
-
-BitmapButton.AFlagsButton {
-    Image = "crayon.png" Smooth;
-    ImageScaling = 0;
-    Position = (270, 320);
-    Renderer = &5;
-    Size = (21, 21);
-    TextSize = 13;
-    UserData = NO_LOCALE;
-}
-
-BitmapButton.DFlagsButton {
-    Image = "crayon.png" Smooth;
-    ImageScaling = 0;
-    Position = (270, 350);
-    Renderer = &5;
-    Size = (21, 21);
-    TextSize = 13;
-    UserData = NO_LOCALE;
-}
-
-EditBox.AFlags {
-    Alignment = Center;
-    InputValidator = "[0-9A-Fa-f]*";
-    Position = (120, 320);
-    Renderer = &4;
-    Size = (145, 21);
-    Text = 0000000000000000;
-    TextSize = 13;
-}
-
-EditBox.DFlags {
-    Alignment = Center;
-    InputValidator = "[0-9A-Fa-f]*";
-    Position = (120, 350);
-    Renderer = &4;
-    Size = (145, 21);
-    Text = 0000000000000000;
-    TextSize = 13;
-}
-
-Label.Label9 {
-    HorizontalAlignment = Right;
-    Position = (5, 382);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (170, 17);
-    Text = "animation.hitproperties";
-    TextSize = 13;
-}
-
-Button.ClearHit {
-    Position = (270, 380);
+Button.ClearBlend {
+    Position = (270, 310);
     Renderer = &1;
     Size = (20, 21);
     Text = X;
@@ -396,155 +313,94 @@ Button.ClearHit {
     UserData = NO_LOCALE;
 }
 
-Button.HitEdit {
-    Position = (180, 380);
-    Renderer = &1;
-    Size = (85, 21);
-    Text = "animation.edit";
-    TextSize = 13;
-}
-
-Label.Label10 {
+Label.Label5 {
     HorizontalAlignment = Right;
-    Position = (5, 442);
+    Position = (5, 312);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
-    Text = "animation.generalproperties";
+    Text = "animation.blend";
     TextSize = 13;
 }
 
-Button.GeneralEdit {
-    Position = (180, 440);
-    Renderer = &1;
+EditBox.RenderGroup {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (180, 280);
+    Renderer = &4;
     Size = (110, 21);
-    Text = "animation.edit";
+    Text = 0;
     TextSize = 13;
 }
 
-Button.BlockEdit {
-    Position = (180, 410);
-    Renderer = &1;
-    Size = (85, 21);
-    Text = "animation.edit";
+Label.Label16 {
+    HorizontalAlignment = Right;
+    Position = (5, 282);
+    Renderer = &2;
+    ScrollbarPolicy = Automatic;
+    Size = (170, 17);
+    Text = "animation.rendergrp";
     TextSize = 13;
 }
 
-Button.ClearBlock {
-    Position = (270, 410);
-    Renderer = &1;
-    Size = (20, 21);
-    Text = X;
+EditBox.Unknown {
+    Alignment = Center;
+    InputValidator = UInt;
+    Position = (180, 250);
+    Renderer = &4;
+    Size = (110, 21);
+    Text = 0;
     TextSize = 13;
-    UserData = NO_LOCALE;
 }
 
 Label.Label11 {
     HorizontalAlignment = Right;
-    Position = (5, 412);
+    Position = (5, 252);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
     Size = (170, 17);
-    Text = "animation.blockproperties";
+    Text = "animation.unknown";
     TextSize = 13;
 }
 
-Panel.SelectedBoxPanel {
-    Position = (0, 470);
-    Size = (300, 90);
+CheckBox.SeqLoop {
+    Position = (273, 105);
+    Size = (17, 17);
+    TextSize = 13;
 
     Renderer {
-        BackgroundColor = white;
-        BorderColor = black;
-        TextureBackground = None;
-    }
-
-    Label.Label12 {
-        HorizontalAlignment = Right;
-        Position = (5, 31.5);
-        Renderer = &2;
-        ScrollbarPolicy = Automatic;
-        Size = (110, 17);
-        Text = "animation.selectedbox.pos";
-        TextSize = 13;
-    }
-
-    EditBox.SelectedBoxPos {
-        Alignment = Center;
-        InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
-        Position = (120, 29.5);
-        Renderer = &4;
-        Size = (170, 21);
-        Text = "(1.0,1.0)";
-        TextSize = 13;
-    }
-
-    EditBox.SelectedBoxSize {
-        Alignment = Center;
-        InputValidator = "\\(-?[0-9]{1,4}(.[0-9]{1,4})?,-?[0-9]{1,4}(.[0-9]{1,4})?\\)";
-        Position = (120, 59.5);
-        Renderer = &4;
-        Size = (170, 21);
-        Text = "(1.0,1.0)";
-        TextSize = 13;
-    }
-
-    Label.Label13 {
-        HorizontalAlignment = Right;
-        Position = (5, 61.5);
-        Renderer = &2;
-        ScrollbarPolicy = Automatic;
-        Size = (110, 17);
-        Text = "animation.selectedbox.size";
-        TextSize = 13;
-    }
-
-    Label.SelectedBoxName {
-        HorizontalAlignment = Center;
-        Position = (5, 11.5);
-        Renderer = &2;
-        ScrollbarPolicy = Automatic;
-        Size = (280, 17);
-        Text = "Hitbox #2";
-        TextSize = 13;
-        UserData = NO_LOCALE;
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BackgroundColorHover = white;
+        BorderColor = #3C3C3C;
+        BorderColorDisabled = #7D7D7D;
+        BorderColorFocused = #1E1EB4;
+        BorderColorHover = black;
+        Borders = (1, 1, 1, 1);
+        CheckColor = #3C3C3C;
+        CheckColorDisabled = #7D7D7D;
+        CheckColorHover = black;
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        TextColorHover = black;
+        TextDistanceRatio = 0.2;
+        TextureChecked = None;
+        TextureCheckedDisabled = None;
+        TextureCheckedFocused = None;
+        TextureCheckedHover = None;
+        TextureUnchecked = None;
+        TextureUncheckedDisabled = None;
+        TextureUncheckedFocused = None;
+        TextureUncheckedHover = None;
     }
 }
 
-Button.NextAction {
-    Position = (130, 55);
-    Renderer = &1;
-    Size = (160, 21);
-    TextSize = 13;
-    UserData = NO_LOCALE;
-}
-
-Button.PrevAction {
-    Position = (130, 5);
-    Renderer = &1;
-    Size = (160, 21);
-    TextSize = 13;
-    UserData = NO_LOCALE;
-}
-
-Label.Label14 {
+Label.Label19 {
     HorizontalAlignment = Right;
-    Position = (5, 5);
+    Position = (5, 105);
     Renderer = &2;
     ScrollbarPolicy = Automatic;
-    Size = (120, 20);
-    Text = "animation.prev_action";
-    TextSize = 11;
-    VerticalAlignment = Center;
-}
-
-Label.Label15 {
-    HorizontalAlignment = Right;
-    Position = (5, 55);
-    Renderer = &2;
-    ScrollbarPolicy = Automatic;
-    Size = (120, 20);
-    Text = "animation.next_action";
-    TextSize = 11;
-    VerticalAlignment = Center;
+    Size = (265, 17);
+    Text = "animation.loop";
+    TextSize = 13;
 }

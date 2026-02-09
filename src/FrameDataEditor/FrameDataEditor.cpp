@@ -85,35 +85,38 @@ void SpiralOfFate::FrameDataEditor::_reloadCrashData()
 void SpiralOfFate::FrameDataEditor::reloadGamePackages()
 {
 	std::list<std::filesystem::path> paths = {
-		game->settings.soku / "th123c.dat",
-		game->settings.soku / "th123b.dat",
-		game->settings.soku / "th123a.dat",
-		game->settings.swr  / "th105b.dat",
 		game->settings.swr  / "th105a.dat",
+		game->settings.swr  / "th105b.dat",
+		game->settings.soku / "th123a.dat",
+		game->settings.soku / "th123b.dat",
+		game->settings.soku / "th123c.dat",
 	};
 
+	game->package.clear();
 	try {
-		game->package.clear();
-		for (auto &path : game->settings.extra)
-			game->package.merge(path);
-	} catch (const std::exception &e) {
-		game->logger.error("Error loading extras: " + std::string(e.what()));
-	}
-	try {
-		for (auto &path : std::filesystem::directory_iterator(game->settings.soku2)) {
+		for (auto &path : std::filesystem::directory_iterator(game->settings.soku2 / "characters")) {
 			if (!path.is_directory())
 				continue;
 			for (auto &path2 : std::filesystem::directory_iterator(path.path()))
 				if (path2.path().extension() == ".dat")
-					paths.push_front(path2.path());
+					paths.push_back(path2.path());
 		}
 	} catch (const std::exception &e) {
 		game->logger.error("Error loading soku2: " + std::string(e.what()));
 	}
 
 	try {
-		for (auto &path : paths)
+		for (auto &path : game->settings.extra)
+			paths.push_back(path);
+	} catch (const std::exception &e) {
+		game->logger.error("Error loading extras: " + std::string(e.what()));
+	}
+
+	try {
+		for (auto &path : paths) {
+			game->logger.info("Loading package " + path.string());
 			game->package.merge(path);
+		}
 	} catch (std::exception &e) {
 		game->logger.error("Failed loading packages " + std::string(e.what()));
 		throw;
@@ -606,11 +609,11 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 
 void SpiralOfFate::FrameDataEditor::_explorePackage()
 {
-	auto file = tgui::PackageFileDialog::create(game->package, this->localize("message_box.title.open_framedata"), "Open");
+	auto file = tgui::PackageFileDialog::create(&game->package, false, this->localize("message_box.title.open_framedata"), "Open");
 
 	file->setFileMustExist(true);
 	file->setPath("");
-	Utils::openWindowWithFocus(game->gui, 750, 450, file);
+	Utils::openWindowWithFocus(game->gui, 1200, 450, file);
 	auto load = [this](const tgui::String &path){
 		try {
 			auto pos = path.find_last_of('/');
@@ -661,7 +664,7 @@ void SpiralOfFate::FrameDataEditor::_explorePackage()
 	file->setFileTypeFilters({
 		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
 		{this->localize("file_type.all"), {}}
-	}, 0);
+	}, 1);
 	file->setMultiSelect(true);
 	file->onFileSelect([load](const std::vector<tgui::String> &arr) {
 		for (auto &path : arr)

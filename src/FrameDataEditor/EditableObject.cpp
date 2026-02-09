@@ -222,6 +222,7 @@ void EditableObject::_generateOverlaySprite()
 
 	if (img.bitsPerPixel != 8)
 		return;
+	data.checkReloadTexture();
 
 	sf::Image image;
 	auto &pal = game->textureMgr.getPalette(data.textureHandle);

@@ -345,7 +345,7 @@
 	"animation.player.action_lock":                        "Action lock",
 
 	"animation.object.move_lock":                          "Density",
-	"animation.object.action_lock":                        "Unused",
+	"animation.object.action_lock":                        "Absorb strength",
 
 	"animation.player.aflag0":                             "Stagger",
 	"animation.player.aflag1":                             "High blockable",

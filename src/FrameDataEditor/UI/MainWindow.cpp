@@ -653,7 +653,7 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButt
 void SpiralOfFate::MainWindow::_init()
 {
 	if (this->_object->_schema.isCharacterData)
-		this->_effectObject = std::make_unique<EditableObject>("data/effect/", std::string("data/effect/effect.xml"), &this->_palettes.front().colors);
+		this->_effectObject = std::make_unique<EditableObject>("data/effect/", std::string("data/effect/effect.xml"), &this->_palettes[this->_selectedPalette].colors);
 	this->_preview = std::make_shared<PreviewWidget>(std::ref(this->_editor), std::ref(*this), *this->_object);
 	this->_preview->setPosition(0, 0);
 	this->_preview->setSize("&.w", "&.h");
@@ -665,7 +665,7 @@ void SpiralOfFate::MainWindow::_init()
 		this->_editor.setCanDelBoxes(false);
 		this->_rePopulateFrameData();
 	});
-	this->_preview->setPalette(&this->_palettes.front().colors);
+	this->_preview->setPalette(&this->_palettes[this->_selectedPalette].colors);
 	this->_pathBak = "./backups/" + std::to_string(++game->lastSwap) + ".bak";
 
 	std::filesystem::create_directories("./backups");
@@ -750,6 +750,11 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 		pal.modified = palj["modified"];
 		pal.name = palj["name"].get<std::string>();
 	}
+	for (size_t i = 0; i < this->_palettes.size(); i++)
+		if (this->_palettes[i].name == "[P]palette000.pal") {
+			this->_selectedPalette = i;
+			break;
+		}
 
 	this->_object->_schema.isCharacterData = json["isCharacterData"];
 	for (const auto &[key, actionj] : framedata.items()) {
@@ -770,7 +775,7 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 			sequence.moveLock = seqj["moveLock"];
 			sequence.actionLock = seqj["actionLock"];
 			for (auto &frame : frames)
-				sequence.data.emplace_back(frame, this->_chrPath, &this->_palettes.back().colors);
+				sequence.data.emplace_back(frame, this->_chrPath, &this->_palettes[this->_selectedPalette].colors);
 		}
 	}
 	for (auto &[id, clone] : clones)
@@ -781,7 +786,7 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::string &frameDataPath, FrameDataEditor &editor) :
 	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
 	_editor(editor),
-	_title(frameDataPath),
+	_title("[P]" + frameDataPath),
 	_chrPath(folder)
 {
 	if (!this->_chrPath.ends_with('/'))
@@ -795,8 +800,14 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::strin
 
 	if (!std::filesystem::exists(palFolder))
 		std::filesystem::create_directories(palFolder);
-	this->reloadPalette();
-	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
+
+	auto pos = frameDataPath.find_last_of('.');
+	std::string palPackage = this->_chrPath;
+
+	if (frameDataPath.substr(0, pos).ends_with("/stand"))
+		palPackage = "data/character/" + this->_character + "/";
+	this->reloadPalette(palPackage);
+	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes[this->_selectedPalette].colors);
 	this->_init();
 }
 
@@ -820,8 +831,13 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::files
 
 	if (!std::filesystem::exists(palFolder))
 		std::filesystem::create_directories(palFolder);
-	this->reloadPalette();
-	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes.front().colors);
+
+	std::string palPackage = this->_chrPath;
+
+	if (frameDataPath.filename().stem().string() == "stand")
+		palPackage = "data/character/" + this->_character + "/";
+	this->reloadPalette(palPackage);
+	this->_object = std::make_unique<EditableObject>(this->_chrPath, frameDataPath, &this->_palettes[this->_selectedPalette].colors);
 	this->_init();
 }
 
@@ -1403,6 +1419,9 @@ SpiralOfFate::LocalizedContainer<tgui::ChildWindow>::Ptr SpiralOfFate::MainWindo
 	};
 	auto data = this->_object->getFrameData();
 
+	contentPanel->localizationOverride.clear();
+	if (this->_object->_action >= 800)
+		contentPanel->localizationOverride["animation.player."] = "animation.object.";
 	contentPanel->loadLocalizedWidgetsFromFile(path);
 	for (auto &w : contentPanel->getWidgets()) {
 		size.x = std::max(size.x, w->getFullSize().x + w->getPosition().x + 10);
@@ -2128,11 +2147,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->_planes.clear();
 			this->_sliders.clear();
 			this->_showingPalette = selected;
-			sidePanel.loadWidgetsFromFile(
-				selected == 0 ?
-				"assets/gui/editor/character/framedata.gui" :
-				"assets/gui/editor/palette/palette.gui"
-			);
+			if (selected == 1)
+				sidePanel.loadWidgetsFromFile("assets/gui/editor/palette/palette.gui");
+			else if (this->_object->_schema.isCharacterData)
+				sidePanel.loadWidgetsFromFile("assets/gui/editor/character/framedata.gui");
+			else
+				sidePanel.loadWidgetsFromFile("assets/gui/editor/character/animation.gui");
 			this->_initSidePanel(sidePanel);
 			this->_localizeWidgets(sidePanel, true);
 			Utils::setRenderer(&sidePanel);
@@ -2155,9 +2175,9 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				This.lock()->setText(std::to_string(this->_object->_action));
 				return;
 			}
-			this->_localizationOverride.clear();
+			this->localizationOverride.clear();
 			if (action >= 800)
-				this->_localizationOverride["animation.player."] = "animation.object.";
+				this->localizationOverride["animation.player."] = "animation.object.";
 			this->_object->_action = action;
 			this->_object->_actionBlock = 0;
 			this->_object->_animation = 0;
@@ -3109,16 +3129,18 @@ bool SpiralOfFate::MainWindow::hasPaletteChanges() const
 	return std::ranges::any_of(this->_palettes, [](const Palette &pal) { return pal.modified; });
 }
 
-void SpiralOfFate::MainWindow::reloadPalette()
+void SpiralOfFate::MainWindow::reloadPalette(const std::string &folder)
 {
 	typedef std::tuple<std::string, ShadyCore::FileType, ShadyCore::BasePackageEntry *> Key;
 	std::vector<Key> pals;
 
 	this->_palettes.clear();
 	for (auto &entry : game->package) {
-		if (!entry.first.actualName.starts_with(this->_chrPath))
-			continue;
 		if (entry.first.fileType.type != ShadyCore::FileType::TYPE_PALETTE)
+			continue;
+		if (!entry.first.actualName.starts_with(folder))
+			continue;
+		if (strchr(entry.first.actualName.data() + folder.size(), '/'))
 			continue;
 		pals.emplace_back(entry.first.actualName, entry.first.fileType, entry.second);
 	}
@@ -3134,8 +3156,9 @@ void SpiralOfFate::MainWindow::reloadPalette()
 		this->_palettes.emplace_back();
 
 		auto &p = this->_palettes.back();
+		auto &name = std::get<0>(entry);
 
-		p.name = std::get<0>(entry).substr(std::get<0>(entry).find_last_of('/') + 1);
+		p.name = "[P]" + name.substr(name.find_last_of('/') + 1);
 		p.modified = false;
 		pal.unpack();
 
@@ -3195,8 +3218,13 @@ void SpiralOfFate::MainWindow::reloadPalette()
 		p.modified = false;
 		p.colors.fill(Color::Black);
 	}
+	for (size_t i = 0; i < this->_palettes.size(); i++)
+		if (this->_palettes[i].name == "[P]palette000.pal") {
+			this->_selectedPalette = i;
+			break;
+		}
 	if (this->_preview)
-		this->_preview->setPalette(&this->_palettes.front().colors);
+		this->_preview->setPalette(&this->_palettes[this->_selectedPalette].colors);
 }
 
 void SpiralOfFate::MainWindow::keyPressed(const tgui::Event::KeyEvent &event)
@@ -3305,9 +3333,9 @@ void SpiralOfFate::MainWindow::navToNextAction()
 	curr = this->_object->_schema.framedata.find(move);
 	assert_exp(curr != this->_object->_schema.framedata.end());
 
-	this->_localizationOverride.clear();
+	this->localizationOverride.clear();
 	if (move >= 800)
-		this->_localizationOverride["animation.player."] = "animation.object.";
+		this->localizationOverride["animation.player."] = "animation.object.";
 	this->_object->_action = move;
 	this->_object->_actionBlock = 0;
 	this->_object->_animation = 0;
@@ -3334,9 +3362,9 @@ void SpiralOfFate::MainWindow::navToPrevAction()
 	auto curr = this->_object->_schema.framedata.find(move);
 	assert_exp(curr != this->_object->_schema.framedata.end());
 
-	this->_localizationOverride.clear();
+	this->localizationOverride.clear();
 	if (move >= 800)
-		this->_localizationOverride["animation.player."] = "animation.object.";
+		this->localizationOverride["animation.player."] = "animation.object.";
 	this->_object->_action = move;
 	this->_object->_actionBlock = 0;
 	this->_object->_animation = 0;
@@ -3361,9 +3389,9 @@ void SpiralOfFate::MainWindow::navGoTo()
 		auto &act = this->_object->_schema.framedata[move];
 		auto &blk = act.sequences().front();
 
-		this->_localizationOverride.clear();
+		this->localizationOverride.clear();
 		if (move >= 800)
-			this->_localizationOverride["animation.player."] = "animation.object.";
+			this->localizationOverride["animation.player."] = "animation.object.";
 		this->_object->_action = move;
 		this->_object->_actionBlock = 0;
 		this->_object->_animation = 0;

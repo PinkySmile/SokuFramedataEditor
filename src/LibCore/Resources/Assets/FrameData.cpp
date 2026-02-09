@@ -314,7 +314,7 @@ namespace SpiralOfFate
 		assert_exp(!this->_slave);
 		game->textureMgr.remove(this->textureHandle);
 		assert_exp(this->__paletteData);
-		this->textureHandle = game->textureMgr.load(this->__folder + this->spritePath, *this->__paletteData);
+		this->textureHandle = game->textureMgr.load(&game->package, this->__folder + this->spritePath, *this->__paletteData);
 	}
 
 	ShadyCore::Schema::Sequence::BlendOptions FrameData::getBlendOptions() const

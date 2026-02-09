@@ -37,6 +37,12 @@
 #include <TGUI/Config.hpp>
 
 #include <tuple>
+#include <SFML/Audio.hpp>
+#include <SFML/Audio/SoundSource.hpp>
+#include <TGUI/Widgets/BitmapButton.hpp>
+#include <TGUI/Widgets/Picture.hpp>
+#include <TGUI/Widgets/Slider.hpp>
+#include <TGUI/Widgets/TextArea.hpp>
 
 #include "dataentry.hpp"
 
@@ -44,8 +50,6 @@
 
 namespace tgui
 {
-	class FileDialogIconLoader;
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief Signal to which the user can subscribe to get callbacks from
 	///
@@ -166,13 +170,15 @@ namespace tgui
 		/// @brief Creates a new file dialog widget
 		///
 		/// @param source             Source of the file list
+		/// @param takeOwnership      Take ownership of the package or not
 		/// @param title              Title to display in the title bar of the file dialog
 		/// @param confirmButtonText  Caption of the open/save button
 		///
 		/// @return The new file dialog
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		TGUI_NODISCARD static PackageFileDialog::Ptr create(
-			const ShadyCore::Package &source,
+			ShadyCore::Package *source,
+			bool takeOwnership,
 			const String &title = "Open file",
 			const String &confirmButtonText = "Open"
 		);
@@ -186,6 +192,8 @@ namespace tgui
 		/// @brief Move constructor
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		PackageFileDialog(PackageFileDialog &&other) noexcept;
+
+		~PackageFileDialog();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// @brief Overload of copy assignment operator
@@ -250,9 +258,10 @@ namespace tgui
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// @brief Populates the file list from a package
 		///
-		/// @param path  Package to discover
+		/// @param source        Package to discover
+		/// @param takeOwnership Take ownership of the package or not
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		void setSource(const ShadyCore::Package &source);
+		void setSource(ShadyCore::Package *source, bool takeOwnership);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// @brief Returns the directory that is currently being shown in the file dialog
@@ -435,24 +444,6 @@ namespace tgui
 		TGUI_NODISCARD bool getMultiSelect() const;
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// @brief Sets a custom icon loader
-		///
-		/// @param iconLoader  New icon loader to use
-		///
-		/// The icon loader is responsible loading the application icons that are shown next to files and folders.
-		/// If no custom icon loader is provided, a default Windows and Linux implementation exists that will use system icons.
-		/// On other platforms the default icon loader does nothing and no icons are shown next to the files.
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		void setIconLoader(std::shared_ptr<FileDialogIconLoader> iconLoader);
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// @brief Gets the icon loader that is currently being used
-		///
-		/// @return Current icon loader
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		TGUI_NODISCARD std::shared_ptr<FileDialogIconLoader> getIconLoader() const;
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// @internal
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		void keyPressed(const Event::KeyEvent &event) override;
@@ -541,6 +532,11 @@ namespace tgui
 		void updateConfirmButtonEnabled();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Updates preview
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		void updatePreview();
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Handles a press of the open/save button
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		void confirmButtonPressed();
@@ -596,7 +592,27 @@ namespace tgui
 			.children = {}
 		};
 		std::map<String, FileInfo *> m_fileList;
+		ShadyCore::Package *m_source = nullptr;
+		bool m_ownSource = false;
+		std::array<sf::Color, 256> m_palette;
+		sf::SoundBuffer m_soundBuffer;
+		sf::Sound m_sound{m_soundBuffer};
+		sf::Music m_music;
+		std::unique_ptr<class PackageStream> m_musicStream;
+		bool m_usesMusic = false;
+		sf::Sound::Status m_lastStatus = sf::Sound::Status::Paused;
 
+		Panel::Ptr m_previewPanel;
+		Label::Ptr m_previewError;
+		BitmapButton::Ptr m_playPause;
+		Slider::Ptr m_playSlider;
+		Label::Ptr m_playLabel;
+		Picture::Ptr m_previewPicture;
+		Picture::Ptr m_previewPalette;
+		Label::Ptr m_previewPicSize;
+		TextArea::Ptr m_previewText;
+
+		Panel::Ptr m_filesPanel;
 		Button::Ptr m_buttonBack;
 		Button::Ptr m_buttonForward;
 		Button::Ptr m_buttonUp;
@@ -610,6 +626,7 @@ namespace tgui
 
 		String m_currentDirectory;
 		std::list<FileInfo> m_filesInDirectory;
+		std::array<Texture, 11> m_icons;
 		std::vector<Texture> m_fileIcons; // Same order as m_filesInDirectory
 		std::size_t m_sortColumnIndex = 0;
 		bool m_sortInversed = false;
@@ -624,13 +641,25 @@ namespace tgui
 		std::vector<std::pair<String, std::vector<String> > > m_fileTypeFilters;
 		std::size_t m_selectedFileTypeFilter = 0;
 
-		std::shared_ptr<FileDialogIconLoader> m_iconLoader;
-
 		std::vector<String> m_selectedFiles;
 
 		FileInfo &getFolder(const String &path);
 	};
 
+	class PackageStream : public sf::InputStream {
+	private:
+		ShadyCore::BasePackageEntry *entry;
+		std::istream &stream;
+		size_t size;
+
+	public:
+		PackageStream(ShadyCore::BasePackageEntry *entry);
+		~PackageStream();
+		[[nodiscard]] std::optional<std::size_t> read(void *data, std::size_t size) override;
+		[[nodiscard]] std::optional<std::size_t> seek(std::size_t position) override;
+		[[nodiscard]] std::optional<std::size_t> tell() override;
+		std::optional<std::size_t> getSize() override;
+	};
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 

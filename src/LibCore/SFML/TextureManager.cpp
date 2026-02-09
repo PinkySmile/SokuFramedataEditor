@@ -39,13 +39,13 @@ namespace SpiralOfFate
 		return tex.index;
 	}
 
-	unsigned TextureManager::_loadPaletted(const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
+	unsigned TextureManager::_loadPaletted(ShadyCore::Package *package, const std::string &path, AllocatedTexture &tex, const std::array<Color, 256> &palette, unsigned id)
 	{
 		std::vector<unsigned char> buffer;
 		ShadyCore::Image resourceImage;
-		auto entry = game->package.find(path, ShadyCore::FileType::TYPE_IMAGE);
+		auto entry = package->find(path, ShadyCore::FileType::TYPE_IMAGE);
 
-		if (entry == game->package.end()) {
+		if (entry == package->end()) {
 			game->logger.error("Could not find image " + path);
 			return 0;
 		}
@@ -94,7 +94,7 @@ namespace SpiralOfFate
 		return tex.index;
 	}
 
-	unsigned TextureManager::load(const std::string &path, const std::array<Color, 256> &palette, Vector2u *size, bool repeated)
+	unsigned TextureManager::load(ShadyCore::Package *package, const std::string &path, const std::array<Color, 256> &palette, Vector2u *size, bool repeated)
 	{
 		std::vector<unsigned char> buffer;
 		std::string paletteName;
@@ -112,12 +112,12 @@ namespace SpiralOfFate
 
 		std::string allocName = path + ":" + paletteName;
 
-		if (this->_allocatedTextures[allocName].count != 0) {
-			this->_allocatedTextures[allocName].count++;
+		if (this->_allocatedTextures[{package, allocName}].count != 0) {
+			this->_allocatedTextures[{package, allocName}].count++;
 			game->logger.verbose("Returning already loaded paletted file " + allocName);
 			if (size)
-				*size = this->_textures[this->_allocatedTextures[allocName].index].getSize();
-			return this->_allocatedTextures[allocName].index;
+				*size = this->_textures[this->_allocatedTextures[{package, allocName}].index].getSize();
+			return this->_allocatedTextures[{package, allocName}].index;
 		}
 
 		if (file != path)
@@ -127,15 +127,15 @@ namespace SpiralOfFate
 
 		AllocatedTexture texture{ 0, 1, path, palette };
 
-		if (this->_loadPaletted(file, texture, palette, 0) == 0)
+		if (this->_loadPaletted(package, file, texture, palette, 0) == 0)
 			this->_loadEmpty(texture, 0);
 
 		if (size)
 			*size = this->_textures[texture.index].getSize();
 
 		this->_textures[texture.index].setRepeated(repeated);
-		this->_allocatedTextures[allocName] = texture;
-		this->_allocatedTexturesPaths[texture.index] = allocName;
+		this->_allocatedTextures[{package, allocName}] = texture;
+		this->_allocatedTexturesPaths[texture.index] = {package, allocName};
 		return texture.index;
 	}
 
@@ -144,16 +144,16 @@ namespace SpiralOfFate
 		if (id == 0)
 			return;
 
-		auto &path = this->_allocatedTexturesPaths.at(id);
-		auto &texture = this->_allocatedTextures.at(path);
+		auto &key = this->_allocatedTexturesPaths.at(id);
+		auto &texture = this->_allocatedTextures.at(key);
 
 		if (texture.count) {
 			texture.count--;
 			if (texture.count) {
-				game->logger.verbose("Remove ref to " + path);
+				game->logger.verbose("Remove ref to " + key.second);
 				return;
 			}
-			game->logger.debug("Destroying texture " + path);
+			game->logger.debug("Destroying texture " + key.second);
 		}
 
 		auto it = this->_textures.find(id);
@@ -175,13 +175,13 @@ namespace SpiralOfFate
 		if (id == 0)
 			return;
 
-		auto &path = this->_allocatedTexturesPaths.at(id);
-		auto &texture = this->_allocatedTextures.at(path);
+		auto &key = this->_allocatedTexturesPaths.at(id);
+		auto &texture = this->_allocatedTextures.at(key);
 
 		if (texture.count) {
 			texture.count++;
 			assert_exp(texture.count > 1);
-			game->logger.verbose("Adding ref to " + path);
+			game->logger.verbose("Adding ref to " + key.second);
 		}
 	}
 
@@ -194,10 +194,10 @@ namespace SpiralOfFate
 
 	void TextureManager::reloadEverything()
 	{
-		for (auto &[loadedPath, attr] : this->_allocatedTextures)
+		for (auto &[key, attr] : this->_allocatedTextures)
 			if (attr.count) {
-				game->logger.debug("Reloading " + loadedPath);
-				if (this->_loadPaletted(attr.path, attr, attr.palette, attr.index))
+				game->logger.debug("Reloading " + key.second);
+				if (this->_loadPaletted(key.first, attr.path, attr, attr.palette, attr.index))
 					this->_loadEmpty(attr, attr.index);
 			}
 	}
