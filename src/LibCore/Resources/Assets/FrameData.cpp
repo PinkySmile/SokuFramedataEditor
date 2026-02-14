@@ -33,6 +33,11 @@ namespace SpiralOfFate
 		std::vector<ShadyCore::Schema::Clone *> clones;
 		bool foundType = false;
 
+		do {
+			if ((!schema.objects.empty()));
+			else
+				throw AssertionFailedException("!schema.objects.empty()");
+		} while (0);
 		assert_exp(!schema.objects.empty());
 		result.isCharacterData = true;
 		for (auto &sequ : schema.objects) {
@@ -139,20 +144,24 @@ namespace SpiralOfFate
 		game->logger.debug("Loading framedata file from " + path.string());
 
 		ShadyCore::Schema schema;
-		std::ifstream stream{path};
-
-		if (!stream)
-			throw std::runtime_error("Cannot open " + path.string());
-
+		std::ifstream::openmode mode = std::ifstream::in;
 		ShadyCore::FileType::Format format;
+
 		// TODO: Allow the user to manually set it
 		if (path.extension() == ".xml")
 			format = ShadyCore::FileType::SCHEMA_XML;
-		else if (path.filename().stem().string().ends_with("effect") || path.filename().stem().string().ends_with("stand"))
+		else if (path.filename().stem().string().ends_with("effect") || path.filename().stem().string().ends_with("stand")) {
 			format = ShadyCore::FileType::SCHEMA_GAME_ANIM;
-		else
+			mode |= std::ifstream::binary;
+		} else {
 			format = ShadyCore::FileType::SCHEMA_GAME_PATTERN;
+			mode |= std::ifstream::binary;
+		}
 
+		std::ifstream stream{path, mode};
+
+		if (!stream)
+			throw std::runtime_error("Cannot open " + path.string());
 		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_SCHEMA, format})(&schema, stream);
 		stream.close();
 		return loadFileSchema(schema, folder, palette);

@@ -17,15 +17,17 @@ namespace SpiralOfFate
 		std::vector<MainWindow::Palette> &_list;
 		std::string _name;
 		unsigned _id;
-		unsigned &_index;
+		const unsigned &_index;
+		std::function<void (unsigned)> _setIndex;
 		MainWindow::Palette _old;
 
 	public:
-		RemovePaletteOperation(std::vector<MainWindow::Palette> &list, const std::string &&name, unsigned &index);
+		RemovePaletteOperation(std::vector<MainWindow::Palette> &list, const std::string &&name, const unsigned &index, const std::function<void (unsigned)> &setIndex);
 		void apply() override;
 		void undo() override;
-		bool hasModification() const override;
-		std::string getName() const noexcept override;
+		[[nodiscard]] bool hasModification() const override;
+		[[nodiscard]] std::string getName() const noexcept override;
+		[[nodiscard]] bool hasFramedataModification() const override;
 	};
 }
 

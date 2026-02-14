@@ -36,8 +36,9 @@ namespace SpiralOfFate
 		EditBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, ShadyCore::Schema::Sequence::BBox newValue);
 		void apply() override;
 		void undo() override;
-		std::string getName() const noexcept override;
-		bool hasModification() const override;
+		[[nodiscard]] std::string getName() const noexcept override;
+		[[nodiscard]] bool hasModification() const override;
+		[[nodiscard]] bool hasFramedataModification() const override;
 	};
 }
 

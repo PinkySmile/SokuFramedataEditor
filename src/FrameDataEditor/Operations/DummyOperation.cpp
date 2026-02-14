@@ -21,3 +21,8 @@ std::string SpiralOfFate::DummyOperation::getName() const noexcept
 {
 	return "";
 }
+
+bool SpiralOfFate::DummyOperation::hasFramedataModification() const
+{
+	return false;
+}

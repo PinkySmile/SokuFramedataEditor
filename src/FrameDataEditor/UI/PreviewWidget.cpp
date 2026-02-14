@@ -300,10 +300,6 @@ void SpiralOfFate::PreviewWidget::_updateHover(const tgui::Vector2f &pos)
 		SpiralOfFate::Vector2f p = {pos.x, pos.y};
 
 		this->_object.setMousePosition(&p);
-		if (this->_selectedColor != 0 && this->_object._paletteIndex <= 0) {
-			this->_object._paletteIndex = this->_selectedColor;
-			this->_object._needGenerate = true;
-		}
 		return;
 	}
 
@@ -579,10 +575,12 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 		auto old = this->_selectedColor;
 
 		this->_updateHover(transformedPos);
-		if (this->_object._paletteIndex <= 0)
-			this->_selectedColor = 0;
-		else
+		if (this->_object._paletteIndex > 0)
 			this->_selectedColor = this->_object._paletteIndex;
+		else if (this->_doubleClick.restart().asSeconds() < 0.2) {
+			this->_translate = {0, 0};
+			this->_scale = 1;
+		}
 		if (old != this->_selectedColor)
 			this->onColorSelect.emit(this, this->_selectedColor);
 		return ClickableWidget::leftMousePressed(pos);

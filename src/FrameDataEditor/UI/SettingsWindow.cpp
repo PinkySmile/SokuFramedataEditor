@@ -195,7 +195,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		extraRemove->setEnabled(true);
 	});
 	extraBrowse->onClick([this](const std::weak_ptr<tgui::ListBox> &extraList_w) {
-		auto file = FileDialog::create(this->localize("message_box.title.open_framedata"), "Open", false);
+		auto file = FileDialog::create(this->localize("message_box.title.open_package"), "Open", false);
 
 		file->setSize(750, 450);
 		file->setFileMustExist(true);

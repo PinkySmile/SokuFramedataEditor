@@ -70,3 +70,8 @@ bool SpiralOfFate::ClearAttackOperation::hasModification() const
 {
 	return true;
 }
+
+bool SpiralOfFate::ClearAttackOperation::hasFramedataModification() const
+{
+	return true;
+}

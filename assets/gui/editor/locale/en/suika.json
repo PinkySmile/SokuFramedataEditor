@@ -1,0 +1,97 @@
+{
+	"401": "6B",
+	"405": "j.6B",
+	"411": "6C",
+	"415": "2C",
+
+	"500": "d.236B (Spectre Dense)",
+	"501": "d.236C (Spectre Dense)",
+
+	"505": "a.236B (Oni Spirit Bomb)",
+	"506": "a.236C (Oni Spirit Bomb)",
+	"507": "j.a.236B (Oni Spirit Bomb)",
+	"508": "j.a.236C (Oni Spirit Bomb)",
+
+	"510": "a.236B (Foot Bellows)",
+	"511": "a.236C (Foot Bellows)",
+	"512": "j.a.236B (Foot Bellows)",
+	"513": "j.a.236C (Foot Bellows)",
+
+
+	"520": "d.623B (Gnome -Dense-)",
+	"521": "d.623C (Gnome -Dense-)",
+	"520": "j.d.623B (Gnome -Dense-)",
+	"521": "j.d.623C (Gnome -Dense-)",
+
+	"525": "a.623B (Gnome -Thin-)",
+	"526": "a.623C (Gnome -Thin-)",
+
+	"530": "a.623B (Fire Oni)",
+	"531": "a.623C (Fire Oni)",
+
+	"540": "d.214B (Spectre -Thin-)",
+	"541": "d.214C (Spectre -Thin-)",
+	"542": "j.d.214B (Spectre -Thin-)",
+	"543": "j.d.214C (Spectre -Thin-)",
+
+	"545": "a.214B (Unpleasant Mist)",
+	"546": "a.214C (Unpleasant Mist)",
+	"547": "j.a.214B (Unpleasant Mist)",
+	"548": "j.a.214C (Unpleasant Mist)",
+
+	"550": "a.214B (Ignis Fatuus)",
+	"551": "a.214C (Ignis Fatuus)",
+
+	"560": "d.22B (Gathering Oni)",
+	"561": "d.22C (Gathering Oni)",
+
+	"565": "a.22B (Thin Oni)",
+	"566": "a.22C (Thin Oni)",
+
+	"570": "a.22B (Kidnapping Oni)",
+	"571": "a.22C (Kidnapping Oni)",
+
+	"600": "Gather Sign \"Throwing Mt. Togakushi\"",
+	"601": "Drunk Sign \"Art of Oni Binding\"",
+	"602": "Oni Sign \"Missing Power\"",
+	"603": "Gathering Oni \"Throwing Atlas\"",
+	"604": "Drunkern Dream \"Art of Gaki Binding\"",
+	"605": "Great Oni \"Missing Purple Power\"",
+	"606": "Mist Sign \"Gathering and Dissipating\"",
+	"607": "Will-o-Wisp \"Superense Conflagration\"",
+	"608": "Oni Sign \"Massacre on Mt.Ooe\"",
+	"612": "Secret of Kings \"3-Step Destruction\"",
+
+	"650": "Gather Sign \"Throwing Mt. Togakushi\" (Air startup)",
+
+
+	"800": "B objects",
+	"801": "C objects",
+
+	"810": "Spectre Dense objects",
+	"811": "Gnome -Dense- objects",
+	"812": "Spectre -Thin- objects",
+	"813": "Gathering Oni objects",
+
+	"815": "Oni Spirit Bomb objects",
+	"816": "Gnome -Thin- objects",
+	"817": "Unpleasant Mist objects",
+	"818": "Thin Oni objects",
+
+	"820": "Foot Bellows objects",
+	"821": "Fire Oni objects",
+	"822": "Ignis Fatuus objects",
+	"823": "Kidnapping Oni objects",
+
+	"848": "Melee objects",
+
+	"850": "Throwing Mt. Togakushi objects",
+	"851": "Art of Oni Binding objects",
+	"852": "Missing Power objects",
+	"853": "Throwing Atlas objects",
+	"854": "Art of Gaki Binding objects",
+	"855": "Missing Purple Power objects",
+	"856": "Superense Conflagration objects",
+	"858": "Massacre on Mt.Ooe objects",
+	"862": "3-Step Destruction3-Step Destruction objects"
+}

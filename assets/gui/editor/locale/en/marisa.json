@@ -1,0 +1,115 @@
+{
+	"401": "6B",
+	"405": "j.6B",
+	"411": "6C",
+	"415": "j.6C",
+
+
+	"500": "(j)d.214B/C (Witch Leyline)",
+	"504": "d.214x (Witch Leyline recovery)",
+
+	"505": "(j)a.214B (Radial Strike)",
+	"506": "(j)a.214C (Radial Strike)",
+
+	"510": "a.214B (Up Sweeper)",
+	"511": "a.214C (Up Sweeper)",
+	"512": "j.a.214B (Up Sweeper)",
+	"513": "j.a.214C (Up Sweeper)",
+
+
+	"520": "d.623B (Miasma Sweep)",
+	"521": "d.623C (Miasma Sweep)",
+
+	"525": "a.623B (Bosky Sweeper)",
+	"526": "a.623C (Bosky Sweeper)",
+
+	"530": "a.623B (Stellar Missile)",
+	"531": "a.623C (Stellar Missile)",
+
+
+	"540": "d.22B (Grand Stardust)",
+	"541": "d.22C (Grand Stardust)",
+	"542": "j.d.22B (Grand Stardust)",
+	"543": "j.d.22C (Grand Stardust)",
+
+	"545": "a.22B (Devildom Torch)",
+	"546": "a.22C (Devildom Torch)",
+
+	"550": "a.22B (Magical Reusable Bomb)",
+	"551": "a.22C (Magical Reusable Bomb)",
+
+
+	"560": "d.236B (Meteonic Debris)",
+	"561": "d.236C (Meteonic Debris)",
+	"562": "j.d.236B (Meteonic Debris)",
+	"563": "j.d.236C (Meteonic Debris)",
+
+	"565": "a.236B (Narrow Spark)",
+	"566": "a.236c (Narrow Spark)",
+	"567": "j.a.236B (Narrow Spark)",
+	"568": "j.a.236c (Narrow Spark)",
+
+	"570": "a.236B (Green Spread)",
+	"571": "a.236C (Green Spread)",
+
+	"572": "j.a.236B (Green Spread)",
+	"573": "j.a.236C (Green Spread)",
+
+
+	"600": "Love Sign \"Master Spark\"",
+	"602": "Magicannon \"Final Spark\"",
+	"603": "Star Sign \"Dragon Meteor\" / (Air)",
+	"604": "Love Sign \"Non-Directional Laser\"",
+	"605": "Magic Sign \"Stardust Reverie\" / (Air)",
+	"606": "Star Sign \"Escape Velocity\"",
+	"607": "Comet \"Blazing Star\" / (Air)",
+	"608": "Star Sign \"Meteonic Shower\"",
+	"609": "Star Sign \"Gravity Beat\"",
+	"611": "Light Sign \"Luminous Strike\" (Air)",
+	"612": "Light Sign \"Earthlight Ray\"",
+	"614": "Magical Research \"Deep Ecological Bomb\"",
+	"615": "Ritual Sign \"Orreries Sun\"",
+	"619": "Perversion \"Sure-Fire Master Spark\"",
+
+	"658": "Star Sign \"Meteonic Shower\"(Air)",
+
+	"800": "B objects",
+	"801": "5C objects",
+	"802": "2C object",
+	"803": "6C object",
+	"804": "j6[a], j2[a] object",
+
+	"810": "Witch Leyline objects",
+	"811": "Radial Strike objects",
+	"812": "Up Sweeper objects",
+
+
+	"817": "Stellar Missile objects",
+
+
+	"820": "Grand Stardust objects",
+	"821": "Devildom Torch objects",
+	"822": "Magical Reusable Bomb objects",
+
+	"825": "Meteonic Debris objects",
+	"826": "Narrows Spark objects",
+	"827": "Green Spread objects",
+
+	"849": "Bosky Sweeper objects",
+
+	"850": "Master Spark objects",
+	"851": "Final Spark objects",
+	"853": "Dragon Meteor objects",
+	"854": "Non-Directional Laser objects",
+	"855": "Stardust Reverie objects",
+	"856": "Ice Tornado objects",
+
+	"857": "Blazing Star objects",
+	"858": "Meteonic Shower objects",
+	"859": "Gravity Beat objects",
+	"860": "Freeze Atmosphere objects",
+	"861": "Luminous Strike objects",
+	"862": "Earthlight Strike objects",
+	"864": "Deep Ecological Bomb objects",
+	"864": "Orreries Sun objects"
+}

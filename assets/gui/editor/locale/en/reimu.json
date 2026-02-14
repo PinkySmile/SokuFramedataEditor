@@ -1,0 +1,110 @@
+{
+	"322": "5aaaa",
+
+	"416": "j.2C",
+
+
+
+    "500": "d.236B (Hakurei Amulet)",
+    "501": "d.236C (Hakurei Amulet)",
+    "502": "j.d.236B (Hakurei Amulet)",
+    "503": "j.d.236C (Hakurei Amulet)",
+
+    "505": "a.236B (Youkai Buster)",
+    "506": "a.236C (Youkai Buster)",
+    "507": "j.a.236B (Youkai Buster)",
+    "508": "j.a.236C (Youkai Buster)",
+
+    "510": "a.236B (Spread Amulet)",
+    "511": "a.236C (Spread Amulet)",
+    "512": "j.a.236C (Spread Amulet)",
+    "513": "j.a.236C (Spread Amulet)",
+
+
+	"520": "d.214B (Cautionary Border)",
+	"521": "d.214C (Cautionary Border)",
+	"522": "j.d.214B (Cautionary Border)",
+	"523": "j.d.214C (Cautionary Border)",
+
+	"525": "d.214B (Binding Border)",
+	"526": "d.214C (Binding Border)",
+	"527": "j.d.214B (Binding Border)",
+	"528": "j.d.214C (Binding Border)",
+
+	"530": "a.214B (Permanent Border)",
+	"531": "a.214C (Permanent Border)",
+
+
+	"540": "(j)d.421B (Illusional Rift)",
+	"541": "(j)d.421C (Illusional Rift)",
+
+	"545": "(j)a.421B (Demon Sealing Dimensional Rift)",
+	"546": "(j)a.421C (Demon Sealing Dimensional Rift)",
+
+	"550": "a.421B (Instant Dimensional Rift)",
+	"551": "a.421C (Instant Dimensional Rift)",
+
+
+	"560": "d.623B (Ascension Kick)",
+	"561": "d.623C (Ascension Kick)",
+
+	"565": "a.623B (Sliding Ascension Kick)",
+	"566": "a.623B (Sliding Ascension Kick)",
+
+	"570": "a.623B (Rain Dance)",
+	"571": "a.623C (Rain Dance)",
+	"572": "j.a.623B (Rain Dance)",
+	"573": "j.a.623C (Rain Dance)",
+
+	"600": "Spirit Sign \"Fantasy Orb\"",
+	"601": "Divine Spirit \"Fantasy Seal\"" ,
+	"604": "Dream Sign \"Demon Binding Array\"",
+	"605": "Boundary \"Objective Border\"",
+	"606": "Divine Arts \"Demon Binding Circle\"",
+	"607": "Boundary \"Expanding Boundary\"",
+	"608": "Jewel Sign \"Concealed Orbs of Light\"",
+	"609": "Treasure Sign \"Ying Yang Orb\"",
+	"610": "Holy Relic \"Ying-Yang Sanctifier Orb\"",
+	"614": "Divine Arts \"Wind God Kick\"",
+	"619": "\"Fantasy Heaven\"",
+
+    "650": "Spirit Sign \"Fantasy Orb\"(Air)",
+    "651": "Divine Spirit \"Fantasy Seal\" (Air)" ,
+	"657": "Boundary \"Expanding Boundary\"(Air)",
+	"658": "Jewel Sign \"Concealed Orbs of Light\"(Air)",
+	"669": "\"Fantasy Heaven\" (Activation)",
+
+
+	"800": "B series objects",
+	"801": "C series objects",
+
+	"808": "Hakurei Amulet objects",
+	"810": "Spread Amulet objects",
+	"811": "Youkai Buster objects",
+
+	"815": "Cautionary Border objects",
+	"816": "Binding Border objects",
+	"817": "Permanent Border objects",
+
+	"820": "Illusional Rift objects",
+	"821": "Demon Sealing Dimensional Rift objects",
+	"822": "Instant Dimensional Rift objects",
+
+	"825": "Ascension Kick objects",
+	"826": "Sliding Ascension Kick objects",
+	"827": "Rain Dance objects",
+
+
+	"848": "Melee objects",
+	"850": "Fantasy Orb objects",
+	"851": "Fanasy Seal objects",
+	"852": "Ying-Yang orb objects",
+	"853": "Fantasy Seal objects",
+	"854": "Demon Binding Array objects",
+	"855": "Objective Border objects",
+	"856": "Demon Binding Circle objects",
+	"857": "Expanding Boundary objects",
+	"858": "Concealed Orbs of Light objects",
+	"859": "Ying-Yang Sanctifier Orb objects",
+	"869": "Fantasy Heaven objects"
+}

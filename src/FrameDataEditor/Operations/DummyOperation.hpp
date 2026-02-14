@@ -14,8 +14,9 @@ namespace SpiralOfFate
 	public:
 		void apply() override;
 		void undo() override;
-		bool hasModification() const override;
-		std::string getName() const noexcept override;
+		[[nodiscard]] bool hasModification() const override;
+		[[nodiscard]] std::string getName() const noexcept override;
+		[[nodiscard]] bool hasFramedataModification() const override;
 	};
 }
 

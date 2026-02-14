@@ -1,0 +1,89 @@
+{
+    "322": null,
+    "401": "6B",
+    "405": "j.6B",
+
+    "500": "d.214B (Spiral-Light Steps)",
+    "501": "d.214C (Spiral-Light Steps)",
+    "505": "a.214B (Searing Red Fist)",
+    "506": "a.214C (Searing Red Fist)",
+    "510": "a.214B (Kick of Showering Brilliance)",
+    "511": "a.214C (Kick of Showering Brilliance)",
+    "512": "j.a.214B (Kick of Showering Brilliance)",
+    "513": "j.a.214C (Kick of Showering Brilliance)",
+
+    "520": "d.623B (Red Cannon)",
+    "521": "d.623C (Red Cannon)",
+    "525": "a.623B (Red Energy Release)",
+    "526": "a.623C (Red Energy Release)",
+    "530": "a.623B (Tiger Chi Release)",
+    "531": "a.623C (Tiger Chi Release)",
+
+
+    "540": "d.22B (Yellow Quake Kick)",
+    "541": "d.22C (Yellow Quake Kick)",
+
+    "545": "a.22B (Earth Dragon Wave)",
+    "546": "a.22C (Earth Dragon Wave)",
+
+    "550": "a.22B (Sky Dragon Kick)",
+    "551": "a.22C (Sky Dragon Kick)",
+
+
+    "560": "d.236B (Fragrant Wave)",
+    "561": "d.236C (Fragrant Wave)",
+
+    "565": "a.236B (Water Taichi Fist)",
+    "566": "a.236C (Water Taichi Fist)",
+
+    "570": "a.236B (Colorful Rain)",
+    "571": "a.236C (Colorful Rain)",
+    "572": "j.a.236B (Colorful Rain)",
+    "573": "j.a.236C (Colorful Rain)",
+
+    "600": "Color Sign \"Colorful Windchime\"",
+    "601": "Ultimate Color \"Mad Colorful Dance\"",
+    "602": "Chi Sign \"Star Bullets\"",
+    "603": "Star Chi \"Earth-moving Star Bullets\"",
+    "604": "Attack Sign\"Roc Fist\"",
+    "605": "Fiery Attack \"Roc-Killing Fist\"",
+    "606": "Rainbow Sign \"Intense Rainbow Fist\"",
+    "607": "Chi Sign \"Earth Dragon Sky Dragon Kick\"",
+    "608": "Colorful Brilliance \"Rainbow Taichi\"",
+    "609": "Brilliance \"Rainbow Brilliance Palm\"",
+    "611": "Chi Sign \"Fierce Tiger Energy Release\"",
+
+    "800": "5B objects",
+    "801": "j.2B objects",
+    "802": "2B objects",
+    "805": "5C objects",
+    "805": "6C objects",
+
+    "810": "Spiral-Light Steps objects",
+    "811": "Searing Red Fist objects",
+    "812": "Kick of Showering Brilliance objects",
+
+    "815": "Red Cannon objects",
+    "816": "Red Energy Release objects",
+    "817": "Tiger Chi Release objects",
+
+    "820": "Yellow Quake Kick objects",
+    "821": "Earth Dragon Wave objects",
+    "822": "Sky Dragon Kick objects",
+
+    "825": "Fragrant Wave objects",
+    "826": "Water Taichi Fist objects",
+    "827": "Colorful Rain objects",
+
+    "850": "Colorful Windchime objects",
+    "851": "Mad Colorful Dance objects",
+    "852": "Star Bullets objects",
+    "853": "Earth-moving Star Bullets objects",
+    "854": "Roc Fist objects",
+    "855": "Roc-Killing Fist objects",
+    "856": "Intense Rainbow Fist objects",
+    "857": "Earth Dragon Sky Dragon Kick objects",
+    "858": "Rainbow Taichi objects",
+    "859": "Rainbow Brilliance Palm objects",
+    "861": "Fierce Tiger Energy Release objects"
+}

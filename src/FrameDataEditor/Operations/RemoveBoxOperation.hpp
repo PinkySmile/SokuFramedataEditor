@@ -32,8 +32,9 @@ namespace SpiralOfFate
 		RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, RemoveBoxApply onApply);
 		void apply() override;
 		void undo() override;
-		std::string getName() const noexcept override;
-		bool hasModification() const override;
+		[[nodiscard]] std::string getName() const noexcept override;
+		[[nodiscard]] bool hasModification() const override;
+		[[nodiscard]] bool hasFramedataModification() const override;
 	};
 }
 

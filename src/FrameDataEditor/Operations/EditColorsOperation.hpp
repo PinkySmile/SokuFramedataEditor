@@ -17,7 +17,6 @@ namespace SpiralOfFate
 		std::array<Color, 256> _oldValue;
 		std::array<Color, 256> _newValue;
 		std::string _fieldName;
-		bool _wasModified;
 		unsigned _oldSelectedPalette;
 		unsigned &_selectedPalette;
 
@@ -30,8 +29,9 @@ namespace SpiralOfFate
 		);
 		void apply() override;
 		void undo() override;
-		std::string getName() const noexcept override;
-		bool hasModification() const override;
+		[[nodiscard]] std::string getName() const noexcept override;
+		[[nodiscard]] bool hasModification() const override;
+		[[nodiscard]] bool hasFramedataModification() const override;
 	};
 } // SpiralOfFate
 

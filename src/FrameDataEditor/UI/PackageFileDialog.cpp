@@ -197,7 +197,7 @@ namespace tgui
 		m_listView->addColumn("Name", 0);
 		m_listView->addColumn("Size", 75, HorizontalAlignment::Right);
 		m_listView->addColumn("Type", 75, HorizontalAlignment::Right);
-		m_listView->addColumn("Format      ", 95, HorizontalAlignment::Right);
+		m_listView->addColumn("Format", 95, HorizontalAlignment::Right);
 		m_listView->setColumnExpanded(0, true);
 
 		m_listView->setFixedIconSize({static_cast<float>(m_listView->getItemHeight()) * 0.8f, 0});
@@ -974,7 +974,7 @@ namespace tgui
 				type = "Table";
 				break;
 			case ShadyCore::FileType::TYPE_LABEL:
-				type = "Label";
+				type = "Loops";
 				break;
 			case ShadyCore::FileType::TYPE_IMAGE:
 				type = "Image";
@@ -986,7 +986,7 @@ namespace tgui
 				type = "Sfx";
 				break;
 			case ShadyCore::FileType::TYPE_BGM:
-				type = "Bgm";
+				type = "Music";
 				break;
 			case ShadyCore::FileType::TYPE_SCHEMA:
 				type = "Schema";
@@ -1006,7 +1006,7 @@ namespace tgui
 				format = "cv0";
 				break;
 			case ShadyCore::FileType::TEXT_NORMAL:
-				format = "Normal";
+				format = "txt";
 				break;
 			case ShadyCore::FileType::TABLE_GAME:
 				format = "cv1";
@@ -1018,7 +1018,7 @@ namespace tgui
 				format = "Riff";
 				break;
 			case ShadyCore::FileType::LABEL_LBL:
-				format = "Lbl";
+				format = "lbl";
 				break;
 			case ShadyCore::FileType::IMAGE_GAME:
 				format = "cv2";
@@ -1048,20 +1048,20 @@ namespace tgui
 				format = "xml";
 				break;
 			case ShadyCore::FileType::SCHEMA_GAME_GUI:
-				format = "Gui";
+				format = "gui";
 				break;
 			case ShadyCore::FileType::SCHEMA_GAME_ANIM:
-				format = "Anim";
+				format = "anim";
 				break;
 			case ShadyCore::FileType::SCHEMA_GAME_PATTERN:
-				format = "Pattern";
+				format = "pattern";
 				break;
 			case ShadyCore::FileType::TEXTURE_DDS:
 				format = "dds";
 				break;
 			}
 
-			const std::size_t itemIndex = m_listView->addItem({file.filename, fileSizeStr, type, format + "      "});
+			const std::size_t itemIndex = m_listView->addItem({file.filename, fileSizeStr, type, format});
 			m_listView->setItemData(itemIndex, file.directory);
 
 			if (icon.getData())
@@ -1092,7 +1092,7 @@ namespace tgui
 		const String& filename = m_editBoxFilename->getText();
 		const bool enabled = ((filename != U".") && (filename != U"..")) // Always disabled for "." and ".." filenames
 			&& (m_selectingDirectory || !m_listView->getSelectedItemIndices().empty() || !filename.empty()) // Disabled when no file selected
-			&& (!m_fileMustExist || m_fileList.contains(m_currentDirectory + "/" + filename)); // Disabled for non-existent files
+			&& (!m_fileMustExist || m_fileList.contains(m_currentDirectory.empty() ? filename : m_currentDirectory + "/" + filename)); // Disabled for non-existent files
 
 		if (enabled != m_buttonConfirm->isEnabled())
 			m_buttonConfirm->setEnabled(enabled);
@@ -1411,23 +1411,26 @@ namespace tgui
 				if (!m_selectingDirectory && m_listView->getItemData<bool>(index))
 					continue;
 
-				paths.push_back(m_currentDirectory + "/" + m_listView->getItem(index));
+				auto p = m_listView->getItem(index);
+
+				paths.push_back(m_currentDirectory.empty() ? p : m_currentDirectory + "/" + p);
 			}
 
 			filesSelected(std::move(paths));
 		}
 		else // Only one file selected
 		{
-			const auto path = m_currentDirectory + "/" + m_editBoxFilename->getText();
+			const auto start = m_currentDirectory.empty() ? "" : m_currentDirectory + "/";
+			const auto path = start + m_editBoxFilename->getText();
 
 			// If we were looking for a file but a directory was selected then just enter that directory
 			if (!m_selectingDirectory && (m_listView->getSelectedItemIndices().size() == 1)
 				  && (m_listView->getItemData<bool>(*m_listView->getSelectedItemIndices().begin())))
 			{
-				changePath(m_currentDirectory + "/" + m_listView->getItem(*m_listView->getSelectedItemIndices().begin()), true);
+				changePath(start + m_listView->getItem(*m_listView->getSelectedItemIndices().begin()), true);
 				m_editBoxFilename->setText(U"");
 			}
-			else if (!m_selectingDirectory && !m_editBoxFilename->getText().empty() && Filesystem::directoryExists(path))
+			else if (!m_selectingDirectory && !m_editBoxFilename->getText().empty() && m_fileList.contains(path) && m_fileList[path]->directory)
 			{
 				changePath(path, true);
 				m_editBoxFilename->setText(U"");

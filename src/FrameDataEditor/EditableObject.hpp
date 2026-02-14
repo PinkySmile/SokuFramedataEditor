@@ -21,10 +21,12 @@ public:
 	unsigned _animation = 0;
 	unsigned _animationCtr = 0;
 	int _paletteIndex = -1;
+	int _oldPaletteIndex = -1;
 	std::string _folder;
 	bool _textureValid = false;
 	bool _needGenerate = false;
 	unsigned char _generateCd = 0;
+	std::function<void (int, int)> _onHoverChange;
 
 	SpiralOfFate::Vector2f _mousePosToImgPos(const SpiralOfFate::Vector2i &mouse);
 	void _generateOverlaySprite();
@@ -44,6 +46,7 @@ public:
 	void update();
 	void resetState();
 	void setMousePosition(const SpiralOfFate::Vector2f *pos);
+	void tick();
 };
 
 

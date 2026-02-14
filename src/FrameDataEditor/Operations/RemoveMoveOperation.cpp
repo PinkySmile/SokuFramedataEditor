@@ -43,3 +43,8 @@ std::string SpiralOfFate::RemoveMoveOperation::getName() const noexcept
 {
 	return this->_name;
 }
+
+bool SpiralOfFate::RemoveMoveOperation::hasFramedataModification() const
+{
+	return true;
+}

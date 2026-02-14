@@ -4,7 +4,30 @@ MenuBar.MainBar {
     TextSize = 13;
 
     Menu {
-        Items = ["menu_item.file.load", "menu_item.file.explore", "menu_item.file.save", "menu_item.file.save_as", "menu_item.file.shortcuts", "menu_item.file.settings", "menu_item.file.quit"];
+        Menu {
+            Text = "menu_item.file.load";
+            Items = ["menu_item.file.load.loaded", "menu_item.file.load.file"];
+        }
+        Menu {
+            Text = "menu_item.file.explore";
+            Items = ["menu_item.file.explore.loaded", "menu_item.file.explore.file"];
+        }
+        Menu {
+            Text = "menu_item.file.save";
+        }
+        Menu {
+            Text = "menu_item.file.save_as";
+        }
+        Menu {
+            Text = "menu_item.file.shortcuts";
+        }
+        Menu {
+            Text = "menu_item.file.settings";
+        }
+        Menu {
+            Text = "menu_item.file.quit";
+        }
+
         Text = "menu_item.file";
     }
 

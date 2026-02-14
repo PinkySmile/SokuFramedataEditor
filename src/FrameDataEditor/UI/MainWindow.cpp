@@ -86,19 +86,23 @@ static ReverseColorConversionCb colorConversionsReverse[] = {
 		if (chroma == 0)
 			h = 0;
 		else if (xmax == r)
-			h = 60 * std::fmod((g - b) / (float)chroma, 6);
+			h = 60 * std::fmod((g - b) / static_cast<float>(chroma), 6);
 		else if (xmax == g)
-			h = 60 * ((b - r) / (float)chroma + 2);
+			h = 60 * ((b - r) / static_cast<float>(chroma) + 2);
 		else if (xmax == b)
-			h = 60 * ((r - g) / (float)chroma + 4);
+			h = 60 * ((r - g) / static_cast<float>(chroma) + 4);
 		else
 			assert_not_reached();
-		h = std::fmod(h, 360);
+		h = std::fmod(h + 360, 360);
 		if (l == 0 || l == 1)
 			s = 0;
 		else
 			s = (v - l) / std::min(l, 1 - l);
-		return WidgetColor{(unsigned)h, static_cast<unsigned>(1000 * s), static_cast<unsigned>(1000 * l)};
+		return WidgetColor{
+			static_cast<unsigned>(h),
+			static_cast<unsigned>(1000 * s),
+			static_cast<unsigned>(1000 * l)
+		};
 	},
 	[](const SpiralOfFate::Color &color) { // https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
 		double r = color.r / 255.;
@@ -114,19 +118,23 @@ static ReverseColorConversionCb colorConversionsReverse[] = {
 		if (chroma == 0)
 			h = 0;
 		else if (xmax == r)
-			h = 60 * std::fmod((g - b) / (float)chroma, 6);
+			h = 60 * std::fmod((g - b) / static_cast<float>(chroma), 6);
 		else if (xmax == g)
-			h = 60 * ((b - r) / (float)chroma + 2);
+			h = 60 * ((b - r) / static_cast<float>(chroma) + 2);
 		else if (xmax == b)
-			h = 60 * ((r - g) / (float)chroma + 4);
+			h = 60 * ((r - g) / static_cast<float>(chroma) + 4);
 		else
 			assert_not_reached();
-		h = std::fmod(h, 360);
+		h = std::fmod(h + 360, 360);
 		if (v == 0)
 			s = 0;
 		else
 			s = chroma / v;
-		return WidgetColor{(unsigned)h, static_cast<unsigned>(1000 * s), static_cast<unsigned>(1000 * v)};
+		return WidgetColor{
+			static_cast<unsigned>(h),
+			static_cast<unsigned>(1000 * s),
+			static_cast<unsigned>(1000 * v)
+		};
 	},
 };
 
@@ -172,9 +180,10 @@ std::string to_hex(unsigned long long value, int count)
                 if (this->_palettes.empty())                                                             \
                         return;                                                                          \
                 this->_colorChangeSource = src;                                                          \
+                this->_onPaletteChanged();                                                               \
                 this->updateTransaction([this, color] {                                                  \
                         return new EditColorOperation(                                                   \
-                                this->localize("color.edit"),                                    \
+                                this->localize("color.edit"),                                            \
                                 this->_palettes[this->_selectedPalette],                                 \
                                 this->_selectedPalette,                                                  \
                                 this->_selectedColor,                                                    \
@@ -212,7 +221,7 @@ std::string to_hex(unsigned long long value, int count)
                 if (this->_palettes.empty())                                                            \
                         return;                                                                         \
                                                                                                         \
-                Color color;                                                                            \
+                Color color{0, 0, 0, 255};                                                              \
                                                                                                         \
                 if (s.size() < 7)                                                                       \
                         return;                                                                         \
@@ -220,7 +229,7 @@ std::string to_hex(unsigned long long value, int count)
                 this->_colorChangeSource = 5;                                                           \
                 this->updateTransaction([this, color]{                                                  \
                         return new EditColorOperation(                                                  \
-                                this->localize("color.edit"),                                   \
+                                this->localize("color.edit"),                                           \
                                 this->_palettes[this->_selectedPalette],                                \
                                 this->_selectedPalette,                                                 \
                                 this->_selectedColor,                                                   \
@@ -650,8 +659,155 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, CloseButtonF
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MaximizeButtonFocused, "ChildWindowButton")
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButtonFocused, "ChildWindowButton")
 
+bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name)
+{
+	std::ifstream stream;
+
+	stream.open("assets/gui/editor/locale/" + this->_editor.getLocale() + "/" + name + ".json");
+	if (!stream)
+		stream.open("assets/gui/editor/locale/en/" + name + ".json");
+	if (!stream)
+		return false;
+
+	nlohmann::json j;
+
+	stream >> j;
+	for (auto &[key, value] : j.items()) {
+		if (value.is_null())
+			this->_labels.erase(std::stoul(key));
+		else
+			this->_labels[std::stoul(key)] = value;
+	}
+	return true;
+}
+
+bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name, const std::string &folder)
+{
+	auto entry = game->package.find(folder + name + "_" + this->_editor.getLocale() + "_labels.json");
+
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_" + this->_editor.getLocale() + "_labels.txt");
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_" + this->_editor.getLocale() + "_labels.cv0");
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_" + this->_editor.getLocale() + "_labels");
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_labels.json");
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_labels.txt");
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_labels.cv0");
+	if (entry == game->package.end())
+		entry = game->package.find(folder + name + "_labels");
+	if (entry == game->package.end())
+		return false;
+
+	auto &stream = entry->second->open();
+	nlohmann::json j;
+
+	stream >> j;
+	entry->second->close(stream);
+	for (auto &[key, value] : j.items()) {
+		if (value.is_null())
+			this->_labels.erase(std::stoul(key));
+		else
+			this->_labels[std::stoul(key)] = value;
+	}
+	return true;
+}
+
+bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name, const std::filesystem::path &folder)
+{
+	std::ifstream stream;
+
+	stream.open(folder / (name + "_" + this->_editor.getLocale() + ".json"));
+	if (!stream)
+		stream.open(folder / (name + "_labels.json"));
+	if (!stream)
+		return false;
+
+	nlohmann::json j;
+
+	stream >> j;
+	for (auto &[key, value] : j.items()) {
+		if (value.is_null())
+			this->_labels.erase(std::stoul(key));
+		else
+			this->_labels[std::stoul(key)] = value;
+	}
+	return true;
+}
+
+void SpiralOfFate::MainWindow::_onColorHover(int oColor, int nColor)
+{
+	if (oColor == nColor)
+		return;
+	for (auto container : this->_containers) {
+		auto colorPanel = container->get<tgui::ScrollablePanel>("AllColorPanel");
+
+		if (!colorPanel)
+			continue;
+
+		if (oColor >= 0) {
+			auto button = colorPanel->get<tgui::Button>("Color" + std::to_string(oColor));
+			auto render = button->getRenderer();
+
+			if (this->_selectedColor == static_cast<unsigned>(oColor)) {
+				render->setBorders({2, 2, 2, 2});
+				render->setBorderColor(tgui::Color{0, 0, 255});
+				render->setBorderColorHover(tgui::Color{100, 100, 255});
+				render->setBorderColorDisabled(tgui::Color{200, 200, 255});
+				render->setBorderColorFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDown(tgui::Color{0, 0, 255});
+				render->setBorderColorDownDisabled(tgui::Color{0, 0, 255});
+				render->setBorderColorDownFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDownHover(tgui::Color{0, 0, 255});
+			} else {
+				render->setBorders({1, 1, 1, 1});
+				render->setBorderColor(tgui::Color{0, 0, 0});
+				render->setBorderColorHover(tgui::Color{100, 100, 100});
+				render->setBorderColorDisabled(tgui::Color{200, 200, 200});
+				render->setBorderColorFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDown(tgui::Color{0, 0, 0});
+				render->setBorderColorDownDisabled(tgui::Color{0, 0, 0});
+				render->setBorderColorDownFocused(tgui::Color{0, 0, 0});
+				render->setBorderColorDownHover(tgui::Color{0, 0, 0});
+			}
+		}
+		if (nColor >= 0) {
+			auto button = colorPanel->get<tgui::Button>("Color" + std::to_string(nColor));
+			auto render = button->getRenderer();
+
+			if (this->_selectedColor == static_cast<unsigned>(nColor)) {
+				render->setBorders({2, 2, 2, 2});
+				render->setBorderColor(tgui::Color{0, 0, 255});
+				render->setBorderColorHover(tgui::Color{100, 100, 255});
+				render->setBorderColorDisabled(tgui::Color{200, 200, 255});
+				render->setBorderColorFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDown(tgui::Color{0, 0, 255});
+				render->setBorderColorDownDisabled(tgui::Color{0, 0, 255});
+				render->setBorderColorDownFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDownHover(tgui::Color{0, 0, 255});
+			} else {
+				render->setBorders({2, 2, 2, 2});
+				render->setBorderColor(tgui::Color{255, 128, 0});
+				render->setBorderColorHover(tgui::Color{255, 178, 100});
+				render->setBorderColorDisabled(tgui::Color{255, 228, 200});
+				render->setBorderColorFocused(tgui::Color{255, 128, 0});
+				render->setBorderColorDown(tgui::Color{255, 128, 0});
+				render->setBorderColorDownDisabled(tgui::Color{255, 128, 0});
+				render->setBorderColorDownFocused(tgui::Color{255, 128, 0});
+				render->setBorderColorDownHover(tgui::Color{255, 128, 0});
+			}
+		}
+	}
+}
+
 void SpiralOfFate::MainWindow::_init()
 {
+	this->_object->_onHoverChange = [this] (int o, int n){
+		this->_onColorHover(o, n);
+	};
 	if (this->_object->_schema.isCharacterData)
 		this->_effectObject = std::make_unique<EditableObject>("data/effect/", std::string("data/effect/effect.xml"), &this->_palettes[this->_selectedPalette].colors);
 	this->_preview = std::make_shared<PreviewWidget>(std::ref(this->_editor), std::ref(*this), *this->_object);
@@ -674,8 +830,9 @@ void SpiralOfFate::MainWindow::_init()
 
 	auto panel = this->get<tgui::Panel>("AnimationPanel");
 	auto showBoxes = panel->get<tgui::BitmapButton>("ShowBoxes");
-	auto ctrlPanel = this->get<tgui::Panel>("ControlPanel");
+	auto ctrlPanel = this->get<tgui::ScrollablePanel>("ControlPanel");
 
+	ctrlPanel->getHorizontalScrollbar()->setPolicy(tgui::Scrollbar::Policy::Never);
 	if (this->_object->_schema.isCharacterData)
 		ctrlPanel->loadWidgetsFromFile("assets/gui/editor/character/framedata.gui");
 	else
@@ -717,6 +874,7 @@ void SpiralOfFate::MainWindow::_init()
 		this->_updateTitleButtons();
 	});
 
+	this->reloadLabels();
 	this->_placeUIHooks(*this);
 	this->_populateData(*this);
 	this->_autoSaveThread = std::thread{&MainWindow::_autoSaveLoop, this};
@@ -725,6 +883,7 @@ void SpiralOfFate::MainWindow::_init()
 SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor &editor) :
 	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
 	_editor(editor),
+	_modifications(json["modifications"]),
 	_title(json["title"]),
 	_chrPath(json["folder"]),
 	_character(json["character"]),
@@ -733,6 +892,8 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 	if (!std::filesystem::exists(game->settings.palettes / this->_character))
 		std::filesystem::create_directories(game->settings.palettes / this->_character);
 	this->_object = std::make_unique<EditableObject>();
+	if (this->_modifications != 0)
+		this->_modifications = 1;
 
 	auto &palettes = json["palettes"];
 	auto &framedata = json["framedata"];
@@ -747,7 +908,7 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 			pal.colors[i] = { colors[i][0], colors[i][1], colors[i][2] };
 		pal.colors[0].a = 0;
 		pal.path = palj["path"].get<std::filesystem::path>();
-		pal.modified = palj["modified"];
+		pal.modifications = palj["modifications"];
 		pal.name = palj["name"].get<std::string>();
 	}
 	for (size_t i = 0; i < this->_palettes.size(); i++)
@@ -848,11 +1009,14 @@ SpiralOfFate::MainWindow::~MainWindow()
 		this->_autoSaveThread.join();
 }
 
-bool SpiralOfFate::MainWindow::isModified() const noexcept
+bool SpiralOfFate::MainWindow::isFramedataModified() const noexcept
 {
-	return
-		this->_operationIndex != this->_operationSaved ||
-		(this->_pendingTransaction && this->_pendingTransaction->hasModification());
+	return this->_modifications != 0;
+}
+
+bool SpiralOfFate::MainWindow::arePalettesModified() const noexcept
+{
+	return std::ranges::any_of(this->_palettes, [](const Palette &p) { return p.modifications != 0; });
 }
 
 bool SpiralOfFate::MainWindow::hasUndoData() const noexcept
@@ -902,11 +1066,17 @@ void SpiralOfFate::MainWindow::redo()
 	std::lock_guard guard{this->_saveMutex};
 
 	this->_operationQueue[this->_operationIndex]->apply();
+	if (this->_operationQueue[this->_operationIndex]->hasFramedataModification())
+		this->_modifications++;
+	else {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
 	this->_operationIndex++;
 	this->_requireReload = true;
-	if (this->isModified())
-		title += "*";
-	title += "~";
+	if (this->isFramedataModified())
+		title.push_back('*');
+	title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(this->hasRedoData());
@@ -926,10 +1096,16 @@ void SpiralOfFate::MainWindow::undo()
 
 	this->_operationIndex--;
 	this->_operationQueue[this->_operationIndex]->undo();
+	if (this->_operationQueue[this->_operationIndex]->hasFramedataModification())
+		this->_modifications--;
+	else {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
 	this->_requireReload = true;
-	if (this->isModified())
-		title += "*";
-	title += "~";
+	if (this->isFramedataModified())
+		title.push_back('*');
+	title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setHasRedo(true);
@@ -1009,10 +1185,14 @@ void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operati
 		operation = new DummyOperation();
 	this->_pendingTransaction.reset(operation);
 	this->_pendingTransaction->apply();
-	if (this->isModified())
-		title += "*";
+	if (this->_pendingTransaction->hasFramedataModification()) {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
+	if (this->isFramedataModified())
+		title.push_back('*');
 	if (this->_requireAutoSave)
-		title += "~";
+		title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 }
@@ -1027,10 +1207,14 @@ void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *
 	this->_pendingTransaction->undo();
 	this->_pendingTransaction.reset(operation());
 	this->_pendingTransaction->apply();
-	if (this->isModified())
-		title += "*";
+	if (!this->_pendingTransaction->hasFramedataModification()) {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
+	if (this->isFramedataModified())
+		title.push_back('*');
 	if (this->_requireAutoSave)
-		title += "~";
+		title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 }
@@ -1042,10 +1226,14 @@ void SpiralOfFate::MainWindow::cancelTransaction()
 
 	assert_exp(this->_pendingTransaction);
 	this->_pendingTransaction->undo();
+	if (!this->_pendingTransaction->hasFramedataModification()) {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
 	this->_pendingTransaction.reset();
-	if (this->isModified())
-		title += "*";
-	title += "~";
+	if (this->isFramedataModified())
+		title.push_back('*');
+	title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
 }
@@ -1059,6 +1247,12 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
+	if (this->_pendingTransaction->hasFramedataModification())
+		this->_modifications++;
+	else {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(nullptr);
 	this->_operationQueue.back().swap(this->_pendingTransaction);
@@ -1067,9 +1261,9 @@ void SpiralOfFate::MainWindow::commitTransaction()
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
 
-	if (this->isModified())
-		title += "*";
-	title += "~";
+	if (this->isFramedataModified())
+		title.push_back('*');
+	title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
@@ -1086,6 +1280,12 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
+	if (operation->hasFramedataModification())
+		this->_modifications++;
+	else {
+		this->_preview->invalidatePalette();
+		this->_requireReloadPal = true;
+	}
 	this->_operationQueue.erase(this->_operationQueue.begin() + this->_operationIndex, this->_operationQueue.end());
 	this->_operationQueue.emplace_back(operation);
 	this->_operationQueue.back()->apply();
@@ -1094,9 +1294,9 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 		this->_operationSaved = -1;
 	this->_operationIndex = this->_operationQueue.size();
 
-	if (this->isModified())
-		title += "*";
-	title += "~";
+	if (this->isFramedataModified())
+		title.push_back('*');
+	title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
@@ -1119,7 +1319,7 @@ void SpiralOfFate::MainWindow::save()
 	if (this->_pendingTransaction)
 		this->commitTransaction();
 
-	if (this->_path.extension() == ".json") {
+	if (this->_pathInit && this->_path.extension() == ".json") {
 		auto j = this->_asJson();
 		std::ofstream stream{this->_path};
 
@@ -1135,70 +1335,80 @@ void SpiralOfFate::MainWindow::save()
 		stream << j;
 		stream.close();
 		this->_operationSaved = this->_operationIndex;
-		this->setTitle(this->_path.string());
+		this->autoSave();
+		this->_modifications = 0;
+		for (auto &pal : this->_palettes)
+			pal.modifications = 0;
+		this->_requireReloadPal = true;
 		return;
 	}
 
-	ShadyCore::FileType::Format format;
-	ShadyCore::Schema schema;
+	if (this->isFramedataModified()) {
+		ShadyCore::FileType::Format format;
+		ShadyCore::Schema schema;
 
-	for (auto &action : this->_object->_schema.framedata) {
-		if (action.second.cloned) {
-			auto c = new ShadyCore::Schema::Clone(action.first);
+		for (auto &action : this->_object->_schema.framedata) {
+			if (action.second.cloned) {
+				auto c = new ShadyCore::Schema::Clone(action.first);
 
-			c->targetId = action.second.clonedId;
-			schema.objects.push_back(c);
-			continue;
-		}
-		for (auto &sequence : action.second) {
-			auto c = new ShadyCore::Schema::Sequence(action.first, !this->_object->_schema.isCharacterData);
-
-			c->loop = sequence.loop;
-			c->moveLock = sequence.moveLock;
-			c->actionLock = sequence.actionLock;
-			for (auto &frame : sequence) {
-				frame.imageIndex = getOrCreateImage(schema, frame.spritePath);
-				c->frames.push_back(new ShadyCore::Schema::Sequence::MoveFrame(frame));
+				c->targetId = action.second.clonedId;
+				schema.objects.push_back(c);
+				continue;
 			}
-			schema.objects.push_back(c);
+			for (auto &sequence : action.second) {
+				auto c = new ShadyCore::Schema::Sequence(action.first, !this->_object->_schema.isCharacterData);
+
+				c->loop = sequence.loop;
+				c->moveLock = sequence.moveLock;
+				c->actionLock = sequence.actionLock;
+				for (auto &frame : sequence) {
+					frame.imageIndex = getOrCreateImage(schema, frame.spritePath);
+					c->frames.push_back(new ShadyCore::Schema::Sequence::MoveFrame(frame));
+				}
+				schema.objects.push_back(c);
+			}
 		}
+
+		std::ifstream::openmode mode = std::ifstream::in;
+
+		if (this->_path.extension() == ".xml")
+			format = ShadyCore::FileType::SCHEMA_XML;
+		else if (this->_object->_schema.isCharacterData) {
+			format = ShadyCore::FileType::SCHEMA_GAME_PATTERN;
+			mode |= std::ifstream::binary;
+		} else {
+			format = ShadyCore::FileType::SCHEMA_GAME_ANIM;
+			mode |= std::ifstream::binary;
+		}
+
+		std::ofstream stream{this->_path, mode};
+
+		if (stream.fail()) {
+			auto err = this->localize("error.open", this->_path.string(), strerror(errno));
+
+			// FIXME: strerror only works on Linux (err.message()?)
+			// TODO: Somehow return the message box so the caller can open the save as dialog when OK is clicked
+			SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
+			game->logger.error(err);
+			return;
+		}
+		ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_SCHEMA, format})(&schema, stream);
+		stream.close();
+		schema.destroy();
 	}
-	if (this->_path.extension() == ".xml")
-		format = ShadyCore::FileType::SCHEMA_XML;
-	else if (this->_object->_schema.isCharacterData)
-		format = ShadyCore::FileType::SCHEMA_GAME_PATTERN;
-	else
-		format = ShadyCore::FileType::SCHEMA_GAME_ANIM;
-
-	std::ofstream stream{this->_path};
-
-	if (stream.fail()) {
-		auto err = this->localize("error.open", this->_path.string(), strerror(errno));
-
-		// FIXME: strerror only works on Linux (err.message()?)
-		// TODO: Somehow return the message box so the caller can open the save as dialog when OK is clicked
-		SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
-		game->logger.error(err);
-		return;
-	}
-	ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_SCHEMA, format})(&schema, stream);
-	stream.close();
-	schema.destroy();
 
 	for (auto &pal : this->_palettes) {
-		if (pal.path.empty() && !pal.modified)
+		if (pal.modifications == 0)
 			continue;
 		try {
 			// For this one since we are saving let's keep going anyway and display the error.
 			assert_exp(!pal.path.empty());
 		} catch (std::exception &e) {
-			if (stream.fail()) {
-				auto err = this->localize("error.open", this->_path.string(), e.what());
+			auto err = this->localize("error.open", pal.path.string(), e.what());
 
-				SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
-				game->logger.error(err);
-				continue;
-			}
+			SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
+			game->logger.error(err);
+			continue;
 		}
 
 		ShadyCore::Palette palette;
@@ -1207,14 +1417,15 @@ void SpiralOfFate::MainWindow::save()
 		palette.bitsPerPixel = 32;
 		palette.data = reinterpret_cast<uint8_t *>(ptr);
 		for (size_t i = 0; i < pal.colors.size(); i++)
-			palette.data[i] =
+			ptr[i] =
 				(i == 0 ? 0x00000000 : 0xFF000000) |
 				pal.colors[i].r << 16 |
 				pal.colors[i].g << 8 |
 				pal.colors[i].b << 0;
 		palette.pack();
 
-		std::ofstream pstream{pal.path};
+		std::ofstream pstream{pal.path, std::ios::binary};
+		ShadyCore::FileType::Format format;
 
 		if (pstream.fail()) {
 			auto err = this->localize("error.open", pal.path.string(), strerror(errno));
@@ -1224,13 +1435,22 @@ void SpiralOfFate::MainWindow::save()
 			game->logger.error(err);
 			continue;
 		}
-		ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, ShadyCore::FileType::PALETTE_ACT})(&palette, pstream);
+		if (pal.path.extension() == ".pal")
+			format = ShadyCore::FileType::PALETTE_PAL;
+		else if (pal.path.extension() == ".act")
+			format = ShadyCore::FileType::PALETTE_ACT;
+		else
+			continue;
+		ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_PALETTE, format})(&palette, pstream);
 		pstream.close();
 		palette.destroy();
+		pal.modifications = 0;
 	}
 
+	this->_modifications = 0;
 	this->_operationSaved = this->_operationIndex;
-	this->setTitle(this->_path.string());
+	this->autoSave();
+	this->_requireReloadPal = true;
 }
 
 void SpiralOfFate::MainWindow::exportPalette(const std::filesystem::path &path)
@@ -1254,7 +1474,7 @@ void SpiralOfFate::MainWindow::exportPalette(const std::filesystem::path &path)
 			pal.colors[i].b << 0;
 	palette.pack();
 
-	std::ofstream pstream{pal.path};
+	std::ofstream pstream{pal.path, std::ios::binary};
 
 	if (pstream.fail()) {
 		auto err = this->localize("error.open", pal.path.string(), strerror(errno));
@@ -1278,8 +1498,9 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 	else
 		format = ShadyCore::FileType::PALETTE_PAL;
 
-	std::ifstream stream{path};
+	std::ifstream stream{path, std::ifstream::binary};
 	ShadyCore::Palette palette;
+	Palette pal;
 
 	if (stream.fail()) {
 		auto err = this->localize("error.open", path.string(), strerror(errno));
@@ -1291,6 +1512,41 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 	}
 	ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, format})(&palette, stream);
 	stream.close();
+	palette.unpack();
+
+	int iter = 0;
+	tgui::String name = path.filename().native();
+	auto pos = name.find_last_of('.');
+
+	if (pos == tgui::String::npos) {
+		pos = name.size();
+		name += ".pal";
+	}
+
+	tgui::String result = name;
+
+	while (std::ranges::any_of(this->_palettes, [&result](const Palette &p){ return p.name == result; })) {
+		++iter;
+		result = name.substr(0, pos) + "-" + std::to_string(iter) + name.substr(pos);
+	}
+
+	auto ptr = reinterpret_cast<uint32_t *>(palette.data);
+
+	for (size_t i = 0 ; i < 256; i++) {
+		pal.colors[i].r = ptr[i] >> 16 & 0xFF;
+		pal.colors[i].g = ptr[i] >> 8  & 0xFF;
+		pal.colors[i].b = ptr[i] >> 0  & 0xFF;
+		pal.colors[i].a = i == 0 ? 0 : 255;
+	}
+	pal.name = result;
+	pal.path = game->settings.palettes / this->_character / result.toWideString();
+	pal.modifications = 1;
+	this->applyOperation(new CreatePaletteOperation(
+		this->_palettes,
+		this->localize("palette.import_action"),
+		pal, this->_selectedPalette,
+		this->_setPaletteIndex
+	));
 }
 
 void SpiralOfFate::MainWindow::_autoSaveLoop()
@@ -1310,6 +1566,40 @@ void SpiralOfFate::MainWindow::_autoSaveLoop()
 	}
 }
 
+void SpiralOfFate::MainWindow::_onPaletteChanged()
+{
+	auto &pal = this->_palettes[this->_selectedPalette];
+
+	if (!pal.path.empty())
+		return;
+
+	Palette copy;
+	tgui::String name = pal.name.substr(3);
+	auto pos = name.find_last_of('.');
+	tgui::String result = name;
+	int iter = 0;
+
+	while (std::ranges::any_of(this->_palettes, [&result](const Palette &p){ return p.name == result; })) {
+		++iter;
+		result = name.substr(0, pos) + "-" + std::to_string(iter) + name.substr(pos);
+	}
+	copy.colors = pal.colors;
+	copy.name = result;
+	copy.path = game->settings.palettes / this->_character / result.toWideString();
+	copy.modifications = 1;
+
+	this->applyOperation(new CreatePaletteOperation(
+		this->_palettes,
+		this->localize("palette.create_action"),
+		copy,
+		this->_selectedPalette,
+		this->_setPaletteIndex
+	));
+
+	this->_preview->setPalette(&this->_palettes[this->_selectedPalette].colors);
+	this->_requireReload = true;
+}
+
 nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 {
 	nlohmann::json json;
@@ -1324,6 +1614,7 @@ nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 	json["title"] = this->_title;
 	json["folder"] = this->_chrPath;
 	json["character"] = this->_character;
+	json["modifications"] = this->_modifications;
 	json["isCharacterData"] = this->_object->_schema.isCharacterData;
 	for (auto &[key, action] : this->_object->_schema.framedata) {
 		auto &actionj = framedata[std::to_string(key)];
@@ -1357,7 +1648,7 @@ nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 		for (auto &c : palette.colors)
 			colors.push_back({c.r, c.g, c.b});
 		palj["path"] = palette.path;
-		palj["modified"] = palette.modified;
+		palj["modifications"] = palette.modifications;
 		palj["name"] = palette.name.toStdString();
 	}
 	return json;
@@ -1380,20 +1671,18 @@ void SpiralOfFate::MainWindow::autoSave()
 
 	std::string title = this->_title;
 
-	if (this->isModified())
-		title += "*";
+	if (this->isFramedataModified())
+		title.push_back('*');
 	this->setTitle(title);
 }
 
 std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id) const
 {
-	if (this->_editor.hasLocalization("action." + this->_character + "." + std::to_string(id)))
-		return this->localize("action." + this->_character + "." + std::to_string(id));
-	if (this->_editor.hasLocalization("action.generic." + std::to_string(id)))
-		return this->localize("action.generic." + std::to_string(id));
+	auto it = this->_labels.find(id);
+
+	if (it != this->_labels.end())
+		return it->second;
 	return "Action #" + std::to_string(id);
-	// TODO: Handle labels json
-	//return Character::actionToString(id);
 }
 
 SpiralOfFate::LocalizedContainer<tgui::ChildWindow>::Ptr SpiralOfFate::MainWindow::_createPopup(const std::string &path)
@@ -1877,15 +2166,25 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 			if (movesNamesLower.at(moveId).find(query) == std::string::npos)
 				continue;
 
-			const auto &name = movesNames.at(moveId);
+			auto name = movesNames.at(moveId);
 			auto label = tgui::Label::create(std::to_string(moveId));
-			auto button = tgui::Button::create(name);
+			auto button = tgui::Button::create();
 
 			label->setPosition(10, index * 25 + 5);
 			button->setPosition(50, index * 25 + 3);
 			button->setSize(410, 20);
 			Utils::setRenderer(button);
 			Utils::setRenderer(label);
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				button->getRenderer()->setTextColor(color);
+				button->getRenderer()->setTextColorHover(color);
+				button->getRenderer()->setTextColorDisabled(color);
+				button->getRenderer()->setTextColorDown(color);
+				button->getRenderer()->setTextColorFocused(color);
+			}
 			if (moveId == current) {
 				button->getRenderer()->setTextColor(tgui::Color::Green);
 				button->getRenderer()->setTextColorHover(tgui::Color{0x40, 0xFF, 0x40});
@@ -1906,6 +2205,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 				button->getRenderer()->setTextColorFocused(tgui::Color{0x80, 0x60, 0x20});
 			}
 
+			button->setText(name);
 			button->onClick(onConfirm, moveId);
 			button->onClick(closePopup, outsidePanel_w, contentPanel_w);
 
@@ -2034,16 +2334,13 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				this->_populateColorData(container);
 			});
 			button->onMouseEnter([this, i]{
+				this->_onColorHover(this->_object->_paletteIndex, i);
 				this->_object->_paletteIndex = i;
 				this->_object->_needGenerate = true;
 			});
 			button->onMouseLeave([this]{
-				if (this->_selectedColor == 0)
-					this->_object->_paletteIndex = -1;
-				else {
-					this->_object->_paletteIndex = this->_selectedColor;
-					this->_object->_needGenerate = true;
-				}
+				this->_onColorHover(this->_object->_paletteIndex, -1);
+				this->_object->_paletteIndex = -1;
 			});
 		}
 	}
@@ -2077,7 +2374,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			auto list = window->get<tgui::ComboBox>("PaletteList");
 
 			for (auto &pal : this->_palettes) {
-				if (pal.modified)
+				if (pal.modifications != 0)
 					list->addItem(pal.name + "*");
 				else
 					list->addItem(pal.name);
@@ -2102,23 +2399,37 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				button->setEnabled(true);
 			}, std::weak_ptr(create));
 			create->onClick([this, name, list](std::weak_ptr<LocalizedContainer<tgui::ChildWindow>> ptr){
-				std::array<Color, 256> colors;
+				Palette copy;
+				tgui::String _name = name->getText();
+				auto pos = _name.find_last_of('.');
+				int iter = 0;
 
+				if (pos == tgui::String::npos) {
+					pos = _name.size();
+					_name += ".pal";
+				}
+
+				tgui::String result = _name;
+
+				while (std::ranges::any_of(this->_palettes, [&result](const Palette &p){ return p.name == result; })) {
+					++iter;
+					result = _name.substr(0, pos) + "-" + std::to_string(iter) + _name.substr(pos);
+				}
 				if (this->_palettes.empty()) {
-					colors.fill(Color::Black);
-					colors[0] = Color::Transparent;
+					copy.colors.fill(Color::Black);
+					copy.colors[0] = Color::Transparent;
 				} else
-					colors = this->_palettes[list->getSelectedItemIndex()].colors;
+					copy.colors = this->_palettes[list->getSelectedItemIndex()].colors;
+				copy.name = result;
+				copy.path = game->settings.palettes / this->_character / result.toWideString();
+				copy.modifications = 1;
+
 				this->applyOperation(new CreatePaletteOperation(
 					this->_palettes,
 					this->localize("palette.create_action"),
-					{
-						.name = name->getText(),
-						.path = game->settings.palettes / this->_character / name->getText().toStdString(),
-						.colors = colors,
-						.modified = true
-					},
-					this->_selectedPalette
+					copy,
+					this->_selectedPalette,
+					this->_setPaletteIndex
 				));
 				ptr.lock()->close();
 			}, std::weak_ptr(window));
@@ -2133,7 +2444,8 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 			this->applyOperation(new RemovePaletteOperation(
 				this->_palettes,
 				this->localize("palette.remove_action"),
-				this->_selectedPalette
+				this->_selectedPalette,
+				this->_setPaletteIndex
 			));
 		});
 
@@ -2277,11 +2589,24 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 
 		this->_updateFrameElements[&container].emplace_back([gndSeq, this]{
 			auto &data = this->_object->getFrameData();
+			std::string name;
 
 			if (data.traits.onGroundHitSetSequence == 0)
-				gndSeq->setText(this->localize("animation.hit.seq.default") + " (0)");
+				name = this->localize("animation.hit.seq.default");
 			else
-				gndSeq->setText(this->_localizeActionName(data.traits.onGroundHitSetSequence) + " (" + std::to_string(data.traits.onGroundHitSetSequence) + ")");
+				name = this->_localizeActionName(data.traits.onGroundHitSetSequence);
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				gndSeq->getRenderer()->setTextColor(color);
+				gndSeq->getRenderer()->setTextColorHover(color);
+				gndSeq->getRenderer()->setTextColorDisabled(color);
+				gndSeq->getRenderer()->setTextColorDown(color);
+				gndSeq->getRenderer()->setTextColorFocused(color);
+			} else
+				Utils::setRenderer(gndSeq);
+			gndSeq->setText(name + " (" + std::to_string(data.traits.onGroundHitSetSequence) + ")");
 		});
 	}
 	if (airSeq) {
@@ -2298,11 +2623,24 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		});
 		this->_updateFrameElements[&container].emplace_back([airSeq, this]{
 			auto &data = this->_object->getFrameData();
+			std::string name;
 
 			if (data.traits.onAirHitSetSequence == 0)
-				airSeq->setText(this->localize("animation.hit.seq.default") + " (0)");
+				name = this->localize("animation.hit.seq.default");
 			else
-				airSeq->setText(this->_localizeActionName(data.traits.onAirHitSetSequence) + " (" + std::to_string(data.traits.onAirHitSetSequence) + ")");
+				name = this->_localizeActionName(data.traits.onAirHitSetSequence);
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				airSeq->getRenderer()->setTextColor(color);
+				airSeq->getRenderer()->setTextColorHover(color);
+				airSeq->getRenderer()->setTextColorDisabled(color);
+				airSeq->getRenderer()->setTextColorDown(color);
+				airSeq->getRenderer()->setTextColorFocused(color);
+			} else
+				Utils::setRenderer(airSeq);
+			airSeq->setText(name + " (" + std::to_string(data.traits.onAirHitSetSequence) + ")");
 		});
 	}
 	if (atkLevel) {
@@ -2503,7 +2841,21 @@ void SpiralOfFate::MainWindow::newAction()
 			actionW.lock()->setText("");
 			createW.lock()->setEnabled(false);
 		} else {
-			actionW.lock()->setText(this->_localizeActionName(std::stoul(t.toStdString())));
+			std::string name = this->_localizeActionName(std::stoul(t.toStdString()));
+			auto action = actionW.lock();
+
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				action->getRenderer()->setTextColor(color);
+				action->getRenderer()->setTextColorHover(color);
+				action->getRenderer()->setTextColorDisabled(color);
+				action->getRenderer()->setTextColorDown(color);
+				action->getRenderer()->setTextColorFocused(color);
+			} else
+				Utils::setRenderer(action);
+			action->setText(name);
 			createW.lock()->setEnabled(true);
 		}
 	});
@@ -2730,15 +3082,41 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 
 	if (action)
 		action->setText(std::to_string(this->_object->_action));
-	if (actionSelect)
-		actionSelect->setText(this->_localizeActionName(this->_object->_action) + " (" + std::to_string(this->_object->_action) + ")");
+	if (actionSelect) {
+		std::string name = this->_localizeActionName(this->_object->_action);
+
+		if (name.starts_with('$')) {
+			tgui::Color color{"#" + name.substr(1, 6)};
+
+			name = name.substr(7);
+			actionSelect->getRenderer()->setTextColor(color);
+			actionSelect->getRenderer()->setTextColorHover(color);
+			actionSelect->getRenderer()->setTextColorDisabled(color);
+			actionSelect->getRenderer()->setTextColorDown(color);
+			actionSelect->getRenderer()->setTextColorFocused(color);
+		} else
+			Utils::setRenderer(actionSelect);
+		actionSelect->setText(name + " (" + std::to_string(this->_object->_action) + ")");
+	}
 	if (prevAction) {
 		auto it = this->_object->_schema.framedata.find(this->_object->_action);
 
 		if (it != this->_object->_schema.framedata.begin()) {
 			auto prev = std::prev(it)->first;
+			std::string name = this->_localizeActionName(prev);
 
-			prevAction->setText(this->_localizeActionName(prev) + " (" + std::to_string(prev) + ")");
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				prevAction->getRenderer()->setTextColor(color);
+				prevAction->getRenderer()->setTextColorHover(color);
+				prevAction->getRenderer()->setTextColorDisabled(color);
+				prevAction->getRenderer()->setTextColorDown(color);
+				prevAction->getRenderer()->setTextColorFocused(color);
+			} else
+				Utils::setRenderer(prevAction);
+			prevAction->setText(name + " (" + std::to_string(prev) + ")");
 			prevAction->setEnabled(true);
 		} else {
 			prevAction->setText(this->localize("animation.no_prev_action"));
@@ -2751,7 +3129,20 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 		auto next = std::next(it);
 
 		if (next != this->_object->_schema.framedata.end()) {
-			nextAction->setText(this->_localizeActionName(next->first) + " (" + std::to_string(next->first) + ")");
+			std::string name = this->_localizeActionName(next->first);
+
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				nextAction->getRenderer()->setTextColor(color);
+				nextAction->getRenderer()->setTextColorHover(color);
+				nextAction->getRenderer()->setTextColorDisabled(color);
+				nextAction->getRenderer()->setTextColorDown(color);
+				nextAction->getRenderer()->setTextColorFocused(color);
+			} else
+				Utils::setRenderer(nextAction);
+			nextAction->setText(name + " (" + std::to_string(next->first) + ")");
 			nextAction->setEnabled(true);
 		} else {
 			nextAction->setText(this->localize("animation.no_next_action"));
@@ -2783,7 +3174,7 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &container)
 {
 	if (auto removePal = container.get<tgui::Button>("RemovePalette"))
-		removePal->setEnabled(this->_palettes.size() > 1);
+		removePal->setEnabled(this->_palettes.size() > 1 && !this->_palettes[this->_selectedPalette].path.empty());
 
 	if (this->_palettes.empty())
 		return;
@@ -2833,15 +3224,37 @@ void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &contain
 			auto render = button->getRenderer();
 			auto ccolor = this->_palettes[this->_selectedPalette].colors[i];
 
-			render->setBorders({1, 1, 1, 1});
-			render->setBorderColor(tgui::Color{0, 0, 0});
-			render->setBorderColorHover(tgui::Color{100, 100, 100});
-			render->setBorderColorDisabled(tgui::Color{200, 200, 200});
-			render->setBorderColorFocused(tgui::Color{0, 0, 255});
-			render->setBorderColorDown(tgui::Color{0, 0, 0});
-			render->setBorderColorDownDisabled(tgui::Color{0, 0, 0});
-			render->setBorderColorDownFocused(tgui::Color{0, 0, 0});
-			render->setBorderColorDownHover(tgui::Color{0, 0, 0});
+			if (this->_selectedColor == i) {
+				render->setBorders({2, 2, 2, 2});
+				render->setBorderColor(tgui::Color{0, 0, 255});
+				render->setBorderColorHover(tgui::Color{100, 100, 255});
+				render->setBorderColorDisabled(tgui::Color{200, 200, 255});
+				render->setBorderColorFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDown(tgui::Color{0, 0, 255});
+				render->setBorderColorDownDisabled(tgui::Color{0, 0, 255});
+				render->setBorderColorDownFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDownHover(tgui::Color{0, 0, 255});
+			} else if (this->_object->_paletteIndex == static_cast<int>(i)) {
+				render->setBorders({2, 2, 2, 2});
+				render->setBorderColor(tgui::Color{0, 255, 255});
+				render->setBorderColorHover(tgui::Color{100, 255, 255});
+				render->setBorderColorDisabled(tgui::Color{200, 255, 255});
+				render->setBorderColorFocused(tgui::Color{0, 255, 255});
+				render->setBorderColorDown(tgui::Color{0, 255, 255});
+				render->setBorderColorDownDisabled(tgui::Color{0, 255, 255});
+				render->setBorderColorDownFocused(tgui::Color{0, 255, 255});
+				render->setBorderColorDownHover(tgui::Color{0, 255, 255});
+			} else {
+				render->setBorders({1, 1, 1, 1});
+				render->setBorderColor(tgui::Color{0, 0, 0});
+				render->setBorderColorHover(tgui::Color{100, 100, 100});
+				render->setBorderColorDisabled(tgui::Color{200, 200, 200});
+				render->setBorderColorFocused(tgui::Color{0, 0, 255});
+				render->setBorderColorDown(tgui::Color{0, 0, 0});
+				render->setBorderColorDownDisabled(tgui::Color{0, 0, 0});
+				render->setBorderColorDownFocused(tgui::Color{0, 0, 0});
+				render->setBorderColorDownHover(tgui::Color{0, 0, 0});
+			}
 
 			render->setBackgroundColor(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
 			render->setBackgroundColorHover(tgui::Color{ccolor.r, ccolor.g, ccolor.b, ccolor.a});
@@ -2868,7 +3281,10 @@ void SpiralOfFate::MainWindow::_populateColorData(const tgui::Container &contain
 		paletteList->onItemSelect.setEnabled(false);
 		paletteList->removeAllItems();
 		for (auto &s : this->_palettes)
-			paletteList->addItem(s.name);
+			if (s.modifications != 0)
+				paletteList->addItem(s.name + "*");
+			else
+				paletteList->addItem(s.name);
 		paletteList->setSelectedItemByIndex(this->_selectedPalette);
 		paletteList->onItemSelect.setEnabled(true);
 	}
@@ -2965,6 +3381,10 @@ void SpiralOfFate::MainWindow::tick()
 {
 	auto animation = this->_object->_animation;
 
+	if (this->_requireReloadPal) {
+		this->_rePopulateColorData();
+		this->_requireReloadPal = false;
+	}
 	if (this->_requireReload) {
 		this->_rePopulateData();
 		this->_preview->invalidatePalette();
@@ -2980,10 +3400,13 @@ void SpiralOfFate::MainWindow::tick()
 			this->_preview->invalidatePalette();
 		}
 	}
+	this->_object->tick();
 	if (!this->_paused)
 		this->_object->update();
-	if (this->_effectObject)
+	if (this->_effectObject) {
+		this->_effectObject->tick();
 		this->_effectObject->update();
+	}
 	if (animation != this->_object->_animation) {
 		this->_preview->frameChanged();
 		for (auto key : this->_containers)
@@ -3112,6 +3535,17 @@ SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getRenderer()
 	return aurora::downcast<Renderer *>(Widget::getRenderer());
 }
 
+void SpiralOfFate::MainWindow::reloadLabels()
+{
+	this->_labels.clear();
+	this->_loadLabelFor("common");
+	if (this->_pathInit && this->_loadLabelFor(this->_character, this->_path.parent_path()))
+		return;
+	if (this->_loadLabelFor(this->_character, this->_chrPath))
+		return;
+	this->_loadLabelFor(this->_character);
+}
+
 bool SpiralOfFate::MainWindow::hasPath() const
 {
 	return this->_pathInit;
@@ -3126,7 +3560,7 @@ std::filesystem::path SpiralOfFate::MainWindow::getPath() const
 
 bool SpiralOfFate::MainWindow::hasPaletteChanges() const
 {
-	return std::ranges::any_of(this->_palettes, [](const Palette &pal) { return pal.modified; });
+	return std::ranges::any_of(this->_palettes, [](const Palette &pal) { return pal.modifications == 0; });
 }
 
 void SpiralOfFate::MainWindow::reloadPalette(const std::string &folder)
@@ -3159,7 +3593,7 @@ void SpiralOfFate::MainWindow::reloadPalette(const std::string &folder)
 		auto &name = std::get<0>(entry);
 
 		p.name = "[P]" + name.substr(name.find_last_of('/') + 1);
-		p.modified = false;
+		p.modifications = 0;
 		pal.unpack();
 
 		auto ptr = reinterpret_cast<uint32_t *>(pal.data);
@@ -3196,7 +3630,7 @@ void SpiralOfFate::MainWindow::reloadPalette(const std::string &folder)
 
 		p.name = path.filename().native();
 		p.path = path;
-		p.modified = false;
+		p.modifications = 0;
 		pal.unpack();
 
 		auto ptr = reinterpret_cast<uint32_t *>(pal.data);
@@ -3215,7 +3649,7 @@ void SpiralOfFate::MainWindow::reloadPalette(const std::string &folder)
 		auto &p = this->_palettes.back();
 
 		p.name = "black";
-		p.modified = false;
+		p.modifications = 0;
 		p.colors.fill(Color::Black);
 	}
 	for (size_t i = 0; i < this->_palettes.size(); i++)

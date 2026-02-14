@@ -81,13 +81,35 @@ namespace SpiralOfFate
 		}
 
 		template<typename T2>
+		Vector2<T> &operator+=(const sf::Vector2<T2> &vec) noexcept
+		{
+			this->x += vec.x;
+			this->y += vec.y;
+			return *this;
+		}
+
+		template<typename T2>
 		auto operator+(const Vector2<T2> &vec) const noexcept
 		{
 			return Vector2<decltype(this->x + vec.x)>(this->x + vec.x, this->y + vec.y);
 		}
 
 		template<typename T2>
+		auto operator+(const sf::Vector2<T2> &vec) const noexcept
+		{
+			return Vector2<decltype(this->x + vec.x)>(this->x + vec.x, this->y + vec.y);
+		}
+
+		template<typename T2>
 		Vector2<T> &operator-=(const Vector2<T2> &vec) noexcept
+		{
+			this->x -= vec.x;
+			this->y -= vec.y;
+			return *this;
+		}
+
+		template<typename T2>
+		Vector2<T> &operator-=(const sf::Vector2<T2> &vec) noexcept
 		{
 			this->x -= vec.x;
 			this->y -= vec.y;

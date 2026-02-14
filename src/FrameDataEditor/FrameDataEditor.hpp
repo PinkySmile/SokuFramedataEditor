@@ -50,6 +50,7 @@ namespace SpiralOfFate
 
 		float _timer = 0;
 		sf::Clock _clock;
+		std::vector<std::string> _patterns;
 		std::shared_ptr<class ShortcutsWindow> _shortcutWindow;
 		std::map<std::string, Shortcut> _shortcutsNames;
 		std::vector<std::string> _shortcutData;
@@ -68,8 +69,10 @@ namespace SpiralOfFate
 		void _loadSettings();
 		void _tickAnimation();
 
+		void _loadFramedataList();
 		void _loadFramedata();
 		void _explorePackage();
+		void _explorePackageFile();
 		void _save();
 		void _saveAs();
 		void _settings();
@@ -117,6 +120,9 @@ namespace SpiralOfFate
 		void _reloadCrashData();
 
 		void _about();
+		bool _openPatternFile(const std::filesystem::path &path, const std::string &folder);
+		bool _openPatternFileJson(const std::filesystem::path &path);
+		bool _openPatternPackage(const std::string &path);
 
 		bool _isEditBoxSelected(const tgui::Container &container);
 

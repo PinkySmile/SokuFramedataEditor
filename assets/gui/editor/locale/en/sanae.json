@@ -1,0 +1,112 @@
+{
+	"322": "5aaaa",
+	"411": "6C",
+	"413": "4C",
+	"415": "j.6C",
+	"416": "j.2C",
+	"417": "j.4C",
+
+
+
+    "500": "d.236B (Wind Call)",
+    "501": "d.236C (Wind Call)",
+    "502": "d.j236B (Wind Call)",
+    "503": "d.j236C (Wind Call)",
+
+    "505": "a.236B (Wave Call)",
+    "506": "a.236C (Wave Call)",
+
+    "510": "a.236B (Falling Stars)",
+    "511": "a.236C (Falling Stars)",
+    "512": "j.a.236C (Falling Stars)",
+    "513": "j.a.236C (Falling Stars)",
+
+
+	"520": "d.22B (Omikuji Bomb)",
+	"521": "d.22C (Omikuji Bomb)",
+
+	"525": "a.22B (Sky Serpent)",
+	"526": "a.22C (Sky Serpent)",
+	"527": "j.a.22B (Sky Serpent)",
+	"528": "j.a.22C (Sky Serpent)",
+
+	"530": "a.22B (Cobalt Spread)",
+	"531": "a.22C (Cobalt Spread)",
+
+
+	"540": "d.623B (Sky-God Summon: Attack)",
+	"541": "d.623C (Sky-God Summon: Attack)",
+	"542": "j.d.623B (Sky-God Summon: Attack)",
+	"543": "j.d.623C (Sky-God Summon: Attack)",
+
+	"545": "a.623B (Sky-God Summon: Wind)",
+	"546": "a.623C (Sky-God Summon: Wind)",
+	"547": "j.a.623B (Sky-God Summon: Wind)",
+	"548": "j.a.623C (Sky-God Summon: Wind)",
+
+	"550": "a.623B (Sky-God Summon: Onbashira)",
+	"551": "a.623C (Sky-God Summon: Onbashira)",
+	"552": "j.a.623B (Sky-God Summon: Onbashira)",
+	"553": "j.a.623C (Sky-God Summon: Onbashira)",
+
+
+	"560": "d.214B (Earth-God Summon: Shield)",
+	"561": "d.214C (Earth-God Summon: Shield)",
+	"562": "j.d.214B (Earth-God Summon: Shield)",
+	"563": "j.d.214C (Earth-God Summon: Shield)",
+
+	"565": "a.214B (Earth-God Summon: Ring)",
+	"566": "a.214B (Earth-God Summon: Ring)",
+
+	"570": "a.214B (Earth-God Summon: Trap)",
+	"571": "a.214C (Earth-God Summon: Trap)",
+	"572": "j.a.421B (Earth-God Summon: Trap)",
+	"573": "j.a.421C (Earth-God Summon: Trap)",
+
+	"600": "Border Sign \"Quadruple Barrier\"",
+	"601": "Shikigami \"Ran Yakumo\"" ,
+	"602": "Boundary \"Border Between 2D and 3D\"",
+	"603": "Boundary \"Charming Quadruple Barrier\"",
+	"604": "Shikigami \"Chen\"",
+	"605": "Boundary \"Objective Border\"",
+	"606": "Fantasy Nest \"Nest of Fireflies\"",
+	"607": "Aerial Bait \"Laced with Venom\"",
+	"608": "Magic Eye \"The Magic Eye of Laplace\"",
+	"615": "Obsolete Line \"Trip to the Old Station\"",
+
+	"656": "Fantasy Nest \"Nest of Fireflies\"(Air)",
+	"657": "Aerial Bait \"Laced with Venom\"(Air)",
+	"658": "Magic Eye \"The Magic Eye of Laplace\"(Air)",
+
+
+	"800": "B series objects",
+	"801": "C series objects",
+
+	"810": "Wind Call objects",
+	"811": "Wave Call objects ",
+	"812": "Falling Stars objects",
+
+	"815": "Omikuji Bomb objects",
+	"816": "Sky Serpent objects",
+	"817": "Cobalt Spread objects",
+
+	"820": "Sky-God Summon: Attack objects",
+	"821": "Sky-God Summon: Wind objects",
+	"822": "Sky-God Summon: Onbashira objects",
+
+	"825": "Earth-God Summon: Shield objects",
+	"826": "Earth-God Summon: Ring objects",
+	"827": "Earth-God Summon: Trap objects",
+
+
+	"848": "Melee objects",
+	"850": "Charm of Good Commerce objects",
+	"851": "Grey Thaumaturgy objects",
+	"852": "Forgotten Ritual objects",
+	"853": "Random Omikuji Barrage objects",
+	"854": "The Day the Sea Split objects",
+	"855": "Moses' Miracle objects",
+	"856": "Mid-Day Supernova objects",
+	"857": "Night of the Supernova Storm objects",
+	"860": "9 Character Pierce objects"
+}

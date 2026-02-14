@@ -1,0 +1,82 @@
+{
+	"411": "6C",
+	"415": "j.6C",
+
+	"500": "d.236B (Netherworld Reflection Slash)",
+	"501": "d.236C (Netherworld Reflection Slash)",
+
+	"505": "a.236B (Lotus Stance Cut)",
+	"506": "a.236C (Lotus Stance Cut)",
+
+	"510": "a.236B (Phosphoric Slash)",
+	"511": "a.236C (Phosphoric Slash)",
+
+	"520": "d.623B (Crescent Moon Slash)",
+	"521": "d.623C (Crescent Moon Slash)",
+	"525": "a.623B (Intolerant Avici)",
+	"526": "a.623C (Intolerant Avici)",
+	"530": "a.623B (Insightful Sword)",
+	"531": "a.623C (Insightful Sword)",
+
+	"540": "d.214B (Slash of Life and Death)",
+	"541": "d.214C (Slash of Life and Death)",
+
+	"545": "a.214B (Heart Carving Cut)",
+	"546": "a.214C (Heart Carving Cut)",
+
+	"550": "a.214B (Slashing a Flower Upon One's Head)",
+	"551": "a.214C (Slashing a Flower Upon One's Head)",
+
+	"560": "d.22B (Medium's Bind)",
+	"561": "d.22C (Medium's Bind)",
+	"562": "j.d.22B (Medium's Bind)",
+	"563": "j.d.22C (Medium's Bind)",
+
+	"565": "a.22B (Wicked Soul)",
+	"566": "a.22C (Wicked Soul)",
+
+	"570": "a.22B (Strange Half-Body)",
+	"571": "a.22C (Strange Half-Body)",
+	"572": "j.a.22B (Strange Half-Body)",
+	"573": "j.a.22C (Strange Half-Body)",
+
+	"600": "Human Sign \"Slash of Present\"",
+	"601": "Life Ending Sword \"Meditation\"",
+	"602": "Soul Sign \"Ghostly Wheel of Pain\"",
+	"603": "Obsessor \"Slash of Eternity\"",
+	"604": "Enlightened Sword \"Rise from Delusion\"",
+	"605": "Spirit \"Secret of Life and Death\"",
+	"606": "Sword Skill \"Thousand Cherry Blossoms\"",
+	"607": "Soul Cutting \"Ascension to Nirvana\"",
+	"608": "Empty Perception \"6-root Cleansing\"",
+	"612": "Reincarnation Sword \"Sword of Cycles\"",
+
+	"800": "B objects",
+	"801": "C objects",
+	"810": "Netherworld Reflection Slash objects",
+	"811": "Crescent Moon Slash objects",
+	"812": "Slash of Life and Death objects",
+	"813": "- objects",
+	"815": "Lotus Stance Cut objects",
+	"817": "Heart Carving Cut objects",
+	"818": "Wicked Soul objects",
+	"820": "Phosphoric Slash objects",
+	"821": "Insightful Sword objects",
+	"822": "Slashing a Flower Upon One's Head objects",
+	"823": "Strange Half-Body objects",
+
+	"850": "Slash of Present objects",
+	"851": "Meditation objects",
+	"852": "Ghostly Wheel of Pain objects",
+	"853": "Slash of Eternity objects",
+	"854": "Rise from Delusion objects",
+	"855": "Secret of Life and Death objects",
+	"856": "Thousand Cherry Blossoms objects",
+	"857": "Asension to Nirvana objects",
+	"858": "6-root Cleansing objects",
+	"862": "Sword of Cycles objects",
+
+	"899": "Myon objects (6c and Medium's Bind) objects"
+
+
+}

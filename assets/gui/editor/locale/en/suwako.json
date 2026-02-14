@@ -1,0 +1,140 @@
+{
+	"206": "Lilypad Forward Dash",
+	"207": "Lilypad Backdash",
+	"218": "Airdash Down",
+	"219": "Airdash Below",
+
+	"303": "l.2A",
+	"304": "l.3A",
+
+	
+	"331": "3A",
+	"332": "l.6A",
+	
+	"401": "6B",
+	"402": "l.5B",
+	"403": "l.6B",
+	"405": "j.6B",
+	
+	"411": "6C",
+	"412": "l.5C",
+	"415": "j.6C",
+	
+	"500": "u.d.214B (Ancient Geyser)",
+	"501": "u.d.214C (Ancient Geyser)",
+	"502": "j.d.214B (Ancient Geyser)",
+	"503": "j.d.214C (Ancient Geyser)",
+	
+	"505": "a.214B (Water Frog God)",
+	"506": "a.214C (Water Frog God)",
+	"507": "l.a.214B (Water Frog God)",
+	"508": "l.a.214C (Water Frog God)",
+	
+	"510": "a.214B (Rain-calling Frog)",
+	"511": "a.214C (Rain-calling Frog)",
+	"512": "l.a.214B (Rain-calling Frog)",
+	"513": "l.a.214C (Rain-calling Frog)",
+
+	"520": "d.623 (Giant Toad God)",
+	"522": "l.d.623 (Giant Toad God)",
+	
+	"525": "l.a.623B (Ancient Iron Ring)",
+	"526": "l.a.623C (Ancient Iron Ring)",
+	"527": "j.a.623B (Ancient Iron Ring)",
+	"528": "j.a.623C (Ancient Iron Ring)",
+	
+	"532": "[j.a623B] Mr. Long-arm & Long-leg",
+	"533": "[j.a623C] Mr. Long-arm & Long-leg",
+	
+	"540": "u.d.236B (Lake of Great Earth)",
+	"541": "u.d.236C (Lake of Great Earth)",
+	"542": "j.d.236B (Lake of Great Earth)",
+	"543": "j.d.236C (Lake of Great Earth)",
+	
+	"545": "u.a.236B (Ancient Jade)",
+	"546": "u.a.236C (Ancient Jade)",
+	"547": "j.a.236B (Ancient Jade)",
+	"548": "j.a.236C (Ancient Jade)",
+	
+	"550": "u.a.236B (Stone Frog God)",
+	"551": "u.a.236C (Stone Frog God)",
+	"552": "j.a.236B (Stone Frog God)",
+	"553": "j.a.236C (Stone Frog God)",
+	
+	"560": "d.22B (Native God's Scourge)",
+	"561": "d.22C (Native God's Scourge)",
+	"562": "l.d.22B (Native God's Scourge)",
+	"563": "l.d.22C (Native God's Scourge)",
+	
+	"565": "a.22B (Scourged Earth)",
+	"566": "a.22C (Scourged Earth)",
+	"567": "u.a.22B (Scourged Earth)",
+	"568": "u.a.22C (Scourged Earth)",
+	
+	"600": "Native God \"Moriya God\"",
+	"601": "Spring Sign \"Suwa Clear Water\" (Lilypad)",
+	"602": "Party Start \"2 Bows, 2 Claps, and 1 Bow\"",
+	"603": "Native God \"Froggy Braves the Wind and Rain\" (Lilypad)",
+	"604": "Divine Tool \"Moriya's Iron Ring\"",
+	"605": "Spring Sign \"Jade of the Horrid River\" (Lilypad)",
+	"606": "Frog Hunt \"The Snake Eats the Croaking Frog\"",
+	"608": "Scourge God \"Mishaguchi-sama\"",
+	"609": "Native God \"Red Frogs of Houei 4\" (Lilypad)",
+	"612": "Frog Nap \"Can Always Hibernate\" (Underground)",
+	
+	"651": "Spring Sign \"Suwa Clear Water\" (Air)",
+	"652": "Party Start \"2 Bows, 2 Claps, and 1 Bow\" (Underground)",
+	"653": "Native God \"Froggy Braves the Wind and Rain\" (Air)",
+	"654": "Divine Tool \"Moriya's Iron Ring\" (Air)",
+	"655": "Spring Sign \"Jade of the Horrid River\" (Underground)",
+	"656": "Frog Hunt \"The Snake Eats the Croaking Frog\" (Lilypad)",
+	"657": "Native God \"Lord Long-arm & Long-leg\" (Air)",
+	"659": "Native God \"Red Frogs of Houei 4\" (Air)",
+	
+	
+
+	"800": "5B series objects",
+	"801": "6B series objects",
+
+	"805": "5C objects",
+	"806": "j.5C objects",
+	"807": "j.2C objects",
+	"808": "j.6C objects",
+	"809": "6C objects",
+	
+	"810": "Ancient Geyser objects",
+	"811": "Water Frog God objects",
+	"812": "Rain-calling Frog objects",
+	
+	"815": "Giant Toad God objects",
+	"816": "Ancient Iron Ring objects",
+	"817": "Mr. Long-arm & Long-leg objects",
+	
+	"820": "Lake of Great Earth objects",
+	"821": "Ancient Jade objects",
+	"822": "Stone Frog God objects",
+	
+	"825": "Native God's Scourge objects",
+	"826": "Scourged Earth objects",
+	"827": "Mishaguji Scourge objects",
+	
+	"850": "\"Moriya God\" objects",
+	"851": "\"Clear Water\" objects",
+	"852": "\"Party Start\" objects",
+	"853": "\"the Wind and Rain\" objects",
+	"854": "\"Iron Ring\" objects",
+	"855": "\"Horrid River\" objects",
+	"856": "\"Frog Hunt\" objects",
+	"857": "\"Long-arm & Long-leg\" objects",
+	"858": "\"Mishaguchi-sama\" objects",
+	"859": "\"Red Frogs\" objects",
+	"862": "\"Hibernate\" objects",
+	
+	"970": "StorySC \"Divine Battle Above Gensokyo\" objects",
+	"989": "Various Melee objects",
+	"990": "Lilypad",
+	"991": "5B tail",
+	"992": "Tail 1",
+	"993": "Tail 3",
+	"994": "Tail 0"
+}

@@ -102,11 +102,6 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states)
 	this->_sprite.setTexture(data.textureHandle);
 	this->_sprite.setTextureRect(texBounds);
 
-	auto size = bounds;
-
-	size.x *= scale.x;
-	size.y *= scale.y;
-
 	if (!data.hasBlendOptions() || data.blendOptions.mode == 0)
 		target.draw(this->_sprite, states);
 	else if (data.blendOptions.mode == 1) {
@@ -121,6 +116,11 @@ void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states)
 		target.draw(this->_sprite, states);
 	} else
 		target.draw(this->_sprite, states);
+
+	if (this->_textureValid) {
+		this->_sprite.setTexture(this->_overlayTexture);
+		target.draw(this->_sprite, states);
+	}
 }
 
 void EditableObject::update()
@@ -211,6 +211,12 @@ void EditableObject::resetState()
 	this->_generateOverlaySprite();
 }
 
+void EditableObject::tick()
+{
+	if (this->_needGenerate)
+		this->_generateOverlaySprite();
+}
+
 void EditableObject::_generateOverlaySprite()
 {
 	this->_textureValid = false;
@@ -261,6 +267,8 @@ void EditableObject::_generateOverlaySprite()
 void EditableObject::setMousePosition(const Vector2f *pos)
 {
 	if (pos == nullptr) {
+		if (this->_onHoverChange)
+			this->_onHoverChange(this->_paletteIndex, -1);
 		this->_paletteIndex = -1;
 		this->_textureValid = false;
 		return;
@@ -269,7 +277,10 @@ void EditableObject::setMousePosition(const Vector2f *pos)
 	auto sPos = this->_mousePosToImgPos(*pos);
 	auto &data = this->_schema.framedata.at(this->_action)[this->_actionBlock][this->_animation];
 
+	this->_mousePos = sPos;
 	if (sPos.x < 0 || sPos.y < 0 || sPos.x >= data.texWidth || sPos.y >= data.texHeight) {
+		if (this->_onHoverChange)
+			this->_onHoverChange(this->_paletteIndex, -1);
 		this->_paletteIndex = -1;
 		this->_textureValid = false;
 		return;
@@ -278,6 +289,8 @@ void EditableObject::setMousePosition(const Vector2f *pos)
 	auto &img = pngLoader.loadImage(data.__folder+ data.spritePath);
 
 	if (img.bitsPerPixel != 8) {
+		if (this->_onHoverChange)
+			this->_onHoverChange(this->_paletteIndex, -1);
 		this->_paletteIndex = -1;
 		this->_textureValid = false;
 		return;
@@ -286,31 +299,74 @@ void EditableObject::setMousePosition(const Vector2f *pos)
 	sPos.y += data.texOffsetY;
 	if (sPos.x < 0 || sPos.x >= img.width || sPos.y < 0 || sPos.y >= img.height)
 		return;
+	if (this->_onHoverChange)
+		this->_onHoverChange(this->_paletteIndex, img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)]);
 	this->_paletteIndex = img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)];
-	this->_needGenerate = true;
+	this->_needGenerate = this->_needGenerate || this->_oldPaletteIndex != this->_paletteIndex;
+	this->_oldPaletteIndex = this->_paletteIndex;
 }
 
 Vector2f EditableObject::_mousePosToImgPos(const Vector2i &mouse)
 {
 	auto &data = this->_schema.framedata.at(this->_action)[this->_actionBlock][this->_animation];
-	auto blend = data.getBlendOptions();
-	auto size = Vector2f{
-		blend.scaleX * data.texWidth / 100.f,
-		blend.scaleY * data.texHeight / 100.f
-	};
-	Vector2f result = {
-		static_cast<float>(data.offsetX),
-		static_cast<float>(data.offsetY)
-	};
+	Vector2f scale;
 
-	result.y *= -1;
-	result -= Vector2f{
-		size.x / 2.f,
-		size.y
+	data.checkReloadTexture();
+	if (data.renderGroup == 0) {
+		scale.x = 2;
+		scale.y = 2;
+	} else if (data.renderGroup == 2) {
+		scale.x = data.blendOptions.scaleX / 100.f;
+		scale.y = data.blendOptions.scaleY / 100.f;
+	} else {
+		scale.x = 1;
+		scale.y = 1;
+	}
+	Vector2f scaleReal{
+		(data.hasBlendOptions() ? data.blendOptions.scaleX : 100) / 100.f,
+		(data.hasBlendOptions() ? data.blendOptions.scaleY : 100) / 100.f
 	};
-	result = mouse - result;
-	result.x /= blend.scaleX / 100.f;
-	result.y /= blend.scaleY / 100.f;
-	this->_mousePos = result;
-	return result;
+	Vector2f bounds{
+		static_cast<float>(data.texWidth),
+		static_cast<float>(data.texHeight)
+	};
+	Vector2f result{
+		static_cast<float>(-data.offsetX) * scaleReal.x,
+		static_cast<float>(-data.offsetY) * scaleReal.y
+	};
+	result += Vector2f{
+		data.texWidth * scale.x / 2,
+		data.texHeight * scale.y / 2
+	};
+	if (!data.hasBlendOptions()) {
+		Vector2f p = mouse;
+
+		p -= result;
+		p.x /= scale.x;
+		p.y /= scale.y;
+		p += bounds / 2;
+		p.y -= 0.5;
+		return p;
+	}
+
+	auto pos = result;
+	auto trueScale = scale;
+
+	// X rotation
+	pos.y *= std::cos(data.blendOptions.flipVert * M_PI / 180);
+	trueScale.y *= std::cos(data.blendOptions.flipVert * M_PI / 180);
+
+	// Y rotation
+	pos.x *= std::cos(data.blendOptions.flipHorz * M_PI / 180);
+	trueScale.x *= std::cos(data.blendOptions.flipHorz * M_PI / 180);
+
+	pos.rotate(data.blendOptions.angle * M_PI / 180, {0, 0});
+
+	auto r = mouse - (pos - bounds / 2);
+
+	r.x /= trueScale.x;
+	r.y /= trueScale.y;
+	r += bounds / 2;
+	r.rotate(-data.blendOptions.angle * M_PI / 180, bounds / 2);
+	return r;
 }

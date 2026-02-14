@@ -6,11 +6,17 @@
 
 namespace SpiralOfFate
 {
-	RemovePaletteOperation::RemovePaletteOperation(std::vector<MainWindow::Palette> &list, const std::string &&name, unsigned int &index) :
+	RemovePaletteOperation::RemovePaletteOperation(
+		std::vector<MainWindow::Palette> &list,
+		const std::string &&name,
+		const unsigned int &index,
+		const std::function<void (unsigned)> &setIndex
+	) :
 		_list(list),
 		_name(name),
 		_id(index),
 		_index(index),
+		_setIndex(setIndex),
 		_old(list[index])
 	{
 	}
@@ -21,13 +27,13 @@ namespace SpiralOfFate
 			return;
 		this->_list.erase(this->_list.begin() + this->_id);
 		if (this->_index >= this->_list.size())
-			this->_index = this->_list.size() - 1;
+			this->_setIndex(this->_list.size() - 1);
 	}
 
 	void RemovePaletteOperation::undo()
 	{
 		this->_list.insert(this->_list.begin() + this->_id, this->_old);
-		this->_index = this->_id;
+		this->_setIndex(this->_id);
 	}
 
 	bool RemovePaletteOperation::hasModification() const
@@ -38,5 +44,10 @@ namespace SpiralOfFate
 	std::string RemovePaletteOperation::getName() const noexcept
 	{
 		return this->_name;
+	}
+
+	bool RemovePaletteOperation::hasFramedataModification() const
+	{
+		return false;
 	}
 }

@@ -1,0 +1,109 @@
+{
+    "402": "2B",
+    "406": "j.2B",
+	"411": "6C",
+	"412": "2C",
+	"415": "j.6C",
+	"416": "j.2C",
+
+
+
+    "500": "d.214B (Ghostly Butterfly)",
+    "501": "d.214C (Ghostly Butterfly)",
+    "502": "j.d214B (Ghostly Butterfly)",
+    "503": "j.d214C (Ghostly Butterfly)",
+
+    "505": "a.214B (Spirits that Died Well)",
+    "506": "a.214C (Spirits that Died Well)",
+    "507": "j.a.214B (Spirits that Died Well)",
+    "508": "j.a.214C (Spirits that Died Well)",
+
+    "510": "a.214B (Sphere Bloom)",
+    "511": "a.214C (Sphere Bloom)",
+    "512": "j.a.214C (Sphere Bloom)",
+    "513": "j.a.214C (Sphere Bloom)",
+
+
+	"520": "d.236B (Light of the Undead)",
+	"521": "d.236C (Light of the Undead)",
+    "522": "j.d.236B (Light of the Undead)",
+	"523": "j.d.236C (Light of the Undead)",
+
+	"525": "a.236B (Lance of the Swallowtail Crest)",
+	"526": "a.236C (Lance of the Swallowtail Crest)",
+
+	"530": "a.236B (Land of Death)",
+	"531": "a.236C (Land of Death)",
+
+
+	"540": "d.421B (Eternal Wandering)",
+	"541": "d.421C (Eternal Wandering)",
+	"542": "j.d.42B (Eternal Wandering)",
+	"543": "j.d.421C (Eternal Wandering)",
+
+	"545": "a.421B (Spirit-Luring Nectar)",
+	"546": "a.421C (Spirit-Luring Nectar)",
+
+	"550": "a.421B (Gifts to the Deceased)",
+	"551": "a.421C (Gifts to the Deceased)",
+
+
+	"560": "d.623B (Dance of the Butterfly Dream)",
+	"561": "d.623C (Dance of the Butterfly Dream)",
+
+	"565": "a.623B (Reverse Screens)",
+	"566": "a.623B (Reverse Screens)",
+
+	"570": "d.623B (Sense of Elegance)",
+	"571": "d.623C (Sense of Elegance)",
+
+	"600": "Death Sign \"Ghastly Dream\"",
+	"601": "Nether Sign \"Passage to the Underworld\"" ,
+	"602": "Ghost Sign \"Ageless Dream\"",
+	"603": "Deadly Butterfly \"Endless Nap\"",
+	"604": "Lost Again \"Gensokyo's Hell\"",
+	"605": "Life Limit \"Ticket to the Netherworld\"",
+	"606": "Psyche \"As the Butterfly Flies\"",
+	"607": "Butterfly Sign \"Death Lance\"",
+	"608": "Elegance \"Invitation to the Afterlife\"",
+	"609": "Cherry Sign \"Sense of Cherry Blossom\"",
+	"619": "\"Resurrection Butterflies\"",
+
+    "651": "Nether Sign \"Passage to the Underworld\"",
+	"656": "Psyche \"As the Butterfly Flies\"(Air)",
+	"657": "Butterfly Sign \"Death Lance\"(Air)",
+
+
+	"800": "B series objects",
+	"801": "C series objects",
+
+	"810": "Ghostly Butterfly objects",
+	"811": "Spirits that Died Well",
+	"812": "Sphere Bloom objects",
+
+	"815": "Light of the Undead objects",
+	"816": "Lance of the Swallowtail Crest objects",
+	"817": "Land of Death objects",
+
+	"820": "Eternal Wandering objects",
+	"821": "Spirit-Luring Nectar objects",
+	"822": "Gifts to the Deceased",
+
+	"825": "Dance of the Butterfly Dream objects",
+	"826": "Reverse Screens objects",
+	"827": "Sense of Elegance objects",
+
+
+	"848": "Melee objects",
+	"850": "Ghastly Dream objects",
+	"851": "Passage to the Underworld objects",
+	"852": "Ageless Dream objects",
+	"853": "Endless Nap objects",
+	"854": "Gensokyo's Hell objects",
+	"855": "Ticket to the Netherworld objects",
+	"856": "As the Butterfly Flies objects",
+	"857": "Death Lance objects",
+	"858": "Invitation to the Afterlife objects",
+	"859": "Sense of Cherry Blossom",
+	"869": "Resurrection Butterflies objects"
+}

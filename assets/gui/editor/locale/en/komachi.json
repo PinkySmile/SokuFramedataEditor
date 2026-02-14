@@ -1,0 +1,87 @@
+{
+	"401": "6B",
+	"405": "j.6B",
+	"411": "6C",
+	"415": "2C",
+	"415": "j.6C",
+	"415": "j.2C",
+	"500": "d.236B (Spirits of the Firm)",
+	"501": "d.236C (Spirits of the Firm)",
+
+	"505": "a.236B (Scythe of the Reaper)",
+	"506": "a.236C (Scythe of the Reaper)",
+	"507": "j.a.236B (Scythe of the Reaper)",
+	"508": "j.a.236C (Scythe of the Reaper)",
+
+	"510": "a.236B (A Human Spirit Passing By)",
+	"511": "a.236C (A Human Spirit Passing By)",
+
+
+	"520": "d.623B (Bound Spirits of the Earth)",
+	"521": "d.623C (Bound Spirits of the Earth)",
+
+	"525": "a.623B (Wind on the Last Journey)",
+	"526": "a.623C (Wind on the Last Journey)",
+
+	"530": "a.623B (Boat on the Sanzu)",
+	"531": "a.623C (Boat on the Sanzu)",
+
+	"540": "d.22B (Ritual of Ecstacy)",
+	"541": "d.22C (Ritual of Ecstacy)",
+	"542": "j.d.22B (Ritual of Ecstacy)",
+	"543": "j.d.22C (Ritual of Ecstacy)",
+
+	"545": "a.22B (The Endless Way)",
+	"546": "a.22C (The Endless Way)",
+
+	"550": "a.22B (Taste of Death)",
+	"551": "a.22C (Taste of Death)",
+
+	"560": "d.214B (Floating Spirits of the Indolent Dead)",
+	"561": "d.214C (Floating Spirits of the Indolent Dead)",
+
+	"565": "a.214B (Lonely Bound Spirit)",
+	"566": "a.214C (Lonely Bound Spirit)",
+
+	"570": "a.214B (Scythe of Exorcism)",
+	"571": "a.214C (Scythe of Exorcism)",
+
+	"600": "Nautical Sign \"Flow of the River\"",
+	"601": "Poor Fate \"Short Life Expectancy\"",
+	"602": "Spirit Sign \"Abundant Floating Spirits\"",
+	"603": "Death Song \"Ferriage in the Deep Fog\"",
+	"604": "Exchange \"Unpitiable, Pitiable Life\"",
+	"605": "Malice Sign \"Irresolute Bound Spirit\"",
+	"606": "Death Sign \"Scythe of Final Judgement\"",
+	"607": "Soul Sign \"Scythe of Wandering Spirits\"",
+	"611": "Hell \"Narrow Confines of Avici\"",
+
+	"800": "B objects",
+	"801": "C objects",
+
+	"810": "Spirits of the Firm objects",
+	"811": "Scythe of the Reaper objects",
+	"812": "A Human Spirit Passing By objects",
+
+	"815": "Bound Spirits of the Earth objects",
+	"816": "Boat on the Sanzu objects",
+	"817": "Wind on the Last Journey objects",
+
+	"820": "Ritual of Ecstacy objects",
+	"821": "The Endless Way objects",
+	"822": "Taste of Death objects",
+
+	"825": "Floating Spirits of the Indolent Dead objects",
+	"826": "Lonely Bound Spirit",
+	"830": "Scythe of Exorcism objects",
+
+	"850": "Flow of the River objects???",
+	"851": "Short Life Expectancy objects",
+	"852": "Abundant Floating Spirits objects",
+	"853": "Ferriage in the Deep Fog objects",
+	"854": "Unpitiable, Pitiable Life objects",
+	"855": "Irresolute Bound Spirit objects",
+	"856": "Scythe of Final Judgement objects",
+	"857": "Scythe of Wandering Spirits objects",
+	"861": "Narrow Confines of Avici objects"
+}

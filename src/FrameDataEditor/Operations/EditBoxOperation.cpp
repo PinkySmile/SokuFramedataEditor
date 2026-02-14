@@ -81,3 +81,8 @@ bool SpiralOfFate::EditBoxOperation::hasModification() const
 		this->_oldValue.left != this->_newValue.left ||
 		this->_oldValue.right != this->_newValue.right;
 }
+
+bool SpiralOfFate::EditBoxOperation::hasFramedataModification() const
+{
+	return this->hasModification();
+}

@@ -1,0 +1,127 @@
+{
+	"401": "6B",
+	"405": "j.6B",
+	"411": "6C",
+	"415": "j.6C",
+
+
+	"500": "d.623B (Flare Up)",
+	"501": "d.623 (Flare Up)",
+
+	"505": "a.623B (Rocket Dive)",
+	"506": "a.623C (Rocket Dive)",
+	"505": "j.a.623B (Rocket Dive)",
+	"506": "j.a.623C (Rocket Dive)",
+
+	"510": "a.623B (Melting Pummel Kick)",
+	"511": "a.623C(Melting Pummel Kick)",
+
+
+	"520": "d.236B (Ground Melt)",
+	"521": "d.236C (Ground Melt)",
+	"522": "j.d.236B (Ground Melt)",
+	"523": "j.d.236C (Ground Melt)",
+
+	"525": "a.236B (Hell Geyser)",
+	"526": "a.236C (Hell Geyser)",
+
+	"530": "a.236B (Radiant Blade)",
+	"531": "a.236C (Radiant Blade)",
+
+
+	"540": "d.22B (Break Sun)",
+	"541": "d.22C (Break Sun)",
+	"542": "j.d.22B (Break Sun)",
+	"543": "j.d.22C (Break Sun)",
+
+	"545": "a.22B (Shooting Sun)",
+	"546": "a.22C (Shooting Sun)",
+	"545": "j.a.22B (Shooting Sun)",
+	"546": "j.a.22C (Shooting Sun)",
+
+	"550": "a.22B (Hell Wave Cannon)",
+	"551": "a.22C (Hell Wave Cannon)",
+	"552": "j.a.22B (Hell Wave Cannon)",
+	"553": "j.a.22C (Hell Wave Cannon)",
+
+
+	"560": "d.214B (Shooting Star)",
+	"561": "d.214C (Shooting Star)",
+	"562": "j.d.214B (Shooting Star)",
+	"563": "j.d.214C (Shooting Star)",
+
+	"565": "a.214B (Retro Atomic Model)",
+	"566": "a.214c (Retro Atomic Model)",
+	"567": "j.a.214B (Retro Atomic Model)",
+	"568": "j.a.214c (Retro Atomic Model)",
+
+	"570": "a.214B (Vengeful Nuclear Spirits)",
+	"571": "a.214C (Vengeful Nuclear Spirits)",
+
+	"572": "j.a.214B (Vengeful Nuclear Spirits)",
+	"573": "j.a.214C (Vengeful Nuclear Spirits)",
+
+
+	"600": "Explosion Sign \"Mega Flare\"",
+	"601": "Explosion Sign \"Giga Flare\"",
+	"603": "Burning Star \"Fixed Star\"",
+	"604": "Burning Star \"The Ten Suns\"",
+	"605": "Nuclear Sign \"Creeping Sun\"",
+	"606": "\"Hell's Artificial Sun\"",
+	"607": "Geothermal \"Nuclear Blaze Geyser\"",
+	"608": "Light Energy \"High Tension Blade\"",
+	"609": "Crow Sign \"Yatagarasu Dive\"",
+	"610": "Nuclear Heat \"Unontrollable Dive\" / (Air)",
+	"611": "Control \"Self Tokomak\"",
+	"612": "\"Subterranean Sun\"",
+	"613": "Light Cover \"Nuclear Vision\"",
+	"614": "\"Abyss Nova\"",
+
+	"650": "Explosion Sign \"Mega Flare\" (Air)",
+	"653": "Burning Star \"Fixed Star\" (Air)",
+	"659": "Crow Sign \"Yatagarasu Dive\" (Air)",
+	"655":"Nuclear Sign \"Creeping Sun\"(Air)",
+	"662": "\"Subterranean Sun\" (Air)",
+
+	"800": "5B objects",
+	"801": "6B objects",
+	"802": "5C object",
+	"803": "6C object",
+	"804": "j6[a], j2[a] object",
+
+	"810": "Flare Up objects",
+	"811": "Rocket Dive objects",
+	"812": "Melting Pummel Kick objects",
+
+	"815": "Ground Melt objects",
+	"816": "Hell Geyser objects",
+	"817": "Radiant Blade objects",
+
+
+	"820": "Break Sun objects",
+	"821": "Shooting Sun objects",
+	"822": "Hell Wave Cannon objects",
+
+	"825": "Shooting Star objects",
+	"826": "Retro Atomic Model objects",
+	"827": "Vengeful Nuclear Spirits objects",
+
+	
+
+	"848": "Melee objects",
+
+	"850": "Mega Flare objects",
+	"851": "Giga Flare objects",
+	"853": "Fixed Star objects",
+	"854": "The Ten Suns objects",
+	"855": "Creeping Sun objects",
+	"856": "Hell's Artificial Sun objects",
+	"857": "Nuclear Blaze Blade objects",
+	"858": "High Tension Blade objects",
+	"859": "Yatagarasu Dive objects",
+	"860": "Uncontrollable Dive objects",
+	"861": "Self Tokomak objects",
+	"862": "Subterranean Sun objects",
+	"863": "Nuclear Vision objects",
+	"864": "Abyss Nova objects"
+}

@@ -46,6 +46,11 @@ bool SpiralOfFate::RemoveBlockOperation::hasModification() const
 	return true;
 }
 
+bool SpiralOfFate::RemoveBlockOperation::hasFramedataModification() const
+{
+	return true;
+}
+
 std::string SpiralOfFate::RemoveBlockOperation::getName() const noexcept
 {
 	return this->_name;

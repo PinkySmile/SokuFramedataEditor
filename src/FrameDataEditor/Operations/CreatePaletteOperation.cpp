@@ -10,26 +10,28 @@ namespace SpiralOfFate
 		std::vector<MainWindow::Palette> &list,
 		const std::string &&name,
 		const MainWindow::Palette &source,
-		unsigned &index
+		const unsigned &index,
+		const std::function<void (unsigned)> &setIndex
 	) :
 		_list(list),
 		_name(name),
 		_source(source),
-		_index(index)
+		_startIndex(index),
+		_index(index),
+		_setIndex(setIndex)
 	{
 	}
 
 	void CreatePaletteOperation::apply()
 	{
 		this->_list.push_back(this->_source);
-		this->_index = this->_list.size() - 1;
+		this->_setIndex(this->_list.size() - 1);
 	}
 
 	void CreatePaletteOperation::undo()
 	{
 		this->_list.pop_back();
-		if (this->_index >= this->_list.size())
-			this->_index = this->_list.size() - 1;
+		this->_setIndex(this->_startIndex);
 	}
 
 	bool CreatePaletteOperation::hasModification() const
@@ -40,5 +42,10 @@ namespace SpiralOfFate
 	std::string CreatePaletteOperation::getName() const noexcept
 	{
 		return this->_name;
+	}
+
+	bool CreatePaletteOperation::hasFramedataModification() const
+	{
+		return false;
 	}
 }

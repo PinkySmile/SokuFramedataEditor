@@ -51,4 +51,9 @@ namespace SpiralOfFate
 	{
 		return true;
 	}
+
+	bool PasteBoxDataOperation::hasFramedataModification() const
+	{
+		return true;
+	}
 }

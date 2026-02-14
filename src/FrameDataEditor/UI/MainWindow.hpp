@@ -14,6 +14,7 @@
 #include "../Operations/Operation.hpp"
 #include "ColorPlaneWidget.hpp"
 #include "ColorSliderWidget.hpp"
+#include "Resources/Assert.hpp"
 
 namespace SpiralOfFate
 {
@@ -40,7 +41,7 @@ namespace SpiralOfFate
 			tgui::String name;
 			std::filesystem::path path;
 			std::array<Color, 256> colors;
-			bool modified = false;
+			int modifications = 0;
 		};
 
 		using Ptr = std::shared_ptr<MainWindow>; //!< Shared widget pointer
@@ -57,6 +58,7 @@ namespace SpiralOfFate
 		const Renderer *getSharedRenderer() const override;
 		Renderer *getRenderer() override;
 
+		void reloadLabels();
 		std::filesystem::path getPath() const;
 		bool hasPath() const;
 		bool hasPaletteChanges() const;
@@ -77,7 +79,8 @@ namespace SpiralOfFate
 		void updateTransaction(const std::function<Operation *()> &operation);
 		void commitTransaction();
 		void cancelTransaction();
-		bool isModified() const noexcept;
+		bool isFramedataModified() const noexcept;
+		bool arePalettesModified() const noexcept;
 		bool hasUndoData() const noexcept;
 		bool hasRedoData() const noexcept;
 		void refreshMenuItems() const;
@@ -143,12 +146,15 @@ namespace SpiralOfFate
 	private:
 		FrameDataEditor &_editor;
 		PreviewWidget::Ptr _preview;
+		std::map<unsigned, std::string> _labels;
 		std::vector<ColorPlaneWidget::Ptr> _planes;
 		std::vector<ColorSliderWidget::Ptr> _sliders;
+		int _modifications = 0;
 		unsigned char _timer = 0;
 		bool _paused = true;
 		bool _showingPalette = false;
 		bool _requireReload = false;
+		bool _requireReloadPal = false;
 		bool _pathInit = false;
 		bool _requireAutoSave = false;
 		std::atomic<bool> _stopped = false;
@@ -170,9 +176,19 @@ namespace SpiralOfFate
 		unsigned _selectedColor = 0;
 		std::thread _autoSaveThread;
 		std::recursive_mutex _saveMutex;
+		const std::function<void (unsigned)> _setPaletteIndex = [this](unsigned id) {
+			assert_exp(id < this->_palettes.size());
+			this->_selectedPalette = id;
+			this->_preview->setPalette(&this->_palettes[id].colors);
+		};
 
+		bool _loadLabelFor(const std::string &name);
+		bool _loadLabelFor(const std::string &name, const std::string &folder);
+		bool _loadLabelFor(const std::string &name, const std::filesystem::path &folder);
+		void _onColorHover(int oColor, int nColor);
 		void _init();
 		void _autoSaveLoop();
+		void _onPaletteChanged();
 		nlohmann::json _asJson() const;
 		void _initSidePanel(tgui::Container &panel);
 		void _reinitSidePanel(tgui::Container &panel);

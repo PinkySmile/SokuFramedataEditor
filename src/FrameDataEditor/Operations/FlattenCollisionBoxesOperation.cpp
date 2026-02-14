@@ -79,4 +79,9 @@ namespace SpiralOfFate
 	{
 		return this->_oldValues.size() > 1;
 	}
+
+	bool FlattenCollisionBoxesOperation::hasFramedataModification() const
+	{
+		return this->hasModification();
+	}
 } // SpiralOfFate

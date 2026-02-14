@@ -1,0 +1,111 @@
+{
+	"322": "5aaaa",
+	"411": "6C",
+	"415": "j.6C",
+	"416": "j.2C",
+
+
+
+    "500": "d.236B (Open, Lamented Box of Urashima)",
+    "501": "d.236C (Open, Lamented Box of Urashima)",
+    "502": "d.j236B (Open, Lamented Box of Urashima)",
+    "503": "d.j236C (Open, Lamented Box of Urashima)",
+
+    "505": "a.236B (Bound to the Grave)",
+    "506": "a.236C (Bound to the grave)",
+
+    "510": "a.236B (Bewitching Bait)",
+    "511": "a.236C (Bewitching Bait)",
+    "512": "j.a.236C (Bewitching Bait)",
+    "513": "j.a.236C (Bewitching Bait)",
+
+
+	"520": "d.623B (Ghostly Butterfly Hidden in Zen Temple)",
+	"521": "d.623C (Ghostly Butterfly Hidden in Zen Temple)",
+
+	"525": "a.623B (Illusion Manji Parasol)",
+	"526": "a.623C (Illusion Manji Parasol)",
+	"527": "j.a.623B (Illusion Manji Parasol)",
+	"528": "j.a.623C (Illusion Manji Parasol)",
+
+	"530": "a.623B (Border Between Brains and Feet)",
+	"531": "a.623C (Border Between Brains and Feet)",
+
+
+	"540": "d.214B (Ride the Waves, Fight the Ocean)",
+	"541": "d.214C (Ride the Waves, Fight the Ocean)",
+	"542": "j.d.214B (Ride the Waves, Fight the Ocean)",
+	"543": "j.d.214C (Ride the Waves, Fight the Ocean)",
+
+	"545": "a.214B (Universe of Matter and Antimatter)",
+	"546": "a.214C (Universe of Matter and Antimatter)",
+	"547": "j.a.214B (Universe of Matter and Antimatter)",
+	"548": "j.a.214C (Universe of Matter and Antimatter)",
+
+	"550": "a.214B (Eye of Changes)",
+	"551": "a.214C (Eye of Changes)",
+	"552": "j.a.214B (Eye of Changes)",
+	"553": "j.a.214C (Eye of Changes)",
+
+
+	"560": "d.421B (Illusional Rift)",
+	"561": "d.421C (Illusional Rift)",
+	"562": "j.d.421B (Illusional Rift)",
+	"563": "j.d.421C (Illusional Rift)",
+
+	"565": "a.421B (Flesh Dismantler)",
+	"566": "a.421B (Flesh Dismantler)",
+
+	"570": "d.421B (Wings of Chimera)",
+	"571": "d.421C (Wings of Chimera)",
+	"572": "j.d.421B (Wings of Chimera)",
+	"573": "j.d.421C (Wings of Chimera)",
+
+	"600": "Border Sign \"Quadruple Barrier\"",
+	"601": "Shikigami \"Ran Yakumo\"" ,
+	"602": "Boundary \"Border Between 2D and 3D\"",
+	"603": "Boundary \"Charming Quadruple Barrier\"",
+	"604": "Shikigami \"Chen\"",
+	"605": "Boundary \"Objective Border\"",
+	"606": "Fantasy Nest \"Nest of Fireflies\"",
+	"607": "Aerial Bait \"Laced with Venom\"",
+	"608": "Magic Eye \"The Magic Eye of Laplace\"",
+	"615": "Obsolete Line \"Trip to the Old Station\"",
+
+	"656": "Fantasy Nest \"Nest of Fireflies\"(Air)",
+	"657": "Aerial Bait \"Laced with Venom\"(Air)",
+	"658": "Magic Eye \"The Magic Eye of Laplace\"(Air)",
+
+
+	"800": "B series objects",
+	"801": "C series objects",
+
+	"810": "Open, Lamented Box of Urashima objects",
+	"811": "Bound to the Grave objects",
+	"812": "Bewitching Bait objects",
+
+	"815": "Ghostly Butterfly Hidden in Zen Temple objects",
+	"816": "Illusion Manji Parasol objects",
+	"817": "Border Between Brains and Feet",
+
+	"820": "Ride the Waves, Fight the Ocean",
+	"821": "Universe of Matter and Antimatter",
+	"822": "Eye of Changes objects",
+
+	"825": "Illusional Rift objects",
+	"826": "Flesh Dismantler objects",
+	"827": "Wings of Chimera objects",
+
+
+	"848": "Melee objects",
+	"850": "Ran Yakumo objects",
+	"851": "Noachian Deluge objects",
+	"852": "Border Between 2D and 3D objects",
+	"853": "Charming Quadruple Barrier objects",
+	"854": "Chen objects",
+	"855": "Objective Border objects",
+	"856": "Nest of Fireflies objects",
+	"857": "Laced with Venom objects",
+	"858": "The Magic Eye of Laplace objects",
+	"865": "Trip to the Old Station objects"
+}

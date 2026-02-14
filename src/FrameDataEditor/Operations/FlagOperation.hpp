@@ -87,12 +87,17 @@ namespace SpiralOfFate
 			}
 		}
 
-		std::string getName() const noexcept override
+		[[nodiscard]] std::string getName() const noexcept override
 		{
 			return this->_fieldName;
 		}
 
-		bool hasModification() const override
+		[[nodiscard]] bool hasModification() const override
+		{
+			return this->_newValue != this->_oldValue;
+		}
+
+		[[nodiscard]] bool hasFramedataModification() const override
 		{
 			return this->_newValue != this->_oldValue;
 		}

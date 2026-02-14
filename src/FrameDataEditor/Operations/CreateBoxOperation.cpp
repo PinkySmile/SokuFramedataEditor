@@ -51,3 +51,8 @@ bool SpiralOfFate::CreateBoxOperation::hasModification() const
 {
 	return true;
 }
+
+bool SpiralOfFate::CreateBoxOperation::hasFramedataModification() const
+{
+	return true;
+}

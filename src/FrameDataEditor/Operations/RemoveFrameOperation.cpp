@@ -47,3 +47,8 @@ bool SpiralOfFate::RemoveFrameOperation::hasModification() const
 {
 	return true;
 }
+
+bool SpiralOfFate::RemoveFrameOperation::hasFramedataModification() const
+{
+	return true;
+}

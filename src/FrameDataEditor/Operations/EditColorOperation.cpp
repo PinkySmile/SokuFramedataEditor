@@ -17,7 +17,6 @@ namespace SpiralOfFate
 		_oldValue(palette.colors[selectedColor]),
 		_newValue(newValue),
 		_fieldName(name),
-		_wasModified(palette.modified),
 		_oldSelectedPalette(selectedPalette),
 		_oldSelectedColor(selectedColor),
 		_selectedPalette(selectedPalette),
@@ -32,7 +31,7 @@ namespace SpiralOfFate
 		this->_selectedPalette = this->_oldSelectedPalette;
 		this->_selectedColor = this->_oldSelectedColor;
 		this->_palette.colors[this->_selectedColor] = this->_newValue;
-		this->_palette.modified = true;
+		this->_palette.modifications++;
 	}
 
 	void EditColorOperation::undo()
@@ -42,7 +41,7 @@ namespace SpiralOfFate
 		this->_selectedPalette = this->_oldSelectedPalette;
 		this->_selectedColor = this->_oldSelectedColor;
 		this->_palette.colors[this->_selectedColor] = this->_oldValue;
-		this->_palette.modified = this->_wasModified;
+		this->_palette.modifications--;
 	}
 
 	std::string EditColorOperation::getName() const noexcept
@@ -55,5 +54,10 @@ namespace SpiralOfFate
 		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
 			return false;
 		return this->_oldValue != this->_newValue;
+	}
+
+	bool EditColorOperation::hasFramedataModification() const
+	{
+		return false;
 	}
 }

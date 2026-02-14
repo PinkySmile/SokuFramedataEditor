@@ -86,4 +86,9 @@ namespace SpiralOfFate
 	{
 		return true;
 	}
+
+	bool CleanPropertiesOperation::hasFramedataModification() const
+	{
+		return true;
+	}
 } // SpiralOfFate
