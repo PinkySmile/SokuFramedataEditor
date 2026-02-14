@@ -659,7 +659,7 @@ TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, CloseButtonF
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MaximizeButtonFocused, "ChildWindowButton")
 TGUI_RENDERER_PROPERTY_RENDERER(SpiralOfFate::MainWindow::Renderer, MinimizeButtonFocused, "ChildWindowButton")
 
-bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name)
+bool SpiralOfFate::MainWindow::_loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name)
 {
 	std::ifstream stream;
 
@@ -674,14 +674,14 @@ bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name)
 	stream >> j;
 	for (auto &[key, value] : j.items()) {
 		if (value.is_null())
-			this->_labels.erase(std::stoul(key));
+			labels.erase(std::stoul(key));
 		else
-			this->_labels[std::stoul(key)] = value;
+			labels[std::stoul(key)] = value;
 	}
 	return true;
 }
 
-bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name, const std::string &folder)
+bool SpiralOfFate::MainWindow::_loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name, const std::string &folder)
 {
 	auto entry = game->package.find(folder + name + "_" + this->_editor.getLocale() + "_labels.json");
 
@@ -709,14 +709,14 @@ bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name, const std:
 	entry->second->close(stream);
 	for (auto &[key, value] : j.items()) {
 		if (value.is_null())
-			this->_labels.erase(std::stoul(key));
+			labels.erase(std::stoul(key));
 		else
-			this->_labels[std::stoul(key)] = value;
+			labels[std::stoul(key)] = value;
 	}
 	return true;
 }
 
-bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name, const std::filesystem::path &folder)
+bool SpiralOfFate::MainWindow::_loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name, const std::filesystem::path &folder)
 {
 	std::ifstream stream;
 
@@ -731,9 +731,9 @@ bool SpiralOfFate::MainWindow::_loadLabelFor(const std::string &name, const std:
 	stream >> j;
 	for (auto &[key, value] : j.items()) {
 		if (value.is_null())
-			this->_labels.erase(std::stoul(key));
+			labels.erase(std::stoul(key));
 		else
-			this->_labels[std::stoul(key)] = value;
+			labels[std::stoul(key)] = value;
 	}
 	return true;
 }
@@ -887,6 +887,7 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 	_title(json["title"]),
 	_chrPath(json["folder"]),
 	_character(json["character"]),
+	_fileName(json["fileName"]),
 	_path(json["path"])
 {
 	if (!std::filesystem::exists(game->settings.palettes / this->_character))
@@ -948,7 +949,8 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::strin
 	LocalizedContainer<tgui::ChildWindow>(editor, MainWindow::StaticWidgetType, false),
 	_editor(editor),
 	_title("[P]" + frameDataPath),
-	_chrPath(folder)
+	_chrPath(folder),
+	_fileName(frameDataPath)
 {
 	if (!this->_chrPath.ends_with('/'))
 		this->_chrPath.push_back('/');
@@ -957,8 +959,11 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::strin
 		this->_character.pop_back();
 	this->_character.erase(0, this->_character.find_last_of('/') + 1);
 
+	auto pos1 = this->_fileName.find_last_of('.');
+	auto pos2 = this->_fileName.find_last_of('/');
 	auto palFolder = game->settings.palettes / this->_character;
 
+	this->_fileName = this->_fileName.substr(pos2 + 1, pos1 - pos2 - 1);
 	if (!std::filesystem::exists(palFolder))
 		std::filesystem::create_directories(palFolder);
 
@@ -1499,8 +1504,8 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 		format = ShadyCore::FileType::PALETTE_PAL;
 
 	std::ifstream stream{path, std::ifstream::binary};
-	ShadyCore::Palette palette;
 	Palette pal;
+	ShadyCore::Palette palette;
 
 	if (stream.fail()) {
 		auto err = this->localize("error.open", path.string(), strerror(errno));
@@ -1510,9 +1515,55 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 		game->logger.error(err);
 		return;
 	}
-	ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, format})(&palette, stream);
-	stream.close();
-	palette.unpack();
+
+	size_t size = std::filesystem::file_size(path);
+
+	if (size != 513 && size > 1024) {
+		std::array<uint32_t, 256> data;
+		std::vector<char> metadata;
+		struct {
+			const char *character;
+			const char *name;
+			const char *description;
+			const char *author;
+		} meta;
+
+		metadata.resize(size - 1024);
+		stream.read(reinterpret_cast<char *>(data.data()), 1024);
+		stream.read(metadata.data(), size - 1024);
+
+		meta.character = metadata.data();
+		meta.name = meta.character + strlen(meta.character) + 1;
+		meta.description = meta.name + strlen(meta.name) + 1;
+		meta.author = meta.description + strlen(meta.description) + 1;
+		if (*meta.name || *meta.author || *meta.description)
+			Utils::dispMsg(
+				game->gui,
+				this->_editor.localize("message_box.title.palette_meta"),
+				this->_editor.localize("message_box.palette_meta", meta.name, meta.author, meta.description),
+				MB_ICONINFORMATION
+			);
+
+		for (size_t i = 0 ; i < 256; i++) {
+			pal.colors[i].r = data[i] >> 16 & 0xFF;
+			pal.colors[i].g = data[i] >> 8  & 0xFF;
+			pal.colors[i].b = data[i] >> 0  & 0xFF;
+			pal.colors[i].a = i == 0 ? 0 : 255;
+		}
+	} else {
+		ShadyCore::getResourceReader({ShadyCore::FileType::TYPE_PALETTE, format})(&palette, stream);
+		stream.close();
+		palette.unpack();
+
+		auto ptr = reinterpret_cast<uint32_t *>(palette.data);
+
+		for (size_t i = 0 ; i < 256; i++) {
+			pal.colors[i].r = ptr[i] >> 16 & 0xFF;
+			pal.colors[i].g = ptr[i] >> 8  & 0xFF;
+			pal.colors[i].b = ptr[i] >> 0  & 0xFF;
+			pal.colors[i].a = i == 0 ? 0 : 255;
+		}
+	}
 
 	int iter = 0;
 	tgui::String name = path.filename().native();
@@ -1530,14 +1581,6 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 		result = name.substr(0, pos) + "-" + std::to_string(iter) + name.substr(pos);
 	}
 
-	auto ptr = reinterpret_cast<uint32_t *>(palette.data);
-
-	for (size_t i = 0 ; i < 256; i++) {
-		pal.colors[i].r = ptr[i] >> 16 & 0xFF;
-		pal.colors[i].g = ptr[i] >> 8  & 0xFF;
-		pal.colors[i].b = ptr[i] >> 0  & 0xFF;
-		pal.colors[i].a = i == 0 ? 0 : 255;
-	}
 	pal.name = result;
 	pal.path = game->settings.palettes / this->_character / result.toWideString();
 	pal.modifications = 1;
@@ -1613,6 +1656,7 @@ nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 	json["path"] = this->_path;
 	json["title"] = this->_title;
 	json["folder"] = this->_chrPath;
+	json["fileName"] = this->_fileName;
 	json["character"] = this->_character;
 	json["modifications"] = this->_modifications;
 	json["isCharacterData"] = this->_object->_schema.isCharacterData;
@@ -1674,6 +1718,15 @@ void SpiralOfFate::MainWindow::autoSave()
 	if (this->isFramedataModified())
 		title.push_back('*');
 	this->setTitle(title);
+}
+
+std::string SpiralOfFate::MainWindow::_localizeEffectName(unsigned id) const
+{
+	auto it = this->_effectLabels.find(id);
+
+	if (it != this->_effectLabels.end())
+		return it->second;
+	return "Effect #" + std::to_string(id);
 }
 
 std::string SpiralOfFate::MainWindow::_localizeActionName(unsigned int id) const
@@ -1805,7 +1858,7 @@ void SpiralOfFate::MainWindow::_createEffectListPopup(const std::function<void(u
 	contentPanel->setPosition("(&.w - w) / 2", "(&.h - h) / 2");
 	this->add(contentPanel);
 	for (auto effectId : effects) {
-		effectsNames[effectId] = this->localize("effect." + std::to_string(effectId));
+		effectsNames[effectId] = this->_localizeEffectName(effectId);
 		effectsNamesLower[effectId].resize(effectsNames[effectId].size());
 		std::ranges::transform(effectsNames[effectId], effectsNamesLower[effectId].begin(), [](signed char c) -> char {
 			// TODO: Handle non-ascii characters properly
@@ -2692,7 +2745,7 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 		this->_updateFrameElements[&container].emplace_back([selectEff, this]{
 			auto &data = this->_object->getFrameData();
 
-			selectEff->setText(this->localize("effect." + std::to_string(data.traits.onHitEffect)) + " (" + std::to_string(data.traits.onHitEffect) + ")");
+			selectEff->setText(this->_localizeEffectName(data.traits.onHitEffect) + " (" + std::to_string(data.traits.onHitEffect) + ")");
 		});
 	}
 
@@ -3538,12 +3591,20 @@ SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getRenderer()
 void SpiralOfFate::MainWindow::reloadLabels()
 {
 	this->_labels.clear();
-	this->_loadLabelFor("common");
-	if (this->_pathInit && this->_loadLabelFor(this->_character, this->_path.parent_path()))
-		return;
-	if (this->_loadLabelFor(this->_character, this->_chrPath))
-		return;
-	this->_loadLabelFor(this->_character);
+	this->_effectLabels.clear();
+	this->_loadLabelFor(this->_effectLabels, "effect");
+	if (this->_object->_schema.isCharacterData) {
+		this->_loadLabelFor(this->_labels, "common");
+		if (this->_pathInit && this->_loadLabelFor(this->_labels, this->_character, this->_path.parent_path()))
+			return;
+		if (this->_loadLabelFor(this->_labels, this->_character, this->_chrPath))
+			return;
+		this->_loadLabelFor(this->_labels, this->_character);
+	} else if (this->_fileName == "stand")
+		this->_loadLabelFor(this->_labels, "stand");
+	else
+		this->_loadLabelFor(this->_labels, this->_character);
+
 }
 
 bool SpiralOfFate::MainWindow::hasPath() const

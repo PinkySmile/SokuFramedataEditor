@@ -138,6 +138,7 @@ namespace SpiralOfFate
 		std::shared_ptr<tgui::RendererData> _maximizeButtonRendererFocusedCached;
 		std::shared_ptr<tgui::RendererData> _maximizeButtonRendererUnFocusedCached;
 
+		std::string _localizeEffectName(unsigned id) const;
 		std::string _localizeActionName(unsigned id) const;
 		void _updateTitleButtons();
 		void _updateTextureTitleBar();
@@ -147,6 +148,7 @@ namespace SpiralOfFate
 		FrameDataEditor &_editor;
 		PreviewWidget::Ptr _preview;
 		std::map<unsigned, std::string> _labels;
+		std::map<unsigned, std::string> _effectLabels;
 		std::vector<ColorPlaneWidget::Ptr> _planes;
 		std::vector<ColorSliderWidget::Ptr> _sliders;
 		int _modifications = 0;
@@ -162,6 +164,7 @@ namespace SpiralOfFate
 		std::string _title;
 		std::string _chrPath;
 		std::string _character;
+		std::string _fileName;
 		std::filesystem::path _path;
 		std::filesystem::path _pathBak;
 		std::unique_ptr<Operation> _pendingTransaction;
@@ -182,9 +185,9 @@ namespace SpiralOfFate
 			this->_preview->setPalette(&this->_palettes[id].colors);
 		};
 
-		bool _loadLabelFor(const std::string &name);
-		bool _loadLabelFor(const std::string &name, const std::string &folder);
-		bool _loadLabelFor(const std::string &name, const std::filesystem::path &folder);
+		bool _loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name);
+		bool _loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name, const std::string &folder);
+		bool _loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name, const std::filesystem::path &folder);
 		void _onColorHover(int oColor, int nColor);
 		void _init();
 		void _autoSaveLoop();

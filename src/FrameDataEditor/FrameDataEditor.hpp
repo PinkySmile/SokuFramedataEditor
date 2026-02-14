@@ -73,6 +73,8 @@ namespace SpiralOfFate
 		void _loadFramedata();
 		void _explorePackage();
 		void _explorePackageFile();
+		void _exportPalette();
+		void _importPalette();
 		void _save();
 		void _saveAs();
 		void _settings();
@@ -136,7 +138,7 @@ namespace SpiralOfFate
 		std::string getLocale() const;
 		void saveSettings();
 		void setShortcuts(const std::map<std::string, Shortcut> &shortcuts);
-		void restoreDefaultShortcuts(std::map<std::string, Shortcut> &shurtcuts) const;
+		void restoreDefaultShortcuts(std::map<std::string, Shortcut> &shortcuts) const;
 		std::map<std::string, Shortcut> getShortcuts() const;
 		std::vector<std::string> getShortcutsNames() const;
 

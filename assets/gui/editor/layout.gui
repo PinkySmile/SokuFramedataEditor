@@ -13,6 +13,10 @@ MenuBar.MainBar {
             Items = ["menu_item.file.explore.loaded", "menu_item.file.explore.file"];
         }
         Menu {
+            Text = "menu_item.file.palette";
+            Items = ["menu_item.file.palette.export", "menu_item.file.palette.import"];
+        }
+        Menu {
             Text = "menu_item.file.save";
         }
         Menu {
