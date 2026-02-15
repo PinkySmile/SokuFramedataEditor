@@ -23,6 +23,9 @@
 namespace SpiralOfFate
 {
 	struct Game {
+		std::filesystem::path config;
+		std::filesystem::path data;
+		std::filesystem::path state;
 		Settings settings;
 		Logger logger;
 		std::unique_ptr<Screen> screen;
@@ -33,7 +36,13 @@ namespace SpiralOfFate
 		std::map<unsigned, unsigned> soundEffects;
 		unsigned lastSwap = 0;
 
-		Game(const std::filesystem::path &settingsPath, const std::filesystem::path &loggerPath = "./latest.log");
+		Game(
+			const std::filesystem::path &config,
+			const std::filesystem::path &data,
+			const std::filesystem::path &state,
+			const std::filesystem::path &settingsPath,
+			const std::filesystem::path &loggerPath = "./latest.log"
+		);
 		~Game();
 		void reloadSounds();
 	};

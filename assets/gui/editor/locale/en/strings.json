@@ -14,8 +14,11 @@
 	"message_box.title.import_palette":                    "Import palette",
 	"message_box.title.palette_meta":                      "Palette metadata",
 	"message_box.title.save_pal_err":                      "Palette saving error",
+	"message_box.title.about":                             "About FrameDataEditor",
+	"message_box.title.recovery":                          "Crash recovery",
 
-	"message_box.not_saved":                               "At least one file has unsaved changes.",
+	"message_box.filename":                                "Filename",
+	"message_box.not_saved":                               "At least one file has changes.\nDo you want to save them ?",
 	"message_box.backup_exists":                           "Some backup data has been found for %1.\nDo you want to load them ? If not, they will get deleted.",
 	"message_box.internal_error":                          "Internal error: %1: %2",
 	"message_box.invalid_file":                            "Invalid file: %1",
@@ -23,15 +26,33 @@
 	"message_box.action_exists":                           "This action already exist. Delete it first if you want to replace it.",
 	"message_box.select_folder":                           "Select assets game folder the selected file\n%1",
 	"message_box.palette_meta":                            "Palette %1 made by %2\n\"%3\"\nPlease, be sure to credit the author when redistributing.",
+	"message_box.recovery":                                "%1 open file(s) have been recovered from the latest crash.\nUndo/Redo data has been lost.",
 
+	"message_box.button.save":                             "Save",
+	"message_box.button.open":                             "Open",
 	"message_box.button.yes":                              "Yes",
 	"message_box.button.no":                               "No",
 	"message_box.button.cancel":                           "Cancel",
 	"message_box.button.ok":                               "OK",
 	"message_box.button.confirm":                          "Confirm",
 
+	"column.name":                                         "Name",
+	"column.size":                                         "Size",
+	"column.modified":                                     "Modified",
+	"column.character":                                    "Character",
+	"column.type":                                         "Type",
+	"column.format":                                       "Format",
+	"column.path":                                         "Path",
+
+	"popup.search":                                        "Search...",
+
 	"error.rename":                                        "Cannot rename %1 to %2: %3",
 	"error.open":                                          "Cannot open %1: %2",
+
+	"type.unknown":                                        "Unknown",
+	"type.main_pat":                                       "Main pattern",
+	"type.chr_sel_pat":                                    "Chr select pattern",
+	"type.effect":                                         "Effect pattern",
 
 	"file_type.res_folder":                                "Resource folder",
 	"file_type.res_dat":                                   "Resource data file (*.dat)",
@@ -259,8 +280,6 @@
 	"shortcut.menu_item.misc.invert_colors":               "Invert colors",
 	"shortcut.menu_item.misc.reverse_palette":             "Reverse palette color order",
 	"shortcut.menu_item.help.about":                       "About FrameDataEditor",
-
-	"popup.search":                                        "Search...",
 
 	"operation.move_box":                                  "Move box",
 	"operation.resize_box":                                "Rescale box",

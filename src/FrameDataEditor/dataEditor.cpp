@@ -1,3 +1,7 @@
+#include <iostream>
+#ifdef __linux__
+#include <pwd.h>
+#endif
 #include "LibCore.hpp"
 #include "FrameDataEditor.hpp"
 
@@ -15,8 +19,8 @@ void run()
 			game->gui.draw();
 			game->screen->display();
 			while (auto event = game->screen->pollEvent()) {
-				if (event->is<EVENT_WINDOW_CLOSED>() && editor->closeAll())
-					game->screen->close();
+				if (event->is<EVENT_WINDOW_CLOSED>())
+					editor->closeAll();
 				if (auto key = event->getIf<sf::Event::KeyPressed>()) {
 					if (editor->canHandleKeyPress(*key)) {
 						editor->keyPressed(*key);
@@ -40,7 +44,22 @@ void initEditor()
 {
 	sf::Image icon;
 
-	new Game("settings.json", "./editor.log");
+#ifdef __linux__
+	std::filesystem::path home = getenv("HOME") ?: getpwuid(getuid())->pw_dir;
+	const char *tmp = getenv("XDG_CONFIG_HOME");
+	std::filesystem::path config = tmp ? std::filesystem::path(tmp) : home / ".config" / "th123fde";
+	tmp = getenv("XDG_DATA_HOME");
+	std::filesystem::path data = tmp ? std::filesystem::path(tmp) : home / ".local" / "share" / "th123fde";
+	tmp = getenv("XDG_STATE_HOME");
+	std::filesystem::path state = tmp ? std::filesystem::path(tmp) : home / ".local" / "state" / "th123fde";
+
+	std::filesystem::create_directories(config);
+	std::filesystem::create_directories(data);
+	std::filesystem::create_directories(state);
+	new Game(config, data, state, config / "settings.json", state / "editor.log");
+#else
+	new Game(".", ".", ".", "settings.json", "./editor.log");
+#endif
 	game->logger.info("Starting editor.");
 	game->screen = std::make_unique<Screen>("Touhou 12.3: Hisoutensoku | FrameData Editor");
 	if (icon.loadFromFile("assets/editorIcon.png"))

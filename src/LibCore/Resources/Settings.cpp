@@ -7,7 +7,7 @@
 #include "Settings.hpp"
 #include "Utils.hpp"
 
-SpiralOfFate::Settings::Settings(const std::filesystem::path &path) :
+SpiralOfFate::Settings::Settings(const std::filesystem::path &data, const std::filesystem::path &path) :
 	_path(path)
 {
 	std::ifstream stream{path};
@@ -16,18 +16,20 @@ SpiralOfFate::Settings::Settings(const std::filesystem::path &path) :
 	if (!stream.fail()) {
 		stream >> json;
 		try {
-			this->palettes = json["palettes"].get<std::filesystem::path>();
+			this->palettes = json["palettes"].get<std::filesystem::path::string_type>();
 			this->theme = json["theme"];
-			this->swr = json["swr"].get<std::filesystem::path>();
-			this->soku = json["soku"].get<std::filesystem::path>();
-			this->soku2 = json["soku2"].get<std::filesystem::path>();
-			this->extra = json["extra"].get<std::vector<std::filesystem::path>>();
+			this->swr = json["swr"].get<std::filesystem::path::string_type>();
+			this->soku = json["soku"].get<std::filesystem::path::string_type>();
+			this->soku2 = json["soku2"].get<std::filesystem::path::string_type>();
+			this->extra.clear();
+			for (const auto &e : json["extra"].get<std::vector<std::filesystem::path::string_type>>())
+				this->extra.emplace_back(e);
 			return;
 		} catch (...) {}
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: " + this->_path.string() + ": " + std::string(strerror(errno)));
 	this->theme = "assets/gui/themes/Black.style";
-	this->palettes = "palettes";
+	this->palettes = data / "palettes";
 }
 
 SpiralOfFate::Settings::~Settings()
@@ -37,15 +39,19 @@ SpiralOfFate::Settings::~Settings()
 
 void SpiralOfFate::Settings::save()
 {
-	std::ofstream stream{this->_path};
 	nlohmann::json json = {
-		{ "palettes", this->palettes },
+		{ "palettes", this->palettes.native() },
 		{ "theme", this->theme },
-		{ "swr", this->swr },
-		{ "soku", this->soku },
-		{ "soku2", this->soku2 },
-		{ "extra", this->extra },
+		{ "swr", this->swr.native() },
+		{ "soku", this->soku.native() },
+		{ "soku2", this->soku2.native() },
+		{ "extra", nlohmann::json::array() },
 	};
+
+	for (auto &e : this->extra)
+		json["extra"].emplace_back(e.native());
+
+	std::ofstream stream{this->_path};
 
 	if (!stream)
 		throw std::runtime_error("Cannot open settings file: " + this->_path.string() + ": " + std::string(strerror(errno)));

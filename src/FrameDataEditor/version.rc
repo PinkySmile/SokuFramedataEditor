@@ -7,14 +7,14 @@
 #define VER_PRODUCTVERSION          VERSION_DIGITS
 #define VER_PRODUCTVERSION_STR      REAL_VERSION_STR "\0"
 
-#define VER_COMPANYNAME_STR         "SoF\0"
+#define VER_COMPANYNAME_STR         "SoF,SokuDev\0"
 #define VER_FILEDESCRIPTION_STR     "Framedata editor for Touhou 12.3: Hisoutensoku\0"
-#define VER_INTERNALNAME_STR        "SoFGVFDE\0"
+#define VER_INTERNALNAME_STR        "TH123FDE\0"
 #define VER_LEGALCOPYRIGHT_STR      "PinkySmile\0"
 #define VER_LEGALTRADEMARKS1_STR    "\0"
 #define VER_LEGALTRADEMARKS2_STR    "\0"
 #define VER_ORIGINALFILENAME_STR    "FrameDataEditor.exe\0"
-#define VER_PRODUCTNAME_STR         "SoFGVFDE\0"
+#define VER_PRODUCTNAME_STR         "TH123FDE\0"
 
 #ifndef _DEBUG
 #define VER_DEBUG 0

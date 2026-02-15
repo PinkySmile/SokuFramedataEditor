@@ -46,6 +46,13 @@
 
 #include "dataentry.hpp"
 
+#ifdef _WIN32
+#undef EXPORT
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace tgui
@@ -57,7 +64,7 @@ namespace tgui
 	/// - vector<String>
 	/// - String
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	class TGUI_API SignalStrings : public Signal
+	class EXPORT SignalStrings : public Signal
 	{
 	public:
 
@@ -150,7 +157,7 @@ namespace tgui
 	/// saveFileDialog->setFileMustExist(false);
 	/// @endcode
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	class TGUI_API PackageFileDialog : public ChildWindow {
+	class EXPORT PackageFileDialog : public ChildWindow {
 	public:
 		using Ptr = std::shared_ptr<PackageFileDialog>; //!< Shared widget pointer
 		using ConstPtr = std::shared_ptr<const PackageFileDialog>; //!< Shared constant widget pointer
@@ -573,7 +580,7 @@ namespace tgui
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	protected:
-		struct TGUI_API FileInfo
+		struct EXPORT FileInfo
 		{
 			String filename;
 			String path;

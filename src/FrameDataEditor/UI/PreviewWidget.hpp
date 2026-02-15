@@ -42,9 +42,9 @@ namespace SpiralOfFate
 		void _handleBoxMove(const tgui::Vector2f &pos);
 		void _updateHover(const tgui::Vector2f &pos);
 		void _updateBoxSliderHover(const tgui::Vector2f &pos, tgui::Cursor::Type &cursor);
-		void _updateBoxSliderHover(const Rectangle &box, const tgui::Vector2f &pos, tgui::Cursor::Type &cursor);
-		void _drawBoxBorder(const Rectangle &box, sf::RenderStates &states) const;
-		void _drawBox(const Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const;
+		void _updateBoxSliderHover(const FDE::Rectangle &box, const tgui::Vector2f &pos, tgui::Cursor::Type &cursor);
+		void _drawBoxBorder(const FDE::Rectangle &box, sf::RenderStates &states) const;
+		void _drawBox(const FDE::Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const;
 	public:
 		tgui::SignalTyped2<BoxType, unsigned> onBoxSelect = {"BoxSelected"};
 		tgui::Signal onBoxUnselect = {"BoxUnselected"};

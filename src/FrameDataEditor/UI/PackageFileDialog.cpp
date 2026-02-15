@@ -400,21 +400,21 @@ namespace tgui
 
 	FileDialogRenderer* PackageFileDialog::getSharedRenderer()
 	{
-		return downcast<FileDialogRenderer*>(Widget::getSharedRenderer());
+		return aurora::downcast<FileDialogRenderer*>(Widget::getSharedRenderer());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	const FileDialogRenderer* PackageFileDialog::getSharedRenderer() const
 	{
-		return downcast<const FileDialogRenderer*>(Widget::getSharedRenderer());
+		return aurora::downcast<const FileDialogRenderer*>(Widget::getSharedRenderer());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	FileDialogRenderer* PackageFileDialog::getRenderer()
 	{
-		return downcast<FileDialogRenderer*>(Widget::getRenderer());
+		return aurora::downcast<FileDialogRenderer*>(Widget::getRenderer());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1000,7 +1000,7 @@ namespace tgui
 			switch (file.type.format) {
 			case ShadyCore::FileType::FORMAT_UNKNOWN:
 				if (!file.directory)
-					format = "Unknown";
+					format = "???";
 				break;
 			case ShadyCore::FileType::TEXT_GAME:
 				format = "cv0";
@@ -1051,10 +1051,10 @@ namespace tgui
 				format = "gui";
 				break;
 			case ShadyCore::FileType::SCHEMA_GAME_ANIM:
-				format = "anim";
+				format = "pat1";
 				break;
 			case ShadyCore::FileType::SCHEMA_GAME_PATTERN:
-				format = "pattern";
+				format = "pat2";
 				break;
 			case ShadyCore::FileType::TEXTURE_DDS:
 				format = "dds";

@@ -134,7 +134,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		}
 	}, std::weak_ptr(sokuPath));
 	soku2PathBrowse->onClick([soku2Path, &editor] {
-		auto win = Utils::openFileDialog(game->gui, editor.localize("settings.browse.soku2"));
+		auto win = editor.openFileDialog(game->gui, editor.localize("settings.browse.soku2"));
 
 		win->setFileTypeFilters({
 			{editor.localize("settings.type.soku2"), {"Soku2.dll"}}
@@ -144,7 +144,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		});
 	});
 	sokuPathBrowse->onClick([sokuPath, &editor] {
-		auto win = Utils::openFileDialog(game->gui, editor.localize("settings.browse.soku"));
+		auto win = editor.openFileDialog(game->gui, editor.localize("settings.browse.soku"));
 
 		win->setFileTypeFilters({
 			{editor.localize("settings.type.soku"), {"th123a.dat", "th123b.dat", "th123c.dat"}}
@@ -154,7 +154,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		});
 	});
 	swrPathBrowse->onClick([swrPath, &editor] {
-		auto win = Utils::openFileDialog(game->gui, editor.localize("settings.browse.swr"));
+		auto win = editor.openFileDialog(game->gui, editor.localize("settings.browse.swr"));
 
 		win->setFileTypeFilters({
 			{editor.localize("settings.type.swr"), {"th105a.dat", "th105b.dat"}}

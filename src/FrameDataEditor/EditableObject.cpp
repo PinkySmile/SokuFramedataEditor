@@ -143,6 +143,8 @@ void EditableObject::update()
 		data = &action[this->_actionBlock][this->_animation];
 		this->resetState();
 		this->_needGenerate = false;
+		if (this->_mousePos)
+			this->setMousePosition(&*this->_mousePos);
 		this->_generateOverlaySprite();
 	}
 }
@@ -167,9 +169,9 @@ const FrameData::Sequence &EditableObject::getSequence() const
 	return this->_schema.framedata.at(this->_action).at(this->_actionBlock);
 }
 
-std::vector<Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const
+std::vector<FDE::Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const
 {
-	std::vector<Rectangle> result;
+	std::vector<FDE::Rectangle> result;
 	//Vector2f center{
 	//	static_cast<float>(data.offsetX),
 	//	data.texHeight * data.scale.y / -2.f - data.offset.y
@@ -196,12 +198,12 @@ std::vector<Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, 
 	return result;
 }
 
-std::vector<Rectangle> EditableObject::_getModifiedHurtBoxes() const
+std::vector<FDE::Rectangle> EditableObject::_getModifiedHurtBoxes() const
 {
 	return this->_getModifiedBoxes(this->getFrameData(), this->getFrameData().hBoxes);
 }
 
-std::vector<Rectangle> EditableObject::_getModifiedHitBoxes() const
+std::vector<FDE::Rectangle> EditableObject::_getModifiedHitBoxes() const
 {
 	return this->_getModifiedBoxes(this->getFrameData(), this->getFrameData().aBoxes);
 }
@@ -267,17 +269,18 @@ void EditableObject::_generateOverlaySprite()
 void EditableObject::setMousePosition(const Vector2f *pos)
 {
 	if (pos == nullptr) {
+		this->_mousePos.reset();
 		if (this->_onHoverChange)
 			this->_onHoverChange(this->_paletteIndex, -1);
 		this->_paletteIndex = -1;
 		this->_textureValid = false;
 		return;
 	}
+	this->_mousePos = *pos;
 
 	auto sPos = this->_mousePosToImgPos(*pos);
 	auto &data = this->_schema.framedata.at(this->_action)[this->_actionBlock][this->_animation];
 
-	this->_mousePos = sPos;
 	if (sPos.x < 0 || sPos.y < 0 || sPos.x >= data.texWidth || sPos.y >= data.texHeight) {
 		if (this->_onHoverChange)
 			this->_onHoverChange(this->_paletteIndex, -1);
@@ -299,9 +302,19 @@ void EditableObject::setMousePosition(const Vector2f *pos)
 	sPos.y += data.texOffsetY;
 	if (sPos.x < 0 || sPos.x >= img.width || sPos.y < 0 || sPos.y >= img.height)
 		return;
+
+	unsigned nColor = img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)];
+
+	if (nColor == 0) {
+		if (this->_onHoverChange)
+			this->_onHoverChange(this->_paletteIndex, -1);
+		this->_paletteIndex = -1;
+		this->_textureValid = false;
+		return;
+	}
 	if (this->_onHoverChange)
-		this->_onHoverChange(this->_paletteIndex, img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)]);
-	this->_paletteIndex = img.raw[static_cast<int>(sPos.y) * img.paddedWidth + static_cast<int>(sPos.x)];
+		this->_onHoverChange(this->_paletteIndex, nColor);
+	this->_paletteIndex = nColor;
 	this->_needGenerate = this->_needGenerate || this->_oldPaletteIndex != this->_paletteIndex;
 	this->_oldPaletteIndex = this->_paletteIndex;
 }

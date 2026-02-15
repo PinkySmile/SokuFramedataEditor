@@ -14,8 +14,11 @@
 	"message_box.title.import_palette":                    "Importer une palette",
 	"message_box.title.palette_meta":                      "Métadonnée de la palette",
 	"message_box.title.save_pal_err":                      "Erreur de sauvegarde de palette",
+	"message_box.title.about":                             "À propos de FrameDataEditor",
+	"message_box.title.recovery":                          "Restauration des fichiers",
 
-	"message_box.not_saved":                               "Un ou plusieurs fichier(s) ont des changements non sauvegardés.",
+	"message_box.filename":                                "Nom de fichier",
+	"message_box.not_saved":                               "Un ou plusieurs fichier(s) ont été modifiés.\nVoulez vous les sauvegarder ?",
 	"message_box.backup_exists":                           "Des données de restauration sont présentes pour le fichier %1.\nVoulez-vous les charger ? Si non, elles seront supprimées.",
 	"message_box.internal_error":                          "Erreur interne: %1: %2",
 	"message_box.invalid_file":                            "Fichier invalide: %1",
@@ -23,17 +26,33 @@
 	"message_box.action_exists":                           "Cette action existe déjà. Supprimez la si vous souhaitez la remplacer.",
 	"message_box.select_folder":                           "Sélectionnez le dossier des assets pour ce fichier\n%1",
 	"message_box.palette_meta":                            "Palette %1 faite par %2\n\"%3\"\nMerci de créditer l'auteur si vous redistribuez.",
+	"message_box.recovery":                                "%1 fichier(s) ouvert(s) ont été restauré après le dernier crash.\nLes données pour \"défaire\" et \"refaire\" ont cependant été perdues.",
 
+	"message_box.button.save":                             "Sauvegarder",
+	"message_box.button.open":                             "Ouvrir",
 	"message_box.button.yes":                              "Oui",
 	"message_box.button.no":                               "Non",
 	"message_box.button.cancel":                           "Annuler",
 	"message_box.button.ok":                               "OK",
 	"message_box.button.confirm":                          "Confirmer",
 
+	"column.name":                                         "Nom",
+	"column.size":                                         "Taille",
+	"column.modified":                                     "Modifié le",
+	"column.character":                                    "Personnage",
+	"column.type":                                         "Type",
+	"column.format":                                       "Format",
+	"column.path":                                         "Chemin",
+
 	"popup.search":                                        "Rechercher...",
 
 	"error.rename":                                        "Impossible de renommer %1 en %2: %3",
 	"error.open":                                          "Erreur lors de l'ouverture de %1: %2",
+
+	"type.unknown":                                        "Inconnu",
+	"type.main_pat":                                       "Patron principal",
+	"type.chr_sel_pat":                                    "Patron sel perso",
+	"type.effect":                                         "Patron d'effets",
 
 	"file_type.res_folder":                                "Dossier de ressources",
 	"file_type.res_dat":                                   "Ressources Touhou 12.3 (*.dat)",

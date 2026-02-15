@@ -132,6 +132,8 @@ namespace SpiralOfFate
 		FrameDataEditor();
 		~FrameDataEditor();
 
+		tgui::FileDialog::Ptr openFileDialog(tgui::Gui &gui, const std::string &title = "Open file", const std::filesystem::path &basePath = std::filesystem::current_path(), bool overWriteWarning = false, bool mustExist = true);
+		tgui::FileDialog::Ptr saveFileDialog(tgui::Gui &gui, const std::string &title = "Save file", const std::filesystem::path &basePath = std::filesystem::current_path());
 		std::string shortcutToString(const Shortcut &s) const;
 		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void setLocale(const std::string &name);

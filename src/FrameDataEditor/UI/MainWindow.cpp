@@ -738,7 +738,7 @@ bool SpiralOfFate::MainWindow::_loadLabelFor(std::map<unsigned, std::string> &la
 	return true;
 }
 
-void SpiralOfFate::MainWindow::_onColorHover(int oColor, int nColor)
+void SpiralOfFate::MainWindow::_onColorHover(int oColor, int nColor, bool shouldPause)
 {
 	if (oColor == nColor)
 		return;
@@ -801,12 +801,13 @@ void SpiralOfFate::MainWindow::_onColorHover(int oColor, int nColor)
 			}
 		}
 	}
+	this->_paused2 = nColor >= 0 && shouldPause;
 }
 
 void SpiralOfFate::MainWindow::_init()
 {
 	this->_object->_onHoverChange = [this] (int o, int n){
-		this->_onColorHover(o, n);
+		this->_onColorHover(o, n, true);
 	};
 	if (this->_object->_schema.isCharacterData)
 		this->_effectObject = std::make_unique<EditableObject>("data/effect/", std::string("data/effect/effect.xml"), &this->_palettes[this->_selectedPalette].colors);
@@ -822,9 +823,9 @@ void SpiralOfFate::MainWindow::_init()
 		this->_rePopulateFrameData();
 	});
 	this->_preview->setPalette(&this->_palettes[this->_selectedPalette].colors);
-	this->_pathBak = "./backups/" + std::to_string(++game->lastSwap) + ".bak";
+	this->_pathBak = game->data / "backups" / (std::to_string(++game->lastSwap) + ".bak");
 
-	std::filesystem::create_directories("./backups");
+	std::filesystem::create_directories(game->data / "backups");
 	this->m_renderer = aurora::makeCopied<Renderer>();
 	this->loadLocalizedWidgetsFromFile("assets/gui/editor/animationWindow.gui");
 
@@ -847,7 +848,6 @@ void SpiralOfFate::MainWindow::_init()
 	this->setResizable();
 	this->setCloseBehavior(CloseBehavior::None);
 	this->onClose([this]{
-		// TODO: Check if it needs to be saved
 		std::filesystem::remove(this->_pathBak);
 		this->m_parent->remove(this->shared_from_this());
 		this->onRealClose.emit(this);
@@ -888,7 +888,7 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 	_chrPath(json["folder"]),
 	_character(json["character"]),
 	_fileName(json["fileName"]),
-	_path(json["path"])
+	_path(json["path"].get<std::filesystem::path::string_type>())
 {
 	if (!std::filesystem::exists(game->settings.palettes / this->_character))
 		std::filesystem::create_directories(game->settings.palettes / this->_character);
@@ -908,7 +908,7 @@ SpiralOfFate::MainWindow::MainWindow(const nlohmann::json &json, FrameDataEditor
 		for (size_t i = 0; i < pal.colors.size(); i++)
 			pal.colors[i] = { colors[i][0], colors[i][1], colors[i][2] };
 		pal.colors[0].a = 0;
-		pal.path = palj["path"].get<std::filesystem::path>();
+		pal.path = palj["path"].get<std::filesystem::path::string_type>();
 		pal.modifications = palj["modifications"];
 		pal.name = palj["name"].get<std::string>();
 	}
@@ -983,8 +983,7 @@ SpiralOfFate::MainWindow::MainWindow(const std::string &folder, const std::files
 	_pathInit(true),
 	_title(frameDataPath.string()),
 	_chrPath(folder),
-	_path(frameDataPath),
-	_pathBak(frameDataPath)
+	_path(frameDataPath)
 {
 	if (!this->_chrPath.ends_with('/'))
 		this->_chrPath.push_back('/');
@@ -1308,10 +1307,10 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	this->_requireAutoSave = true;
 }
 
-void SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
+bool SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
 {
 	this->setPath(path);
-	this->save();
+	return this->save();
 }
 
 void SpiralOfFate::MainWindow::setPath(const std::filesystem::path &path)
@@ -1319,7 +1318,12 @@ void SpiralOfFate::MainWindow::setPath(const std::filesystem::path &path)
 	this->_path = path;
 }
 
-void SpiralOfFate::MainWindow::save()
+void SpiralOfFate::MainWindow::setBakPath(const std::filesystem::path &path)
+{
+	this->_pathBak = path;
+}
+
+bool SpiralOfFate::MainWindow::save()
 {
 	if (this->_pendingTransaction)
 		this->commitTransaction();
@@ -1333,9 +1337,9 @@ void SpiralOfFate::MainWindow::save()
 
 			// FIXME: strerror only works on Linux (err.message()?)
 			// TODO: Somehow return the message box so the caller can open the save as dialog when OK is clicked
-			SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
+			Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
 			game->logger.error(err);
-			return;
+			return false;
 		}
 		stream << j;
 		stream.close();
@@ -1345,8 +1349,10 @@ void SpiralOfFate::MainWindow::save()
 		for (auto &pal : this->_palettes)
 			pal.modifications = 0;
 		this->_requireReloadPal = true;
-		return;
+		return true;
 	}
+
+	bool result = true;
 
 	if (this->isFramedataModified()) {
 		ShadyCore::FileType::Format format;
@@ -1393,9 +1399,9 @@ void SpiralOfFate::MainWindow::save()
 
 			// FIXME: strerror only works on Linux (err.message()?)
 			// TODO: Somehow return the message box so the caller can open the save as dialog when OK is clicked
-			SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
+			Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
 			game->logger.error(err);
-			return;
+			return false;
 		}
 		ShadyCore::getResourceWriter({ShadyCore::FileType::TYPE_SCHEMA, format})(&schema, stream);
 		stream.close();
@@ -1411,8 +1417,9 @@ void SpiralOfFate::MainWindow::save()
 		} catch (std::exception &e) {
 			auto err = this->localize("error.open", pal.path.string(), e.what());
 
-			SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
+			Utils::dispMsg(game->gui, this->localize("message_box.title.save_err"), err, MB_ICONERROR);
 			game->logger.error(err);
+			result = false;
 			continue;
 		}
 
@@ -1436,7 +1443,7 @@ void SpiralOfFate::MainWindow::save()
 			auto err = this->localize("error.open", pal.path.string(), strerror(errno));
 
 			// FIXME: strerror only works on Linux (err.message()?)
-			SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_pal_err"), err, MB_ICONERROR);
+			Utils::dispMsg(game->gui, this->localize("message_box.title.save_pal_err"), err, MB_ICONERROR);
 			game->logger.error(err);
 			continue;
 		}
@@ -1456,36 +1463,35 @@ void SpiralOfFate::MainWindow::save()
 	this->_operationSaved = this->_operationIndex;
 	this->autoSave();
 	this->_requireReloadPal = true;
+	return result;
 }
 
 void SpiralOfFate::MainWindow::exportPalette(const std::filesystem::path &path)
 {
 	auto &pal = this->_palettes[this->_selectedPalette];
 	ShadyCore::Palette palette;
-	auto ptr = new uint32_t[256];
 	ShadyCore::FileType::Format format;
 
 	if (path.extension() == ".act")
 		format = ShadyCore::FileType::PALETTE_ACT;
 	else
 		format = ShadyCore::FileType::PALETTE_PAL;
-	palette.bitsPerPixel = 32;
-	palette.data = reinterpret_cast<uint8_t *>(ptr);
+	palette.initialize(32);
 	for (size_t i = 0; i < pal.colors.size(); i++)
-		palette.data[i] =
+		reinterpret_cast<uint32_t *>(palette.data)[i] =
 			(i == 0 ? 0x00000000 : 0xFF000000) |
 			pal.colors[i].r << 16 |
 			pal.colors[i].g << 8 |
 			pal.colors[i].b << 0;
 	palette.pack();
 
-	std::ofstream pstream{pal.path, std::ios::binary};
+	std::ofstream pstream{path, std::ios::binary};
 
 	if (pstream.fail()) {
-		auto err = this->localize("error.open", pal.path.string(), strerror(errno));
+		auto err = this->localize("error.open", path.string(), strerror(errno));
 
 		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.save_pal_err"), err, MB_ICONERROR);
+		Utils::dispMsg(game->gui, this->localize("message_box.title.save_pal_err"), err, MB_ICONERROR);
 		game->logger.error(err);
 		return;
 	}
@@ -1511,7 +1517,7 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 		auto err = this->localize("error.open", path.string(), strerror(errno));
 
 		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, this->localize("message_box.title.open_pal_err"), err, MB_ICONERROR);
+		Utils::dispMsg(game->gui, this->localize("message_box.title.open_pal_err"), err, MB_ICONERROR);
 		game->logger.error(err);
 		return;
 	}
@@ -1653,7 +1659,7 @@ nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 	auto &framedata = json["framedata"];
 	auto &palettes = json["palettes"];
 
-	json["path"] = this->_path;
+	json["path"] = this->_path.native();
 	json["title"] = this->_title;
 	json["folder"] = this->_chrPath;
 	json["fileName"] = this->_fileName;
@@ -1691,7 +1697,7 @@ nlohmann::json SpiralOfFate::MainWindow::_asJson() const
 
 		for (auto &c : palette.colors)
 			colors.push_back({c.r, c.g, c.b});
-		palj["path"] = palette.path;
+		palj["path"] = palette.path.native();
 		palj["modifications"] = palette.modifications;
 		palj["name"] = palette.name.toStdString();
 	}
@@ -1706,7 +1712,7 @@ void SpiralOfFate::MainWindow::autoSave()
 
 	if (stream.fail()) {
 		// FIXME: strerror only works on Linux (err.message()?)
-		SpiralOfFate::Utils::dispMsg(game->gui, "Saving failed", this->_pathBak.string() + ": " + strerror(errno), MB_ICONERROR);
+		Utils::dispMsg(game->gui, "Saving failed", this->_pathBak.string() + ": " + strerror(errno), MB_ICONERROR);
 		return;
 	}
 	stream << j;
@@ -2387,12 +2393,12 @@ void SpiralOfFate::MainWindow::_placeUIHooks(tgui::Container &container)
 				this->_populateColorData(container);
 			});
 			button->onMouseEnter([this, i]{
-				this->_onColorHover(this->_object->_paletteIndex, i);
+				this->_onColorHover(this->_object->_paletteIndex, i, false);
 				this->_object->_paletteIndex = i;
 				this->_object->_needGenerate = true;
 			});
 			button->onMouseLeave([this]{
-				this->_onColorHover(this->_object->_paletteIndex, -1);
+				this->_onColorHover(this->_object->_paletteIndex, -1, false);
 				this->_object->_paletteIndex = -1;
 			});
 		}
@@ -3454,7 +3460,7 @@ void SpiralOfFate::MainWindow::tick()
 		}
 	}
 	this->_object->tick();
-	if (!this->_paused)
+	if (!this->_paused && !this->_paused2)
 		this->_object->update();
 	if (this->_effectObject) {
 		this->_effectObject->tick();
@@ -3594,7 +3600,7 @@ void SpiralOfFate::MainWindow::reloadLabels()
 	this->_effectLabels.clear();
 	this->_loadLabelFor(this->_effectLabels, "effect");
 	if (this->_object->_schema.isCharacterData) {
-		this->_loadLabelFor(this->_labels, "common");
+		this->_loadLabelFor(this->_labels, "_common");
 		if (this->_pathInit && this->_loadLabelFor(this->_labels, this->_character, this->_path.parent_path()))
 			return;
 		if (this->_loadLabelFor(this->_labels, this->_character, this->_chrPath))
@@ -3604,7 +3610,6 @@ void SpiralOfFate::MainWindow::reloadLabels()
 		this->_loadLabelFor(this->_labels, "stand");
 	else
 		this->_loadLabelFor(this->_labels, this->_character);
-
 }
 
 bool SpiralOfFate::MainWindow::hasPath() const

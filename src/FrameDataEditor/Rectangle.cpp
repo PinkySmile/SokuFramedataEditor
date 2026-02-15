@@ -4,7 +4,7 @@
 
 #include "Rectangle.hpp"
 
-bool Rectangle::contains(const SpiralOfFate::Vector2f &point)
+bool FDE::Rectangle::contains(const SpiralOfFate::Vector2f &point)
 
 {
 	// 0 <= dot(AB,AM) <= dot(AB,AB) &&

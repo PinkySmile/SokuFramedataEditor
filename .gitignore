@@ -30,6 +30,8 @@
 *.exe
 *.out
 *.app
+*.AppImage
+*.zip
 
 # CMake build folders
 cmake-build-*

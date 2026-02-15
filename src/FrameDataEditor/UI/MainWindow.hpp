@@ -70,9 +70,10 @@ namespace SpiralOfFate
 		void pasteFrame();
 		void pasteBoxData();
 		void pasteAnimData();
-		void save();
-		void save(const std::filesystem::path &path);
+		bool save();
+		bool save(const std::filesystem::path &path);
 		void setPath(const std::filesystem::path &path);
+		void setBakPath(const std::filesystem::path &path);
 		void autoSave();
 		void applyOperation(Operation *operation);
 		void startTransaction(Operation *operation = nullptr);
@@ -154,6 +155,7 @@ namespace SpiralOfFate
 		int _modifications = 0;
 		unsigned char _timer = 0;
 		bool _paused = true;
+		bool _paused2 = false;
 		bool _showingPalette = false;
 		bool _requireReload = false;
 		bool _requireReloadPal = false;
@@ -188,7 +190,7 @@ namespace SpiralOfFate
 		bool _loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name);
 		bool _loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name, const std::string &folder);
 		bool _loadLabelFor(std::map<unsigned, std::string> &labels, const std::string &name, const std::filesystem::path &folder);
-		void _onColorHover(int oColor, int nColor);
+		void _onColorHover(int oColor, int nColor, bool shouldPause);
 		void _init();
 		void _autoSaveLoop();
 		void _onPaletteChanged();

@@ -77,9 +77,48 @@ SpiralOfFate::FrameDataEditor::~FrameDataEditor()
 	this->saveSettings();
 }
 
+tgui::FileDialog::Ptr SpiralOfFate::FrameDataEditor::openFileDialog(tgui::Gui &gui, const std::string &title, const std::filesystem::path &basePath, bool overWriteWarning, bool mustExist)
+{
+	auto dialog = Utils::openFileDialog(gui, title, basePath, overWriteWarning, mustExist);
+
+	dialog->setFilenameLabelText(this->localize("message_box.filename"));
+	dialog->setConfirmButtonText(this->localize("message_box.button.open"));
+	dialog->setCancelButtonText(this->localize("message_box.button.cancel"));
+	dialog->setListViewColumnCaptions(this->localize("column.name"), this->localize("column.size"), this->localize("column.modified"));
+	return dialog;
+}
+
+tgui::FileDialog::Ptr SpiralOfFate::FrameDataEditor::saveFileDialog(tgui::Gui &gui, const std::string &title, const std::filesystem::path &basePath)
+{
+	auto dialog = Utils::saveFileDialog(gui, title, basePath);
+
+	dialog->setFilenameLabelText(this->localize("message_box.filename"));
+	dialog->setConfirmButtonText(this->localize("message_box.button.save"));
+	dialog->setCancelButtonText(this->localize("message_box.button.cancel"));
+	dialog->setListViewColumnCaptions(this->localize("column.name"), this->localize("column.size"), this->localize("column.modified"));
+	return dialog;
+}
+
 void SpiralOfFate::FrameDataEditor::_reloadCrashData()
 {
-	// TODO: Not implemented
+	std::error_code err;
+	unsigned v = 0;
+
+	for (const auto &entry : std::filesystem::directory_iterator(game->data / "backups", err)) {
+		std::filesystem::path path = entry;
+
+		if (this->_openPatternFileJson(path))
+			this->_focusedWindow->setBakPath(path);
+		game->lastSwap = std::max<unsigned>(game->lastSwap, std::stoul(path.filename().stem()));
+		++v;
+	}
+	if (v != 0)
+		Utils::dispMsg(
+			game->gui,
+			this->localize("message_box.title.recovery"),
+			this->localize("message_box.recovery", std::to_string(v)),
+			MB_ICONINFORMATION
+		);
 }
 
 void SpiralOfFate::FrameDataEditor::reloadGamePackages()
@@ -184,19 +223,49 @@ bool SpiralOfFate::FrameDataEditor::closeAll()
 {
 	auto vec = this->_openWindows;
 
-	// TODO: Actually end the program if all popups are answered with no
-	for (auto &widget : vec)
-		if (!widget->isFramedataModified() && !widget->arePalettesModified())
+	if (!std::ranges::any_of(vec, [](const MainWindow::Ptr &widget) { return widget->isFramedataModified() || widget->arePalettesModified(); })) {
+		for (auto &widget : vec)
 			widget->close();
-	if (this->_openWindows.empty())
+		game->screen->close();
 		return true;
-	Utils::dispMsg(game->gui, this->localize("message_box.title.not_saved"), this->localize("message_box.not_saved"), MB_ICONINFORMATION);
+	}
+
+	auto dialog = tgui::MessageBox::create(
+		this->localize("message_box.title.not_saved"),
+		this->localize("message_box.not_saved"),
+		{
+			this->localize("message_box.button.yes"),
+			this->localize("message_box.button.no"),
+			this->localize("message_box.button.cancel")
+		 }
+	);
+
+	Utils::openWindowWithFocus(game->gui, 0, 0, dialog);
+	dialog->onButtonPress([this, vec](const std::weak_ptr<tgui::MessageBox> &d, const tgui::String &text){
+		if (text == this->localize("message_box.button.yes")) {
+			bool noError = true;
+
+			for (auto &widget : vec) {
+				if (widget->save())
+					widget->close();
+				else
+					noError = false;
+			}
+			if (noError)
+				game->screen->close();
+		} else if (text == this->localize("message_box.button.no")) {
+			for (auto &widget : vec)
+				widget->close();
+			game->screen->close();
+		}
+		d.lock()->close();
+	}, std::weak_ptr(dialog));
 	return false;
 }
 
 void SpiralOfFate::FrameDataEditor::_loadSettings()
 {
-	std::ifstream stream{"editorSettings.json"};
+	std::ifstream stream{game->config / "editorSettings.json"};
 	nlohmann::json json;
 
 	if (!stream.fail()) {
@@ -212,13 +281,12 @@ void SpiralOfFate::FrameDataEditor::_loadSettings()
 		return;
 	}
 	if (errno != ENOENT)
-		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
+		throw std::runtime_error("Cannot open settings file: " + (game->config / "editorSettings.json").string() + ": " + std::string(strerror(errno)));
 	this->restoreDefaultShortcuts(this->_shortcutsNames);
 }
 
 void SpiralOfFate::FrameDataEditor::saveSettings()
 {
-	std::ofstream stream{"editorSettings.json"};
 	nlohmann::json json = {
 		{ "locale", this->_locale },
 		{ "shortcuts", nlohmann::json::object() }
@@ -227,8 +295,10 @@ void SpiralOfFate::FrameDataEditor::saveSettings()
 	for (const auto &[name, shortcut] : this->_shortcutsNames)
 		to_json(json["shortcuts"][name], shortcut);
 
+	std::ofstream stream{game->config / "editorSettings.json"};
+
 	if (!stream)
-		throw std::runtime_error("Cannot open settings file: editorSettings.json: " + std::string(strerror(errno)));
+		throw std::runtime_error("Cannot open settings file: " + (game->config / "editorSettings.json").string() + ": " + std::string(strerror(errno)));
 	stream << json.dump(4);
 }
 
@@ -498,18 +568,16 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 	auto list = tgui::ListView::create();
 	std::vector<std::tuple<std::string, std::string, std::string>> columns;
 
-	// TODO: Hardcoded strings
-	list->addColumn("Character", 200, tgui::HorizontalAlignment::Right);
-	list->addColumn("Type", 150, tgui::HorizontalAlignment::Right);
-	list->addColumn("Path", 0, tgui::HorizontalAlignment::Left);
+	list->addColumn(this->localize("column.character"), 200, tgui::HorizontalAlignment::Right);
+	list->addColumn(this->localize("column.type"), 150, tgui::HorizontalAlignment::Right);
+	list->addColumn(this->localize("column.path"), 0, tgui::HorizontalAlignment::Left);
 	list->setColumnExpanded(2, true);
 
 	for (auto &pat : this->_patterns) {
 		auto pos = pat.find_last_of('/');
 
 		if (pos == std::string::npos) {
-			// TODO: Hardcoded strings
-			columns.emplace_back("Unknown", "Unknown", pat);
+			columns.emplace_back(this->localize("type.unknown"), this->localize("type.unknown"), pat);
 			continue;
 		}
 
@@ -517,7 +585,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 		auto extPos = name.find_last_of('.');
 		auto nameNoExt = name.substr(0, extPos);
 
-		if (pat.starts_with("data/character/src")) {
+		if (pat.starts_with("data/character/src/")) {
 			// FIXME: Dirty hack
 			continue;
 		}
@@ -537,11 +605,9 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 				cap = c == '/';
 			}
 			if (chr != nameNoExt)
-				// TODO: Hardcoded strings
-				columns.emplace_back(fullChrName, "Unknown", pat);
+				columns.emplace_back(fullChrName, this->localize("type.unknown"), pat);
 			else
-				// TODO: Hardcoded strings
-				columns.emplace_back(fullChrName, "Main pattern", pat);
+				columns.emplace_back(fullChrName, this->localize("type.main_pat"), pat);
 		} else if (pat.starts_with("data/scene/select/character/") && nameNoExt == "stand") {
 			auto fullChr = pat.substr(28, pos - 28);
 			std::string fullChrName;
@@ -555,8 +621,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 					fullChrName.push_back(std::tolower(c));
 				cap = c == '/';
 			}
-			// TODO: Hardcoded strings
-			columns.emplace_back(fullChrName, "Chr select stand", pat);
+			columns.emplace_back(fullChrName, this->localize("type.chr_sel_pat"), pat);
 		} else if (pat.starts_with("data/") && nameNoExt == "effect") {
 			auto fullChr = pat.substr(5, pos - 5);
 			std::string fullChrName;
@@ -572,12 +637,9 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 					fullChrName.push_back(std::tolower(c));
 				cap = false;
 			}
-			// TODO: Hardcoded strings
-			columns.emplace_back(fullChrName, "Effect", pat);
-		} else {
-			// TODO: Hardcoded strings
-			columns.emplace_back("Unknown", "Unknown", pat);
-		}
+			columns.emplace_back(fullChrName, this->localize("type.effect"), pat);
+		} else
+			columns.emplace_back(this->localize("type.unknown"), this->localize("type.unknown"), pat);
 	}
 	auto compChr = [](const std::tuple<std::string, std::string, std::string> &a, const std::tuple<std::string, std::string, std::string> &b)-> bool  {
 		auto fa1 = std::get<0>(a);
@@ -652,7 +714,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 
 void SpiralOfFate::FrameDataEditor::_loadFramedata()
 {
-	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_framedata"));
+	auto file = this->openFileDialog(game->gui, this->localize("message_box.title.open_framedata"));
 
 	file->setFileTypeFilters({
 		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
@@ -698,6 +760,15 @@ void SpiralOfFate::FrameDataEditor::_explorePackage()
 	file->setPath("");
 	Utils::openWindowWithFocus(game->gui, 1200, 450, file);
 
+	file->setFilenameLabelText(this->localize("message_box.filename"));
+	file->setConfirmButtonText(this->localize("message_box.button.open"));
+	file->setCancelButtonText(this->localize("message_box.button.cancel"));
+	file->setListViewColumnCaptions(
+		this->localize("column.name"),
+		this->localize("column.size"),
+		this->localize("column.type"),
+		this->localize("column.format")
+	);
 	file->setFileTypeFilters({
 		{this->localize("file_type.text"), {"*.txt", "*.cv0"}},
 		{this->localize("file_type.table"), {"*.csv", "*.cv1"}},
@@ -719,12 +790,11 @@ void SpiralOfFate::FrameDataEditor::_explorePackage()
 
 void SpiralOfFate::FrameDataEditor::_explorePackageFile()
 {
-	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.open_package"));
+	auto file = this->openFileDialog(game->gui, this->localize("message_box.title.open_package"));
 
 	file->setSize(750, 450);
 	file->setFileMustExist(true);
 	file->setPath(tgui::Filesystem::Path(std::filesystem::current_path()));
-	Utils::openWindowWithFocus(game->gui, 0, 0, file);
 	file->setFileTypeFilters({
 		{this->localize("file_type.res_dat"), {"*.dat"}},
 		{this->localize("file_type.res_zip"), {"*.zip"}},
@@ -748,6 +818,15 @@ void SpiralOfFate::FrameDataEditor::_explorePackageFile()
 
 		auto file = tgui::PackageFileDialog::create(package, true, arr[0].asNativeString(), "Open");
 
+		file->setFilenameLabelText(this->localize("message_box.filename"));
+		file->setConfirmButtonText(this->localize("message_box.button.open"));
+		file->setCancelButtonText(this->localize("message_box.button.cancel"));
+		file->setListViewColumnCaptions(
+			this->localize("column.name"),
+			this->localize("column.size"),
+			this->localize("column.type"),
+			this->localize("column.format")
+		);
 		file->setFileMustExist(true);
 		file->setPath("");
 		Utils::openWindowWithFocus(game->gui, 1200, 450, file);
@@ -770,7 +849,7 @@ void SpiralOfFate::FrameDataEditor::_explorePackageFile()
 
 void SpiralOfFate::FrameDataEditor::_exportPalette()
 {
-	auto file = Utils::saveFileDialog(game->gui, this->localize("message_box.title.export_palette"), this->_focusedWindow->getPath());
+	auto file = this->saveFileDialog(game->gui, this->localize("message_box.title.export_palette"), this->_focusedWindow->getPath());
 
 	file->setFileTypeFilters({
 		{this->localize("file_type.palette"), {"*.act", "*.pal"}},
@@ -787,7 +866,7 @@ void SpiralOfFate::FrameDataEditor::_exportPalette()
 
 void SpiralOfFate::FrameDataEditor::_importPalette()
 {
-	auto file = Utils::openFileDialog(game->gui, this->localize("message_box.title.import_palette"), this->_focusedWindow->getPath());
+	auto file = this->openFileDialog(game->gui, this->localize("message_box.title.import_palette"), this->_focusedWindow->getPath());
 
 	file->setFileTypeFilters({
 		{this->localize("file_type.palette"), {"*.act", "*.pal"}},
@@ -808,7 +887,7 @@ void SpiralOfFate::FrameDataEditor::_save()
 
 void SpiralOfFate::FrameDataEditor::_saveAs()
 {
-	auto file = Utils::saveFileDialog(game->gui, this->localize("message_box.title.save_framedata"), this->_focusedWindow->getPath());
+	auto file = this->saveFileDialog(game->gui, this->localize("message_box.title.save_framedata"), this->_focusedWindow->getPath());
 
 	file->setFileTypeFilters({
 		{this->localize("file_type.framedata"), {"*.pat", "*.xml"}},
@@ -854,8 +933,7 @@ void SpiralOfFate::FrameDataEditor::_editShortcuts()
 
 void SpiralOfFate::FrameDataEditor::_quit()
 {
-	if (this->closeAll())
-		game->screen->close();
+	this->closeAll();
 }
 
 void SpiralOfFate::FrameDataEditor::_navToNextFrame()
@@ -1036,7 +1114,7 @@ void SpiralOfFate::FrameDataEditor::_about()
 	auto window = Utils::openWindowWithFocus(game->gui, 470, 150);
 
 	window->loadWidgetsFromFile("assets/gui/editor/about.gui");
-	window->setTitle("About FrameDataEditor");
+	window->setTitle(this->localize("message_box.title.about"));
 	window->get<tgui::Label>("Version")->setText(VERSION_STR);
 }
 

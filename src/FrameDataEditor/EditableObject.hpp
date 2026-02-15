@@ -6,6 +6,7 @@
 #define BATTLE_EDITABLEOBJECT_HPP
 
 
+#include <vector>
 #include <LibCore.hpp>
 #include "Rectangle.hpp"
 
@@ -15,7 +16,7 @@ public:
 	sf::Sprite _overlaySprite{this->_overlayTexture};
 	sf::Texture _overlayTexture;
 	SpiralOfFate::FrameData::LoadedSchema _schema;
-	SpiralOfFate::Vector2f _mousePos = {0, 0};
+	std::optional<SpiralOfFate::Vector2f> _mousePos = {};
 	unsigned _action = 0;
 	unsigned _actionBlock = 0;
 	unsigned _animation = 0;
@@ -30,9 +31,9 @@ public:
 
 	SpiralOfFate::Vector2f _mousePosToImgPos(const SpiralOfFate::Vector2i &mouse);
 	void _generateOverlaySprite();
-	std::vector<Rectangle> _getModifiedBoxes(const SpiralOfFate::FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const;
-	std::vector<Rectangle> _getModifiedHurtBoxes() const;
-	std::vector<Rectangle> _getModifiedHitBoxes() const;
+	std::vector<FDE::Rectangle> _getModifiedBoxes(const SpiralOfFate::FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const;
+	std::vector<FDE::Rectangle> _getModifiedHurtBoxes() const;
+	std::vector<FDE::Rectangle> _getModifiedHitBoxes() const;
 
 	EditableObject() = default;
 	EditableObject(const std::string &folder, const std::string &frameData, const std::array<SpiralOfFate::Color, 256> *palette);

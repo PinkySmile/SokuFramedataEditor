@@ -23,7 +23,7 @@ namespace SpiralOfFate
 		std::filesystem::path soku2;
 		std::vector<std::filesystem::path> extra;
 
-		Settings(const std::filesystem::path &path);
+		Settings(const std::filesystem::path &data, const std::filesystem::path &path);
 		~Settings();
 		void save();
 	};

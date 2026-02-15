@@ -79,7 +79,7 @@ ShadyCore::Schema::Sequence::BBox *SpiralOfFate::PreviewWidget::getSelectedBoxRe
 	return &data.cBoxes.front();
 }
 
-void SpiralOfFate::PreviewWidget::_drawBox(const Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const
+void SpiralOfFate::PreviewWidget::_drawBox(const FDE::Rectangle &box, const Color &color, sf::RenderStates &states, bool hovered, bool selected) const
 {
 	sf::VertexArray arr{ sf::PrimitiveType::TriangleFan, 4 };
 	sf::VertexArray arr2{ sf::PrimitiveType::LineStrip, 5 };
@@ -101,7 +101,7 @@ void SpiralOfFate::PreviewWidget::_drawBox(const Rectangle &box, const Color &co
 	game->screen->draw(arr2, states);
 }
 
-void SpiralOfFate::PreviewWidget::_drawBoxBorder(const Rectangle &box, sf::RenderStates &states) const
+void SpiralOfFate::PreviewWidget::_drawBoxBorder(const FDE::Rectangle &box, sf::RenderStates &states) const
 {
 	sf::RectangleShape rect;
 
@@ -187,7 +187,7 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 				static_cast<unsigned>(box.right - box.left),
 				static_cast<unsigned>(box.down  - box.up)
 			};
-			Rectangle rect{
+			FDE::Rectangle rect{
 				realPos + pos,
 				realPos + Vector2f{
 					static_cast<float>(pos.x),
@@ -213,7 +213,7 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	}
 }
 
-void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const Rectangle &box, const tgui::Vector2f &pos, tgui::Cursor::Type &cursor)
+void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const FDE::Rectangle &box, const tgui::Vector2f &pos, tgui::Cursor::Type &cursor)
 {
 	Vector2f centers[] = {
 		box.pt1,
@@ -229,7 +229,7 @@ void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const Rectangle &box, co
 
 	this->_cornerHovered = 0;
 	for (size_t i = 0; i < std::size(centers); i++) {
-		Rectangle rect{
+		FDE::Rectangle rect{
 			(centers[i] + Vector2f{-DRAG_CORNER_SIZE / 2.f, -DRAG_CORNER_SIZE / 2.f}).rotation(angle, centers[i]),
 			(centers[i] + Vector2f{ DRAG_CORNER_SIZE / 2.f, -DRAG_CORNER_SIZE / 2.f}).rotation(angle, centers[i]),
 			(centers[i] + Vector2f{ DRAG_CORNER_SIZE / 2.f,  DRAG_CORNER_SIZE / 2.f}).rotation(angle, centers[i]),
@@ -271,7 +271,7 @@ void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const tgui::Vector2f &po
 			static_cast<unsigned>(box.right - box.left),
 			static_cast<unsigned>(box.down  - box.up)
 		};
-		Rectangle rect{
+		FDE::Rectangle rect{
 			realPos + _pos,
 			realPos + Vector2f{
 				static_cast<float>(_pos.x),
@@ -334,7 +334,7 @@ void SpiralOfFate::PreviewWidget::_updateHover(const tgui::Vector2f &pos)
 			static_cast<unsigned>(box.down  - box.up)
 		};
 		Vector2f realPos = {0, 0};
-		Rectangle rect{
+		FDE::Rectangle rect{
 			realPos + _pos,
 			realPos + Vector2f{
 				static_cast<float>(_pos.x),
