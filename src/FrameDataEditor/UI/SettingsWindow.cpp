@@ -78,6 +78,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		auto locale = id.substr(pos + 1);
 
 		editor.setLocale(locale.toStdString());
+		Utils::setRenderer(game->gui);
 	});
 	theme->onItemSelect([this, setArrowColor, extraUp, extraDown, &editor](const tgui::String &, const tgui::String &id){
 		tgui::Theme::setDefault(tgui::Theme::create("assets/gui/themes/" + id + ".style"));

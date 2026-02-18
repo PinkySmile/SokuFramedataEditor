@@ -146,6 +146,7 @@ namespace SpiralOfFate::Utils
 
 		if (renderer)
 			widget.setRenderer(renderer);
+		widget.setInheritedFont(tgui::Font::getGlobalFont());
 		for (auto &w : widget.getWidgets()) {
 			try {
 				if (!w->getUserData<bool>())
@@ -169,6 +170,7 @@ namespace SpiralOfFate::Utils
 				Utils::setRenderer(c);
 			else
 				Utils::setRenderer(w);
+			w->setInheritedFont(tgui::Font::getGlobalFont());
 		}
 	}
 

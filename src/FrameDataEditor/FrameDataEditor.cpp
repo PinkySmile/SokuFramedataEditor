@@ -200,7 +200,7 @@ void SpiralOfFate::FrameDataEditor::restoreDefaultShortcuts(std::map<std::string
 	shortcuts["menu_item.navigate.previous_block"]  = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = false, .shift = true,  .meta = false };
 	shortcuts["menu_item.navigate.next_action"]     = { .code = sf::Keyboard::Key::Right,  .alt = false, .control = true,  .shift = false, .meta = false };
 	shortcuts["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::Left,   .alt = false, .control = true,  .shift = false, .meta = false };
-	shortcuts["menu_item.navigate.previous_action"] = { .code = sf::Keyboard::Key::G,      .alt = false, .control = true,  .shift = false, .meta = false };
+	shortcuts["menu_item.navigate.go_to"]           = { .code = sf::Keyboard::Key::G,      .alt = false, .control = true,  .shift = false, .meta = false };
 
 	shortcuts["menu_item.new.frame"]                = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = false, .meta = false };
 	shortcuts["menu_item.new.frame_end"]            = { .code = sf::Keyboard::Key::F,      .alt = false, .control = true,  .shift = true,  .meta = false };
@@ -534,6 +534,11 @@ void SpiralOfFate::FrameDataEditor::setLocale(const std::string &name)
 	this->_localization.clear();
 	if (locale.empty())
 		locale = Utils::getLocale();
+
+	if (std::filesystem::exists("assets/gui/editor/locale/" + locale + "/font.ttf"))
+		tgui::Font::setGlobalFont(tgui::Font("assets/gui/editor/locale/" + locale + "/font.ttf"));
+	else
+		tgui::Font::setGlobalFont(game->defaultFont);
 
 	std::ifstream stream{ "assets/gui/editor/locale/" + locale + "/strings.json" };
 

@@ -153,11 +153,13 @@ namespace SpiralOfFate::Utils
 
 		if (renderer)
 			widget->setRenderer(renderer);
+		widget->setInheritedFont(tgui::Font::getGlobalFont());
 	}
 	template<typename T>
 	void setRenderer(const std::shared_ptr<T> &widget, const std::string &name)
 	{
 		widget->setRenderer(tgui::Theme::getDefault()->getRenderer(name));
+		widget->setInheritedFont(tgui::Font::getGlobalFont());
 	}
 
 	template<>

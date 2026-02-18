@@ -50,6 +50,7 @@ namespace SpiralOfFate
 
 		float _timer = 0;
 		sf::Clock _clock;
+		tgui::Font font = tgui::Font::getGlobalFont();
 		std::vector<std::string> _patterns;
 		std::shared_ptr<class ShortcutsWindow> _shortcutWindow;
 		std::map<std::string, Shortcut> _shortcutsNames;
