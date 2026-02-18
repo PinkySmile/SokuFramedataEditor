@@ -571,10 +571,17 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 {
 	auto win = Utils::openWindowWithFocus(game->gui, 1200, 800);
 	auto list = tgui::ListView::create();
-	std::vector<std::tuple<std::string, std::string, std::string>> columns;
+	typedef std::tuple<std::string, std::string, std::string, unsigned> Column;
+	std::vector<Column> columns;
+	enum ColumnType {
+		TYPE_MAIN_PATTERN,
+		TYPE_STAND_PATTERN,
+		TYPE_EFFECT,
+		TYPE_UNKNOWN
+	};
 
 	list->addColumn(this->localize("column.character"), 200, tgui::HorizontalAlignment::Right);
-	list->addColumn(this->localize("column.type"), 150, tgui::HorizontalAlignment::Right);
+	list->addColumn(this->localize("column.type"), 250, tgui::HorizontalAlignment::Right);
 	list->addColumn(this->localize("column.path"), 0, tgui::HorizontalAlignment::Left);
 	list->setColumnExpanded(2, true);
 
@@ -582,7 +589,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 		auto pos = pat.find_last_of('/');
 
 		if (pos == std::string::npos) {
-			columns.emplace_back(this->localize("type.unknown"), this->localize("type.unknown"), pat);
+			columns.emplace_back(this->localize("type.unknown"), this->localize("type.unknown"), pat, TYPE_UNKNOWN);
 			continue;
 		}
 
@@ -610,9 +617,9 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 				cap = c == '/';
 			}
 			if (chr != nameNoExt)
-				columns.emplace_back(fullChrName, this->localize("type.unknown"), pat);
+				columns.emplace_back(fullChrName, this->localize("type.unknown"), pat, TYPE_UNKNOWN);
 			else
-				columns.emplace_back(fullChrName, this->localize("type.main_pat"), pat);
+				columns.emplace_back(fullChrName, this->localize("type.main_pat"), pat, TYPE_MAIN_PATTERN);
 		} else if (pat.starts_with("data/scene/select/character/") && nameNoExt == "stand") {
 			auto fullChr = pat.substr(28, pos - 28);
 			std::string fullChrName;
@@ -626,7 +633,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 					fullChrName.push_back(std::tolower(c));
 				cap = c == '/';
 			}
-			columns.emplace_back(fullChrName, this->localize("type.chr_sel_pat"), pat);
+			columns.emplace_back(fullChrName, this->localize("type.chr_sel_pat"), pat, TYPE_STAND_PATTERN);
 		} else if (pat.starts_with("data/") && nameNoExt == "effect") {
 			auto fullChr = pat.substr(5, pos - 5);
 			std::string fullChrName;
@@ -642,18 +649,18 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 					fullChrName.push_back(std::tolower(c));
 				cap = false;
 			}
-			columns.emplace_back(fullChrName, this->localize("type.effect"), pat);
+			columns.emplace_back(fullChrName, this->localize("type.effect"), pat, TYPE_EFFECT);
 		} else
-			columns.emplace_back(this->localize("type.unknown"), this->localize("type.unknown"), pat);
+			columns.emplace_back(this->localize("type.unknown"), this->localize("type.unknown"), pat, TYPE_UNKNOWN);
 	}
-	auto compChr = [](const std::tuple<std::string, std::string, std::string> &a, const std::tuple<std::string, std::string, std::string> &b)-> bool  {
+	auto compChr = [](const Column &a, const Column &b)-> bool  {
 		auto fa1 = std::get<0>(a);
 		auto fb1 = std::get<0>(b);
 
 		if (fa1 != fb1)
 			return fa1 < fb1;
-		auto fa2 = std::get<1>(a);
-		auto fb2 = std::get<1>(b);
+		auto fa2 = std::get<3>(a);
+		auto fb2 = std::get<3>(b);
 
 		if (fa2 != fb2)
 			return fa2 < fb2;
@@ -663,9 +670,9 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 
 		return fa3 < fb3;
 	};
-	auto compType = [](const std::tuple<std::string, std::string, std::string> &a, const std::tuple<std::string, std::string, std::string> &b)-> bool  {
-		auto fa2 = std::get<1>(a);
-		auto fb2 = std::get<1>(b);
+	auto compType = [](const Column &a, const Column &b)-> bool  {
+		auto fa2 = std::get<3>(a);
+		auto fb2 = std::get<3>(b);
 
 		if (fa2 != fb2)
 			return fa2 < fb2;
@@ -681,17 +688,17 @@ void SpiralOfFate::FrameDataEditor::_loadFramedataList()
 
 		return fa3 < fb3;
 	};
-	auto compPath = [](const std::tuple<std::string, std::string, std::string> &a, const std::tuple<std::string, std::string, std::string> &b)-> bool  {
+	auto compPath = [](const Column &a, const Column &b)-> bool  {
 		auto fa3 = std::get<2>(a);
 		auto fb3 = std::get<2>(b);
 
 		return fa3 < fb3;
 	};
-	std::array<std::function<bool (const std::tuple<std::string, std::string, std::string> &a, const std::tuple<std::string, std::string, std::string> &b)>, 3> comparators = {
+	std::array<std::function<bool (const Column &a, const Column &b)>, 3> comparators = {
 		compChr, compType, compPath
 	};
 
-	std::ranges::sort(columns, compChr);
+	std::ranges::sort(columns, compType);
 	win->setTitle(this->localize("message_box.title.open_framedata"));
 	list->setUserData("NO_LOCALE");
 	for (const auto &c : columns)

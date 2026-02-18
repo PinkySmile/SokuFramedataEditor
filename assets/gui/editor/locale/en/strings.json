@@ -51,7 +51,7 @@
 
 	"type.unknown":                                        "Unknown",
 	"type.main_pat":                                       "Main pattern",
-	"type.chr_sel_pat":                                    "Chr select pattern",
+	"type.chr_sel_pat":                                    "Character select pattern",
 	"type.effect":                                         "Effect pattern",
 
 	"file_type.res_folder":                                "Resource folder",

@@ -51,7 +51,7 @@
 
 	"type.unknown":                                        "Inconnu",
 	"type.main_pat":                                       "Patron principal",
-	"type.chr_sel_pat":                                    "Patron sel perso",
+	"type.chr_sel_pat":                                    "Patron de selection de personnage",
 	"type.effect":                                         "Patron d'effets",
 
 	"file_type.res_folder":                                "Dossier de ressources",
