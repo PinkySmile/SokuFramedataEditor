@@ -8,10 +8,8 @@
 	"500": "d.623B (Flare Up)",
 	"501": "d.623 (Flare Up)",
 
-	"505": "a.623B (Rocket Dive)",
-	"506": "a.623C (Rocket Dive)",
-	"505": "j.a.623B (Rocket Dive)",
-	"506": "j.a.623C (Rocket Dive)",
+	"505": "(j.)a.623B (Rocket Dive)",
+	"506": "(j.)a.623C (Rocket Dive)",
 
 	"510": "a.623B (Melting Pummel Kick)",
 	"511": "a.623C(Melting Pummel Kick)",
@@ -36,8 +34,8 @@
 
 	"545": "a.22B (Shooting Sun)",
 	"546": "a.22C (Shooting Sun)",
-	"545": "j.a.22B (Shooting Sun)",
-	"546": "j.a.22C (Shooting Sun)",
+	"547": "j.a.22B (Shooting Sun)",
+	"548": "j.a.22C (Shooting Sun)",
 
 	"550": "a.22B (Hell Wave Cannon)",
 	"551": "a.22C (Hell Wave Cannon)",
@@ -57,7 +55,6 @@
 
 	"570": "a.214B (Vengeful Nuclear Spirits)",
 	"571": "a.214C (Vengeful Nuclear Spirits)",
-
 	"572": "j.a.214B (Vengeful Nuclear Spirits)",
 	"573": "j.a.214C (Vengeful Nuclear Spirits)",
 
@@ -71,7 +68,7 @@
 	"607": "Geothermal \"Nuclear Blaze Geyser\"",
 	"608": "Light Energy \"High Tension Blade\"",
 	"609": "Crow Sign \"Yatagarasu Dive\"",
-	"610": "Nuclear Heat \"Unontrollable Dive\" / (Air)",
+	"610": "Nuclear Heat \"Unontrollable Dive\"",
 	"611": "Control \"Self Tokomak\"",
 	"612": "\"Subterranean Sun\"",
 	"613": "Light Cover \"Nuclear Vision\"",
@@ -80,14 +77,14 @@
 	"650": "Explosion Sign \"Mega Flare\" (Air)",
 	"653": "Burning Star \"Fixed Star\" (Air)",
 	"659": "Crow Sign \"Yatagarasu Dive\" (Air)",
-	"655":"Nuclear Sign \"Creeping Sun\"(Air)",
+	"655":"Nuclear Sign \"Creeping Sun\" (Air)",
 	"662": "\"Subterranean Sun\" (Air)",
 
 	"800": "5B objects",
 	"801": "6B objects",
 	"802": "5C object",
 	"803": "6C object",
-	"804": "j6[a], j2[a] object",
+	"804": "j.6[A], j.2[A] object",
 
 	"810": "Flare Up objects",
 	"811": "Rocket Dive objects",

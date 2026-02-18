@@ -1,5 +1,5 @@
 {
-	"322": "5aaaa",
+	"322": "5AAAA",
 	"411": "6C",
 	"413": "4C",
 	"415": "j.6C",
@@ -63,24 +63,21 @@
 	"572": "j.a.421B (Earth-God Summon: Trap)",
 	"573": "j.a.421C (Earth-God Summon: Trap)",
 
-	"600": "Border Sign \"Quadruple Barrier\"",
-	"601": "Shikigami \"Ran Yakumo\"" ,
-	"602": "Boundary \"Border Between 2D and 3D\"",
-	"603": "Boundary \"Charming Quadruple Barrier\"",
-	"604": "Shikigami \"Chen\"",
-	"605": "Boundary \"Objective Border\"",
-	"606": "Fantasy Nest \"Nest of Fireflies\"",
-	"607": "Aerial Bait \"Laced with Venom\"",
-	"608": "Magic Eye \"The Magic Eye of Laplace\"",
-	"615": "Obsolete Line \"Trip to the Old Station\"",
+	"600": "Prayer \"Charm of Good Commerce\"",
+	"601": "Esoterica \"Grey Thaumaturgy\"",
+	"602": "Esoterica \"Forgotten Ritual\"",
+	"603": "Omikuji \"Random Omikuji Barrage\"",
+	"604": "Sea Opening \"The Day the Sea Split\"",
+	"605": "Sea Opening \"Moses' Miracle\"",
+	"606": "Miracle \"Mid-Day Supernova\"",
+	"607": "Miracle \"Night of the Supernova Storm\"",
+	"610": "Esoterica \"9 Character Pierce\"",
 
-	"656": "Fantasy Nest \"Nest of Fireflies\"(Air)",
-	"657": "Aerial Bait \"Laced with Venom\"(Air)",
-	"658": "Magic Eye \"The Magic Eye of Laplace\"(Air)",
+	"651": "Esoterica \"Grey Thaumaturgy\" (Air)",
 
 
 	"800": "B series objects",
-	"801": "C series objects",
+	"805": "C series objects",
 
 	"810": "Wind Call objects",
 	"811": "Wave Call objects ",
@@ -108,5 +105,7 @@
 	"855": "Moses' Miracle objects",
 	"856": "Mid-Day Supernova objects",
 	"857": "Night of the Supernova Storm objects",
-	"860": "9 Character Pierce objects"
+	"860": "9 Character Pierce objects",
+
+	"950": "Flight wind"
 }
