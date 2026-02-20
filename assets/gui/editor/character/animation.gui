@@ -404,3 +404,13 @@ Label.Label19 {
     Text = "animation.loop";
     TextSize = 13;
 }
+
+Label.Cloned {
+    HorizontalAlignment = Right;
+    Position = (5, 105);
+    Renderer = &2;
+    ScrollbarPolicy = Automatic;
+    Size = (100, 17);
+    Text = "action.cloned";
+    TextSize = 13;
+}

@@ -13,6 +13,7 @@ namespace SpiralOfFate
 {
 	class RemoveMoveOperation : public Operation {
 	private:
+		std::vector<unsigned> _clones;
 		EditableObject &_obj;
 		std::string _name;
 		unsigned _id;

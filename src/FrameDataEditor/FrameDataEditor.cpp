@@ -222,8 +222,11 @@ void SpiralOfFate::FrameDataEditor::restoreDefaultShortcuts(std::map<std::string
 bool SpiralOfFate::FrameDataEditor::closeAll()
 {
 	auto vec = this->_openWindows;
+	auto hasModification = std::ranges::any_of(vec, [](const MainWindow::Ptr &widget) {
+		return widget->isFramedataModified() || widget->arePalettesModified();
+	});
 
-	if (!std::ranges::any_of(vec, [](const MainWindow::Ptr &widget) { return widget->isFramedataModified() || widget->arePalettesModified(); })) {
+	if (!hasModification) {
 		for (auto &widget : vec)
 			widget->close();
 		game->screen->close();
@@ -255,7 +258,7 @@ bool SpiralOfFate::FrameDataEditor::closeAll()
 				game->screen->close();
 		} else if (text == this->localize("message_box.button.no")) {
 			for (auto &widget : vec)
-				widget->close();
+				widget->forceClose();
 			game->screen->close();
 		}
 		d.lock()->close();

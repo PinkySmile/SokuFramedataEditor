@@ -5,6 +5,7 @@
 #include <TGUI/RendererDefines.hpp>
 #include "MainWindow.hpp"
 
+#include <memory>
 #include <ranges>
 
 #include "ColorPlaneWidget.hpp"
@@ -38,6 +39,7 @@
 #include "../Operations/PasteAnimDataOperation.hpp"
 #include "../Operations/PasteBoxDataOperation.hpp"
 #include "Resources/Assert.hpp"
+#include "util/encodingConverter.hpp"
 
 static ColorConversionCb colorConversions[] = {
 	[](unsigned r, unsigned g, unsigned b) {
@@ -507,8 +509,8 @@ do {                                                                            
 
 #define NO_FROMSTRING_PRE(s)
 
-#define STRING_FROM_STRING(s, _, __) s.toStdString()
-#define STRING_TO_STRING(s, _) s
+#define STRING_FROM_STRING(s, _, __) shiftJISEncode(s.toUtf32())
+#define STRING_TO_STRING(s, _) shiftJISDecode(s)
 
 #define HEXNUMBER_FROM_STRING(s, type, _) static_cast<type>(std::stoul(s.toStdString().substr(1), nullptr, 16))
 #define HEXNUMBER_TO_STRING(s, p) ("#" + to_hex(s, p))
@@ -847,6 +849,33 @@ void SpiralOfFate::MainWindow::_init()
 	this->setTitle(this->_title);
 	this->setResizable();
 	this->setCloseBehavior(CloseBehavior::None);
+	this->onClosing([this](bool *abort) {
+		if (this->_forced)
+			return;
+		if (!this->arePalettesModified() && !this->isFramedataModified())
+			return;
+		*abort = true;
+
+		auto dialog = tgui::MessageBox::create(
+			this->localize("message_box.title.not_saved_single"),
+			this->localize("message_box.not_saved_single"),
+			{
+				this->localize("message_box.button.yes"),
+				this->localize("message_box.button.no"),
+				this->localize("message_box.button.cancel")
+			 }
+		);
+
+		Utils::openWindowWithFocus(*this, 0, 0, dialog);
+		dialog->onButtonPress([this](const std::weak_ptr<tgui::MessageBox> &d, const tgui::String &text){
+			if (text == this->localize("message_box.button.yes")) {
+				if (this->save())
+					this->close();
+			} else if (text == this->localize("message_box.button.no"))
+				this->forceClose();
+			d.lock()->close();
+		}, std::weak_ptr(dialog));
+	});
 	this->onClose([this]{
 		std::filesystem::remove(this->_pathBak);
 		this->m_parent->remove(this->shared_from_this());
@@ -1045,7 +1074,12 @@ void SpiralOfFate::MainWindow::refreshMenuItems() const
 	this->_editor.setHasRedo(this->hasRedoData());
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setCanDelBoxes(this->_preview->getSelectedBox().first != BOXTYPE_NONE);
-	this->_editor.setCanDelAction(mov.size() > 1);
+	this->_editor.setCanDelAction(mov.size() > 1 && !std::ranges::all_of(
+		this->_object->_schema.framedata | std::ranges::views::values,
+		[this](const FrameData::Action &a){
+			return a.cloned && a.clonedId == this->_object->_action;
+		}
+	));
 	this->_editor.setCanDelBlock(act.size() > 1);
 	this->_editor.setCanDelFrame(blk.size() > 1);
 	this->_editor.setCanCopyLast(this->_object->_animation > 0);
@@ -1178,7 +1212,7 @@ void SpiralOfFate::MainWindow::pasteAnimData()
 	}
 }
 
-void SpiralOfFate::MainWindow::startTransaction(SpiralOfFate::Operation *operation)
+void SpiralOfFate::MainWindow::startTransaction(Operation *operation)
 {
 	assert_exp(!this->_pendingTransaction);
 
@@ -1316,6 +1350,9 @@ bool SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
 void SpiralOfFate::MainWindow::setPath(const std::filesystem::path &path)
 {
 	this->_path = path;
+	this->_title = path.string();
+	if (this->_modifications == 0)
+		this->_modifications++;
 }
 
 void SpiralOfFate::MainWindow::setBakPath(const std::filesystem::path &path)
@@ -1344,7 +1381,8 @@ bool SpiralOfFate::MainWindow::save()
 		stream << j;
 		stream.close();
 		this->_operationSaved = this->_operationIndex;
-		this->autoSave();
+		if (!this->_autoSaveGone)
+			this->autoSave();
 		this->_modifications = 0;
 		for (auto &pal : this->_palettes)
 			pal.modifications = 0;
@@ -1380,7 +1418,7 @@ bool SpiralOfFate::MainWindow::save()
 			}
 		}
 
-		std::ifstream::openmode mode = std::ifstream::in;
+		std::ifstream::openmode mode = std::ifstream::out;
 
 		if (this->_path.extension() == ".xml")
 			format = ShadyCore::FileType::SCHEMA_XML;
@@ -1461,7 +1499,8 @@ bool SpiralOfFate::MainWindow::save()
 
 	this->_modifications = 0;
 	this->_operationSaved = this->_operationIndex;
-	this->autoSave();
+	if (!this->_autoSaveGone)
+		this->autoSave();
 	this->_requireReloadPal = true;
 	return result;
 }
@@ -1600,18 +1639,22 @@ void SpiralOfFate::MainWindow::importPalette(const std::filesystem::path &path)
 
 void SpiralOfFate::MainWindow::_autoSaveLoop()
 {
-	while (!this->_stopped) {
-		for (size_t i = 0; i < 100; i++) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			if (this->_stopped)
-				return;
+	try {
+		while (!this->_stopped) {
+			for (size_t i = 0; i < 100; i++) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				if (this->_stopped)
+					return;
+			}
+
+			std::lock_guard guard{this->_saveMutex};
+
+			if (this->_pendingTransaction)
+				continue;
+			this->autoSave();
 		}
-
-		std::lock_guard guard{this->_saveMutex};
-
-		if (this->_pendingTransaction)
-			continue;
-		this->autoSave();
+	} catch (std::exception &e) {
+		this->_autoSaveError = std::make_unique<std::string>(e.what());
 	}
 }
 
@@ -1902,7 +1945,10 @@ void SpiralOfFate::MainWindow::_createEffectListPopup(const std::function<void(u
 		});
 		movesPanel_p->removeAllWidgets();
 		for (auto effectId : effects) {
-			if (effectsNamesLower.at(effectId).find(query) == std::string::npos)
+			if (
+				std::to_string(effectId).find(query) == std::string::npos &&
+				effectsNamesLower.at(effectId).find(query) == std::string::npos
+			)
 				continue;
 
 			const auto &name = effectsNames.at(effectId);
@@ -1955,31 +2001,32 @@ void SpiralOfFate::MainWindow::_createEffectListPopup(const std::function<void(u
 	) {
 		unsigned index = 0;
 		unsigned lastIndex = 0;
-		unsigned move;
+		unsigned effect;
 		std::string query = search_w.lock()->getText().toStdString();
 
 		// TODO: Handle non-ascii characters
 		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
-		for (auto moveId : effects) {
-			auto &name = effectsNamesLower.at(moveId);
+		for (auto effectId : effects) {
+			auto &name = effectsNamesLower.at(effectId);
+			auto idStr = std::to_string(effectId);
 
-			if (name == query) {
-				move = moveId;
+			if (name == query || idStr == query) {
+				effect = effectId;
 				lastIndex = 1;
 				break;
 			}
-			if (name.find(query) != std::string::npos) {
+			if (idStr.find(query) == std::string::npos || name.find(query) != std::string::npos) {
 				if (lastIndex)
 					lastIndex = UINT32_MAX;
 				else
 					lastIndex = index + 1;
-				move = moveId;
+				effect = effectId;
 			}
 			index++;
 		}
 		if (lastIndex == UINT32_MAX || lastIndex == 0)
 			return;
-		onConfirm(move);
+		onConfirm(effect);
 		closePopup(outsidePanel_w, contentPanel_w);
 	};
 
@@ -2057,7 +2104,10 @@ void SpiralOfFate::MainWindow::_createSfxListPopup(const std::function<void(unsi
 		});
 		movesPanel_p->removeAllWidgets();
 		for (auto sfxId : sfxs) {
-			if (sfxNamesLower.at(sfxId).find(query) == std::string::npos)
+			if (
+				std::to_string(sfxId).find(query) == std::string::npos &&
+				sfxNamesLower.at(sfxId).find(query) == std::string::npos
+			)
 				continue;
 
 			const auto &name = sfxNames.at(sfxId);
@@ -2106,31 +2156,32 @@ void SpiralOfFate::MainWindow::_createSfxListPopup(const std::function<void(unsi
 	) {
 		unsigned index = 0;
 		unsigned lastIndex = 0;
-		unsigned move;
+		unsigned sound;
 		std::string query = search_w.lock()->getText().toStdString();
 
 		// TODO: Handle non-ascii characters
 		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
 		for (auto sndId : sfxs) {
 			auto &name = sfxNamesLower.at(sndId);
+			auto idStr = std::to_string(sndId);
 
-			if (name == query) {
-				move = sndId;
+			if (name == query || idStr == query) {
+				sound = sndId;
 				lastIndex = 1;
 				break;
 			}
-			if (name.find(query) != std::string::npos) {
+			if (idStr.find(query) != std::string::npos || name.find(query) != std::string::npos) {
 				if (lastIndex)
 					lastIndex = UINT32_MAX;
 				else
 					lastIndex = index + 1;
-				move = sndId;
+				sound = sndId;
 			}
 			index++;
 		}
 		if (lastIndex == UINT32_MAX || lastIndex == 0)
 			return;
-		onConfirm(move);
+		onConfirm(sound);
 		closePopup(outsidePanel_w, contentPanel_w);
 	};
 
@@ -2222,7 +2273,10 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		});
 		movesPanel_p->removeAllWidgets();
 		for (auto moveId : moves) {
-			if (movesNamesLower.at(moveId).find(query) == std::string::npos)
+			if (
+				std::to_string(moveId).find(query) == std::string::npos &&
+				movesNamesLower.at(moveId).find(query) == std::string::npos
+			)
 				continue;
 
 			auto name = movesNames.at(moveId);
@@ -2294,13 +2348,14 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 		std::ranges::transform(query, query.begin(), [](signed char c) -> char { if (c < 0) return c; return std::tolower(c);});
 		for (auto moveId : moves) {
 			auto &name = movesNamesLower.at(moveId);
+			auto idStr = std::to_string(moveId);
 
-			if (name == query) {
+			if (name == query || idStr == query) {
 				move = moveId;
 				lastIndex = 1;
 				break;
 			}
-			if (name.find(query) != std::string::npos) {
+			if (name.find(query) != std::string::npos || idStr.find(query) != std::string::npos) {
 				if (lastIndex)
 					lastIndex = UINT32_MAX;
 				else
@@ -2887,15 +2942,19 @@ void SpiralOfFate::MainWindow::newAction()
 	auto window = this->_createPopup("assets/gui/editor/character/actionCreate.gui");
 	auto idBox = window->get<tgui::EditBox>("ActionID");
 	auto action = window->get<tgui::Button>("Action");
+	auto actionClone = window->get<tgui::Button>("ActionClone");
+	auto clone = window->get<tgui::CheckBox>("Clone");
 	auto create = window->get<tgui::Button>("Create");
 	auto actionW = std::weak_ptr(action);
+	auto cloneW = std::weak_ptr(clone);
+	auto actionCloneW = std::weak_ptr(actionClone);
 	auto createW = std::weak_ptr(create);
 	auto idBoxW  = std::weak_ptr(idBox);
 	auto windowW = std::weak_ptr(window);
 
 	window->setTitle(this->localize("message_box.title.create_action"));
 	create->setEnabled(false);
-	idBox->onTextChange([createW, actionW, idBoxW, this](const tgui::String &t){
+	idBox->onTextChange([createW, actionW, cloneW, actionCloneW, this](const tgui::String &t){
 		if (t.empty()) {
 			actionW.lock()->setText("");
 			createW.lock()->setEnabled(false);
@@ -2915,34 +2974,55 @@ void SpiralOfFate::MainWindow::newAction()
 			} else
 				Utils::setRenderer(action);
 			action->setText(name);
-			createW.lock()->setEnabled(true);
+			createW.lock()->setEnabled(!cloneW.lock()->isChecked() || actionCloneW.lock()->hasUserData());
 		}
 	});
 	action->onClick(&MainWindow::_createMoveListPopup, this, [idBoxW](unsigned move){
 		idBoxW.lock()->setText(std::to_string(move));
 	}, this->_object->_action, true);
-	create->onClick([windowW, idBox, this]{
+	actionClone->onClick([this, actionCloneW, createW, idBoxW] {
+		unsigned current = -1;
+
+		if (actionCloneW.lock()->hasUserData())
+			current = actionCloneW.lock()->getUserData<unsigned>();
+		this->_createMoveListPopup([actionCloneW, createW, idBoxW](unsigned move) {
+			actionCloneW.lock()->setUserData(move);
+			createW.lock()->setEnabled(!idBoxW.lock()->getText().empty());
+		}, current, false);
+	});
+	clone->onChange([actionCloneW] (bool v){
+		actionCloneW.lock()->setVisible(v);
+	});
+	create->onClick([windowW, idBox, cloneW, actionCloneW, this]{
 		auto &data = this->_object->getFrameData();
 		auto &seq = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 		auto action = std::stoul(idBox->getText().toStdString());
 
 		if (!this->_object->_schema.framedata.contains(action)) {
+			FrameData::Action *cloned = nullptr;
+			unsigned clonedId = 0;
+			std::vector<FrameData::Sequence> sequences;
+
+			if (cloneW.lock()->isChecked()) {
+				clonedId = actionCloneW.lock()->getUserData<unsigned>();
+				cloned = &this->_object->_schema.framedata[clonedId];
+			} else
+				sequences.push_back(
+					FrameData::Sequence{
+						.data = { data },
+						.moveLock = seq.moveLock,
+						.actionLock = seq.actionLock,
+						.loop = seq.loop
+					}
+				);
 			this->applyOperation(new CreateMoveOperation(
 				*this->_object,
 				this->localize("operation.create_move"),
 				action,
 				FrameData::Action{
-					._sequences = {
-						FrameData::Sequence{
-							.data = { data },
-							.moveLock = seq.moveLock,
-							.actionLock = seq.actionLock,
-							.loop = seq.loop
-						}
-					},
-					// TODO: Allow to create clones
-					.cloned = nullptr,
-					.clonedId = 0
+					._sequences = sequences,
+					.cloned = cloned,
+					.clonedId = clonedId
 				}
 			));
 			windowW.lock()->close();
@@ -2992,12 +3072,47 @@ void SpiralOfFate::MainWindow::removeAnimationBlock()
 
 void SpiralOfFate::MainWindow::removeAction()
 {
-	assert_exp(this->_object->_schema.framedata.size() > 1);
-	this->applyOperation(new RemoveMoveOperation(
-		*this->_object,
-		this->localize("operation.remove_action"),
-		this->_object->_action
-	));
+	auto doIt = [this] {
+		assert_exp(this->_object->_schema.framedata.size() > 1);
+		assert_exp(!std::ranges::all_of(this->_object->_schema.framedata | std::ranges::views::values, [this](const FrameData::Action &a){
+			return a.cloned && a.clonedId == this->_object->_action;
+		}));
+		this->applyOperation(new RemoveMoveOperation(
+			*this->_object,
+			this->localize("operation.remove_action"),
+			this->_object->_action
+		));
+	};
+	std::string clones;
+	unsigned count = 0;
+
+	for (auto &[k, a] : this->_object->_schema.framedata)
+		if (a.cloned && a.clonedId == this->_object->_action) {
+			count++;
+			clones += "\n - ";
+			clones += this->_localizeActionName(k);
+			clones += " (";
+			clones += std::to_string(k);
+			clones.push_back(')');
+		}
+	if (count == 0)
+		return doIt();
+
+	auto dialog = tgui::MessageBox::create(
+		this->localize(count > 1 ? "message_box.title.extra_deletes" : "message_box.title.extra_delete"),
+		this->localize(count > 1 ? "message_box.extra_deletes" : "message_box.extra_delete", clones),
+		{
+			this->localize("message_box.button.yes"),
+			this->localize("message_box.button.cancel")
+		 }
+	);
+
+	Utils::openWindowWithFocus(game->gui, 0, 0, dialog);
+	dialog->onButtonPress([this, doIt](const std::weak_ptr<tgui::MessageBox> &d, const tgui::String &text){
+		if (text == this->localize("message_box.button.yes"))
+			doIt();
+		d.lock()->close();
+	}, std::weak_ptr(dialog));
 }
 
 void SpiralOfFate::MainWindow::removeBox()
@@ -3138,6 +3253,7 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 	auto frameSpin = container.get<tgui::SpinButton>("FrameSpin");
 	auto frame = container.get<tgui::Slider>("Frame");
 	auto ctrl = container.get<tgui::Tabs>("ControlTabs");
+	auto cloned = container.get<tgui::Label>("Cloned");
 
 	if (action)
 		action->setText(std::to_string(this->_object->_action));
@@ -3224,6 +3340,19 @@ void SpiralOfFate::MainWindow::_populateData(const tgui::Container &container)
 		ctrl->onTabSelect.setEnabled(false);
 		ctrl->select(this->_showingPalette);
 		ctrl->onTabSelect.setEnabled(true);
+	}
+	if (cloned) {
+		auto &act = this->_object->_schema.framedata[this->_object->_action];
+
+		if (act.cloned) {
+			cloned->setVisible(true);
+			cloned->getRenderer()->setTextColor(tgui::Color{0xFF, 0x80, 0x00});
+			cloned->setText(this->localize(
+				cloned->getUserData<std::string>(),
+				std::to_string(act.clonedId)
+			));
+		} else
+			cloned->setVisible(false);
 	}
 
 	this->_populateFrameData(container);
@@ -3439,7 +3568,18 @@ void SpiralOfFate::MainWindow::_populateFrameData(const tgui::Container &contain
 void SpiralOfFate::MainWindow::tick()
 {
 	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 
+	if (this->_autoSaveError) {
+		Utils::dispMsg(
+			game->gui,
+			this->localize("message_box.title.auto_save_error"),
+			this->localize("message_box.auto_save_error", *this->_autoSaveError),
+			MB_ICONERROR
+		);
+		this->_autoSaveError.reset();
+		this->_autoSaveGone = true;
+	}
 	if (this->_requireReloadPal) {
 		this->_rePopulateColorData();
 		this->_requireReloadPal = false;
@@ -3466,10 +3606,14 @@ void SpiralOfFate::MainWindow::tick()
 		this->_effectObject->tick();
 		this->_effectObject->update();
 	}
-	if (animation != this->_object->_animation) {
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock) {
 		this->_preview->frameChanged();
-		for (auto key : this->_containers)
-			this->_populateFrameData(*key);
+		if (block == this->_object->_actionBlock)
+			for (auto key : this->_containers)
+				this->_populateFrameData(*key);
+		else
+			for (auto key : this->_containers)
+				this->_populateData(*key);
 
 		auto &blk = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 
@@ -3594,6 +3738,12 @@ SpiralOfFate::MainWindow::Renderer *SpiralOfFate::MainWindow::getRenderer()
 	return aurora::downcast<Renderer *>(Widget::getRenderer());
 }
 
+void SpiralOfFate::MainWindow::forceClose()
+{
+	this->_forced = true;
+	this->close();
+}
+
 void SpiralOfFate::MainWindow::reloadLabels()
 {
 	this->_labels.clear();
@@ -3622,11 +3772,6 @@ std::filesystem::path SpiralOfFate::MainWindow::getPath() const
 	if (!this->_pathInit)
 		return ".";
 	return this->_path.parent_path();
-}
-
-bool SpiralOfFate::MainWindow::hasPaletteChanges() const
-{
-	return std::ranges::any_of(this->_palettes, [](const Palette &pal) { return pal.modifications == 0; });
 }
 
 void SpiralOfFate::MainWindow::reloadPalette(const std::string &folder)

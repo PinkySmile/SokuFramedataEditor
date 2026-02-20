@@ -8,6 +8,7 @@
 #include "Logger.hpp"
 #include "Utils.hpp"
 #include "Resources/Assert.hpp"
+#include "util/encodingConverter.hpp"
 
 uint32_t getOrCreateImage(ShadyCore::Schema &schema, const std::string_view &name)
 {
@@ -188,7 +189,7 @@ namespace SpiralOfFate
 		__folder(folder),
 		__paletteData(palette)
 	{
-		this->spritePath = json["sprite"];
+		this->spritePath = convertEncoding<char, char, UTF8Decode, shiftJISEncode>(json["sprite"]);
 		this->unknown = json["unknown"];
 		this->texOffsetX = json["texOffsetX"];
 		this->texOffsetY = json["texOffsetY"];
@@ -351,7 +352,7 @@ namespace SpiralOfFate
 	nlohmann::json FrameData::toJson() const
 	{
 		nlohmann::json j{
-			{ "sprite", this->spritePath },
+			{ "sprite", convertEncoding<char, char, shiftJISDecode, UTF8Encode>(this->spritePath) },
 			{ "unknown", this->unknown },
 			{ "texOffsetX", this->texOffsetX },
 			{ "texOffsetY", this->texOffsetY },

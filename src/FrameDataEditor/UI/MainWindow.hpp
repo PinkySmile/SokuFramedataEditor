@@ -58,10 +58,10 @@ namespace SpiralOfFate
 		const Renderer *getSharedRenderer() const override;
 		Renderer *getRenderer() override;
 
+		void forceClose();
 		void reloadLabels();
 		std::filesystem::path getPath() const;
 		bool hasPath() const;
-		bool hasPaletteChanges() const;
 		void reloadPalette(const std::string &folder);
 		void mouseMovedAbsolute(tgui::Vector2f pos);
 		void undo();
@@ -161,12 +161,15 @@ namespace SpiralOfFate
 		bool _requireReloadPal = false;
 		bool _pathInit = false;
 		bool _requireAutoSave = false;
+		bool _forced = false;
+		bool _autoSaveGone = false;
 		std::atomic<bool> _stopped = false;
 		unsigned char _colorChangeSource = 255;
 		std::string _title;
 		std::string _chrPath;
 		std::string _character;
 		std::string _fileName;
+		std::unique_ptr<std::string> _autoSaveError;
 		std::filesystem::path _path;
 		std::filesystem::path _pathBak;
 		std::unique_ptr<Operation> _pendingTransaction;
