@@ -102,6 +102,7 @@ namespace SpiralOfFate
 		void newEndFrame();
 		void newAnimationBlock();
 		void newAction();
+		void newCollisionBox();
 		void newHurtBox();
 		void newHitBox();
 

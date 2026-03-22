@@ -46,8 +46,6 @@ void SpiralOfFate::PreviewWidget::setSelectedBox(BoxType type, unsigned index)
 {
 	auto &data = this->_object.getFrameData();
 
-	// TODO:
-	this->_forced = true;
 	switch (type) {
 	case BOXTYPE_NONE:
 		this->_boxSelected = 0;
@@ -542,18 +540,48 @@ bool SpiralOfFate::PreviewWidget::scrolled(float delta, tgui::Vector2f pos, bool
 
 void SpiralOfFate::PreviewWidget::frameChanged()
 {
-	if (this->_forced) {
-		// TODO:
-		this->_forced = false;
-		return;
+	if (this->_dragStarted) {
+		auto action = this->_object._action;
+		auto block = this->_object._actionBlock;
+		auto pose = this->_object._animation;
+
+		this->_dragStarted = false;
+		this->_main.cancelTransaction();
+		this->_object._action = action;
+		this->_object._actionBlock = block;
+		this->_object._animation = pose;
 	}
 	this->_boxCounter = 0;
 	this->_boxHovered = 0;
 	this->_boxSelected = 0;
 	this->_cornerHovered = 0;
 	this->_cornerSelected = 0;
-	this->_dragStarted = false;
 	this->_commited = false;
+}
+
+void SpiralOfFate::PreviewWidget::boxDeleted(BoxType type, unsigned index)
+{
+	auto &data = this->_object.getFrameData();
+	unsigned boxIndex = 0;
+
+	switch (type) {
+	case BOXTYPE_NONE:
+		boxIndex = 0;
+		break;
+	case BOXTYPE_HURTBOX:
+		boxIndex = index + 1;
+		break;
+	case BOXTYPE_HITBOX:
+		boxIndex = index + 1 + data.hBoxes.size();
+		break;
+	case BOXTYPE_COLLISIONBOX:
+		boxIndex = 1 + data.hBoxes.size() + data.aBoxes.size();
+		break;
+	}
+	if (this->_boxSelected == boxIndex)
+		this->frameChanged();
+	else if (this->_boxSelected > boxIndex)
+		this->_boxSelected--;
 }
 
 bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
@@ -622,18 +650,20 @@ bool SpiralOfFate::PreviewWidget::leftMousePressed(tgui::Vector2f pos)
 void SpiralOfFate::PreviewWidget::mouseNoLongerOnWidget()
 {
 	this->_cornerSelected = 0;
-	if (this->_dragStarted)
+	if (this->_dragStarted) {
+		this->_dragStarted = false;
 		this->_main.cancelTransaction();
-	this->_dragStarted = false;
+	}
 	Widget::mouseNoLongerOnWidget();
 }
 
 void SpiralOfFate::PreviewWidget::leftMouseButtonNoLongerDown()
 {
 	this->_cornerSelected = 0;
-	if (this->_dragStarted)
+	if (this->_dragStarted) {
+		this->_dragStarted = false;
 		this->_main.commitTransaction();
-	this->_dragStarted = false;
+	}
 	this->_translateDragStarted = false;
 	Widget::leftMouseButtonNoLongerDown();
 }

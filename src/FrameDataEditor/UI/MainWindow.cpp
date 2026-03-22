@@ -1100,6 +1100,8 @@ void SpiralOfFate::MainWindow::redo()
 		return;
 	}
 
+	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 	std::string title = this->_title;
 	std::lock_guard guard{this->_saveMutex};
 
@@ -1119,6 +1121,8 @@ void SpiralOfFate::MainWindow::redo()
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(this->hasRedoData());
 	this->_requireAutoSave = true;
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock)
+		this->_preview->frameChanged();
 }
 
 void SpiralOfFate::MainWindow::undo()
@@ -1129,6 +1133,8 @@ void SpiralOfFate::MainWindow::undo()
 		return;
 	}
 
+	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
@@ -1148,6 +1154,8 @@ void SpiralOfFate::MainWindow::undo()
 	this->_editor.setHasUndo(this->hasUndoData());
 	this->_editor.setHasRedo(true);
 	this->_requireAutoSave = true;
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock)
+		this->_preview->frameChanged();
 }
 
 void SpiralOfFate::MainWindow::copyFrame()
@@ -1239,6 +1247,8 @@ void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *
 {
 	assert_exp(this->_pendingTransaction);
 
+	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
@@ -1255,10 +1265,14 @@ void SpiralOfFate::MainWindow::updateTransaction(const std::function<Operation *
 		title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock)
+		this->_preview->frameChanged();
 }
 
 void SpiralOfFate::MainWindow::cancelTransaction()
 {
+	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
@@ -1274,6 +1288,8 @@ void SpiralOfFate::MainWindow::cancelTransaction()
 	title.push_back('~');
 	this->setTitle(title);
 	this->_editor.setHasUndo(this->hasUndoData());
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock)
+		this->_preview->frameChanged();
 }
 
 void SpiralOfFate::MainWindow::commitTransaction()
@@ -1282,6 +1298,8 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	if (!this->_pendingTransaction->hasModification())
 		return this->_pendingTransaction.reset();
 
+	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
@@ -1306,6 +1324,8 @@ void SpiralOfFate::MainWindow::commitTransaction()
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
 	this->_requireAutoSave = true;
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock)
+		this->_preview->frameChanged();
 }
 
 void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
@@ -1315,6 +1335,8 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 		return;
 	}
 
+	auto animation = this->_object->_animation;
+	auto block = this->_object->_actionBlock;
 	std::lock_guard guard{this->_saveMutex};
 	std::string title = this->_title;
 
@@ -1339,6 +1361,8 @@ void SpiralOfFate::MainWindow::applyOperation(Operation *operation)
 	this->_editor.setHasUndo(true);
 	this->_editor.setHasRedo(false);
 	this->_requireAutoSave = true;
+	if (animation != this->_object->_animation || block != this->_object->_actionBlock)
+		this->_preview->frameChanged();
 }
 
 bool SpiralOfFate::MainWindow::save(const std::filesystem::path &path)
@@ -3032,12 +3056,23 @@ void SpiralOfFate::MainWindow::newAction()
 	});
 }
 
+void SpiralOfFate::MainWindow::newCollisionBox()
+{
+	this->applyOperation(new CreateBoxOperation(
+		*this->_object,
+		this->localize("operation.create_collisionbox"),
+		BOXTYPE_COLLISIONBOX,
+		*this->_preview
+	));
+}
+
 void SpiralOfFate::MainWindow::newHurtBox()
 {
 	this->applyOperation(new CreateBoxOperation(
 		*this->_object,
 		this->localize("operation.create_hurtbox"),
-		true
+		BOXTYPE_HURTBOX,
+		*this->_preview
 	));
 }
 
@@ -3046,7 +3081,8 @@ void SpiralOfFate::MainWindow::newHitBox()
 	this->applyOperation(new CreateBoxOperation(
 		*this->_object,
 		this->localize("operation.create_hitbox"),
-		false
+		BOXTYPE_HITBOX,
+		*this->_preview
 	));
 }
 
@@ -3124,6 +3160,7 @@ void SpiralOfFate::MainWindow::removeBox()
 		*this->_object,
 		this->localize("operation.remove_box"),
 		b.first, b.second,
+		*this->_preview,
 		[this](BoxType t, unsigned i) { this->_preview->setSelectedBox(t, i); }
 	));
 }
@@ -3229,7 +3266,6 @@ void SpiralOfFate::MainWindow::_rePopulateData()
 		this->_populateData(*key);
 	}
 	this->_object->resetState();
-	this->_preview->frameChanged();
 }
 
 void SpiralOfFate::MainWindow::_rePopulateFrameData()

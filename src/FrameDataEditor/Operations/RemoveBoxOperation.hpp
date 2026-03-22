@@ -13,10 +13,13 @@
 
 namespace SpiralOfFate
 {
+	class PreviewWidget;
 	typedef std::function<void(BoxType type, unsigned boxIndex)> RemoveBoxApply;
+
 	class RemoveBoxOperation : public Operation {
 	protected:
 		EditableObject &_obj;
+		PreviewWidget &_preview;
 		RemoveBoxApply _onApply;
 		unsigned _action;
 		unsigned _actionBlock;
@@ -29,7 +32,7 @@ namespace SpiralOfFate
 		ShadyCore::Schema::Sequence::BBox &_getBox();
 
 	public:
-		RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, RemoveBoxApply onApply);
+		RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, PreviewWidget &preview, RemoveBoxApply onApply);
 		void apply() override;
 		void undo() override;
 		[[nodiscard]] std::string getName() const noexcept override;

@@ -36,7 +36,6 @@ namespace SpiralOfFate
 		unsigned _boxSelected = 0;
 		unsigned _cornerHovered = 0;
 		unsigned _cornerSelected = 0;
-		bool _forced = false;
 
 		void _handleBoxResize(const tgui::Vector2f &pos);
 		void _handleBoxMove(const tgui::Vector2f &pos);
@@ -67,6 +66,7 @@ namespace SpiralOfFate
 		std::pair<BoxType, unsigned> getSelectedBox();
 		ShadyCore::Schema::Sequence::BBox *getSelectedBoxRef();
 		void frameChanged();
+		void boxDeleted(BoxType type, unsigned index);
 		bool leftMousePressed(tgui::Vector2f pos) override;
 		void leftMouseButtonNoLongerDown() override;
 		bool scrolled(float delta, tgui::Vector2f pos, bool touch) override;

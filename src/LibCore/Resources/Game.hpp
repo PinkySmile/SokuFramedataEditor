@@ -26,7 +26,6 @@ namespace SpiralOfFate
 		std::filesystem::path config;
 		std::filesystem::path data;
 		std::filesystem::path state;
-		tgui::Font defaultFont;
 		Settings settings;
 		Logger logger;
 		std::unique_ptr<Screen> screen;
@@ -34,6 +33,7 @@ namespace SpiralOfFate
 		TextureManager textureMgr;
 		SoundManager soundMgr;
 		tgui::Gui gui;
+		tgui::Font defaultFont;
 		std::map<unsigned, unsigned> soundEffects;
 		unsigned lastSwap = 0;
 

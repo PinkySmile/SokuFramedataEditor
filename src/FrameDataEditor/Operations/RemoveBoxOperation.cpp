@@ -2,9 +2,9 @@
 // Created by PinkySmile on 04/07/25.
 //
 
-#include "RemoveBoxOperation.hpp"
-
 #include <utility>
+#include "RemoveBoxOperation.hpp"
+#include "../UI/PreviewWidget.hpp"
 
 ShadyCore::Schema::Sequence::BBox &SpiralOfFate::RemoveBoxOperation::_getBox()
 {
@@ -17,8 +17,9 @@ ShadyCore::Schema::Sequence::BBox &SpiralOfFate::RemoveBoxOperation::_getBox()
 	return data.hBoxes[this->_boxIndex];
 }
 
-SpiralOfFate::RemoveBoxOperation::RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, RemoveBoxApply onApply) :
+SpiralOfFate::RemoveBoxOperation::RemoveBoxOperation(EditableObject &obj, const std::string &&name, BoxType type, unsigned boxIndex, PreviewWidget &preview, RemoveBoxApply onApply) :
 	_obj(obj),
+	_preview(preview),
 	_onApply(std::move(onApply)),
 	_action(obj._action),
 	_actionBlock(obj._actionBlock),
@@ -38,13 +39,13 @@ void SpiralOfFate::RemoveBoxOperation::apply()
 
 	auto &data = this->_obj.getFrameData();
 
+	this->_preview.boxDeleted(this->_type, this->_boxIndex);
 	if (this->_type == BOXTYPE_COLLISIONBOX)
 		data.cBoxes.clear();
 	else if (this->_type == BOXTYPE_HURTBOX)
 		data.hBoxes.erase(data.hBoxes.begin() + this->_boxIndex);
 	else
 		data.aBoxes.erase(data.aBoxes.begin() + this->_boxIndex);
-	this->_onApply(BOXTYPE_NONE, 0);
 }
 
 void SpiralOfFate::RemoveBoxOperation::undo()
