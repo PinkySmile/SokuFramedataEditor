@@ -140,21 +140,17 @@ namespace SpiralOfFate
 		game->logger.debug("Loading framedata file from " + path.string());
 
 		ShadyCore::Schema schema;
-		std::ifstream::openmode mode = std::ifstream::in;
 		ShadyCore::FileType::Format format;
 
 		// TODO: Allow the user to manually set it
 		if (path.extension() == ".xml")
 			format = ShadyCore::FileType::SCHEMA_XML;
-		else if (path.filename().stem().string().ends_with("effect") || path.filename().stem().string().ends_with("stand")) {
+		else if (path.filename().stem().string().ends_with("effect") || path.filename().stem().string().ends_with("stand"))
 			format = ShadyCore::FileType::SCHEMA_GAME_ANIM;
-			mode |= std::ifstream::binary;
-		} else {
+		else
 			format = ShadyCore::FileType::SCHEMA_GAME_PATTERN;
-			mode |= std::ifstream::binary;
-		}
 
-		std::ifstream stream{path, mode};
+		std::ifstream stream{path, std::ifstream::in | std::ifstream::binary};
 
 		if (!stream)
 			throw std::runtime_error("Cannot open " + path.string());
