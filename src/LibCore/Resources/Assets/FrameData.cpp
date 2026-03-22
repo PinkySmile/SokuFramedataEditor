@@ -34,11 +34,6 @@ namespace SpiralOfFate
 		std::vector<ShadyCore::Schema::Clone *> clones;
 		bool foundType = false;
 
-		do {
-			if ((!schema.objects.empty()));
-			else
-				throw AssertionFailedException("!schema.objects.empty()");
-		} while (0);
 		assert_exp(!schema.objects.empty());
 		result.isCharacterData = true;
 		for (auto &sequ : schema.objects) {
@@ -300,6 +295,7 @@ namespace SpiralOfFate
 	{
 		auto old = this->textureHandle;
 
+		MoveFrame::operator=(other);
 		this->__folder = other.__folder;
 		this->__requireReload = other.__requireReload;
 		this->__paletteData = other.__paletteData;
