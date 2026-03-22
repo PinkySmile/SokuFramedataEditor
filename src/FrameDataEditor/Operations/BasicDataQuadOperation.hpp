@@ -110,7 +110,11 @@ namespace SpiralOfFate
 
 		[[nodiscard]] bool hasModification() const override
 		{
-			return this->_oldValue1 != this->_newValue1 || this->_oldValue2 != this->_newValue2;
+			return
+				this->_oldValue1 != this->_newValue1 ||
+				this->_oldValue2 != this->_newValue2 ||
+				this->_oldValue3 != this->_newValue3 ||
+				this->_oldValue4 != this->_newValue4;
 		}
 	};
 }
