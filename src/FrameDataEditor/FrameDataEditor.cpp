@@ -738,6 +738,7 @@ void SpiralOfFate::FrameDataEditor::_loadFramedata()
 	}, 0);
 	file->setMultiSelect(true);
 	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+		game->settings.lastPath = arr[0].getParentPath();
 		for (auto &p : arr) {
 			const std::filesystem::path &filePath = p;
 
@@ -819,6 +820,7 @@ void SpiralOfFate::FrameDataEditor::_explorePackageFile()
 	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
 		ShadyCore::Package *package;
 
+		game->settings.lastPath = arr[0].getParentPath();
 		try {
 			package = new ShadyCore::Package(arr[0]);
 		} catch (std::exception &e) {
@@ -873,6 +875,7 @@ void SpiralOfFate::FrameDataEditor::_exportPalette()
 	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
 		std::filesystem::path p = arr[0];
 
+		game->settings.lastPath = p.parent_path();
 		if (!p.has_extension())
 			p.replace_extension("pal");
 		this->_focusedWindow->exportPalette(p);
@@ -888,6 +891,7 @@ void SpiralOfFate::FrameDataEditor::_importPalette()
 		{this->localize("file_type.all"), {}}
 	}, 0);
 	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
+		game->settings.lastPath = arr[0].getParentPath();
 		this->_focusedWindow->importPalette(arr[0]);
 	});
 }
@@ -912,6 +916,7 @@ void SpiralOfFate::FrameDataEditor::_saveAs()
 	file->onFileSelect([this](const std::vector<tgui::Filesystem::Path> &arr) {
 		std::filesystem::path p = arr[0];
 
+		game->settings.lastPath = p.parent_path();
 		if (!p.has_extension())
 			p.replace_extension("pat");
 		this->_focusedWindow->save(p);

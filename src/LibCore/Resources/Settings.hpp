@@ -16,6 +16,7 @@ namespace SpiralOfFate
 		std::filesystem::path _path;
 
 	public:
+		std::filesystem::path lastPath;
 		std::filesystem::path palettes;
 		std::string theme;
 		std::filesystem::path swr;

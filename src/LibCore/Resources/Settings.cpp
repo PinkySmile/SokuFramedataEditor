@@ -24,6 +24,10 @@ SpiralOfFate::Settings::Settings(const std::filesystem::path &data, const std::f
 			this->extra.clear();
 			for (const auto &e : json["extra"].get<std::vector<std::filesystem::path::string_type>>())
 				this->extra.emplace_back(e);
+			if (json.contains("last_path"))
+				this->lastPath = json["last_path"].get<std::filesystem::path::string_type>();
+			else
+				this->lastPath = ".";
 			return;
 		} catch (...) {}
 	} else if (errno != ENOENT)
@@ -45,6 +49,7 @@ void SpiralOfFate::Settings::save()
 		{ "swr", this->swr.native() },
 		{ "soku", this->soku.native() },
 		{ "soku2", this->soku2.native() },
+		{ "last_path", this->lastPath.native() },
 		{ "extra", nlohmann::json::array() },
 	};
 

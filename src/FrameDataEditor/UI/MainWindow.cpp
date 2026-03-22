@@ -3806,7 +3806,7 @@ bool SpiralOfFate::MainWindow::hasPath() const
 std::filesystem::path SpiralOfFate::MainWindow::getPath() const
 {
 	if (!this->_pathInit)
-		return ".";
+		return game->settings.lastPath;
 	return this->_path.parent_path();
 }
 
