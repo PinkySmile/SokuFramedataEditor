@@ -27,13 +27,14 @@ SpiralOfFate::Settings::Settings(const std::filesystem::path &data, const std::f
 			if (json.contains("last_path"))
 				this->lastPath = json["last_path"].get<std::filesystem::path::string_type>();
 			else
-				this->lastPath = ".";
+				this->lastPath = std::filesystem::current_path();
 			return;
 		} catch (...) {}
 	} else if (errno != ENOENT)
 		throw std::runtime_error("Cannot open settings file: " + this->_path.string() + ": " + std::string(strerror(errno)));
 	this->theme = "assets/gui/themes/Black.style";
 	this->palettes = data / "palettes";
+	this->lastPath = std::filesystem::current_path();
 }
 
 SpiralOfFate::Settings::~Settings()

@@ -141,7 +141,10 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 			{editor.localize("settings.type.soku2"), {"Soku2.dll"}}
 		});
 		win->onFileSelect([soku2Path] (const std::vector<tgui::Filesystem::Path> &file){
-			soku2Path->setText(file[0].getParentPath().asString());
+			auto parent = file[0].getParentPath();
+
+			game->settings.lastPath = parent;
+			soku2Path->setText(parent.asString());
 		});
 	});
 	sokuPathBrowse->onClick([sokuPath, &editor] {
@@ -151,7 +154,10 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 			{editor.localize("settings.type.soku"), {"th123a.dat", "th123b.dat", "th123c.dat"}}
 		});
 		win->onFileSelect([sokuPath] (const std::vector<tgui::Filesystem::Path> &file){
-			sokuPath->setText(file[0].getParentPath().asString());
+			auto parent = file[0].getParentPath();
+
+			game->settings.lastPath = parent;
+			sokuPath->setText(parent.asString());
 		});
 	});
 	swrPathBrowse->onClick([swrPath, &editor] {
@@ -161,7 +167,10 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 			{editor.localize("settings.type.swr"), {"th105a.dat", "th105b.dat"}}
 		});
 		win->onFileSelect([swrPath] (const std::vector<tgui::Filesystem::Path> &file){
-			swrPath->setText(file[0].getParentPath().asString());
+			auto parent = file[0].getParentPath();
+
+			game->settings.lastPath = parent;
+			swrPath->setText(parent.asString());
 		});
 	});
 	extraList->onItemSelect([setArrowColor, extraUp, extraDown, extraRemove](int id) {
@@ -200,7 +209,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 
 		file->setSize(750, 450);
 		file->setFileMustExist(true);
-		file->setPath(tgui::Filesystem::Path(std::filesystem::current_path()));
+		file->setPath(tgui::Filesystem::Path(game->settings.lastPath));
 		Utils::openWindowWithFocus(game->gui, 0, 0, file);
 		file->setFileTypeFilters({
 			{this->localize("file_type.res_folder"), {"*"}},
@@ -210,6 +219,7 @@ SpiralOfFate::SettingsWindow::SettingsWindow(FrameDataEditor &editor) :
 		}, 0);
 		file->setMultiSelect(true);
 		file->onFileSelect([extraList_w](const std::vector<tgui::Filesystem::Path> &arr) {
+			game->settings.lastPath = arr[0].getParentPath();
 			for (auto &p : arr)
 				game->settings.extra.push_back(p);
 

@@ -251,6 +251,8 @@
 	"shortcut.menu_item.file.load.file":                   "Ouvrir fichier patron",
 	"shortcut.menu_item.file.explore.loaded":              "Explorer paquets chargés",
 	"shortcut.menu_item.file.explore.file":                "Explorer fichier paquet",
+	"shortcut.menu_item.file.palette.export":              "Exporter la palette séléctionnée",
+	"shortcut.menu_item.file.palette.import":              "Importer une palette",
 	"shortcut.menu_item.file.save":                        "Enregistrer un fichier",
 	"shortcut.menu_item.file.save_as":                     "Enregistrer un fichier sous",
 	"shortcut.menu_item.file.settings":                    "Options",
