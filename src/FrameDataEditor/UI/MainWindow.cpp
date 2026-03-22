@@ -636,12 +636,12 @@ do {                                                                            
         if (!__elem)                                                               \
                 break;                                                             \
         __elem->onChange([this](bool b){                                           \
-                this->updateTransaction([&]{ return new BasicDataOperationSeq(     \
+                this->applyOperation(new BasicDataOperationSeq(                    \
                         *this->_object,                                            \
                         name,                                                      \
                         &FrameData::Sequence::field,                               \
                         b, reset                                                   \
-                ); });                                                             \
+                ));                                                                \
                 this->_rePopulateFrameData();                                      \
         });                                                                        \
         this->_updateFrameElements[&container].emplace_back([__elem, this]{        \
@@ -2001,7 +2001,7 @@ void SpiralOfFate::MainWindow::_createEffectListPopup(const std::function<void(u
 	) {
 		unsigned index = 0;
 		unsigned lastIndex = 0;
-		unsigned effect;
+		unsigned effect = 0;
 		std::string query = search_w.lock()->getText().toStdString();
 
 		// TODO: Handle non-ascii characters
@@ -2156,7 +2156,7 @@ void SpiralOfFate::MainWindow::_createSfxListPopup(const std::function<void(unsi
 	) {
 		unsigned index = 0;
 		unsigned lastIndex = 0;
-		unsigned sound;
+		unsigned sound = 0;
 		std::string query = search_w.lock()->getText().toStdString();
 
 		// TODO: Handle non-ascii characters
@@ -2341,7 +2341,7 @@ void SpiralOfFate::MainWindow::_createMoveListPopup(const std::function<void(uns
 	) {
 		unsigned index = 0;
 		unsigned lastIndex = 0;
-		unsigned move;
+		unsigned move = 0;
 		std::string query = search_w.lock()->getText().toStdString();
 
 		// TODO: Handle non-ascii characters

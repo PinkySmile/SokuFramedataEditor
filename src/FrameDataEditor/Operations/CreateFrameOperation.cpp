@@ -23,7 +23,7 @@ void SpiralOfFate::CreateFrameOperation::apply()
 {
 	this->_obj._action = this->_action;
 	this->_obj._actionBlock = this->_block;
-	this->_obj._animation = this->_id;
+	this->_obj._animation = this->_id + 1;
 
 	auto &arr = this->_obj._schema.framedata[this->_action][this->_block];
 
