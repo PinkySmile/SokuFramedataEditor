@@ -66,6 +66,7 @@ void initEditor()
 		game->screen->setIcon(icon.getSize(), icon.getPixelsPtr());
 	game->screen->setFramerateLimit(240);
 	game->gui.setWindow(*game->screen);
+	game->defaultFont = tgui::Font("assets/gui/editor/font.ttf");
 	editor = new FrameDataEditor();
 }
 

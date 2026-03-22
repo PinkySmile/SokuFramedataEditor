@@ -25,7 +25,7 @@ Renderer.1 {
 Label.Shortcut {
     HorizontalAlignment = Right;
     Position = (10, 5);
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (Key.x - 15, 17);
     Text = Label;
     TextSize = 13;

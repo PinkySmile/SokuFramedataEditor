@@ -50,7 +50,7 @@ Label.Label1 {
     HorizontalAlignment = Right;
     Position = (0, 13);
     Renderer = &1;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (175, 17);
     Text = "animation.blend.mode";
     TextSize = 13;
@@ -69,7 +69,7 @@ Label.Label3 {
     HorizontalAlignment = Right;
     Position = (0, 43);
     Renderer = &1;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (175, 17);
     Text = "animation.blend.color";
     TextSize = 13;
@@ -88,7 +88,7 @@ Label.Label2 {
     HorizontalAlignment = Right;
     Position = (280, 13);
     Renderer = &1;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (175, 17);
     Text = "animation.blend.flipVert";
     TextSize = 13;
@@ -107,7 +107,7 @@ Label.Label4 {
     HorizontalAlignment = Right;
     Position = (280, 43);
     Renderer = &1;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (175, 17);
     Text = "animation.blend.flipHorz";
     TextSize = 13;
@@ -117,7 +117,7 @@ Label.Label5 {
     HorizontalAlignment = Right;
     Position = (280, 73);
     Renderer = &1;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (175, 17);
     Text = "animation.blend.angle";
     TextSize = 13;
@@ -136,7 +136,7 @@ Label.Label8 {
     HorizontalAlignment = Right;
     Position = (0, 73);
     Renderer = &1;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (175, 17);
     Text = "animation.blend.scale";
     TextSize = 13;

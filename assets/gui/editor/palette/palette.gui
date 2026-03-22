@@ -96,7 +96,7 @@ Label.BlockLabel {
     HorizontalAlignment = Right;
     Position = (0, 88);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (110, 17);
     Text = "animation.block";
     TextSize = 13;
@@ -116,7 +116,7 @@ Label.FrameLabel {
     HorizontalAlignment = Right;
     Position = (0, 109);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (110, 17);
     Text = "animation.frame";
     TextSize = 13;
@@ -177,7 +177,7 @@ Label.Label1 {
     HorizontalAlignment = Right;
     Position = (5, 30);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (120, 20);
     Text = "animation.action";
     TextSize = 11;
@@ -333,7 +333,7 @@ Label.ColorComponentName1 {
     HorizontalAlignment = Center;
     Position = (200, 220);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (100, 17);
     Text = Hue;
     TextSize = 13;
@@ -344,7 +344,7 @@ Label.ColorComponentName2 {
     HorizontalAlignment = Center;
     Position = (200, 265);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (100, 17);
     Text = Saturation;
     TextSize = 13;
@@ -355,7 +355,7 @@ Label.ColorComponentName3 {
     HorizontalAlignment = Center;
     Position = (200, 310);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (100, 17);
     Text = Value;
     TextSize = 13;
@@ -366,7 +366,7 @@ Label.RGBColorName {
     HorizontalAlignment = Center;
     Position = (200, 355);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (100, 17);
     Text = "color.hexcode";
     TextSize = 13;
@@ -375,9 +375,9 @@ Label.RGBColorName {
 
 Label.ColorIndex {
     HorizontalAlignment = Right;
-    Position = (210, 170);
+    Position = (210, 172);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (40, 20);
     Text = "#%1";
     TextSize = 13;
@@ -387,7 +387,7 @@ Label.ColorIndex {
 
 Label.ColorPreview {
     Position = (250, 170);
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (40, 20);
     TextSize = 13;
     UserData = NO_LOCALE;
@@ -468,7 +468,7 @@ Label.Label2 {
     HorizontalAlignment = Right;
     Position = (5, 5);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (120, 20);
     Text = "animation.prev_action";
     TextSize = 11;
@@ -495,7 +495,7 @@ Label.Label3 {
     HorizontalAlignment = Right;
     Position = (5, 55);
     Renderer = &2;
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (120, 20);
     Text = "animation.next_action";
     TextSize = 11;

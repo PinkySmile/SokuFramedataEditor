@@ -26,7 +26,7 @@ namespace SpiralOfFate
 		std::filesystem::path config;
 		std::filesystem::path data;
 		std::filesystem::path state;
-		tgui::Font defaultFont = tgui::Font::getGlobalFont();
+		tgui::Font defaultFont;
 		Settings settings;
 		Logger logger;
 		std::unique_ptr<Screen> screen;

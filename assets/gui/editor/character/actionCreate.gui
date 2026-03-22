@@ -24,13 +24,14 @@ Renderer.1 {
 
 Button.Create {
     Enabled = false;
-    Position = (73, 70);
+    Position = ((&.w - w) - 10, 70);
     Renderer = &1;
     Text = "message_box.button.confirm";
     TextSize = 13;
 }
 
 EditBox.ActionID {
+    Alignment = Center;
     InputValidator = UInt;
     Position = (10, 10);
     Size = (100, 21);
@@ -107,8 +108,9 @@ CheckBox.Clone {
 }
 
 Label.Label1 {
+    HorizontalAlignment = Right;
     Position = (10, 42);
-    ScrollbarPolicy = Automatic;
+    ScrollbarPolicy = Never;
     Size = (79, 17);
     Text = "action.clone";
     TextSize = 13;

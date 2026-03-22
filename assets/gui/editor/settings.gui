@@ -158,7 +158,7 @@ Panel.Panel {
         HorizontalAlignment = Right;
         Position = (0, 12);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (169, 17);
         Text = "settings.locale";
         TextSize = 13;
@@ -178,7 +178,7 @@ Panel.Panel {
         HorizontalAlignment = Right;
         Position = (Theme.x - w, 12);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = ((Theme.x - Locale.x) / 2, 17);
         Text = "settings.theme";
         TextSize = 13;
@@ -227,7 +227,7 @@ Panel.Panel {
     Label.SokuPathError {
         Position = (170, SokuPath.y + SokuPath.h);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (40, 17);
         Text = Label;
         TextSize = 13;
@@ -252,7 +252,7 @@ Panel.Panel {
     Label.SwrPathError {
         Position = (170, SwrPath.y + SwrPath.h);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (40, 17);
         Text = Label;
         TextSize = 13;
@@ -278,7 +278,7 @@ Panel.Panel {
         HorizontalAlignment = Right;
         Position = (0, 42);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (169, 21);
         Text = "settings.soku";
         TextSize = 13;
@@ -289,7 +289,7 @@ Panel.Panel {
         HorizontalAlignment = Right;
         Position = (0, Soku2Path.y);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (169, 21);
         Text = "settings.soku2";
         TextSize = 13;
@@ -300,7 +300,7 @@ Panel.Panel {
         HorizontalAlignment = Right;
         Position = (0, SwrPath.y);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (169, 21);
         Text = "settings.swr";
         TextSize = 13;
@@ -311,7 +311,7 @@ Panel.Panel {
         HorizontalAlignment = Right;
         Position = (0, ExtraList.y);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (169, 21);
         Text = "settings.extra";
         TextSize = 13;
@@ -397,7 +397,7 @@ Panel.Panel {
     Label.Soku2PathError {
         Position = (170, Soku2Path.y + Soku2Path.h);
         Renderer = &1;
-        ScrollbarPolicy = Automatic;
+        ScrollbarPolicy = Never;
         Size = (40, 17);
         Text = Label;
         TextSize = 13;
