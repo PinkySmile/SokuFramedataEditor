@@ -172,12 +172,6 @@ const FrameData::Sequence &EditableObject::getSequence() const
 std::vector<FDE::Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const
 {
 	std::vector<FDE::Rectangle> result;
-	//Vector2f center{
-	//	static_cast<float>(data.offsetX),
-	//	data.texHeight * data.scale.y / -2.f - data.offset.y
-	//};
-	Vector2f center = {0, 0};;
-	auto rotation = data.getBlendOptions().angle * M_PI / 180;
 	Vector2f real = {0, 0};
 
 	result.reserve(boxes.size());
@@ -189,10 +183,10 @@ std::vector<FDE::Rectangle> EditableObject::_getModifiedBoxes(const FrameData &d
 		};
 
 		result.push_back({
-			.pt1 = real + pos.rotation(rotation, center),
-			.pt2 = real + (pos + Vector2f{0, static_cast<float>(size.y)}).rotation(rotation, center),
-			.pt3 = real + (pos + size.to<int>()).rotation(rotation, center),
-			.pt4 = real + (pos + Vector2f{static_cast<float>(size.x), 0}).rotation(rotation, center)
+			.pt1 = real + pos,
+			.pt2 = real + pos + Vector2f{0, static_cast<float>(size.y)},
+			.pt3 = real + pos + size.to<int>(),
+			.pt4 = real + pos + Vector2f{static_cast<float>(size.x), 0}
 		});
 	}
 	return result;

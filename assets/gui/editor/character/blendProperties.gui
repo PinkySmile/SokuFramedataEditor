@@ -58,7 +58,7 @@ Label.Label1 {
 
 EditBox.FlipVert {
     Alignment = Center;
-    InputValidator = UInt;
+    InputValidator = Int;
     Position = (460, 10);
     Renderer = &2;
     Size = (60, 21);
@@ -77,7 +77,7 @@ Label.Label3 {
 
 EditBox.FlipHorz {
     Alignment = Center;
-    InputValidator = UInt;
+    InputValidator = Int;
     Position = (460, 40);
     Renderer = &2;
     Size = (60, 21);
@@ -125,7 +125,7 @@ Label.Label5 {
 
 EditBox.Angle {
     Alignment = Center;
-    InputValidator = UInt;
+    InputValidator = Int;
     Position = (460, 70);
     Renderer = &2;
     Size = (60, 21);
