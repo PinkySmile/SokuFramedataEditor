@@ -524,7 +524,7 @@ do {                                                                            
 #define SOKU_FLOAT_PERCENT_FROM_STRING(s, type, p) static_cast<type>(std::stof(s.toStdString()) * std::pow(10, p / 10))
 #define SOKU_FLOAT_PERCENT_TO_STRING(s, p) (to_string(static_cast<float>(s / std::pow(10, p / 10)), p % 10) + "%")
 
-#define NUMFLAGS_FROM_STRING(s, type, __) (type)std::stoul(s.toStdString(), nullptr, sizeof(type) * 2)
+#define NUMFLAGS_FROM_STRING(s, type, __) (type)std::stoul(s.toStdString(), nullptr, 16)
 #define NUMFLAGS_TO_STRING(s, d) to_hex(s, d)
 
 #define VECTOR_FROM_STRING_PRE(s)                                       \
