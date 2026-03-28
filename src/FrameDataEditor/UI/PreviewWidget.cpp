@@ -142,12 +142,18 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 	auto realTarget = sfmlTarget.getTarget();
 	tgui::Vector2f blank = {50, 100 + this->getSize().y - this->_stageTexture.getSize().y - 150};
 	tgui::Vector2f baseTranslate{100, this->getSize().y - 150};
+	Vector2 rounded = {
+		round(this->_mousePos.x),
+		round(this->_mousePos.y)
+	};
 
 	this->_stageSprite.setPosition(-baseTranslate / this->_scale - this->_translate);
 	this->_stageSprite.setTextureRect({
 		tgui::Vector2i(-blank - this->_translate - (baseTranslate / this->_scale - baseTranslate)),
 		tgui::Vector2i(this->getSize() / this->_scale)
 	});
+
+	auto old = states;
 
 	states.transform.translate(baseTranslate);
 	states.transform.scale({this->_scale, this->_scale});
@@ -209,6 +215,24 @@ void SpiralOfFate::PreviewWidget::draw(tgui::BackendRenderTarget &target, tgui::
 		else if (this->_boxSelected <= data.hBoxes.size() + data.aBoxes.size())
 			this->_drawBoxBorder(modifiedHitBoxes[this->_boxSelected - 1 - data.hBoxes.size()], statesSFML);
 	}
+
+	auto font = tgui::Font::getGlobalFont();
+	auto txt = std::to_string(static_cast<int>(rounded.x)) + "," + std::to_string(static_cast<int>(rounded.y));
+	Vector2f size = {0, font.getFontHeight(16)};
+
+	for (char c : txt)
+		size.x += font.getGlyph(c, 16, false, 1).advance;
+	this->_text.setCharacterSize(16);
+	this->_text.setString(txt);
+	this->_text.setColor(tgui::Color::White);
+	this->_text.setOutlineColor(tgui::Color::Black);
+	this->_text.setOutlineThickness(1);
+	this->_text.setFont(font);
+	this->_text.setPosition({
+		this->getSize().x - size.x - 10,
+		this->getSize().y - size.y - 35
+	});
+	target.drawText(old, this->_text);
 }
 
 void SpiralOfFate::PreviewWidget::_updateBoxSliderHover(const FDE::Rectangle &box, const tgui::Vector2f &pos, tgui::Cursor::Type &cursor)
@@ -495,6 +519,7 @@ void SpiralOfFate::PreviewWidget::mouseMoved(tgui::Vector2f pos)
 	transformedPos.y -= this->getSize().y - 150;
 	transformedPos /= this->_scale;
 	transformedPos -= this->_translate;
+	this->_mousePos = transformedPos;
 	if (this->_translateDragStarted) {
 		// TODO: Hardcoded key
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)) {
@@ -535,6 +560,14 @@ bool SpiralOfFate::PreviewWidget::scrolled(float delta, tgui::Vector2f pos, bool
 			this->_boxCounter = this->_hoveredBoxes.size() - 1;
 		this->_boxHovered = this->_hoveredBoxes[this->_boxCounter];
 	}
+
+	auto transformedPos = pos;
+
+	transformedPos.x -= 100;
+	transformedPos.y -= this->getSize().y - 150;
+	transformedPos /= this->_scale;
+	transformedPos -= this->_translate;
+	this->_mousePos = transformedPos;
 	return Widget::scrolled(delta, pos, touch);
 }
 

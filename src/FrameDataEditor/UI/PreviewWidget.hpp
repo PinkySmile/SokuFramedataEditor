@@ -17,6 +17,7 @@ namespace SpiralOfFate
 
 	class PreviewWidget : public tgui::ClickableWidget {
 	private:
+		mutable tgui::Text _text;
 		sf::Clock _doubleClick;
 		sf::Texture _stageTexture;
 		mutable sf::Sprite _stageSprite;
@@ -27,6 +28,7 @@ namespace SpiralOfFate
 		bool _dragStarted = false;
 		bool _translateDragStarted = false;
 		unsigned char _selectedColor = 0;
+		tgui::Vector2f _mousePos;
 		tgui::Vector2f _lastMousePos;
 		tgui::Vector2f _startMousePos;
 		std::vector<size_t> _hoveredBoxes;

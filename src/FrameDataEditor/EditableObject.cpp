@@ -169,7 +169,7 @@ const FrameData::Sequence &EditableObject::getSequence() const
 	return this->_schema.framedata.at(this->_action).at(this->_actionBlock);
 }
 
-std::vector<FDE::Rectangle> EditableObject::_getModifiedBoxes(const FrameData &data, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const
+std::vector<FDE::Rectangle> EditableObject::_getModifiedBoxes(const FrameData &, const std::vector<ShadyCore::Schema::Sequence::BBox> &boxes) const
 {
 	std::vector<FDE::Rectangle> result;
 	Vector2f real = {0, 0};
