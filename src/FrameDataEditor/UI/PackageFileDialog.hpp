@@ -37,6 +37,7 @@
 #include <TGUI/Config.hpp>
 
 #include <tuple>
+#include <list>
 #include <SFML/Audio.hpp>
 #include <SFML/Audio/SoundSource.hpp>
 #include <TGUI/Widgets/BitmapButton.hpp>

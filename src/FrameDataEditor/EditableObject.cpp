@@ -30,12 +30,14 @@ EditableObject::EditableObject(const std::string &folder, const std::string &fra
 	_folder(folder)
 {
 	this->_schema = FrameData::loadFile(frameData, folder, palette);
+	this->_action = this->_schema.framedata.begin()->first;
 }
 
 EditableObject::EditableObject(const std::string &folder, const std::filesystem::path &frameData, const std::array<Color, 256> *palette) :
 	_folder(folder)
 {
 	this->_schema = FrameData::loadFile(frameData, folder, palette);
+	this->_action = this->_schema.framedata.begin()->first;
 }
 
 void EditableObject::render(sf::RenderTarget &target, sf::RenderStates states)

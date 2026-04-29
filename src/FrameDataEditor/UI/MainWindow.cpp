@@ -3007,11 +3007,29 @@ void SpiralOfFate::MainWindow::newAction()
 	actionClone->onClick([this, actionCloneW, createW, idBoxW] {
 		unsigned current = -1;
 
-		if (actionCloneW.lock()->hasUserData())
-			current = actionCloneW.lock()->getUserData<unsigned>();
-		this->_createMoveListPopup([actionCloneW, createW, idBoxW](unsigned move) {
-			actionCloneW.lock()->setUserData(move);
+		try {
+			if (actionCloneW.lock()->hasUserData())
+				current = actionCloneW.lock()->getUserData<unsigned>();
+		} catch (const std::bad_any_cast &) {}
+		this->_createMoveListPopup([actionCloneW, createW, idBoxW, this](unsigned move) {
+			auto action = actionCloneW.lock();
+			std::string name = this->_localizeActionName(move);
+
+			action->setUserData(move);
 			createW.lock()->setEnabled(!idBoxW.lock()->getText().empty());
+
+			if (name.starts_with('$')) {
+				tgui::Color color{"#" + name.substr(1, 6)};
+
+				name = name.substr(7);
+				action->getRenderer()->setTextColor(color);
+				action->getRenderer()->setTextColorHover(color);
+				action->getRenderer()->setTextColorDisabled(color);
+				action->getRenderer()->setTextColorDown(color);
+				action->getRenderer()->setTextColorFocused(color);
+			} else
+				Utils::setRenderer(action);
+			action->setText(name);
 		}, current, false);
 	});
 	clone->onChange([actionCloneW] (bool v){
