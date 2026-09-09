@@ -1,6 +1,7 @@
 #include <iostream>
 #ifdef __linux__
 #include <pwd.h>
+#include <unistd.h>
 #endif
 #include "LibCore.hpp"
 #include "FrameDataEditor.hpp"

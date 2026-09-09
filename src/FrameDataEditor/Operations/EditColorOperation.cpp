@@ -26,7 +26,7 @@ namespace SpiralOfFate
 
 	void EditColorOperation::apply()
 	{
-		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
+		if (this->_selectedColor == 0 || this->_selectedColor >= 256)
 			return;
 		this->_selectedPalette = this->_oldSelectedPalette;
 		this->_selectedColor = this->_oldSelectedColor;
@@ -36,7 +36,7 @@ namespace SpiralOfFate
 
 	void EditColorOperation::undo()
 	{
-		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
+		if (this->_selectedColor == 0 || this->_selectedColor >= 256)
 			return;
 		this->_selectedPalette = this->_oldSelectedPalette;
 		this->_selectedColor = this->_oldSelectedColor;
@@ -51,7 +51,7 @@ namespace SpiralOfFate
 
 	bool EditColorOperation::hasModification() const
 	{
-		if (this->_selectedColor == 0 || this->_selectedColor >= 251)
+		if (this->_selectedColor == 0 || this->_selectedColor >= 256)
 			return false;
 		return this->_oldValue != this->_newValue;
 	}

@@ -34,5 +34,5 @@ ldd "$OUTPUT/usr/bin/FrameDataEditor" | tail -n +2 | sort | tail -n +2 | cut -d 
 		cat "$line" > "$OUTPUT/usr/lib/$(basename "$line")"
 	fi
 done
-ARCH=x86_64 appimagetool appimage_folder/ th123fde.AppImage
+ARCH=x86_64 appimagetool "$OUTPUT"/ th123fde.AppImage
 rm -rf "$OUTPUT"

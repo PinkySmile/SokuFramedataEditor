@@ -3245,7 +3245,7 @@ void SpiralOfFate::MainWindow::invertColors()
 	auto &pal = this->_palettes[this->_selectedPalette];
 	std::array<Color, 256> palette = pal.colors;
 
-	for (size_t i = 1; i < 251; i++) {
+	for (size_t i = 1; i < 256; i++) {
 		palette[i].r = ~palette[i].r;
 		palette[i].g = ~palette[i].g;
 		palette[i].b = ~palette[i].b;
@@ -3263,12 +3263,7 @@ void SpiralOfFate::MainWindow::reversePalette()
 	std::array<Color, 256> palette;
 
 	palette[0] = pal.colors[0];
-	palette[251] = pal.colors[251];
-	palette[252] = pal.colors[252];
-	palette[253] = pal.colors[253];
-	palette[254] = pal.colors[254];
-	palette[255] = pal.colors[255];
-	for (size_t i = 1; i < 251; i++)
+	for (size_t i = 1; i < 256; i++)
 		palette[i] = pal.colors[255 - i];
 	this->applyOperation(new EditColorsOperation(
 		this->localize("operation.reverse_palette"),
