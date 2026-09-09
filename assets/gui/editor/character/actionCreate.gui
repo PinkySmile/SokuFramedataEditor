@@ -141,3 +141,65 @@ Label.Label1 {
         }
     }
 }
+
+ComboBox.CopyCombo {
+    ChangeItemOnScroll = false;
+    Items = ["action.copy_frame", "action.copy_sequence", "action.copy_action"];
+    ItemsToDisplay = 0;
+    MaximumItems = 0;
+    Position = (120, 40);
+    SelectedItemIndex = 0;
+    Size = (160, 22);
+    TextSize = 13;
+
+    Renderer {
+        ArrowBackgroundColor = #F5F5F5;
+        ArrowBackgroundColorHover = white;
+        ArrowColor = #3C3C3C;
+        ArrowColorHover = black;
+        BackgroundColor = #F5F5F5;
+        BackgroundColorDisabled = #E6E6E6;
+        BorderColor = black;
+        Borders = (1, 1, 1, 1);
+        Padding = (0, 0, 0, 0);
+        TextColor = #3C3C3C;
+        TextColorDisabled = #7D7D7D;
+        TextureArrow = None;
+        TextureArrowDisabled = None;
+        TextureArrowHover = None;
+        TextureBackground = None;
+        TextureBackgroundDisabled = None;
+
+        ListBox {
+            BackgroundColor = #F5F5F5;
+            BackgroundColorHover = white;
+            BorderColor = black;
+            Borders = (1, 1, 1, 1);
+            Padding = (0, 0, 0, 0);
+            SelectedBackgroundColor = #006EFF;
+            SelectedBackgroundColorHover = #1E96FF;
+            SelectedTextColor = white;
+            TextColor = #3C3C3C;
+            TextColorHover = black;
+            TextureBackground = None;
+
+            Scrollbar {
+                ArrowBackgroundColor = #F5F5F5;
+                ArrowBackgroundColorHover = white;
+                ArrowColor = #3C3C3C;
+                ArrowColorHover = black;
+                TextureArrowDown = None;
+                TextureArrowDownHover = None;
+                TextureArrowUp = None;
+                TextureArrowUpHover = None;
+                TextureThumb = None;
+                TextureThumbHover = None;
+                TextureTrack = None;
+                TextureTrackHover = None;
+                ThumbColor = #DCDCDC;
+                ThumbColorHover = #E6E6E6;
+                TrackColor = #F5F5F5;
+            }
+        }
+    }
+}

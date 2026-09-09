@@ -2969,15 +2969,18 @@ void SpiralOfFate::MainWindow::newAction()
 	auto actionClone = window->get<tgui::Button>("ActionClone");
 	auto clone = window->get<tgui::CheckBox>("Clone");
 	auto create = window->get<tgui::Button>("Create");
+	auto copy = window->get<tgui::ComboBox>("CopyCombo");
 	auto actionW = std::weak_ptr(action);
 	auto cloneW = std::weak_ptr(clone);
 	auto actionCloneW = std::weak_ptr(actionClone);
 	auto createW = std::weak_ptr(create);
 	auto idBoxW  = std::weak_ptr(idBox);
 	auto windowW = std::weak_ptr(window);
+	auto copyW = std::weak_ptr(copy);
 
 	window->setTitle(this->localize("message_box.title.create_action"));
 	create->setEnabled(false);
+	copy->setSelectedItemByIndex(0);
 	idBox->onTextChange([createW, actionW, cloneW, actionCloneW, this](const tgui::String &t){
 		if (t.empty()) {
 			actionW.lock()->setText("");
@@ -3032,10 +3035,11 @@ void SpiralOfFate::MainWindow::newAction()
 			action->setText(name);
 		}, current, false);
 	});
-	clone->onChange([actionCloneW] (bool v){
+	clone->onChange([actionCloneW, copyW] (bool v){
 		actionCloneW.lock()->setVisible(v);
+		copyW.lock()->setVisible(!v);
 	});
-	create->onClick([windowW, idBox, cloneW, actionCloneW, this]{
+	create->onClick([windowW, idBox, cloneW, actionCloneW, copy, this]{
 		auto &data = this->_object->getFrameData();
 		auto &seq = this->_object->_schema.framedata[this->_object->_action][this->_object->_actionBlock];
 		auto action = std::stoul(idBox->getText().toStdString());
@@ -3048,7 +3052,7 @@ void SpiralOfFate::MainWindow::newAction()
 			if (cloneW.lock()->isChecked()) {
 				clonedId = actionCloneW.lock()->getUserData<unsigned>();
 				cloned = &this->_object->_schema.framedata[clonedId];
-			} else
+			} else if (copy->getSelectedItemIndex() == 0)
 				sequences.push_back(
 					FrameData::Sequence{
 						.data = { data },
@@ -3057,6 +3061,10 @@ void SpiralOfFate::MainWindow::newAction()
 						.loop = seq.loop
 					}
 				);
+			else if (copy->getSelectedItemIndex() == 1)
+				sequences.emplace_back(seq);
+			else for (auto &s : this->_object->_schema.framedata[this->_object->_action])
+				sequences.emplace_back(s);
 			this->applyOperation(new CreateMoveOperation(
 				*this->_object,
 				this->localize("operation.create_move"),

@@ -45,6 +45,9 @@
 	"message_box.button.confirm":                          "Confirmer",
 
 	"action.clone":                                        "Clone",
+	"action.copy_frame":                                   "Copier pose",
+	"action.copy_sequence":                                "Copier séquence",
+	"action.copy_action":                                  "Copier action",
 	"action.cloned":                                       "Action liée à %1",
 
 	"column.name":                                         "Nom",

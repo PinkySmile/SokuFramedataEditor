@@ -91,10 +91,10 @@ namespace SpiralOfFate
 	{
 		switch (align) {
 		case ALIGN_RIGHT:
-			pos.x += boxSize - this->getTextSize(str);
+			pos.x += boxSize - this->getTextSize(str.toAnsiString());
 			break;
 		case ALIGN_CENTER:
-			pos.x += (boxSize - this->getTextSize(str)) / 2;
+			pos.x += (boxSize - this->getTextSize(str.toAnsiString())) / 2;
 			break;
 		default:
 			break;
